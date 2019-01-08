@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Capítulo 3. DSelect</title>
+    <meta name="generator" content="DocBook XSL Stylesheets V1.79.1"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="home" href="index.html" title="Guia de Utilizador do APT"/>
+    <link rel="up" href="index.html" title="Guia de Utilizador do APT"/>
+    <link rel="prev" href="ch2.html" title="Capítulo 2. apt-get"/>
+    <link rel="next" href="ch4.html" title="Capítulo 4. A Interface"/>
+  </head>
+  <body>
+    <div class="navheader">
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Capítulo 3. DSelect</th>
+        </tr>
+        <tr>
+          <td align="left"><a accesskey="p" href="ch2.html">Anterior</a> </td>
+          <th width="60%" align="center"> </th>
+          <td align="right"> <a accesskey="n" href="ch4.html">Próximo</a></td>
+        </tr>
+      </table>
+      <hr/>
+    </div>
+    <div class="chapter">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h1 class="title"><a id="ch3"/>Capítulo 3. DSelect</h1>
+          </div>
+        </div>
+      </div>
+      <p>
+O método <span class="command"><strong>dselect</strong></span> do APT disponibiliza o sistema APT
+completo com a GUI de selecção de pacotes <span class="command"><strong>dselect</strong></span>. O
+<span class="command"><strong>dselect</strong></span> é usado para seleccionar os pacotes a serem
+instalados ou removidos e o APT instala-os.
+</p>
+      <p>
+Para activar o método APT você precisa de seleccionar [A]ccess no
+<span class="command"><strong>dselect</strong></span> e depois escolher o método APT. Ser-lhe-à
+perguntado por um conjunto de <span class="emphasis"><em>Sources</em></span> que são os
+lugares de onde obter os arquivos. Estes podem ser sites remotos da
+Internet, mirrors Debian locais ou CD-ROMs. Cada source pode disponibilizar
+um fragmento do arquivo Debian total. O APT irá automaticamente combiná-los
+para formar um conjunto completo de pacotes. Se tem um CD-ROM, então é boa
+ideia especificá-lo em primeiro lugar e depois especificar um mirror para
+ter acesso às correcções de bugs mais recentes. O APT irá automaticamente
+usar os pacotes no seu CD-ROM antes de descarregar da Internet.
+</p>
+      <pre class="screen">
+   Configurar uma lista de localizações fonte da distribuição
+
+ Por favor forneça o URL base da distribuição Debian.
+ Os esquemas de acesso que conheço são: http file
+
+ Por exemplo:
+      file:/mnt/debian,
+      ftp://ftp.debian.org/debian,
+      http://ftp.de.debian.org/debian,
+
+
+ URL [http://llug.sep.bnl.gov/debian]:
+</pre>
+      <p>
+A configuração de <span class="emphasis"><em>Sources</em></span> começa por perguntar pela
+base do arquivo Debian, usando por predefinição um mirror HTTP. Depois
+pergunta qual a distribuição a obter.
+</p>
+      <pre class="screen">
+ Por favor forneça a etiqueta da distribuição a obter ou um caminho para o
+ ficheiro package terminando com um /. As etiquetas da
+ distribuição são tipicamente algo como: stable unstable testing non-US
+
+ Distribution [stable]:
+</pre>
+      <p>
+A distribuição refere-se à versão Debian no arquivo,
+<span class="emphasis"><em>stable</em></span> refere-se à última versão lançada e
+<span class="emphasis"><em>unstable</em></span> refere-se à versão de
+desenvolvimento. <span class="emphasis"><em>non-US</em></span> apenas está disponível em
+alguns mirrors e refere-se a pacotes que contém tecnologia de encriptação ou
+outras coisas que não podem ser exportadas dos Estados Unidos. No entanto
+importar estes pacotes para os US é legal.
+</p>
+      <pre class="screen">
+ Por favor forneça os componentes a obter
+ Tipicamente os componentes são algo como: main contrib non-free
+
+ Componentes [main contrib non-free]:
+</pre>
+      <p>
+A lista de componentes refere-se à lista das sub-distribuições a obter. A
+distribuição é dividida baseando-se nas licenças do software, sendo main
+pacotes livres DFSG enquanto contrib e non-free contêm coisas que têm várias
+restrições colocadas no seu uso e distribuição.
+</p>
+      <p>
+Pode ser adicionado qualquer número de fontes, o script de configuração irá
+continuar a perguntar-lhe até que tenha especificado todas as que deseja.
+</p>
+      <p>
+Antes de começar a usar o <span class="command"><strong>dselect</strong></span> é necessário actualizar
+a lista disponível ao seleccionar [U]pdate no menu. Isto é um super-conjunto
+do <code class="literal">apt-get update</code> que torna a informação obtida
+disponível ao <span class="command"><strong>dselect</strong></span>. Deve ser executado o [U]pdate
+mesmo que tenha sido feito <code class="literal">apt-get update</code> antes.
+</p>
+      <p>
+Você pode depois fazer as suas selecções usando [S]elect e depois executar a
+instalação usando [I]nstall. Quando se usa o método APT os comandos [C]onfig
+e [R]emove não fazem sentido, o comando [I]nstall executa ambos juntamente.
+</p>
+      <p>
+Por predefinição o APT irá automaticamente remover o ficheiro de pacote
+(.deb) assim que ele tenha sido instalado com sucesso. Para alterar este
+comportamento coloque <code class="literal">Dselect::clean "prompt";</code> em
+/etc/apt/apt.conf.
+</p>
+    </div>
+    <div class="navfooter">
+      <hr/>
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td align="left"><a accesskey="p" href="ch2.html">Anterior</a> </td>
+          <td align="center"> </td>
+          <td align="right"> <a accesskey="n" href="ch4.html">Próximo</a></td>
+        </tr>
+        <tr>
+          <td align="left" valign="top">Capítulo 2. apt-get </td>
+          <td align="center">
+            <a accesskey="h" href="index.html">Início</a>
+          </td>
+          <td align="right" valign="top"> Capítulo 4. A Interface</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

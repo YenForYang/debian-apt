@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+  "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % aptent SYSTEM "apt.ent"> %aptent;
+<!ENTITY % aptverbatiment SYSTEM "apt-verbatim.ent"> %aptverbatiment;
+<!ENTITY % aptvendor SYSTEM "apt-vendor.ent"> %aptvendor;
+]>
+
+<refentry>
+ <refentryinfo>
+   <!-- The last update date -->
+&apt-author.jgunthorpe;
+   &apt-author.team;
+   &apt-email;
+   &apt-product;
+   
+   <date>2016-11-22T00:00:00Z</date>
+ </refentryinfo>
+
+ <refmeta>
+   <refentrytitle>apt-key</refentrytitle>
+   <manvolnum>8</manvolnum>
+   <refmiscinfo class="manual">APT</refmiscinfo>
+ </refmeta>
+ 
+ 
+ <!-- Man page title -->
+<refnamediv>
+    <refname>apt-key</refname>
+    <refpurpose>Hulpprogramma voor het beheer van de sleutels van APT</refpurpose>
+ </refnamediv>
+
+ &synopsis-command-apt-key;
+
+ <refsect1><title>Omschrijving</title>
+   <para>
+   <command>apt-key</command> wordt gebruikt om de lijst van sleutels te
+beheren die door apt gebruikt worden om pakketten te
+authenticeren. Pakketten die met deze sleutels geauthenticeerd werden,
+worden als betrouwbaar beschouwd.
+   </para>
+   <para>
+   Merk op dat als het gebruik van het commando <command>apt-key</command>
+gewenst is, dan ook de installatie van de GNU Privacy Guard suite (verpakt
+in het pakket <package>gnupg</package>) vereist is. Enkel omwille daarvan al
+wordt het gebruik ervan in programma's (zeker in scripts voor
+pakketonderhoud) sterk afgeraden. Daarenboven wordt de indeling van de
+uitvoer van alle commando's onvoorspelbaar en kan die wijzigen telkens
+wanneer de achterliggende commando's wijzigen. <command>apt-key</command>
+zal een dergelijk gebruik trachten te detecteren en geeft in dergelijke
+gevallen waarschuwingen op de standaard foutuitvoer.
+   </para>
+</refsect1>
+
+<refsect1><title>Ondersteunde sleutelbosbestanden</title>
+<para>apt-key ondersteunt enkel de binaire indeling van OpenPGP (ook gekend als
+"GPG key public ring") bij bestanden met de extensie
+"<literal>gpg</literal>" en niet de database-indeling keybox (sleutelkistje)
+die in recentere &gpg;-versies als standaard gebruikt wordt voor
+sleutelbosbestanden. Binaire sleutelbosbestanden die met om het even welke
+versie van apt gebruikt moeten kunnen worden, moeten daarom steeds
+aangemaakt worden met het commando <command>gpg --export</command>.
+</para>
+<para>In het andere geval, als op alle systemen die de aangemaakte sleutelbos
+moeten gebruiken, minstens een versie van apt >= 1.4 geïnstalleerd is, kunt
+u wel de ASCII-armor indeling met de extensie "<literal>asc</literal>"
+gebruiken die met het commando <command>gpg --armor --export</command>
+gecreëerd kan worden.
+</para>
+</refsect1>
+
+<refsect1><title>Commando's</title>
+   <variablelist>
+     <varlistentry><term><option>add</option> <option>&synopsis-param-filename;</option></term>
+     <listitem>
+     <para>
+       Een nieuwe sleutel toevoegen aan de lijst van betrouwbare sleutels. De
+sleutel wordt gelezen uit het bestand waarvan de naam met de parameter
+&synopsis-param-filename; opgegeven werd of uit de standaardinvoer als de
+bestandsnaam <literal>-</literal> is.
+     </para>
+     <para>
+     Het is van cruciaal belang dat bij sleutels die handmatig toegevoegd worden
+via <command>apt-key</command>, geverifieerd wordt of de bewering dat ze
+toebehoren aan de eigenaar van de pakketbronnen, wel degelijk met de
+werkelijkheid overeenkomt, anders wordt de &apt-secure;-infrastructuur
+volledig ondermijnd.
+     </para>
+     <para>
+       <emphasis>Opmerking</emphasis>: In plaats van dit commando te gebruiken zou
+u een sleutelbos rechtstreeks in de map
+<filename>/etc/apt/trusted.gpg.d/</filename> moeten plaatsen met een
+descriptieve naam en ofwel "<literal>gpg</literal>" of
+"<literal>asc</literal>" als bestandsextensie.
+     </para>
+     </listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>del</option> <option>&synopsis-param-keyid;</option></term>
+     <listitem>
+     <para>
+
+       Een sleutel verwijderen uit de lijst van betrouwbare sleutels.
+
+     </para>
+
+     </listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>export</option> <option>&synopsis-param-keyid;</option></term>
+     <listitem>
+     <para>
+
+        De sleutel &synopsis-param-keyid; via de standaarduitvoer weergeven.
+
+     </para>
+
+     </listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>exportall</option></term>
+     <listitem>
+     <para>
+
+        Alle betrouwbare sleutels op de standaarduitvoer weergeven.
+
+     </para>
+
+     </listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>list</option>, <option>finger</option></term>
+     <listitem>
+     <para>
+
+       Som betrouwbare sleutels op met hun vingerafdruk.
+
+     </para>
+
+     </listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>adv</option></term>
+     <listitem>
+     <para>
+     Geef geavanceerde opties mee met gpg. Met <command>adv --recv-key</command>
+kunt u bijvoorbeeld een sleutel rechtstreeks van een sleutelserver naar de
+set van betrouwbare sleutels downloaden. Merk op dat er
+<emphasis>geen</emphasis> controles uitgevoerd worden. Daarom kan dit
+gemakkelijk de &apt-secure;-infrastructuur volledig ondermijnen als het
+onzorgvuldig gebruikt wordt.
+     </para>
+
+     </listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>update</option> (verouderd)</term>
+     <listitem>
+     <para>
+       De lokale sleutelbos bijwerken met de sleutelbos van het archief en de
+archiefsleutels die niet langer geldig zijn verwijderen uit de lokale
+sleutelbos. De sleutelbos van het archief bevindt zich in het pakket
+<literal>archive-keyring</literal> van uw distributie, bijvoorbeeld het
+pakket &keyring-package; in &keyring-distro;.
+     </para>
+     <para>
+       Merk op dat een distributie dit commando niet langer hoeft en ook niet zou
+mogen gebruiken. In plaats daarvan moeten rechtstreeks sleutelbosbestanden
+meegeleverd worden in de map
+<filename>/etc/apt/trusted.gpg.d/</filename>. Dit voorkomt dat het pakket
+<package>gnupg</package> een vereiste is, en zowel voor pakketonderhouders
+als voor gebruikers is het makkelijker om sleutels te beheren door
+eenvoudigweg bestanden toe te voegen of te verwijderen.
+     </para>
+     </listitem>
+     </varlistentry>
+     
+     <varlistentry><term><option>net-update</option></term>
+     <listitem>
+     <para>
+
+       Een bijwerking uitvoeren zoals hiervoor met het commando
+<command>update</command>, maar in plaats daarvan de sleutelbos van het
+archief ophalen vanaf een URI en die valideren tegenover een
+hoofdsleutel. Dit veronderstelt dat &wget; geïnstalleerd is en vereist een
+versie van APT die gebouwd werd met de nodige instellingen om de sleutel van
+een server te kunnen ophalen en een hoofdsleutelbos om de validering te
+kunnen uitvoeren. APT in Debian ondersteunt dit commando niet en steunt in
+de plaats daarvan op <command>update</command>, maar APT in Ubuntu wel.
+
+     </para>
+
+     </listitem>
+     </varlistentry>
+   </variablelist>
+</refsect1>
+
+ <refsect1><title>Opties</title>
+<para>Merk op dat opties opgegeven moeten worden voor de commando's die in de
+vorige sectie behandeld werden.</para>
+   <variablelist>
+      <varlistentry><term><option>--keyring</option> <option>&synopsis-param-filename;</option></term>
+      <listitem><para>Met deze optie kunt u een specifiek sleutelbosbestand opgeven waarmee het
+commando moet werken. Standaard wordt een commando uitgevoerd op het bestand
+<filename>trusted.gpg</filename> en op alle onderdelen uit de map
+<filename>trusted.gpg.d</filename>, hoewel <filename>trusted.gpg</filename>
+de primaire sleutelbos is, wat betekent dat bijvoorbeeld alle nieuwe
+sleutels daar toegevoegd worden.
+      </para></listitem>
+      </varlistentry>
+   </variablelist>
+ </refsect1>
+
+ <refsect1><title>Bestanden</title>
+   <variablelist>
+
+     &file-trustedgpg;
+
+   </variablelist>
+
+</refsect1>
+
+<refsect1><title>Zie ook</title>
+<para>
+&apt-get;, &apt-secure;
+</para>
+</refsect1>
+
+ &manbugs;
+ &manauthor;
+
+ <refsect1><title>&translation-title;</title>
+   <para>&translation-holder;</para>
+   <para>&translation-english;</para>
+ </refsect1>
+</refentry>
+

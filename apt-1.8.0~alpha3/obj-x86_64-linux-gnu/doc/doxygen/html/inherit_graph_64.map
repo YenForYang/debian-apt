@@ -1,0 +1,8 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" href="$classpkgCache_1_1Namespace.xhtml" title="pkgCache::Namespace" alt="" coords="5,56,176,83"/>
+<area shape="rect" id="node2" href="$classpkgDepCache.xhtml" title="pkgDepCache" alt="" coords="246,5,358,32"/>
+<area shape="rect" id="node3" href="$classpkgOrderList.xhtml" title="pkgOrderList" alt="" coords="249,56,355,83"/>
+<area shape="rect" id="node4" href="$classpkgPackageManager.xhtml" title="pkgPackageManager" alt="" coords="224,107,380,133"/>
+<area shape="rect" id="node5" href="$classpkgDPkgPM.xhtml" title="pkgDPkgPM" alt="" coords="431,81,529,108"/>
+<area shape="rect" id="node6" href="$classpkgSimulate.xhtml" title="pkgSimulate" alt="" coords="428,132,532,159"/>
+</map>

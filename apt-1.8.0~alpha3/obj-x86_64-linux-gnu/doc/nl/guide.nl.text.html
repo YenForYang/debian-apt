@@ -1,0 +1,463 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>Gebruikershandleiding voor APT</title><meta name="generator" content="DocBook XSL Stylesheets V1.79.1"/><meta name="description" content="Dit document geeft een overzicht van het gebruik van de pakketmanager APT."/></head><body><div xml:lang="nl" class="book"><div class="titlepage"><div><div><br xmlns=""/><center xmlns=""><h1 xmlns="http://www.w3.org/1999/xhtml" class="title"><a id="idm1"/>Gebruikershandleiding voor APT</h1></center><br xmlns=""/><hr xmlns=""/></div><div><div class="authorgroup"><center xmlns=""><div xmlns="http://www.w3.org/1999/xhtml" class="author"><h3 class="author">Jason Gunthorpe</h3><code class="email">&lt;<a class="email" href="mailto:jgg@debian.org">jgg@debian.org</a>&gt;</code></div></center></div></div><div><center xmlns=""><p xmlns="http://www.w3.org/1999/xhtml" class="releaseinfo">Versie 1.8.0~alpha3</p></center><hr xmlns=""/></div><div><p class="copyright">Copyright © 1998 Jason Gunthorpe</p></div><div><div class="legalnotice"><a id="idm14"/><p class="legalnotice-title"><strong>Toelichting bij de licentie</strong></p><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+"APT" en dit document zijn vrije software. U kunt ze verspreiden en/of ze
+aanpassen overeenkomstig de bepalingen van de GNU General Public License,
+versie 2 of (volgens uw keuze) iedere latere versie, zoals die door de Free
+Software Foundation gepubliceerd werd. 
+</p></td></tr></table></para></div></div><div><div class="legalnotice"><a id="idm17"/><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+Meer details en de volledige licentie vindt u op Debian-systemen in het
+bestand /usr/share/common-licenses/GPL.
+</p></td></tr></table></para></div></div><div><div class="abstract"><p class="title"><strong>Samenvatting</strong></p><p>
+Dit document geeft een overzicht van het gebruik van de pakketmanager APT.
+</p></div></div></div><hr/></div><div class="toc"><p><strong>Inhoudsopgave</strong></p><dl class="toc"><dt><span class="chapter"><a href="#ch1">1. Algemeen</a></span></dt><dd><dl><dt><span class="section"><a href="#s1.1">1.1. Anatomie van het pakketsysteem</a></span></dt></dl></dd><dt><span class="chapter"><a href="#ch2">2. apt-get</a></span></dt><dt><span class="chapter"><a href="#ch3">3. DSelect</a></span></dt><dt><span class="chapter"><a href="#ch4">4. De interface</a></span></dt><dd><dl><dt><span class="section"><a href="#s4.1">4.1. Opstarten</a></span></dt><dt><span class="section"><a href="#s4.2">4.2. Het statusrapport</a></span></dt><dd><dl><dt><span class="section"><a href="#s4.2.1">4.2.1. De lijst met extra pakketten</a></span></dt><dt><span class="section"><a href="#s4.2.2">4.2.2. De te verwijderen pakketten</a></span></dt><dt><span class="section"><a href="#s4.2.3">4.2.3. De lijst nieuw te installeren pakketten</a></span></dt><dt><span class="section"><a href="#s4.2.4">4.2.4. De lijst van tegengehouden pakketten</a></span></dt><dt><span class="section"><a href="#s4.2.5">4.2.5. Waarschuwing over tegengehouden pakketten</a></span></dt><dt><span class="section"><a href="#s4.2.6">4.2.6. Afsluitende samenvatting</a></span></dt></dl></dd><dt><span class="section"><a href="#s4.3">4.3. De statusweergave</a></span></dt><dt><span class="section"><a href="#s4.4">4.4. Dpkg</a></span></dt></dl></dd></dl></div><div class="chapter"><div class="titlepage"><div><div><h1 class="title"><a id="ch1"/>Hoofdstuk 1. Algemeen</h1></div></div></div><div class="toc"><p><strong>Inhoudsopgave</strong></p><dl class="toc"><dt><span class="section"><a href="#s1.1">1.1. Anatomie van het pakketsysteem</a></span></dt></dl></div><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+Momenteel bevat het APT-pakket twee secties, de
+<span class="command"><strong>dselect</strong></span>-methode van APT en het commandoregelprogramma
+<span class="command"><strong>apt-get</strong></span>. Beide bieden een manier om pakketten te
+installeren en te verwijderen en nieuwe pakketten via het internet op te
+halen.
+</p></td></tr></table></para><div class="section"><div class="titlepage"><div><div><h2 class="title"><a id="s1.1"/>1.1. Anatomie van het pakketsysteem</h2></div></div></div><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+Het pakketsysteem van Debian maakt gebruik van een grote hoeveelheid aan
+informatie over elk pakket om te helpen verzekeren dat het eenvoudig en
+netjes in het systeem ingepast kan worden. Het meest prominente aspect van
+zijn functionaliteit is het vereistensysteem.
+</p></td></tr></table></para><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+Het vereistensysteem laat individuele programma's toe om gebruik te maken
+van gemeenschappelijke elementen uit het systeem, zoals bibliotheken. Het
+vereenvoudigt het onderbrengen van weinig gebruikte aspecten van een
+programma in aparte pakketten om het aantal zaken dat een gewone gebruiker
+moet installeren, te beperken. Het laat ook toe te kiezen uit verschillende
+mailservers (mail transport agents), X-servers, enz.
+</p></td></tr></table></para><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+Een eerste stap in het begrijpen van het vereistensysteem is het concept van
+een eenvoudige vereiste vatten. Een eenvoudige vereiste houdt in dat een
+pakket om behoorlijk te kunnen functioneren, vereist dat een ander pakket
+gelijktijdig geïnstalleerd wordt.
+</p></td></tr></table></para><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+Bijvoorbeeld, mailcrypt is een emacs-uitbreiding die helpt bij het
+versleutelen van e-mail met GPG. Zonder dat GPG geïnstalleerd is, is
+mailcrypt nutteloos. Dus is mailcrypt afhankelijk van GPG (en is GPG een
+vereiste voor mailcrypt). Omdat mailcrypt een uitbreiding van emacs is, is
+het bovendien ook daarvan afhankelijk. Zonder emacs is het gewoon
+onbruikbaar.
+</p></td></tr></table></para><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+Een andere belangrijke afhankelijkheid die u goed moet begrijpen is een
+conflicterende afhankelijkheid. Dit houdt in dat een pakket, mocht het
+tegelijk met een ander pakket geïnstalleerd zijn, niet zal werken en
+misschien zelfs heel schadelijk voor het systeem kan zijn. Neem bijvoorbeeld
+een mail transport agent (mailserver) zoals sendmail, exim of qmail. Het is
+niet mogelijk om er twee van te installeren, omdat ze allemaal op het
+netwerk moeten luisteren om mail te ontvangen. Mocht men er toch twee
+proberen te installeren, dan zou het systeem ernstig beschadigd raken en om
+die reden hebben alle mail transport agents een conflictafhankelijkheid
+tegenover alle andere mail transport agents.
+</p></td></tr></table></para><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+Een bijkomende complicatie is dat de mogelijkheid bestaat dat een pakket
+zich als een ander pakket voordoet. Bedenk dat exim en sendmail voor vele
+doeleinden identiek zijn: allebei bezorgen ze e-mail en allebei kunnen ze
+overweg met een gemeenschappelijke interface. Daarom voorziet het
+pakketsysteem voor hen in de mogelijkheid om te verklaren dat ze allebei
+mail-transport-agents zijn. Dus verklaren exim en sendmail allebei dat ze
+een mail-transport-agent aanbieden. En andere pakketten die een mail
+transport agent nodig hebben, hebben mail-transport-agent als vereiste. Bij
+het manueel proberen repareren van pakketten kan dit tot heel wat verwarring
+leiden.
+</p></td></tr></table></para><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+Aan een eenvoudige vereiste kan op elk moment al dan niet voldaan worden
+door pakketten die reeds geïnstalleerd zijn. APT probeert te helpen bij het
+oplossen van vereistenproblemen door een aantal automatische algoritmes aan
+te bieden die helpen bij het selecteren van te installeren pakketten.
+</p></td></tr></table></para></div></div><div class="chapter"><div class="titlepage"><div><div><h1 class="title"><a id="ch2"/>Hoofdstuk 2. apt-get</h1></div></div></div><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+<span class="command"><strong>apt-get</strong></span> biedt een eenvoudige manier om aan de
+commandoregel pakketten te installeren. Anders dan <span class="command"><strong>dpkg</strong></span>
+beheerst <span class="command"><strong>apt-get</strong></span> niet het behandelen van
+.deb-bestanden. Het werkt met de eigenlijke naam van het pakket en kan enkel
+.deb-archieven installeren vanuit een <span class="emphasis"><em>Source</em></span>
+(pakketbron).
+</p></td></tr></table></para><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+Het eerste <a href="#ftn.idm41" class="footnote" id="idm41"><sup class="footnote">[1]</sup></a> wat men moet doen vooraleer
+<span class="command"><strong>apt-get</strong></span> te gebruiken, is de pakketlijst ophalen uit de
+<span class="emphasis"><em>Sources</em></span> (pakketbronnen), zodat het op de hoogte is van
+de beschikbare pakketten. Dit doet men met <code class="literal">apt-get
+update</code>. Bijvoorbeeld:
+</p></td></tr></table></para><screen xmlns=""><table><tr><td>   </td><td><pre xmlns="http://www.w3.org/1999/xhtml" class="screen">
+# apt-get update
+Ophalen van http://ftp.de.debian.org/debian-non-US/ stable/binary-i386/ Packages
+Ophalen van http://llug.sep.bnl.gov/debian/ testing/contrib Packages
+Pakketlijsten worden ingelezen... Klaar
+Boom van vereisten wordt opgebouwd... Klaar
+</pre></td></tr></table></screen><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+Na het bijwerken van de pakketlijst kunnen verschillende commando's gebruikt
+worden.
+</p></td></tr></table></para><variablelist xmlns=""><table><tr><td>   </td><td><div xmlns="http://www.w3.org/1999/xhtml" class="variablelist"><dl class="variablelist"><dt><span class="term">upgrade</span></dt><dd><p>
+Upgrade zal proberen om op een gematigde manier het hele systeem bij te
+werken. Upgrade zal nooit een nieuw pakket installeren of een bestaand
+pakket verwijderen en het zal ook nooit een pakket bijwerken dat een ander
+pakket onbruikbaar zou kunnen maken. Dit commando kan dagelijks gebruikt
+worden om het systeem veilig bij te werken. Upgrade zal alle pakketten die
+het niet kon bijwerken vermelden. Gewoonlijk betekent dit dat zij
+afhankelijk zijn van nieuwe pakketten of conflicteren met een ander
+pakket. Men kan <span class="command"><strong>dselect</strong></span> of <code class="literal">apt-get
+install</code> gebruiken om de installatie van deze pakketten af te
+dwingen.
+</p></dd><dt><span class="term">install</span></dt><dd><p>
+Install wordt gebruikt om bij naam genoemde pakketten te installeren. Het
+pakket wordt automatisch opgehaald en geïnstalleerd. Dit kan nuttig zijn als
+u reeds de naam van het te installeren pakket kent en geen GUI wenst te
+gebruiken om het te kiezen. Gelijk welk aantal pakketten kan voor
+installatie opgegeven worden. Ze zullen allemaal opgehaald worden. Install
+zal automatisch proberen om een oplossing te vinden voor de
+vereistenproblemen die zich met de opgegeven pakketten stellen, het zal er
+een samenvatting van weergeven en om bevestiging vragen indien er nog andere
+wijzigingen door te voeren zijn dan de opgegeven argumenten.
+</p></dd><dt><span class="term">dist-upgrade</span></dt><dd><p>
+Dist-upgrade voert een volledige opwaardering uit en is ontworpen om de
+opwaardering tussen verschillende uitgaves van Debian te
+vergemakkelijken. Het maakt gebruik van een gesofisticeerd algoritme om de
+beste combinatie van pakketten te vinden die geïnstalleerd, opgewaardeerd en
+verwijderd moeten worden om op die manier een zo groot mogelijk deel van het
+systeem op het niveau van de meest recente uitgave te krijgen. In sommige
+omstandigheden kan het aangewezen zijn dist-upgrade te gebruiken in plaats
+van zelf tijd te investeren in het manueel oplossen in
+<span class="command"><strong>dselect</strong></span> van vereistenproblemen. Nadat dist-upgrade zijn
+operatie beëindigd heeft, kan men dan <span class="command"><strong>dselect</strong></span> gebruiken
+om eventuele pakketten die achterwege gelaten werden, te installeren.
+</p><p>
+Het is van belang om van nabij te onderzoeken wat dist-upgrade van plan is
+te doen. Zijn keuzes kunnen soms redelijk verrassend zijn.
+</p></dd></dl></div></td></tr></table></variablelist><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+Er kunnen met <span class="command"><strong>apt-get</strong></span> verschillende commandoregelopties
+gebruikt worden die beschreven worden in de man-pagina
+<span class="citerefentry"><span class="refentrytitle">apt-get</span>(8)</span>.
+De meest bruikbare optie is <code class="literal">-d</code> dat de opgehaalde
+bestanden niet installeert. Indien het systeem een groot aantal pakketten
+moet downloaden en er zou iets fout gegaan zijn, dan zou het onwenselijk
+zijn dat er met hun installatie begonnen wordt. Als de optie
+<code class="literal">-d</code> gebruikt werd, kan men de opgehaalde archieven
+beginnen installeren door gewoon het commando waarmee men ze opgehaald heeft
+opnieuw uit te voeren, maar dan zonder de optie <code class="literal">-d</code>.
+</p></td></tr></table></para><div class="footnotes"><br/><hr/><div id="ftn.idm41" class="footnote"><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml"><a href="#idm41" class="para"><sup class="para">[1] </sup></a> Indien u van een http proxy-server gebruik maakt, moet u eerst de
+omgevingsvariabele http_proxy instellen; zie sources.list(5) </p></td></tr></table></para></div></div></div><div class="chapter"><div class="titlepage"><div><div><h1 class="title"><a id="ch3"/>Hoofdstuk 3. DSelect</h1></div></div></div><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+De APT-methode <span class="command"><strong>dselect</strong></span> stelt aan het volledige APT
+systeem het GUI <span class="command"><strong>dselect</strong></span> ter beschikking voor de selectie
+van pakketten. <span class="command"><strong>dselect</strong></span> wordt gebruikt om de te
+installeren of te verwijderen pakketten te selecteren en APT voert de
+eigenlijke operatie uit.
+</p></td></tr></table></para><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+Om de APT-methode te activeren moet u in <span class="command"><strong>dselect</strong></span>
+[T]oegang ([A]ccess) selecteren en dan voor de APT-methode kiezen. Er wordt
+dan om een stel <span class="emphasis"><em>Sources</em></span> (pakketbronnen) gevraagd. Dat
+zijn plaatsen waarvandaan archieven opgehaald kunnen worden. Dat kunnen
+externe internetsites zijn, lokale spiegelservers van Debian of CD's. Elke
+bron kan een fragment van het volledige archief van Debian aanbieden en APT
+zal ze automatisch combineren om een volledige set van pakketten samen te
+stellen. Indien u een CD gebruikt is het goed om die eerst te vermelden en
+daarna een spiegelserver waardoor u ook toegang krijgt tot de meest recente
+reparaties van bugs. APT zal automatisch eerst de pakketten van uw CD
+gebruiken vooraleer pakketten van het internet te downloaden.
+</p></td></tr></table></para><screen xmlns=""><table><tr><td>   </td><td><pre xmlns="http://www.w3.org/1999/xhtml" class="screen">
+   Een lijst van locaties met pakketbronnen voor de distributie instellen
+
+ Voer het basis-URL van de debian distributie in.
+ Toegangsmethodes waarmee ik kan werken zijn: http file
+
+ Bijvoorbeeld:
+      file:/mnt/debian,
+      ftp://ftp.debian.org/debian,
+      http://ftp.de.debian.org/debian,
+
+
+ URL [http://llug.sep.bnl.gov/debian]:
+</pre></td></tr></table></screen><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+Het instellen van de <span class="emphasis"><em>Sources</em></span> (pakketbronnen) begint met
+een vraag naar de basis van het Debian archief, wat standaard een
+HTTP-spiegelserver is. Nadien wordt gevraagd welke distributie opgehaald
+moet worden.
+</p></td></tr></table></para><screen xmlns=""><table><tr><td>   </td><td><pre xmlns="http://www.w3.org/1999/xhtml" class="screen">
+ Voer het label van de op te halen distributie in of een pad
+ naar het pakketbestand dat eindig op een /. Een label van een
+ distributie is typisch iets in de zin van : stable unstable testing non-US
+
+ Distributie [stable]:
+</pre></td></tr></table></screen><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+De distributie verwijst naar de versie van Debian in het
+archief. <span class="emphasis"><em>stable</em></span> verwijst naar de recentste uitgebrachte
+versie en <span class="emphasis"><em>unstable</em></span> verwijst naar de versie die
+ontwikkeld wordt. <span class="emphasis"><em>non-US</em></span> is enkel op sommige
+spiegelservers beschikbaar en verwijst naar pakketten die
+encryptietechnologie gebruiken of andere zaken waarvan de uitvoer uit de
+Verenigde Staten niet toegelaten is. Deze pakketten invoeren in de Verenigde
+Staten is echter wel legaal.
+</p></td></tr></table></para><screen xmlns=""><table><tr><td>   </td><td><pre xmlns="http://www.w3.org/1999/xhtml" class="screen">
+ Voer de op te halen componenten in
+ Componenten zijn typisch iets zoals: main contrib non-free
+
+ Componenten [main contrib non-free]:
+</pre></td></tr></table></screen><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+De lijst met componenten verwijst naar een lijst van sub-distributies die
+opgehaald moeten worden. De distributie is onderverdeeld op basis van
+softwarelicenties. Daarbij bevat main pakketten die vrij zijn volgens de
+DFSG (vrije software richtlijnen van Debian), terwijl pakketten in contrib
+en non-free zaken bevatten met restricties op het vlak van gebruik of
+verspreiding.
+</p></td></tr></table></para><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+Gelijk welk aantal pakketbronnen kan opgegeven worden. Het script dat het
+instellen ervan begeleidt, zal vragen blijven stellen totdat u alles wat u
+wenste ingegeven hebt.
+</p></td></tr></table></para><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+Vooraleer met het gebruik van <span class="command"><strong>dselect</strong></span> te beginnen moet u
+de lijst van beschikbare pakketten bijwerken door in het menu te kiezen voor
+[B]ijwerken ([U]pdate). Dit is een uitbreiding van <code class="literal">apt-get
+update</code> die de opgehaalde informatie aan <span class="command"><strong>dselect</strong></span>
+doorgeeft. [B]ijwerken ([U]pdate) moet uitgevoerd worden, zelfs indien
+voordien <code class="literal">apt-get update</code> uitgevoerd werd.
+</p></td></tr></table></para><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+U kunt dan voortdoen en uw selectie maken met [S]electeer ([S]elect) en
+vervolgens de installatie uitvoeren met [I]nstalleren ([I]nstall). Indien u
+de APT-methode gebruikt zijn de commando's [C]onfigureer ([C]onfig) en
+[V]erwijder ([R]emove) overbodig. Het commando [I]nstalleren ([I]nstall)
+voert ze allemaal samen uit.
+</p></td></tr></table></para><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+Standaard verwijdert APT automatisch de opgehaalde pakketbestanden (.deb)
+nadat ze succesvol geïnstalleerd werden. Om dit gedrag aan te passen moet u
+<code class="literal">Dselect::clean "prompt";</code> plaatsen in /etc/apt/apt.conf.
+</p></td></tr></table></para></div><div class="chapter"><div class="titlepage"><div><div><h1 class="title"><a id="ch4"/>Hoofdstuk 4. De interface</h1></div></div></div><div class="toc"><p><strong>Inhoudsopgave</strong></p><dl class="toc"><dt><span class="section"><a href="#s4.1">4.1. Opstarten</a></span></dt><dt><span class="section"><a href="#s4.2">4.2. Het statusrapport</a></span></dt><dd><dl><dt><span class="section"><a href="#s4.2.1">4.2.1. De lijst met extra pakketten</a></span></dt><dt><span class="section"><a href="#s4.2.2">4.2.2. De te verwijderen pakketten</a></span></dt><dt><span class="section"><a href="#s4.2.3">4.2.3. De lijst nieuw te installeren pakketten</a></span></dt><dt><span class="section"><a href="#s4.2.4">4.2.4. De lijst van tegengehouden pakketten</a></span></dt><dt><span class="section"><a href="#s4.2.5">4.2.5. Waarschuwing over tegengehouden pakketten</a></span></dt><dt><span class="section"><a href="#s4.2.6">4.2.6. Afsluitende samenvatting</a></span></dt></dl></dd><dt><span class="section"><a href="#s4.3">4.3. De statusweergave</a></span></dt><dt><span class="section"><a href="#s4.4">4.4. Dpkg</a></span></dt></dl></div><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+Zowel de <span class="command"><strong>dselect</strong></span>-methode van APT als
+<span class="command"><strong>apt-get</strong></span> maken gebruik van dezelfde interface. Het is een
+eenvoudig systeem dat u in het algemeen zegt wat het van plan is te doen en
+dan voor de uitvoering ervan gaat. <a href="#ftn.idm107" class="footnote" id="idm107"><sup class="footnote">[2]</sup></a>
+Nadat het een samenvatting gegeven heeft van wat er zal gebeuren, zal APT
+een aantal informatieve statusberichten weergeven, waardoor u kunt
+inschatten hoe ver het gevorderd is en hoeveel werk er nog te verrichten is.
+</p></td></tr></table></para><div class="section"><div class="titlepage"><div><div><h2 class="title"><a id="s4.1"/>4.1. Opstarten</h2></div></div></div><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+Alvorens met een operatie te beginnen, behalve bij update, voert APT een
+aantal acties uit om zijn interne status klaar te maken. Het voert ook een
+aantal controles uit op de status van het systeem. Op om het even welk
+moment kunnen deze operaties uitgevoerd worden door het commando
+<code class="literal">apt-get check</code> uit te voeren.
+</p></td></tr></table></para><screen xmlns=""><table><tr><td>   </td><td><pre xmlns="http://www.w3.org/1999/xhtml" class="screen">
+# apt-get check
+Pakketlijsten worden ingelezen... Klaar (Reading Package Lists... Done)
+Boom van vereisten wordt opgebouwd... Klaar (Building Dependency Tree... Done)
+</pre></td></tr></table></screen><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+Het eerste wat het doet is alle pakketbestanden in het geheugen laden. APT
+maakt gebruik van een bufferingsschema, waardoor de operatie sneller zal
+verlopen bij een tweede uitvoering. Indien sommige pakketbestanden niet
+gevonden worden, zullen ze overgeslagen worden en er zal een waarschuwing
+gegeven worden bij het afsluiten van apt-get.
+</p></td></tr></table></para><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+De laatste operatie voert een gedetailleerde analyse uit van de
+vereistenboom op het systeem. Het voert een controle uit van elke vereiste
+van elk geïnstalleerd of uitgepakt pakket en gaat na of die OK is. Mocht
+daarbij een probleem ontdekt worden, dan zal een rapport weergegeven worden
+en <span class="command"><strong>apt-get</strong></span> zal de operatie niet voortzetten.
+</p></td></tr></table></para><screen xmlns=""><table><tr><td>   </td><td><pre xmlns="http://www.w3.org/1999/xhtml" class="screen">
+# apt-get check
+Pakketlijsten worden ingelezen... Klaar
+Boom van vereisten wordt opgebouwd... Klaar
+U zou 'apt --fix-broken install' kunnen uitvoeren om dit te repareren.
+Sorry, maar de volgende pakketten hebben niet-voldane vereisten:
+  9fonts: Vereist: xlib6g maar dit is niet geïnstalleerd
+  uucp: Vereist: mailx maar dit is niet geïnstalleerd
+  blast: Vereist: xlib6g (&gt;= 3.3-5) maar dit is niet geïnstalleerd
+  adduser: Vereist: perl-base maar dit is niet geïnstalleerd
+  aumix: Vereist: libgpmg1 maar dit is niet geïnstalleerd
+  debiandoc-sgml: Vereist: sgml-base maar dit is niet geïnstalleerd
+  bash-builtins: Vereist: bash (&gt;= 2.01) maar 2.0-3 is geïnstalleerd
+  cthugha: Vereist: svgalibg1 maar dit is niet geïnstalleerd
+           Vereist: xlib6g (&gt;= 3.3-5) maar dit is niet geïnstalleerd
+  libreadlineg2: Conflicteert met:libreadline2 (&lt;&lt; 2.1-2.1)
+</pre></td></tr></table></screen><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+Het systeem uit dit voorbeeld kampt met veel problemen, inclusief een
+ernstig probleem met libreadlineg2. Voor elk pakket met onvoldane vereisten
+wordt een regel weergegeven met een aanduiding van het pakket dat met het
+probleem geconfronteerd wordt en de vereisten waaraan niet voldaan zijn. Ook
+een korte verklaring waarom het pakket een vereistenprobleem heeft wordt
+toegevoegd.
+</p></td></tr></table></para><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+Een systeem kan op twee manieren terechtkomen in een dergelijke defecte
+staat. Een eerste oorzaak kan <span class="command"><strong>dpkg</strong></span> zijn aan wie sommige
+subtiele onderlinge relaties tussen pakketten ontgaan zijn bij het uitvoeren
+van opwaarderingen. <a href="#ftn.idm124" class="footnote" id="idm124"><sup class="footnote">[3]</sup></a>. Een tweede
+oorzaak is het mislukken van de operatie in de loop van de installatie van
+een pakket. In een dergelijk geval kan een pakket uitgepakt zijn zonder dat
+zijn vereisten geïnstalleerd werden.
+</p></td></tr></table></para><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+De tweede situatie is veel minder ernstig dan de eerste omdat APT sommige
+beperkingen instelt op de volgorde waarin pakketten geïnstalleerd worden. In
+beide gevallen zal het toevoegen van de optie <code class="literal">-f</code> aan het
+commando <span class="command"><strong>apt-get</strong></span> APT ertoe aanzetten om een mogelijke
+oplossing voor het probleem te zoeken en om dan voort te gaan. De
+<span class="command"><strong>dselect</strong></span>-methode van APT voegt steeds de optie
+<code class="literal">-f</code> toe om bij het mislukken van een script van de
+pakketonderhouder toch een vlotte voortgang te hebben.
+</p></td></tr></table></para><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+Nochtans, als de optie <code class="literal">-f</code> gebruikt wordt voor het
+herstellen van een ernstig defect systeem ten gevolge van de eerste oorzaak,
+dan kan het gebeuren dat het commando ofwel onmiddellijk faalt of dat het in
+de loop van de installatiesequentie tot een mislukking komt. In beide
+gevallen zal het nodig zijn om manueel gebruik te maken van dpkg (wellicht
+met forceeropties) om de situatie in voldoende mate te corrigeren zodat APT
+in staat is voort te gaan.
+</p></td></tr></table></para></div><div class="section"><div class="titlepage"><div><div><h2 class="title"><a id="s4.2"/>4.2. Het statusrapport</h2></div></div></div><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+Vooraleer het voortgaat zal <span class="command"><strong>apt-get</strong></span> een rapport tonen
+over wat er te gebeuren staat. In het algemeen geeft het rapport het type
+operatie weer dat uitgevoerd zal worden, maar dit bevat veel
+gemeenschappelijke elementen. In alle gevallen reflecteren de lijsten de
+eindstand van zaken, rekening houdend met de optie <code class="literal">-f</code> en
+alle andere mogelijke activiteiten die relevant zijn voor het uit te voeren
+commando.
+</p></td></tr></table></para><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s4.2.1"/>4.2.1. De lijst met extra pakketten</h3></div></div></div><screen xmlns=""><table><tr><td>   </td><td><pre xmlns="http://www.w3.org/1999/xhtml" class="screen">
+De volgende extra pakketten zullen geïnstalleerd worden:
+(The following extra packages will be installed:)
+  libdbd-mysql-perl xlib6 zlib1 xzx libreadline2 libdbd-msql-perl
+  mailpgp xdpkg fileutils pinepgp zlib1g xlib6g perl-base
+  bin86 libgdbm1 libgdbmg1 quake-lib gmp2 bcc xbuffy
+  squake pgp-i python-base debmake ldso perl libreadlineg2
+  ssh
+</pre></td></tr></table></screen><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+De lijst met extra pakketten geeft alle pakketten weer die geïnstalleerd of
+opgewaardeerd zullen worden bovenop degene die aan de commandoregel
+opgegeven werden. Die lijst wordt enkel aangemaakt voor een
+<code class="literal">install</code> commando. De weergegeven pakketten zijn vaak het
+resultaat van een automatische installatie.
+</p></td></tr></table></para></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s4.2.2"/>4.2.2. De te verwijderen pakketten</h3></div></div></div><screen xmlns=""><table><tr><td>   </td><td><pre xmlns="http://www.w3.org/1999/xhtml" class="screen">
+De volgende pakketten zullen VERWIJDERD worden:
+(The following packages will be REMOVED:)
+  xlib6-dev xpat2 tk40-dev xkeycaps xbattle xonix
+  xdaliclock tk40 tk41 xforms0.86 ghostview xloadimage xcolorsel
+  xadmin xboard perl-debug tkined xtetris libreadline2-dev perl-suid
+  nas xpilot xfig
+</pre></td></tr></table></screen><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+De lijst met te verwijderen pakketten geeft alle pakketten weer die van het
+systeem verwijderd zullen worden. Ze kan bij elk van de operaties getoond
+worden en zou zorgvuldig nagekeken moeten worden om zich ervan te
+vergewissen dat niets belangrijks weggenomen zal worden. Zeker de optie
+<code class="literal">-f</code> lokt vaak het verwijderen van pakketten uit en in dat
+geval is extra zorgvuldigheid zeker aangewezen. De lijst kan pakketten
+bevatten die verwijderd zullen worden omdat ze slechts ten dele
+geïnstalleerd werden, mogelijks ten gevolge van een afgebroken installatie.
+</p></td></tr></table></para></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s4.2.3"/>4.2.3. De lijst nieuw te installeren pakketten</h3></div></div></div><screen xmlns=""><table><tr><td>   </td><td><pre xmlns="http://www.w3.org/1999/xhtml" class="screen">
+De volgende NIEUWE pakketten zullen geïnstalleerd worden:
+(The following NEW packages will installed:)
+  zlib1g xlib6g perl-base libgdbmg1 quake-lib gmp2 pgp-i python-base
+</pre></td></tr></table></screen><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+De lijst met nieuwe pakketten is enkel een geheugensteun voor wat er gaat
+gebeuren. De vermelde pakketten worden nu nog niet op het systeem
+geïnstalleerd, maar dat zal gebeuren als APT uitgevoerd wordt.
+</p></td></tr></table></para></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s4.2.4"/>4.2.4. De lijst van tegengehouden pakketten</h3></div></div></div><screen xmlns=""><table><tr><td>   </td><td><pre xmlns="http://www.w3.org/1999/xhtml" class="screen">
+De volgende pakketten werden tegengehouden
+(The following packages have been kept back)
+  compface man-db tetex-base msql libpaper svgalib1
+  gs snmp arena lynx xpat2 groff xscreensaver
+</pre></td></tr></table></screen><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+Telkens het hele systeem opgewaardeerd wordt, bestaat de kans dat nieuwe
+versies van pakketten niet geïnstalleerd kunnen worden omdat ze nieuwe zaken
+vereisen of conflicteren met reeds geïnstalleerde zaken. In dat geval zal
+dat pakket vermeld worden in de lijst van tegengehouden pakketten. De beste
+manier om de daar vermelde pakketten te overtuigen om zich te laten
+installeren is <code class="literal">apt-get install</code> te gebruiken of
+<span class="command"><strong>dselect</strong></span> te gebruiken om hen een oplossing voor de
+problemen te laten vinden.
+</p></td></tr></table></para></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s4.2.5"/>4.2.5. Waarschuwing over tegengehouden pakketten</h3></div></div></div><screen xmlns=""><table><tr><td>   </td><td><pre xmlns="http://www.w3.org/1999/xhtml" class="screen">
+De volgende tegengehouden pakketten zullen gewijzigd worden:
+(The following held packages will be changed:)
+  cvs
+</pre></td></tr></table></screen><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+Soms kan het gebeuren dat u APT vraagt om een als tegengehouden gemarkeerd
+pakket te installeren. In dat geval geeft het een waarschuwing dat het
+tegengehouden pakket gewijzigd zal worden. Dit zou enkel mogen voorkomen bij
+een dist-upgrade of een install.
+</p></td></tr></table></para></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s4.2.6"/>4.2.6. Afsluitende samenvatting</h3></div></div></div><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+Tenslotte zal APT een samenvatting weergeven van alle wijzigingen die
+aangebracht zullen worden.
+</p></td></tr></table></para><screen xmlns=""><table><tr><td>   </td><td><pre xmlns="http://www.w3.org/1999/xhtml" class="screen">
+206 pakketten opgewaardeerd, 8 nieuw geïnstalleerd, 23 te verwijderen en 51 niet opgewaardeerd.
+12 pakketten niet volledig geïnstalleerd of verwijderd.
+Moet 65.7M/66.7M archieven ophalen. Na uitpakken zal 26.5M gebruikt worden.
+</pre></td></tr></table></screen><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+De eerste regel van de samenvatting is gewoon een beknopte versie van alle
+lijsten en bevat het aantal opwaarderingen - dat zijn reeds geïnstalleerde
+pakketten waarvoor nieuwere versies beschikbaar zin. De tweede regel toont
+het aantal slecht geconfigureerde pakketten, mogelijks het gevolg van een
+afgebroken installatie. De laatste regel toont de opslagruimte die door de
+installatie gebruikt zal worden. Het eerste paar getallen verwijst naar de
+grootte van de archiefbestanden. Het eerste getal geeft het aantal bytes op
+dat van externe locaties opgehaald moet worden en het tweede geeft de
+gezamenlijke omvang van alle benodigde archieven op. Het volgende getal
+geeft het verschil in grootte op tussen de actueel geïnstalleerde pakketten
+en de nieuwe situatie. Grofweg is dit vergelijkbaar met de benodigde ruimte
+in /usr nadat alles achter de rug is. Indien een groot aantal pakketten
+verwijderd wordt, kan de opgegeven waarde verwijzen naar de ruimte die vrij
+zal komen.
+</p></td></tr></table></para><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+Door de optie -u te gebruiken kan men rapporten laten opmaken over de op te
+waarderen pakketten. Deze rapporten zijn vergelijkbaar met de vorige
+voorbeelden.
+</p></td></tr></table></para></div></div><div class="section"><div class="titlepage"><div><div><h2 class="title"><a id="s4.3"/>4.3. De statusweergave</h2></div></div></div><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+Tijdens het downloaden van archieven en pakketbestanden geeft APT een aantal
+statusberichten weer.
+</p></td></tr></table></para><screen xmlns=""><table><tr><td>   </td><td><pre xmlns="http://www.w3.org/1999/xhtml" class="screen">
+# apt-get update
+Ophalen:1 http://ftp.de.debian.org/debian-non-US/ stable/non-US/ Packages
+Ophalen:2 http://llug.sep.bnl.gov/debian/ testing/contrib Packages
+Geraakt http://llug.sep.bnl.gov/debian/ testing/main Packages
+Ophalen:4 http://ftp.de.debian.org/debian-non-US/ unstable/binary-i386/ Packages
+Ophalen:5 http://llug.sep.bnl.gov/debian/ testing/non-free Packages
+11% [5 testing/non-free `Wachten op bestand' 0/32.1k 0%] 2203b/s 1m52s
+</pre></td></tr></table></screen><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+Regels die beginnen met <span class="emphasis"><em>Ophalen</em></span> worden weergegeven
+wanneer APT een bestand begint op te halen, terwijl de laatste regel de
+voortgang van de download aangeeft. Het eerste percentage op de
+voortgangsregel verwijst naar het totale percentage van alle bestanden samen
+dat afgewerkt is. Aangezien de grootte van de Packages-bestanden niet bekend
+is, maakt <code class="literal">apt-get update</code> een schatting van het reeds
+afgewerkte percentage, maar die is jammer genoeg in een zekere mate
+inaccuraat.
+</p></td></tr></table></para><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+De volgende sectie van de statusregel wordt voor elke downloadtaak herhaald
+en geeft de operatie die uitgevoerd wordt weer evenals wat nuttige
+informatie over wat er aan het gebeuren is. Soms zal die sectie gewoon
+<span class="emphasis"><em>Forking</em></span> bevatten, wat er op wijst dat het OS de
+downloadmodule aan het laden is. Het eerste woord na het [ is het volgnummer
+van de ophaaltaak zoals dat op de voortgangsregels getoond wordt. Het
+volgende woord is de verkorte vorm van de naam van het object dat opgehaald
+wordt. Als het archieven betreft, zal het de naam van het pakket dat
+opgehaald wordt bevatten.
+</p></td></tr></table></para><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+Tussen de enkelvoudige aanhalingstekens staat een informatieve tekst die de
+voortgang weergeeft van de onderhandelingsfase van de download. Gewoonlijk
+evolueert dat van <span class="emphasis"><em>Aan het verbinden</em></span> over <span class="emphasis"><em>Aan
+het wachten op bestand</em></span> naar <span class="emphasis"><em>Aan het
+downloaden</em></span> of <span class="emphasis"><em>Aan het hervatten</em></span>. De laatste
+waarde geeft het aantal bytes weer dat opgehaald werd van de externe
+site. Als het proces van downloaden begonnen is, wordt dit weergegeven als
+<code class="literal">102/10.2k</code>, hetgeen betekent dat er reeds 102 bytes
+opgehaald werden van een verwacht totaal van 10.2 kilobytes. De weergave van
+de volledige grootte wordt steeds getoond in een 4-cijfernotatie om plaats
+te sparen. Na de weergave van de grootte komt het reeds opgehaalde
+percentage van het bestand. Het voorlaatste element geeft de huidige
+gemiddelde snelheid op. Deze waarde wordt elke 5 seconden ververst en geeft
+de snelheid van de gegevensoverdracht voor die periode weer. Tenslotte wordt
+de verwachte duur van de gegevensoverdracht weergegeven. Dit wordt
+regelmatig ververst en weerspiegelt de tijd die nodig is om alles af te
+werken aan het getoonde tempo van gegevensoverdracht.
+</p></td></tr></table></para><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+De statusweergave wordt iedere halve seconde ververst en geeft zo een
+constante feedback over het downloadproces terwijl de Ophalen-regels naar
+boven scrollen telkens er met een nieuw bestand wordt begonnen. Vermits de
+statusweergave permanent ververst wordt, is dit niet geschikt om in een
+logbestand opgeslagen te worden. Gebruik de optie <code class="literal">-q</code> om
+de statusweergave te onderdrukken.
+</p></td></tr></table></para></div><div class="section"><div class="titlepage"><div><div><h2 class="title"><a id="s4.4"/>4.4. Dpkg</h2></div></div></div><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+APT gebruikt <span class="command"><strong>dpkg</strong></span> om de archieven te installeren en
+schakelt na het voltooien van het downloaden over op de interface
+<span class="command"><strong>dpkg</strong></span>. Tijdens het verwerken van de pakketten zal
+<span class="command"><strong>dpkg</strong></span> een aantal vragen stellen en ook de pakketten zelf
+kunnen verschillende vragen stellen. Aan elke vraag gaat er gewoonlijk een
+beschrijving vooraf van waarover de vraag gaat. De vragen zijn dermate
+gevarieerd dat het niet mogelijk is om ze hier volledig te behandelen.
+</p></td></tr></table></para></div><div class="footnotes"><br/><hr/><div id="ftn.idm107" class="footnote"><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml"><a href="#idm107" class="para"><sup class="para">[2] </sup></a> De <span class="command"><strong>dselect</strong></span>-methode is eigenlijk een geheel van scripts
+die rondom <span class="command"><strong>apt-get</strong></span> gebouwd werden. De methode biedt
+eigenlijk meer functionaliteit dan aanwezig is in <span class="command"><strong>apt-get</strong></span>
+alleen. </p></td></tr></table></para></div><div id="ftn.idm124" class="footnote"><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml"><a href="#idm124" class="para"><sup class="para">[3] </sup></a> APT neemt evenwel alle gekende vereisten in overweging en probeert het
+ontstaan van defecte pakketten te voorkomen. </p></td></tr></table></para></div></div></div></div></body></html>

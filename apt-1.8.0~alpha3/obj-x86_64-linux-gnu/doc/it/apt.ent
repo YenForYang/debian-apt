@@ -1,0 +1,246 @@
+<!ENTITY apt-author.team "
+   <author>
+    <othername>Team APT</othername>
+    <contrib></contrib>
+   </author>
+">
+
+<!ENTITY apt-qapage "
+	<para>
+		<ulink url='http://packages.qa.debian.org/a/apt.html'>Pagina QA</ulink>
+	</para>
+">
+
+<!-- Boiler plate Bug reporting section -->
+<!ENTITY manbugs "
+ <refsect1><title>Bug</title>
+   <para><ulink url='http://bugs.debian.org/src:apt'>Pagina dei bug di APT</ulink>.
+   Se si desidera segnalare un bug in APT, vedere
+   <filename>/usr/share/doc/debian/bug-reporting.txt</filename> o il
+   comando &reportbug;.
+   </para>
+ </refsect1>
+">
+
+<!-- Sezione standard autore -->
+<!ENTITY manauthor "
+ <refsect1><title>Autore</title>
+   <para>APT è stato scritto dal Team APT <email>apt@packages.debian.org</email>.
+   </para>
+ </refsect1>
+">
+
+<!-- Da usare all'interno della sezione opzioni del testo da
+     mettere nella pappardella su -h, -v, -c e -o -->
+<!ENTITY apt-commonoptions "
+     <varlistentry><term><option>-h</option></term>
+     <term><option>--help</option></term>
+     <listitem><para>Mostra un breve riassunto sull'uso.
+     </para>
+     </listitem>
+     </varlistentry>
+     
+     <varlistentry>
+      <term><option>-v</option></term>
+      <term><option>--version</option></term>
+      <listitem><para>Mostra la versione del programma.
+     </para>
+     </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><option>-c</option></term>
+      <term><option>--config-file</option></term>
+     <listitem><para>File di configurazione; specifica un file di configurazione da usare. 
+     Il programma legge il file di configurazione predefinito e poi questo 
+     file di configurazione. Se è necessario modificare le impostazioni di 
+     configurazione prima che vengano analizzati i file di configurazione 
+     predefiniti, specificare un file con la variabile d'ambiente <envar>APT_CONFIG</envar>. 
+     Vedere &apt-conf; per informazioni sulla sintassi.
+     </para>
+     </listitem>
+     </varlistentry>
+     
+     <varlistentry>
+      <term><option>-o</option></term>
+      <term><option>--option</option></term>
+     <listitem><para>Imposta un'opzione di configurazione; imposterà una qualunque
+      opzione di configurazione. La sintassi è <option>-o Pinco::Pallo=pallo</option>.
+      <option>-o</option> e <option>--option</option> si possono usare più
+      volte per impostare opzioni diverse.
+     </para>
+     </listitem>
+     </varlistentry>
+">
+
+<!-- Da usare all'interno della sezione opzioni del testo da
+     mettere nella pappardella su -h, -v, -c e -o -->
+<!ENTITY apt-cmdblurb "
+   <para>Tutte le opzioni a riga di comando si possono impostare usando il file di
+   configurazione; le descrizioni indicano l'opzione da impostare. Per le opzioni
+   booleane si può scavalcare il file di configurazione usando 
+qualcosa come <option>-f-</option>, <option>--no-f</option>, <option>-f=no</option>
+   o diverse altre varianti.
+   </para>
+">
+
+<!ENTITY file-aptconf "
+     <varlistentry><term><filename>/etc/apt/apt.conf</filename></term>
+     <listitem><para>File di configurazione di APT.
+     Voce di configurazione: <literal>Dir::Etc::Main</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><filename>/etc/apt/apt.conf.d/</filename></term>
+     <listitem><para>Frammenti di file di configurazione di APT.
+     Voce di configurazione: <literal>Dir::Etc::Parts</literal>.</para></listitem>
+     </varlistentry>
+">
+
+<!ENTITY file-cachearchives "
+     <varlistentry><term><filename>&cachedir;/archives/</filename></term>
+     <listitem><para>Area di archiviazione per i file dei pacchetti recuperati.
+     Voce di configurazione: <literal>Dir::Cache::Archives</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><filename>&cachedir;/archives/partial/</filename></term>
+     <listitem><para>Area di archiviazione per i file dei pacchetti in transito.
+     Voce di configurazione: <literal>Dir::Cache::Archives</literal> (<filename>partial</filename> verrà implicitamente aggiunto in fondo al nome)</para></listitem>
+     </varlistentry>
+">
+
+<!ENTITY file-preferences "
+     <varlistentry><term><filename>/etc/apt/preferences</filename></term>
+     <listitem><para>File di preferenze di versione.
+     Qui si specifica il &quot;pinning&quot;,
+     ossia una preferenza a prendere determinati pacchetti
+     da una fonte separata
+     o da una diversa versione di una distribuzione.
+     Voce di configurazione: <literal>Dir::Etc::Preferences</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><filename>/etc/apt/preferences.d/</filename></term>
+     <listitem><para>Frammenti di file per le preferenze di versione.
+     Voce di configurazione: <literal>Dir::Etc::PreferencesParts</literal>.</para></listitem>
+     </varlistentry>
+">
+
+<!ENTITY file-sourceslist "
+     <varlistentry><term><filename>/etc/apt/sources.list</filename></term>
+     <listitem><para>Posizioni da cui scaricare i pacchetti.
+     Voce di configurazione: <literal>Dir::Etc::SourceList</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><filename>/etc/apt/sources.list.d/</filename></term>
+     <listitem><para>Frammenti di file per le posizioni da cui scaricare i pacchetti.
+     Voce di configurazione: <literal>Dir::Etc::SourceParts</literal>.</para></listitem>
+     </varlistentry>
+">
+
+<!ENTITY file-statelists "
+     <varlistentry><term><filename>&statedir;/lists/</filename></term>
+     <listitem><para>Area di archiviazione per le informazioni sullo stato di ciascuna risorsa dei pacchetti specificata in
+     &sources-list;
+     Voce di configurazione: <literal>Dir::State::Lists</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><filename>&statedir;/lists/partial/</filename></term>
+     <listitem><para>Area di archiviazione per le informazioni di stato in transito.
+     Voce di configurazione: <literal>Dir::State::Lists</literal> (<filename>partial</filename> verrà implicitamente aggiunto in fondo al nome)</para></listitem>
+     </varlistentry>
+">
+
+<!ENTITY file-trustedgpg "
+     <varlistentry><term><filename>/etc/apt/trusted.gpg</filename></term>
+     <listitem><para>Portachiavi delle chiavi fidate locali; qui saranno aggiunte le nuove chiavi.
+     Voce di configurazione: <literal>Dir::Etc::Trusted</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><filename>/etc/apt/trusted.gpg.d/</filename></term>
+     <listitem><para>Frammenti di file per le chiavi fidate, qui potranno essere memorizzati
+     ulteriori portachiavi (da parte di altri pacchetti o dall'amministratore).
+     Voce di configurazione <literal>Dir::Etc::TrustedParts</literal>.</para></listitem>
+     </varlistentry>
+">
+
+<!ENTITY file-extended_states "
+      <varlistentry><term><filename>/var/lib/apt/extended_states</filename></term>
+      <listitem><para>Elenco degli stati dei pacchetti installati automaticamente.
+      Voce di configurazione: <literal>Dir::State::extended_states</literal>.
+      </para></listitem>
+      </varlistentry>
+">
+
+<!-- TRANSLATOR: This is the section header for the following paragraphs - comparable
+     to the other headers like NAME and DESCRIPTION and should therefore be uppercase. -->
+<!ENTITY translation-title "TRADUZIONE">
+
+<!-- TRANSLATOR: This is a placeholder. You should write here who has contributed
+     to the translation in the past, who is responsible now and maybe further information
+     specially related to your translation. -->
+<!ENTITY translation-holder "
+     Traduzione in italiano a cura del Team italiano di localizzazione di Debian <email>debian-l10n-italian@lists.debian.org</email>. In particolare hanno contribuito Eugenia Franzoni (2000), Hugh Hartmann (2000-2012), Gabriele Stilli (2012), Beatrice Torracca (2012, 2014, 2015).
+">
+
+<!-- TRANSLATOR: As a translation is allowed to have 20% of untranslated/fuzzy strings
+     in a shipped manpage newer/modified paragraphs will maybe appear in english in
+     the generated manpage. This sentence is therefore here to tell the reader that this
+     is not a mistake by the translator - obviously the target is that at least for stable
+     releases this sentence is not needed. :) -->
+<!ENTITY translation-english "
+     Notare che questa versione tradotta del documento può contenere parti non tradotte. Ciò è voluto, per evitare di perdere contenuti quando la traduzione non è aggiornata rispetto all'originale.
+">
+
+<!-- TRANSLATOR: used as in -o=config_string
+e.g. -o=Debug::pkgProblemResolver=1 --> <!ENTITY synopsis-config-string
+"stringa_config">
+
+<!-- TRANSLATOR: used as in -c=config_file e.g. -c=./apt.conf --> <!ENTITY
+synopsis-config-file "file_config">
+
+<!-- TRANSLATOR: used as in -t=target_release or pkg/target_release
+e.g. -t=squeeze apt/experimental --> <!ENTITY synopsis-target-release
+"rilascio_obiettivo">
+
+<!-- TRANSLATOR: used as in -a=architecture e.g. -a=armel --> <!ENTITY
+synopsis-architecture "architettura">
+
+<!-- TRANSLATOR: used as in apt-get install pkg e.g. apt-get install awesome
+--> <!ENTITY synopsis-pkg "pacch">
+
+<!-- TRANSLATOR: used as in pkg=pkg_version_number e.g. apt=0.8.15 -->
+<!ENTITY synopsis-pkg-ver-number "numero_versione_pacch">
+
+<!-- TRANSLATOR: used as in apt-cache pkgnames prefix e.g. apt-cache
+pkgnames apt --> <!ENTITY synopsis-prefix "prefisso">
+
+<!-- TRANSLATOR: used as in apt-cache search regex e.g. apt-cache search
+awesome --> <!ENTITY synopsis-regex "espr_reg">
+
+<!-- TRANSLATOR: used as in apt-cdrom -d=cdrom_mount_point e.g. apt-cdrom
+-d=/media/cdrom --> <!ENTITY synopsis-cdrom-mount "punto_mount_cdrom">
+
+<!-- TRANSLATOR: used as in apt-extracttemplates -t=temporary_directory
+e.g. apt-extracttemplates -t=/tmp --> <!ENTITY synopsis-tmp-directory
+"directory_temporanea">
+
+<!-- TRANSLATOR: used as in apt-extracttemplates filename --> <!ENTITY
+synopsis-filename "nomefile">
+
+<!-- TRANSLATOR: used as parameter for apt-ftparchive e.g. apt-ftparchive
+packages path override-file pathprefix --> <!ENTITY synopsis-path
+"percorso">
+
+<!-- TRANSLATOR: used as parameter for apt-ftparchive e.g. apt-ftparchive
+packages path override-file pathprefix --> <!ENTITY synopsis-override
+"file-override">
+
+<!-- TRANSLATOR: used as parameter for apt-ftparchive e.g. apt-ftparchive
+packages path override-file pathprefix --> <!ENTITY synopsis-pathprefix
+"prefisso_percorso">
+
+<!-- TRANSLATOR: used as parameter for apt-ftparchive e.g. apt-ftparchive
+generate section --> <!ENTITY synopsis-section "sezione">
+
+<!-- TRANSLATOR: used as in apt-key export keyid e.g. apt-key export
+473041FA --> <!ENTITY synopsis-keyid "IDchiave">
+

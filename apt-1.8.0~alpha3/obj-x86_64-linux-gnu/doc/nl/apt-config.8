@@ -1,0 +1,152 @@
+'\" t
+.\"     Title: apt-config
+.\"    Author: Jason Gunthorpe
+.\" Generator: DocBook XSL Stylesheets v1.79.1 <http://docbook.sf.net/>
+.\"      Date: 30\ \&november\ \&2013
+.\"    Manual: APT
+.\"    Source: APT 1.8.0~alpha3
+.\"  Language: Dutch
+.\"
+.TH "APT\-CONFIG" "8" "30\ \&november\ \&2013" "APT 1.8.0~alpha3" "APT"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+apt-config \- Programma om de configuratie van APT op te vragen
+.SH "SAMENVATTING"
+.HP \w'\fBapt\-config\fR\ 'u
+\fBapt\-config\fR [\fB\-\-empty\fR] [\fB\-\-format\ \*(Aq\fR\fB\fI%f\ "%v";%n\fR\fR\fB\*(Aq\fR] [\fB\-o=\fR\fB\fIconfiguratietekenreeks\fR\fR] [\fB\-c=\fR\fB\fIconfiguratiebestand\fR\fR] {shell | dump | {\-v\ |\ \-\-version} | {\-h\ |\ \-\-help}}
+.SH "OMSCHRIJVING"
+.PP
+\fBapt\-config\fR
+is een intern programma dat door verschillende onderdelen van de APT\-suite gebruikt wordt om op een consistente wijze configuratiemogelijkheden te bieden\&. Het maakt gebruik van het hoofdconfiguratiebestand
+/etc/apt/apt\&.conf
+op een manier die scripts toelaat om er handig gebruik van te maken\&.
+.PP
+Tenzij de optie
+\fB\-h\fR, of
+\fB\-\-help\fR
+opgegeven werd, moet een van de onderstaande commando\*(Aqs gebruikt worden\&.
+.PP
+\fBshell\fR
+.RS 4
+Men gebruikt shell om in een shell\-script configuratie\-informatie op te vragen\&. Argumenten worden in paren opgegeven\&. Het eerste argument is een shell\-variabele en het tweede de configuratiewaarde waarnaar gezocht moet worden\&. De uitvoer bestaat uit een lijst shell\-opdrachten waarin elke gevonden waarde aan een variabele toegekend wordt\&. In een shell\-script moet het als volgt gebruikt worden:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+OPTS="\-f"
+RES=`apt\-config shell OPTS MyApp::options`
+eval $RES
+.fi
+.if n \{\
+.RE
+.\}
+Dit zal aan de shell\-omgevingsvariabele $OPTS de waarde toekennen van MyApp::options met een standaard van
+\fB\-f\fR\&.
+.sp
+Achter het configuratie\-item mag een /[fdbi] staan\&. f levert een bestandsnaam op, d een map, b geeft de terugkeerwaarde true of false en i geeft een geheel getal als terugkeerwaarde\&. Elke terugkeerwaarde wordt intern genormaliseerd en gecontroleerd\&.
+.RE
+.PP
+\fBdump\fR
+.RS 4
+Enkel de inhoud van de configuratieruimte weergeven\&.
+.RE
+.SH "OPTIES"
+.PP
+Alle commandoregelopties kunnen via het configuratiebestand ingesteld worden\&. de omschrijving geeft de in te stellen configuratieoptie op\&. Bij booleaanse opties kunt u instellingen uit het configuratiebestand overschrijven door iets te gebruiken als
+\fB\-f\-\fR,
+\fB\-\-no\-f\fR,
+\fB\-f=no\fR
+en meerdere andere variaties\&.
+.PP
+\fB\-\-empty\fR
+.RS 4
+Opties met een lege waarde opnemen\&. Dit is de standaard\&. Gebruik dus \-\-no\-empty om ze uit de uitvoer te verwijderen\&.
+.RE
+.PP
+\fB\-\-format \*(Aq\fR\fB\fI%f "%v";%n\fR\fR\fB\*(Aq\fR
+.RS 4
+Definieert de uitvoer van elke configuratie\-optie\&. %t wordt vervangen door zijn eigen naam, %f door zijn volledige hi\(:erarchische naam en %v door zijn waarde\&. Gebruik hoofdletters, en als in de waarde speciale tekens voorkomen, worden ze gecodeerd om er voor te zorgen dat die waarde bijvoorbeeld veilig gebruikt kan worden in een tekenreeks binnen aanhalingstekens zoals bepaald door RFC822\&. Voorts zal %n vervangen worden door een nieuwe regel en %N door een TAB\&. Om een % weer te geven gebruikt men %%\&.
+.RE
+.PP
+\fB\-h\fR, \fB\-\-help\fR
+.RS 4
+Een korte samenvatting van het gebruik weergeven\&.
+.RE
+.PP
+\fB\-v\fR, \fB\-\-version\fR
+.RS 4
+Het versienummer van het programma weergeven\&.
+.RE
+.PP
+\fB\-c\fR, \fB\-\-config\-file\fR
+.RS 4
+Configuratiebestand; Een te gebruiken configuratiebestand opgeven\&. Het programma zal het standaard configuratiebestand inlezen en nadien dit configuratiebestand\&. Als configuratie\-instellingen opgegeven moeten worden vooraleer de standaard configuratiebestanden verwerkt worden, geef dan een bestand op met de omgevingsvariabele
+\fBAPT_CONFIG\fR\&. Raadpleeg
+\fBapt.conf\fR(5)
+voor informatie over de syntaxis\&.
+.RE
+.PP
+\fB\-o\fR, \fB\-\-option\fR
+.RS 4
+Een configuratieoptie instellen; Dit stelt een willekeurige configuratieoptie in\&. De syntaxis is
+\fB\-o Foo::Bar=bar\fR\&.
+\fB\-o\fR
+en
+\fB\-\-option\fR
+kunnen meermaals gebruikt worden om verschillende opties in te stellen\&.
+.RE
+.SH "ZIE OOK"
+.PP
+\fBapt.conf\fR(5)
+.SH "DIAGNOSTIEK"
+.PP
+\fBapt\-config\fR
+geeft de terugkeerwaarde nul bij een normaal verlopen operatie, het decimaal getal 100 in geval van een fout\&.
+.SH "BUGS"
+.PP
+\m[blue]\fBAPT bugpagina\fR\m[]\&\s-2\u[1]\d\s+2\&. Indien u een bug in APT wilt rapporteren, raadpleeg dan
+/usr/share/doc/debian/bug\-reporting\&.txt
+of het
+\fBreportbug\fR(1)
+commando\&.
+.SH "VERTALING"
+.PP
+De Nederlandse vertaling werd in 2015 gemaakt door Frans Spiesschaert
+<Frans\&.Spiesschaert@yucom\&.be>, in samenwerking met het Debian Dutch l10n Team
+<debian\-l10n\-dutch@lists\&.debian\&.org>\&.
+.PP
+Merk op dat de vertaling van dit document nog onvertaalde delen kan bevatten\&. Dit is intentioneel om te vermijden dat inhoud verloren zou gaan door een vertaling die achterop loopt op het origineel\&.
+.SH "AUTEURS"
+.PP
+\fBJason Gunthorpe\fR
+.RS 4
+.RE
+.PP
+\fBAPT\-team\fR
+.RS 4
+.RE
+.SH "OPMERKINGEN"
+.IP " 1." 4
+APT bugpagina
+.RS 4
+\%http://bugs.debian.org/src:apt
+.RE

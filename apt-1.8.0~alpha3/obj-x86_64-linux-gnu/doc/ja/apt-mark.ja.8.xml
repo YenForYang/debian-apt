@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+  "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % aptent SYSTEM "apt.ent"> %aptent;
+<!ENTITY % aptverbatiment SYSTEM "apt-verbatim.ent"> %aptverbatiment;
+<!ENTITY % aptvendor SYSTEM "apt-vendor.ent"> %aptvendor;
+]>
+
+<refentry>
+
+ <refentryinfo>
+   <!-- The last update date -->
+&apt-author.moconnor;
+   &apt-author.team;
+   &apt-email;
+   &apt-product;
+   
+   <date>2015-09-25T00:00:00Z</date>
+ </refentryinfo>
+ 
+ <refmeta>
+   <refentrytitle>apt-mark</refentrytitle>
+   <manvolnum>8</manvolnum>
+   <refmiscinfo class="manual">APT</refmiscinfo>
+ </refmeta>
+ 
+ 
+ <!-- Man page title -->
+<refnamediv>
+    <refname>apt-mark</refname>
+    <refpurpose>パッケージの各種設定の表示、設定、設定解除</refpurpose>
+ </refnamediv>
+
+ &synopsis-command-apt-mark;
+
+ <refsect1><title>説明</title>
+    <para>統合フロントエンドとして使用することができます。例えば、パッケージを自動/手動インストール済みとマークしたり、<command>dpkg</command>
+の選択を保留、インストール、削除や完全削除に変更できます。例えば <command>apt-get dselect-upgrade</command>
+や <command>aptitude</command> によりリスペクトされています。
+   </para>
+   </refsect1><refsect1><title>自動および手動インストール済みパッケージ</title>
+   <para>
+     パッケージをインストールすると要求し、その結果、別のパッケージが依存関係を満たすためにインストールされた場合、依存関係に自動インストール済みとマークされます。いったん自動的にインストールされたパッケージは、手動でインストールしたパッケージに依存されなくなると、そのパッケージは、例えば
+<command>apt-get</command> や <command>aptitude</command> により削除が提案されます。
+   </para>
+   <variablelist>
+     <varlistentry><term><option>auto</option></term>
+	 <listitem><para><literal>auto</literal>
+は、パッケージを自動インストール済みとマークします。このパッケージに依存する手動でインストールされたパッケージがなくなると、このパッケージを削除します。
+       </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>manual</option></term>
+	 <listitem><para><literal>manual</literal>
+は、パッケージを手動インストール済みとマークします。このパッケージに依存するほかのパッケージがなくなっても、このパッケージを自動的に削除するのを防ぎます。
+       </para></listitem>
+     </varlistentry>
+
+       <varlistentry><term><option>showauto</option></term>
+	 <listitem><para><literal>showauto</literal>
+は、自動的にインストールされたパッケージを、パッケージごとに改行して表示します。パッケージを与えなければ、自動的にインストールされたパッケージをすべて一覧表示します。パッケージを与えた場合は、そのパッケージが自動的にインストールされている場合にのみ、表示します。
+       </para></listitem>
+     </varlistentry>
+
+       <varlistentry><term><option>showmanual</option></term>
+	 <listitem><para><literal>showmanual</literal> は <literal>showauto</literal>
+と同様に使用できますが、手動でインストールされたパッケージの一覧を表示します。
+       </para></listitem>
+     </varlistentry>
+   </variablelist>
+
+   <refsect2><title>オプション</title>
+     <variablelist>
+       <varlistentry>
+	 <term><option>-f=&synopsis-param-filename;</option></term>
+	 <term><option>--file=&synopsis-param-filename;</option></term>
+	 <listitem><para>
+	   デフォルトの場所 (設定項目: <literal>Dir::State</literal> で定義したディレクトリの
+<filename>extended_status</filename>) ではなく、パラメータ &synopsis-param-filename;
+からパッケージの状態を読み書きします。
+	 </para></listitem>
+       </varlistentry>
+     </variablelist>
+   </refsect2>
+
+ </refsect1><refsect1><title>パッケージの変更を防ぐ</title>
+   <variablelist>
+     <varlistentry><term><option>hold</option></term>
+	 <listitem><para><literal>hold</literal>
+は、パッケージを保留としてマークします。パッケージを自動的なインストール、アップグレード、削除から防ぎます。
+       </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>unhold</option></term>
+	 <listitem><para><literal>unhold</literal> は、以前保留したパッケージを、また操作できるようキャンセルするのに使用します。
+       </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>showhold</option></term>
+	 <listitem><para><literal>showhold</literal> は、他の show コマンドと同様に、保留されているパッケージを出力します。
+       </para></listitem>
+     </varlistentry>
+   </variablelist>
+ </refsect1><refsect1><title>パッケージのインストール、削除、完全削除をスケジュールする</title>
+ <para>
+    <command>apt-get dselect-upgrade</command>
+のようないくつかのフロントエンドは、パッケージのインストール状態の事前のスケジュール変更を適用するために使用することができます。このような変更は、<option>install</option>、<option>remove</option>
+(<option>deinstall</option> としても知られています) および <option>purge</option>
+オプションでスケジュールすることができます。特定のパッケージの選択は、それぞれ
+<option>showinstall</option>、<option>showremove</option> および
+<option>showpurge</option> で表示することができます。dpkg 選択とも呼ぶこれらの詳細については、dpkg
+で見つけることができます。
+ </para>
+ </refsect1>
+
+ <refsect1><title>オプション</title>
+   <variablelist>
+     &apt-commonoptions;
+   </variablelist>
+ </refsect1>
+
+ <refsect1><title>ファイル</title>
+   <variablelist>
+	&file-extended_states;
+   </variablelist>
+ </refsect1>
+
+ <refsect1><title>関連項目</title>
+    <para><phrase>&apt-get;,&aptitude;,&apt-conf;</phrase></para>
+ </refsect1>
+
+ <refsect1><title>診断メッセージ</title>
+   <para><command>apt-mark</command> は正常終了時に 0 を返します。エラー時には 0 以外を返します。</para>
+ </refsect1>
+
+ &manbugs;
+ 
+ <refsect1><title>&translation-title;</title>
+   <para>&translation-holder;</para>
+   <para>&translation-english;</para>
+ </refsect1>
+</refentry>

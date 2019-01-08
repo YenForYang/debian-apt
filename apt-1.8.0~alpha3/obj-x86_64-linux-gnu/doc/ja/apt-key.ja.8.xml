@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+  "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % aptent SYSTEM "apt.ent"> %aptent;
+<!ENTITY % aptverbatiment SYSTEM "apt-verbatim.ent"> %aptverbatiment;
+<!ENTITY % aptvendor SYSTEM "apt-vendor.ent"> %aptvendor;
+]>
+
+<refentry>
+ <refentryinfo>
+   <!-- The last update date -->
+&apt-author.jgunthorpe;
+   &apt-author.team;
+   &apt-email;
+   &apt-product;
+   
+   <date>2016-11-22T00:00:00Z</date>
+ </refentryinfo>
+
+ <refmeta>
+   <refentrytitle>apt-key</refentrytitle>
+   <manvolnum>8</manvolnum>
+   <refmiscinfo class="manual">APT</refmiscinfo>
+ </refmeta>
+ 
+ 
+ <!-- Man page title -->
+<refnamediv>
+    <refname>apt-key</refname>
+    <refpurpose>APT キー管理ユーティリティ</refpurpose>
+ </refnamediv>
+
+ &synopsis-command-apt-key;
+
+ <refsect1><title>説明</title>
+   <para>
+   <command>apt-key</command> は、apt が
+パッケージを認証するのに使用するキーの一覧を管理するのに使用します。このキーで認証されたパッケージは、信頼するに足ると見なせるでしょう。
+   </para>
+   <para>
+   <command>apt-key</command> を利用するためには GNU Privacy Guard suite
+(<package>gnupg</package> に収録)
+を追加でインストールする必要があることに注意してください。そのため、プログラム単体での用途に (特にパッケージのメンテナスクリプトで!)
+使うことは全く勧められません。さらに、このプログラムのコマンドの出力形式はどれも規定されておらず、根本となるコマンドに変更があればこちらも変わるということになります。<command>apt-key</command>
+はそういった使い方の検出を試み、その場合には標準エラーに警告を出します。
+   </para>
+</refsect1>
+
+<refsect1><title>サポートするキーリングファイル</title>
+<para>apt-key では拡張子「<literal>gpg</literal>」の付けられた OpenPGP のバイナリ形式 (いわゆる「GPG
+キー公開用リング」) を収録するファイルだけをサポートします。&gpg;
+のもっと新しいバージョンで導入されてキーリングファイルのデフォルトとなっているキーボックスのデータベース形式はサポートしません。そのため、バージョンを問わず
+apt で利用するためのバイナリキーリングファイルの作成には常に <command>gpg --export</command> を使ってください。
+</para>
+<para>また、作成したキーリングを利用するシステムにインストールされている apt のバージョンが全て 1.4 以降であれば、<command>gpg
+--armor --export</command>
+で作成する、拡張子に「<literal>asc</literal>」を付けられた保護付きアスキー形式を代わりに使うこともできます。 
+</para>
+</refsect1>
+
+<refsect1><title>コマンド</title>
+   <variablelist>
+     <varlistentry><term><option>add</option> <option>&synopsis-param-filename;</option></term>
+     <listitem>
+     <para>
+       信頼キーのリストに新しいキーを追加します。このキーを &synopsis-param-filename;
+パラメータに与えたファイル名から読み込みますが、ファイル名を <literal>-</literal> とすると、標準入力から読み込みます。
+     </para>
+     <para>
+     <command>apt-key</command>
+を使用して手動で追加されたキーは、リポジトリの所有者に所属していることが確認されていることが重要です。そうでなければ、&apt-secure;
+インフラが完全に損なわれます。
+     </para>
+     <para>
+       <emphasis>注意</emphasis>: このコマンドを使う代わりに、キーリングに記述的な名前 (ファイル名については &apt-conf;
+ファイルと同一の規則が適用されます)
+を付けて、ファイルの拡張子を「<literal>gpg</literal>」または「<literal>asc</literal>」として
+<filename>/etc/apt/trusted.gpg.d/</filename> ディレクトリに直接配置する方法もあります。
+     </para>
+     </listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>del</option> <option>&synopsis-param-keyid;</option></term>
+     <listitem>
+     <para>
+
+       信頼キー一覧からキーを削除します。
+
+     </para>
+
+     </listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>export</option> <option>&synopsis-param-keyid;</option></term>
+     <listitem>
+     <para>
+
+        キー &synopsis-param-keyid; を標準出力に出力します。
+
+     </para>
+
+     </listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>exportall</option></term>
+     <listitem>
+     <para>
+
+        信頼するキーをすべて標準出力に出力します。
+
+     </para>
+
+     </listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>list</option>, <option>finger</option></term>
+     <listitem>
+     <para>
+
+       信頼キーとそのフィンガープリントを一覧表示します。
+
+     </para>
+
+     </listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>adv</option></term>
+     <listitem>
+     <para>
+     Pass advanced options to gpg. With <command>adv --recv-key</command> you can
+e.g. download key from keyservers directly into the trusted set of
+keys. Note that there are <emphasis>no</emphasis> checks performed, so it is
+easy to completely undermine the &apt-secure; infrastructure if used without
+care.
+     </para>
+
+     </listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>update</option> (非推奨)</term>
+     <listitem>
+     <para>
+       ローカルキーリングをアーカイブキーリングで更新し、もう有効でなくなったアーカイブキーをローカルキーリングから削除します。アーカイブキーリングは、使用中のディストリビューションにある
+<literal>archive-keyring</literal> パッケージ (例えば &keyring-distro; では
+&keyring-package; パッケージ) で提供されています。
+     </para>
+     <para>
+       ディストリビューションでこのコマンドを使う必要はなく、実のところもはやこれを使うのではなくキーリングファイルを
+<filename>/etc/apt/trusted.gpg</filename>
+ディレクトリに直接配置すべきであることに注意してください。それによって <package>gnupg</package>
+への依存を回避でき、鍵の管理は単純にファイルを追加、削除するだけになるため、メンテナにとってもユーザにとっても同様に容易になります。
+     </para>
+     </listitem>
+     </varlistentry>
+     
+     <varlistentry><term><option>net-update</option></term>
+     <listitem>
+     <para>
+
+       上記の <command>update</command> コマンドと同様に更新しますが、アーカイブキーリングを URI
+から取得し、マスターキーを用いて検証します。これには &wget; のインストールと、 APT
+のビルドに取得するサーバと検証するマスターキーリングが設定されていることが必要です。Debian での APT
+はこのコマンドをサポートしていません。代わりに <command>update</command> を使用してください。Ubuntu の APT
+では有効です。
+
+     </para>
+
+     </listitem>
+     </varlistentry>
+   </variablelist>
+</refsect1>
+
+ <refsect1><title>オプション</title>
+<para>前節で説明したコマンドの前に、このオプションを定義する必要があることに注意してください。</para>
+   <variablelist>
+      <varlistentry><term><option>--keyring</option> <option>&synopsis-param-filename;</option></term>
+      <listitem><para>このオプションでは、コマンドが操作するべき特定のキーリングファイルを指定できます。デフォルトでは、<filename>trusted.gpg</filename>
+と <filename>trusted.gpg.d</filename>
+ディレクトリにあるすべてのファイルを用いて、コマンドが動作します。とはいえ、<filename>trusted.gpg</filename>
+がプライマリキーリングになります。つまり新しいキーはこのファイルに追加されます。
+      </para></listitem>
+      </varlistentry>
+   </variablelist>
+ </refsect1>
+
+ <refsect1><title>ファイル</title>
+   <variablelist>
+
+     &file-trustedgpg;
+
+   </variablelist>
+
+</refsect1>
+
+<refsect1><title>関連項目</title>
+<para>
+&apt-get;, &apt-secure;
+</para>
+</refsect1>
+
+ &manbugs;
+ &manauthor;
+
+ <refsect1><title>&translation-title;</title>
+   <para>&translation-holder;</para>
+   <para>&translation-english;</para>
+ </refsect1>
+</refentry>
+

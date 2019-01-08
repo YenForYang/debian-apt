@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Capítulo 3. DSelect</title>
+    <meta name="generator" content="DocBook XSL Stylesheets V1.79.1"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="home" href="index.html" title="Guía de usuario de APT"/>
+    <link rel="up" href="index.html" title="Guía de usuario de APT"/>
+    <link rel="prev" href="ch2.html" title="Capítulo 2. apt-get"/>
+    <link rel="next" href="ch4.html" title="Capítulo 4. La interfaz"/>
+  </head>
+  <body>
+    <div class="navheader">
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Capítulo 3. DSelect</th>
+        </tr>
+        <tr>
+          <td align="left"><a accesskey="p" href="ch2.html">Anterior</a> </td>
+          <th width="60%" align="center"> </th>
+          <td align="right"> <a accesskey="n" href="ch4.html">Siguiente</a></td>
+        </tr>
+      </table>
+      <hr/>
+    </div>
+    <div class="chapter">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h1 class="title"><a id="ch3"/>Capítulo 3. DSelect</h1>
+          </div>
+        </div>
+      </div>
+      <p>
+El método <span class="command"><strong>dselect</strong></span> de APT ofrece el sistema completo de
+APT con la interfaz gráfica de selección de paquetes
+<span class="command"><strong>dselect</strong></span>. <span class="command"><strong>dselect</strong></span> se usa para
+seleccionar los paquetes a instalar o desinstalar que en realidad instalará
+APT.
+</p>
+      <p>
+Para habilitar el método APT tiene que seleccionar [M]étodo en
+<span class="command"><strong>dselect</strong></span>, y después seleccionar el método APT. Se le
+pedirá un conjunto de <span class="emphasis"><em>fuentes</em></span>, ubicaciones de donde
+obtener los ficheros. Pueden ser sitios remotos de Internet, replicas
+locales de Debian o discos ópticos. Cada fuente puede proporcionar un
+fragmento del total del archivo Debian, los cuales APT combinará
+automáticamente para formar un conjunto completo de paquetes. Si tiene un
+disco óptico es una buena idea definirlo primero en el fichero de
+configuración y después especificar una replica para así tener acceso a los
+últimos arreglos de fallos. APT usará automáticamente los paquetes del disco
+óptico en lugar de descargarlos de Internet.
+</p>
+      <pre class="screen">
+   Set up a list of distribution source locations
+
+ Please give the base URL of the debian distribution.
+ The access schemes I know about are: http file
+
+ For example:
+      file:/mnt/debian,
+      ftp://ftp.debian.org/debian,
+      http://ftp.de.debian.org/debian,
+
+
+ URL [http://llug.sep.bnl.gov/debian]:
+</pre>
+      <p>
+La configuración de las <span class="emphasis"><em>fuentes</em></span> comienza preguntando la
+base del archivo de Debian, cuyo valor predeterminado es una réplica HTTP. A
+continuación, preguntará la distribución a obtener.
+</p>
+      <pre class="screen">
+ Please give the distribution tag to get or a path to the
+ package file ending in a /. The distribution
+ tags are typically something like: stable unstable testing non-US
+
+ Distribution [stable]:
+</pre>
+      <p>
+La distribución se refiere a la versión de Debian en el archivo,
+<span class="emphasis"><em>stable</em></span> (estable) se refiere a la última versión
+publicada, y <span class="emphasis"><em>unstable</em></span> (inestable) se refiere a la
+versión en desarrollo. <span class="emphasis"><em>non-US</em></span> sólo está disponible en
+algunas réplicas, aquellos paquetes que contienen tecnología cifrada y otras
+cosas que no se pueden exportar desde los Estados Unidos. Aun así, importar
+estos paquetes a E.E.U.U es ilegal.
+</p>
+      <pre class="screen">
+ Please give the components to get
+ The components are typically something like: main contrib non-free
+
+ Components [main contrib non-free]:
+</pre>
+      <p>
+La lista de componentes se refiere a la lista de sub-distribuciones a
+obtener. La distribución está dividida en base a licencias de software,
+siendo «main» paquetes libres de acuerdo con DFSG, mientras que «contrib» y
+«non-free» contienen paquetes con restricciones en cuanto a su uso y
+distribución.
+</p>
+      <p>
+Puede añadir cualquier número de fuentes, el script de configuración le
+preguntará por fuentes hasta que el usuario defina todo lo que quiera.
+</p>
+      <p>
+Es necesario actualizar la lista disponible mediante el elemento de menú
+[A]ctualizar antes de iniciar <span class="command"><strong>dselect</strong></span>. Éste es un
+superconjunto de <code class="literal">apt-get update</code> que permite a
+<span class="command"><strong>dselect</strong></span> disponer de la información obtenida. Debe
+ejecutar [A]ctualizar aunque haya ejecutado <code class="literal">apt-get
+update</code> con anterioridad.
+</p>
+      <p>
+Hecho esto puede realizar sus selecciones usando [S]elect y ejecutar la
+instalación posteriormente con [I]nstall. Al usar el método APT las órdenes
+[C]onfig y [R]emove carecen de significado ya que la orden [I]nstall ejecuta
+ambos a la vez.
+</p>
+      <p>
+Por omisión, APT eliminará automáticamente los ficheros de paquete («.deb»)
+una vez que se hayan instalado con éxito. Para modificar este
+comportamiento, inserte <code class="literal">Dselect::clean "prompt";</code> en
+«/etc/apt/apt.conf».
+</p>
+    </div>
+    <div class="navfooter">
+      <hr/>
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td align="left"><a accesskey="p" href="ch2.html">Anterior</a> </td>
+          <td align="center"> </td>
+          <td align="right"> <a accesskey="n" href="ch4.html">Siguiente</a></td>
+        </tr>
+        <tr>
+          <td align="left" valign="top">Capítulo 2. apt-get </td>
+          <td align="center">
+            <a accesskey="h" href="index.html">Inicio</a>
+          </td>
+          <td align="right" valign="top"> Capítulo 4. La interfaz</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

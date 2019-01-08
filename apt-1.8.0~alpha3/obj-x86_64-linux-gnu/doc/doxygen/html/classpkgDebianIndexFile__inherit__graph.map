@@ -1,0 +1,16 @@
+<map id="pkgDebianIndexFile" name="pkgDebianIndexFile">
+<area shape="rect" id="node3" href="$classpkgDebianIndexRealFile.xhtml" title="pkgDebianIndexRealFile" alt="" coords="362,132,541,159"/>
+<area shape="rect" id="node12" href="$classpkgDebianIndexTargetFile.xhtml" title="pkgDebianIndexTargetFile" alt="" coords="356,284,547,311"/>
+<area shape="rect" id="node2" href="$classpkgIndexFile.xhtml" title="pkgIndexFile" alt="" coords="5,233,109,260"/>
+<area shape="rect" id="node4" href="$classdebDebPkgFileIndex.xhtml" title="debDebPkgFileIndex" alt="" coords="605,5,759,32"/>
+<area shape="rect" id="node5" href="$classdebDscFileIndex.xhtml" title="debDscFileIndex" alt="" coords="618,56,746,83"/>
+<area shape="rect" id="node7" href="$classdebStatusIndex.xhtml" title="debStatusIndex" alt="" coords="621,107,743,133"/>
+<area shape="rect" id="node8" href="$classdebStringPackageIndex.xhtml" title="debStringPackageIndex" alt="" coords="595,157,769,184"/>
+<area shape="rect" id="node9" href="$classedspLikeIndex.xhtml" title="edspLikeIndex" alt="" coords="624,208,740,235"/>
+<area shape="rect" id="node6" href="$classdebDebianSourceDirIndex.xhtml" title="debDebianSourceDirIndex" alt="" coords="817,56,1008,83"/>
+<area shape="rect" id="node10" href="$classedspIndex.xhtml" title="edspIndex" alt="" coords="868,183,957,209"/>
+<area shape="rect" id="node11" href="$classeippIndex.xhtml" title="eippIndex" alt="" coords="869,233,956,260"/>
+<area shape="rect" id="node13" href="$classdebPackagesIndex.xhtml" title="debPackagesIndex" alt="" coords="611,259,753,285"/>
+<area shape="rect" id="node14" href="$classdebSourcesIndex.xhtml" title="debSourcesIndex" alt="" coords="615,309,749,336"/>
+<area shape="rect" id="node15" href="$classdebTranslationsIndex.xhtml" title="debTranslationsIndex" alt="" coords="602,360,762,387"/>
+</map>

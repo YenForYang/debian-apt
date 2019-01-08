@@ -1,0 +1,557 @@
+
+                       Gebruikershandleiding voor APT
+
+
+-----------------------------------------------------------------------------
+                                      
+                               Jason Gunthorpe
+
+                              <jgg@debian.org>
+
+                             Versie 1.8.0~alpha3
+
+-----------------------------------------------------------------------------
+
+Copyright © 1998 Jason Gunthorpe
+
+Toelichting bij de licentie
+
+    "APT" en dit document zijn vrije software. U kunt ze verspreiden en/of ze
+    aanpassen overeenkomstig de bepalingen van de GNU General Public License,
+    versie 2 of (volgens uw keuze) iedere latere versie, zoals die door de
+    Free Software Foundation gepubliceerd werd.
+
+    Meer details en de volledige licentie vindt u op Debian-systemen in het
+    bestand /usr/share/common-licenses/GPL.
+
+Samenvatting
+
+Dit document geeft een overzicht van het gebruik van de pakketmanager APT.
+
+-----------------------------------------------------------------------------
+
+Inhoudsopgave
+
+1. Algemeen
+
+    1.1. Anatomie van het pakketsysteem
+
+2. apt-get
+3. DSelect
+4. De interface
+
+    4.1. Opstarten
+    4.2. Het statusrapport
+
+        4.2.1. De lijst met extra pakketten
+        4.2.2. De te verwijderen pakketten
+        4.2.3. De lijst nieuw te installeren pakketten
+        4.2.4. De lijst van tegengehouden pakketten
+        4.2.5. Waarschuwing over tegengehouden pakketten
+        4.2.6. Afsluitende samenvatting
+
+    4.3. De statusweergave
+    4.4. Dpkg
+
+Hoofdstuk 1. Algemeen
+
+Inhoudsopgave
+
+1.1. Anatomie van het pakketsysteem
+
+    Momenteel bevat het APT-pakket twee secties, de dselect-methode van APT
+    en het commandoregelprogramma apt-get. Beide bieden een manier om
+    pakketten te installeren en te verwijderen en nieuwe pakketten via het
+    internet op te halen.
+
+1.1. Anatomie van het pakketsysteem
+
+    Het pakketsysteem van Debian maakt gebruik van een grote hoeveelheid aan
+    informatie over elk pakket om te helpen verzekeren dat het eenvoudig en
+    netjes in het systeem ingepast kan worden. Het meest prominente aspect
+    van zijn functionaliteit is het vereistensysteem.
+
+    Het vereistensysteem laat individuele programma's toe om gebruik te maken
+    van gemeenschappelijke elementen uit het systeem, zoals bibliotheken. Het
+    vereenvoudigt het onderbrengen van weinig gebruikte aspecten van een
+    programma in aparte pakketten om het aantal zaken dat een gewone
+    gebruiker moet installeren, te beperken. Het laat ook toe te kiezen uit
+    verschillende mailservers (mail transport agents), X-servers, enz.
+
+    Een eerste stap in het begrijpen van het vereistensysteem is het concept
+    van een eenvoudige vereiste vatten. Een eenvoudige vereiste houdt in dat
+    een pakket om behoorlijk te kunnen functioneren, vereist dat een ander
+    pakket gelijktijdig geïnstalleerd wordt.
+
+    Bijvoorbeeld, mailcrypt is een emacs-uitbreiding die helpt bij het
+    versleutelen van e-mail met GPG. Zonder dat GPG geïnstalleerd is, is
+    mailcrypt nutteloos. Dus is mailcrypt afhankelijk van GPG (en is GPG een
+    vereiste voor mailcrypt). Omdat mailcrypt een uitbreiding van emacs is,
+    is het bovendien ook daarvan afhankelijk. Zonder emacs is het gewoon
+    onbruikbaar.
+
+    Een andere belangrijke afhankelijkheid die u goed moet begrijpen is een
+    conflicterende afhankelijkheid. Dit houdt in dat een pakket, mocht het
+    tegelijk met een ander pakket geïnstalleerd zijn, niet zal werken en
+    misschien zelfs heel schadelijk voor het systeem kan zijn. Neem
+    bijvoorbeeld een mail transport agent (mailserver) zoals sendmail, exim
+    of qmail. Het is niet mogelijk om er twee van te installeren, omdat ze
+    allemaal op het netwerk moeten luisteren om mail te ontvangen. Mocht men
+    er toch twee proberen te installeren, dan zou het systeem ernstig
+    beschadigd raken en om die reden hebben alle mail transport agents een
+    conflictafhankelijkheid tegenover alle andere mail transport agents.
+
+    Een bijkomende complicatie is dat de mogelijkheid bestaat dat een pakket
+    zich als een ander pakket voordoet. Bedenk dat exim en sendmail voor vele
+    doeleinden identiek zijn: allebei bezorgen ze e-mail en allebei kunnen ze
+    overweg met een gemeenschappelijke interface. Daarom voorziet het
+    pakketsysteem voor hen in de mogelijkheid om te verklaren dat ze allebei
+    mail-transport-agents zijn. Dus verklaren exim en sendmail allebei dat ze
+    een mail-transport-agent aanbieden. En andere pakketten die een mail
+    transport agent nodig hebben, hebben mail-transport-agent als vereiste.
+    Bij het manueel proberen repareren van pakketten kan dit tot heel wat
+    verwarring leiden.
+
+    Aan een eenvoudige vereiste kan op elk moment al dan niet voldaan worden
+    door pakketten die reeds geïnstalleerd zijn. APT probeert te helpen bij
+    het oplossen van vereistenproblemen door een aantal automatische
+    algoritmes aan te bieden die helpen bij het selecteren van te installeren
+    pakketten.
+
+Hoofdstuk 2. apt-get
+
+    apt-get biedt een eenvoudige manier om aan de commandoregel pakketten te
+    installeren. Anders dan dpkg beheerst apt-get niet het behandelen van
+    .deb-bestanden. Het werkt met de eigenlijke naam van het pakket en kan
+    enkel .deb-archieven installeren vanuit een Source (pakketbron).
+
+    Het eerste ^[1] wat men moet doen vooraleer apt-get te gebruiken, is de
+    pakketlijst ophalen uit de Sources (pakketbronnen), zodat het op de
+    hoogte is van de beschikbare pakketten. Dit doet men met apt-get update.
+    Bijvoorbeeld:
+
+    # apt-get update
+    Ophalen van http://ftp.de.debian.org/debian-non-US/ stable/binary-i386/ Packages
+    Ophalen van http://llug.sep.bnl.gov/debian/ testing/contrib Packages
+    Pakketlijsten worden ingelezen... Klaar
+    Boom van vereisten wordt opgebouwd... Klaar
+
+    Na het bijwerken van de pakketlijst kunnen verschillende commando's
+    gebruikt worden.
+
+    upgrade
+
+        Upgrade zal proberen om op een gematigde manier het hele systeem bij
+        te werken. Upgrade zal nooit een nieuw pakket installeren of een
+        bestaand pakket verwijderen en het zal ook nooit een pakket bijwerken
+        dat een ander pakket onbruikbaar zou kunnen maken. Dit commando kan
+        dagelijks gebruikt worden om het systeem veilig bij te werken.
+        Upgrade zal alle pakketten die het niet kon bijwerken vermelden.
+        Gewoonlijk betekent dit dat zij afhankelijk zijn van nieuwe pakketten
+        of conflicteren met een ander pakket. Men kan dselect of apt-get
+        install gebruiken om de installatie van deze pakketten af te dwingen.
+
+    install
+
+        Install wordt gebruikt om bij naam genoemde pakketten te installeren.
+        Het pakket wordt automatisch opgehaald en geïnstalleerd. Dit kan
+        nuttig zijn als u reeds de naam van het te installeren pakket kent en
+        geen GUI wenst te gebruiken om het te kiezen. Gelijk welk aantal
+        pakketten kan voor installatie opgegeven worden. Ze zullen allemaal
+        opgehaald worden. Install zal automatisch proberen om een oplossing
+        te vinden voor de vereistenproblemen die zich met de opgegeven
+        pakketten stellen, het zal er een samenvatting van weergeven en om
+        bevestiging vragen indien er nog andere wijzigingen door te voeren
+        zijn dan de opgegeven argumenten.
+
+    dist-upgrade
+
+        Dist-upgrade voert een volledige opwaardering uit en is ontworpen om
+        de opwaardering tussen verschillende uitgaves van Debian te
+        vergemakkelijken. Het maakt gebruik van een gesofisticeerd algoritme
+        om de beste combinatie van pakketten te vinden die geïnstalleerd,
+        opgewaardeerd en verwijderd moeten worden om op die manier een zo
+        groot mogelijk deel van het systeem op het niveau van de meest
+        recente uitgave te krijgen. In sommige omstandigheden kan het
+        aangewezen zijn dist-upgrade te gebruiken in plaats van zelf tijd te
+        investeren in het manueel oplossen in dselect van vereistenproblemen.
+        Nadat dist-upgrade zijn operatie beëindigd heeft, kan men dan dselect
+        gebruiken om eventuele pakketten die achterwege gelaten werden, te
+        installeren.
+
+        Het is van belang om van nabij te onderzoeken wat dist-upgrade van
+        plan is te doen. Zijn keuzes kunnen soms redelijk verrassend zijn.
+
+    Er kunnen met apt-get verschillende commandoregelopties gebruikt worden
+    die beschreven worden in de man-pagina apt-get(8). De meest bruikbare
+    optie is -d dat de opgehaalde bestanden niet installeert. Indien het
+    systeem een groot aantal pakketten moet downloaden en er zou iets fout
+    gegaan zijn, dan zou het onwenselijk zijn dat er met hun installatie
+    begonnen wordt. Als de optie -d gebruikt werd, kan men de opgehaalde
+    archieven beginnen installeren door gewoon het commando waarmee men ze
+    opgehaald heeft opnieuw uit te voeren, maar dan zonder de optie -d.
+
+
+-----------------------------------------------------------------------------
+
+    ^[1] Indien u van een http proxy-server gebruik maakt, moet u eerst de
+    omgevingsvariabele http_proxy instellen; zie sources.list(5)
+
+Hoofdstuk 3. DSelect
+
+    De APT-methode dselect stelt aan het volledige APT systeem het GUI 
+    dselect ter beschikking voor de selectie van pakketten. dselect wordt
+    gebruikt om de te installeren of te verwijderen pakketten te selecteren
+    en APT voert de eigenlijke operatie uit.
+
+    Om de APT-methode te activeren moet u in dselect [T]oegang ([A]ccess)
+    selecteren en dan voor de APT-methode kiezen. Er wordt dan om een stel 
+    Sources (pakketbronnen) gevraagd. Dat zijn plaatsen waarvandaan archieven
+    opgehaald kunnen worden. Dat kunnen externe internetsites zijn, lokale
+    spiegelservers van Debian of CD's. Elke bron kan een fragment van het
+    volledige archief van Debian aanbieden en APT zal ze automatisch
+    combineren om een volledige set van pakketten samen te stellen. Indien u
+    een CD gebruikt is het goed om die eerst te vermelden en daarna een
+    spiegelserver waardoor u ook toegang krijgt tot de meest recente
+    reparaties van bugs. APT zal automatisch eerst de pakketten van uw CD
+    gebruiken vooraleer pakketten van het internet te downloaden.
+
+       Een lijst van locaties met pakketbronnen voor de distributie instellen
+
+     Voer het basis-URL van de debian distributie in.
+     Toegangsmethodes waarmee ik kan werken zijn: http file
+
+     Bijvoorbeeld:
+          file:/mnt/debian,
+          ftp://ftp.debian.org/debian,
+          http://ftp.de.debian.org/debian,
+
+
+     URL [http://llug.sep.bnl.gov/debian]:
+
+    Het instellen van de Sources (pakketbronnen) begint met een vraag naar de
+    basis van het Debian archief, wat standaard een HTTP-spiegelserver is.
+    Nadien wordt gevraagd welke distributie opgehaald moet worden.
+
+     Voer het label van de op te halen distributie in of een pad
+     naar het pakketbestand dat eindig op een /. Een label van een
+     distributie is typisch iets in de zin van : stable unstable testing non-US
+
+     Distributie [stable]:
+
+    De distributie verwijst naar de versie van Debian in het archief. stable
+    verwijst naar de recentste uitgebrachte versie en unstable verwijst naar
+    de versie die ontwikkeld wordt. non-US is enkel op sommige spiegelservers
+    beschikbaar en verwijst naar pakketten die encryptietechnologie gebruiken
+    of andere zaken waarvan de uitvoer uit de Verenigde Staten niet
+    toegelaten is. Deze pakketten invoeren in de Verenigde Staten is echter
+    wel legaal.
+
+     Voer de op te halen componenten in
+     Componenten zijn typisch iets zoals: main contrib non-free
+
+     Componenten [main contrib non-free]:
+
+    De lijst met componenten verwijst naar een lijst van sub-distributies die
+    opgehaald moeten worden. De distributie is onderverdeeld op basis van
+    softwarelicenties. Daarbij bevat main pakketten die vrij zijn volgens de
+    DFSG (vrije software richtlijnen van Debian), terwijl pakketten in
+    contrib en non-free zaken bevatten met restricties op het vlak van
+    gebruik of verspreiding.
+
+    Gelijk welk aantal pakketbronnen kan opgegeven worden. Het script dat het
+    instellen ervan begeleidt, zal vragen blijven stellen totdat u alles wat
+    u wenste ingegeven hebt.
+
+    Vooraleer met het gebruik van dselect te beginnen moet u de lijst van
+    beschikbare pakketten bijwerken door in het menu te kiezen voor [B]
+    ijwerken ([U]pdate). Dit is een uitbreiding van apt-get update die de
+    opgehaalde informatie aan dselect doorgeeft. [B]ijwerken ([U]pdate) moet
+    uitgevoerd worden, zelfs indien voordien apt-get update uitgevoerd werd.
+
+    U kunt dan voortdoen en uw selectie maken met [S]electeer ([S]elect) en
+    vervolgens de installatie uitvoeren met [I]nstalleren ([I]nstall). Indien
+    u de APT-methode gebruikt zijn de commando's [C]onfigureer ([C]onfig) en
+    [V]erwijder ([R]emove) overbodig. Het commando [I]nstalleren ([I]nstall)
+    voert ze allemaal samen uit.
+
+    Standaard verwijdert APT automatisch de opgehaalde pakketbestanden (.deb)
+    nadat ze succesvol geïnstalleerd werden. Om dit gedrag aan te passen moet
+    u Dselect::clean "prompt"; plaatsen in /etc/apt/apt.conf.
+
+Hoofdstuk 4. De interface
+
+Inhoudsopgave
+
+4.1. Opstarten
+4.2. Het statusrapport
+
+    4.2.1. De lijst met extra pakketten
+    4.2.2. De te verwijderen pakketten
+    4.2.3. De lijst nieuw te installeren pakketten
+    4.2.4. De lijst van tegengehouden pakketten
+    4.2.5. Waarschuwing over tegengehouden pakketten
+    4.2.6. Afsluitende samenvatting
+
+4.3. De statusweergave
+4.4. Dpkg
+
+    Zowel de dselect-methode van APT als apt-get maken gebruik van dezelfde
+    interface. Het is een eenvoudig systeem dat u in het algemeen zegt wat
+    het van plan is te doen en dan voor de uitvoering ervan gaat. ^[2] Nadat
+    het een samenvatting gegeven heeft van wat er zal gebeuren, zal APT een
+    aantal informatieve statusberichten weergeven, waardoor u kunt inschatten
+    hoe ver het gevorderd is en hoeveel werk er nog te verrichten is.
+
+4.1. Opstarten
+
+    Alvorens met een operatie te beginnen, behalve bij update, voert APT een
+    aantal acties uit om zijn interne status klaar te maken. Het voert ook
+    een aantal controles uit op de status van het systeem. Op om het even
+    welk moment kunnen deze operaties uitgevoerd worden door het commando
+    apt-get check uit te voeren.
+
+    # apt-get check
+    Pakketlijsten worden ingelezen... Klaar (Reading Package Lists... Done)
+    Boom van vereisten wordt opgebouwd... Klaar (Building Dependency Tree... Done)
+
+    Het eerste wat het doet is alle pakketbestanden in het geheugen laden.
+    APT maakt gebruik van een bufferingsschema, waardoor de operatie sneller
+    zal verlopen bij een tweede uitvoering. Indien sommige pakketbestanden
+    niet gevonden worden, zullen ze overgeslagen worden en er zal een
+    waarschuwing gegeven worden bij het afsluiten van apt-get.
+
+    De laatste operatie voert een gedetailleerde analyse uit van de
+    vereistenboom op het systeem. Het voert een controle uit van elke
+    vereiste van elk geïnstalleerd of uitgepakt pakket en gaat na of die OK
+    is. Mocht daarbij een probleem ontdekt worden, dan zal een rapport
+    weergegeven worden en apt-get zal de operatie niet voortzetten.
+
+    # apt-get check
+    Pakketlijsten worden ingelezen... Klaar
+    Boom van vereisten wordt opgebouwd... Klaar
+    U zou 'apt --fix-broken install' kunnen uitvoeren om dit te repareren.
+    Sorry, maar de volgende pakketten hebben niet-voldane vereisten:
+      9fonts: Vereist: xlib6g maar dit is niet geïnstalleerd
+      uucp: Vereist: mailx maar dit is niet geïnstalleerd
+      blast: Vereist: xlib6g (>= 3.3-5) maar dit is niet geïnstalleerd
+      adduser: Vereist: perl-base maar dit is niet geïnstalleerd
+      aumix: Vereist: libgpmg1 maar dit is niet geïnstalleerd
+      debiandoc-sgml: Vereist: sgml-base maar dit is niet geïnstalleerd
+      bash-builtins: Vereist: bash (>= 2.01) maar 2.0-3 is geïnstalleerd
+      cthugha: Vereist: svgalibg1 maar dit is niet geïnstalleerd
+               Vereist: xlib6g (>= 3.3-5) maar dit is niet geïnstalleerd
+      libreadlineg2: Conflicteert met:libreadline2 (<< 2.1-2.1)
+
+    Het systeem uit dit voorbeeld kampt met veel problemen, inclusief een
+    ernstig probleem met libreadlineg2. Voor elk pakket met onvoldane
+    vereisten wordt een regel weergegeven met een aanduiding van het pakket
+    dat met het probleem geconfronteerd wordt en de vereisten waaraan niet
+    voldaan zijn. Ook een korte verklaring waarom het pakket een
+    vereistenprobleem heeft wordt toegevoegd.
+
+    Een systeem kan op twee manieren terechtkomen in een dergelijke defecte
+    staat. Een eerste oorzaak kan dpkg zijn aan wie sommige subtiele
+    onderlinge relaties tussen pakketten ontgaan zijn bij het uitvoeren van
+    opwaarderingen. ^[3]. Een tweede oorzaak is het mislukken van de operatie
+    in de loop van de installatie van een pakket. In een dergelijk geval kan
+    een pakket uitgepakt zijn zonder dat zijn vereisten geïnstalleerd werden.
+
+    De tweede situatie is veel minder ernstig dan de eerste omdat APT sommige
+    beperkingen instelt op de volgorde waarin pakketten geïnstalleerd worden.
+    In beide gevallen zal het toevoegen van de optie -f aan het commando 
+    apt-get APT ertoe aanzetten om een mogelijke oplossing voor het probleem
+    te zoeken en om dan voort te gaan. De dselect-methode van APT voegt
+    steeds de optie -f toe om bij het mislukken van een script van de
+    pakketonderhouder toch een vlotte voortgang te hebben.
+
+    Nochtans, als de optie -f gebruikt wordt voor het herstellen van een
+    ernstig defect systeem ten gevolge van de eerste oorzaak, dan kan het
+    gebeuren dat het commando ofwel onmiddellijk faalt of dat het in de loop
+    van de installatiesequentie tot een mislukking komt. In beide gevallen
+    zal het nodig zijn om manueel gebruik te maken van dpkg (wellicht met
+    forceeropties) om de situatie in voldoende mate te corrigeren zodat APT
+    in staat is voort te gaan.
+
+4.2. Het statusrapport
+
+    Vooraleer het voortgaat zal apt-get een rapport tonen over wat er te
+    gebeuren staat. In het algemeen geeft het rapport het type operatie weer
+    dat uitgevoerd zal worden, maar dit bevat veel gemeenschappelijke
+    elementen. In alle gevallen reflecteren de lijsten de eindstand van
+    zaken, rekening houdend met de optie -f en alle andere mogelijke
+    activiteiten die relevant zijn voor het uit te voeren commando.
+
+4.2.1. De lijst met extra pakketten
+
+    De volgende extra pakketten zullen geïnstalleerd worden:
+    (The following extra packages will be installed:)
+      libdbd-mysql-perl xlib6 zlib1 xzx libreadline2 libdbd-msql-perl
+      mailpgp xdpkg fileutils pinepgp zlib1g xlib6g perl-base
+      bin86 libgdbm1 libgdbmg1 quake-lib gmp2 bcc xbuffy
+      squake pgp-i python-base debmake ldso perl libreadlineg2
+      ssh
+
+    De lijst met extra pakketten geeft alle pakketten weer die geïnstalleerd
+    of opgewaardeerd zullen worden bovenop degene die aan de commandoregel
+    opgegeven werden. Die lijst wordt enkel aangemaakt voor een install
+    commando. De weergegeven pakketten zijn vaak het resultaat van een
+    automatische installatie.
+
+4.2.2. De te verwijderen pakketten
+
+    De volgende pakketten zullen VERWIJDERD worden:
+    (The following packages will be REMOVED:)
+      xlib6-dev xpat2 tk40-dev xkeycaps xbattle xonix
+      xdaliclock tk40 tk41 xforms0.86 ghostview xloadimage xcolorsel
+      xadmin xboard perl-debug tkined xtetris libreadline2-dev perl-suid
+      nas xpilot xfig
+
+    De lijst met te verwijderen pakketten geeft alle pakketten weer die van
+    het systeem verwijderd zullen worden. Ze kan bij elk van de operaties
+    getoond worden en zou zorgvuldig nagekeken moeten worden om zich ervan te
+    vergewissen dat niets belangrijks weggenomen zal worden. Zeker de optie
+    -f lokt vaak het verwijderen van pakketten uit en in dat geval is extra
+    zorgvuldigheid zeker aangewezen. De lijst kan pakketten bevatten die
+    verwijderd zullen worden omdat ze slechts ten dele geïnstalleerd werden,
+    mogelijks ten gevolge van een afgebroken installatie.
+
+4.2.3. De lijst nieuw te installeren pakketten
+
+    De volgende NIEUWE pakketten zullen geïnstalleerd worden:
+    (The following NEW packages will installed:)
+      zlib1g xlib6g perl-base libgdbmg1 quake-lib gmp2 pgp-i python-base
+
+    De lijst met nieuwe pakketten is enkel een geheugensteun voor wat er gaat
+    gebeuren. De vermelde pakketten worden nu nog niet op het systeem
+    geïnstalleerd, maar dat zal gebeuren als APT uitgevoerd wordt.
+
+4.2.4. De lijst van tegengehouden pakketten
+
+    De volgende pakketten werden tegengehouden
+    (The following packages have been kept back)
+      compface man-db tetex-base msql libpaper svgalib1
+      gs snmp arena lynx xpat2 groff xscreensaver
+
+    Telkens het hele systeem opgewaardeerd wordt, bestaat de kans dat nieuwe
+    versies van pakketten niet geïnstalleerd kunnen worden omdat ze nieuwe
+    zaken vereisen of conflicteren met reeds geïnstalleerde zaken. In dat
+    geval zal dat pakket vermeld worden in de lijst van tegengehouden
+    pakketten. De beste manier om de daar vermelde pakketten te overtuigen om
+    zich te laten installeren is apt-get install te gebruiken of dselect te
+    gebruiken om hen een oplossing voor de problemen te laten vinden.
+
+4.2.5. Waarschuwing over tegengehouden pakketten
+
+    De volgende tegengehouden pakketten zullen gewijzigd worden:
+    (The following held packages will be changed:)
+      cvs
+
+    Soms kan het gebeuren dat u APT vraagt om een als tegengehouden
+    gemarkeerd pakket te installeren. In dat geval geeft het een waarschuwing
+    dat het tegengehouden pakket gewijzigd zal worden. Dit zou enkel mogen
+    voorkomen bij een dist-upgrade of een install.
+
+4.2.6. Afsluitende samenvatting
+
+    Tenslotte zal APT een samenvatting weergeven van alle wijzigingen die
+    aangebracht zullen worden.
+
+    206 pakketten opgewaardeerd, 8 nieuw geïnstalleerd, 23 te verwijderen en 51 niet opgewaardeerd.
+    12 pakketten niet volledig geïnstalleerd of verwijderd.
+    Moet 65.7M/66.7M archieven ophalen. Na uitpakken zal 26.5M gebruikt worden.
+
+    De eerste regel van de samenvatting is gewoon een beknopte versie van
+    alle lijsten en bevat het aantal opwaarderingen - dat zijn reeds
+    geïnstalleerde pakketten waarvoor nieuwere versies beschikbaar zin. De
+    tweede regel toont het aantal slecht geconfigureerde pakketten, mogelijks
+    het gevolg van een afgebroken installatie. De laatste regel toont de
+    opslagruimte die door de installatie gebruikt zal worden. Het eerste paar
+    getallen verwijst naar de grootte van de archiefbestanden. Het eerste
+    getal geeft het aantal bytes op dat van externe locaties opgehaald moet
+    worden en het tweede geeft de gezamenlijke omvang van alle benodigde
+    archieven op. Het volgende getal geeft het verschil in grootte op tussen
+    de actueel geïnstalleerde pakketten en de nieuwe situatie. Grofweg is dit
+    vergelijkbaar met de benodigde ruimte in /usr nadat alles achter de rug
+    is. Indien een groot aantal pakketten verwijderd wordt, kan de opgegeven
+    waarde verwijzen naar de ruimte die vrij zal komen.
+
+    Door de optie -u te gebruiken kan men rapporten laten opmaken over de op
+    te waarderen pakketten. Deze rapporten zijn vergelijkbaar met de vorige
+    voorbeelden.
+
+4.3. De statusweergave
+
+    Tijdens het downloaden van archieven en pakketbestanden geeft APT een
+    aantal statusberichten weer.
+
+    # apt-get update
+    Ophalen:1 http://ftp.de.debian.org/debian-non-US/ stable/non-US/ Packages
+    Ophalen:2 http://llug.sep.bnl.gov/debian/ testing/contrib Packages
+    Geraakt http://llug.sep.bnl.gov/debian/ testing/main Packages
+    Ophalen:4 http://ftp.de.debian.org/debian-non-US/ unstable/binary-i386/ Packages
+    Ophalen:5 http://llug.sep.bnl.gov/debian/ testing/non-free Packages
+    11% [5 testing/non-free `Wachten op bestand' 0/32.1k 0%] 2203b/s 1m52s
+
+    Regels die beginnen met Ophalen worden weergegeven wanneer APT een
+    bestand begint op te halen, terwijl de laatste regel de voortgang van de
+    download aangeeft. Het eerste percentage op de voortgangsregel verwijst
+    naar het totale percentage van alle bestanden samen dat afgewerkt is.
+    Aangezien de grootte van de Packages-bestanden niet bekend is, maakt
+    apt-get update een schatting van het reeds afgewerkte percentage, maar
+    die is jammer genoeg in een zekere mate inaccuraat.
+
+    De volgende sectie van de statusregel wordt voor elke downloadtaak
+    herhaald en geeft de operatie die uitgevoerd wordt weer evenals wat
+    nuttige informatie over wat er aan het gebeuren is. Soms zal die sectie
+    gewoon Forking bevatten, wat er op wijst dat het OS de downloadmodule aan
+    het laden is. Het eerste woord na het [ is het volgnummer van de
+    ophaaltaak zoals dat op de voortgangsregels getoond wordt. Het volgende
+    woord is de verkorte vorm van de naam van het object dat opgehaald wordt.
+    Als het archieven betreft, zal het de naam van het pakket dat opgehaald
+    wordt bevatten.
+
+    Tussen de enkelvoudige aanhalingstekens staat een informatieve tekst die
+    de voortgang weergeeft van de onderhandelingsfase van de download.
+    Gewoonlijk evolueert dat van Aan het verbinden over Aan het wachten op
+    bestand naar Aan het downloaden of Aan het hervatten. De laatste waarde
+    geeft het aantal bytes weer dat opgehaald werd van de externe site. Als
+    het proces van downloaden begonnen is, wordt dit weergegeven als 102/
+    10.2k, hetgeen betekent dat er reeds 102 bytes opgehaald werden van een
+    verwacht totaal van 10.2 kilobytes. De weergave van de volledige grootte
+    wordt steeds getoond in een 4-cijfernotatie om plaats te sparen. Na de
+    weergave van de grootte komt het reeds opgehaalde percentage van het
+    bestand. Het voorlaatste element geeft de huidige gemiddelde snelheid op.
+    Deze waarde wordt elke 5 seconden ververst en geeft de snelheid van de
+    gegevensoverdracht voor die periode weer. Tenslotte wordt de verwachte
+    duur van de gegevensoverdracht weergegeven. Dit wordt regelmatig ververst
+    en weerspiegelt de tijd die nodig is om alles af te werken aan het
+    getoonde tempo van gegevensoverdracht.
+
+    De statusweergave wordt iedere halve seconde ververst en geeft zo een
+    constante feedback over het downloadproces terwijl de Ophalen-regels naar
+    boven scrollen telkens er met een nieuw bestand wordt begonnen. Vermits
+    de statusweergave permanent ververst wordt, is dit niet geschikt om in
+    een logbestand opgeslagen te worden. Gebruik de optie -q om de
+    statusweergave te onderdrukken.
+
+4.4. Dpkg
+
+    APT gebruikt dpkg om de archieven te installeren en schakelt na het
+    voltooien van het downloaden over op de interface dpkg. Tijdens het
+    verwerken van de pakketten zal dpkg een aantal vragen stellen en ook de
+    pakketten zelf kunnen verschillende vragen stellen. Aan elke vraag gaat
+    er gewoonlijk een beschrijving vooraf van waarover de vraag gaat. De
+    vragen zijn dermate gevarieerd dat het niet mogelijk is om ze hier
+    volledig te behandelen.
+
+
+-----------------------------------------------------------------------------
+
+    ^[2] De dselect-methode is eigenlijk een geheel van scripts die rondom 
+    apt-get gebouwd werden. De methode biedt eigenlijk meer functionaliteit
+    dan aanwezig is in apt-get alleen.
+
+    ^[3] APT neemt evenwel alle gekende vereisten in overweging en probeert
+    het ontstaan van defecte pakketten te voorkomen.
+

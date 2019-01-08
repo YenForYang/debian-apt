@@ -1,0 +1,124 @@
+'\" t
+.\"     Title: apt-extracttemplates
+.\"    Author: Jason Gunthorpe
+.\" Generator: DocBook XSL Stylesheets v1.79.1 <http://docbook.sf.net/>
+.\"      Date: 27\ \&Marzo\ \&2014
+.\"    Manual: APT
+.\"    Source: APT 1.8.0~alpha3
+.\"  Language: Spanish
+.\"
+.TH "APT\-EXTRACTTEMPLATE" "1" "27\ \&Marzo\ \&2014" "APT 1.8.0~alpha3" "APT"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NOMBRE"
+apt-extracttemplates \- Herramienta de extracci\('on de configuraci\('on de \fBdebconf\fR y plantillas de paquetes de Debian
+.SH "SINOPSIS"
+.HP \w'\fBapt\-extracttemplates\fR\ 'u
+\fBapt\-extracttemplates\fR [\fB\-t=\fR\fB\fItemporary_directory\fR\fR] \fIfilename\fR... {\-v\ |\ \-\-version} {\-h\ |\ \-\-help}
+.SH "DESCRIPCI\('ON"
+.PP
+\fBapt\-extracttemplates\fR
+tomar\('a uno o m\('as ficheros de paquetes de Debian como entrada para escribir (a un directorio temporal) todos los scripts de configuraci\('on asociados y los ficheros de plantilla\&. Para cada paquete proporcionado que contenga scripts de configuraci\('on y plantillas, se generar\('a una salida de una l\('inea con el formato:
+.PP
+paquete versi\('on fichero\-de\-plantilla script\-de\-configuraci\('on
+.PP
+El fichero de plantilla y el script de configuraci\('on se escriben en el directorio temporal definido mediante la opci\('on
+\fB\-t\fR
+o
+\fB\-\-tempdir\fR
+(APT::ExtractTemplates::TempDir), con un formato de nombre de fichero
+paquete\&.template\&.XXXXXX
+y
+paquete\&.config\&.XXXXXX
+.SH "OPCIONES"
+.PP
+Todas las opciones de la l\('inea de \('ordenes se pueden definir mediante el fichero de configuraci\('on, las descripciones indican la opci\('on de la configuraci\('on a definir\&. Para opciones de tipo \(Foboolean\(Fc puede invalidar el fichero de configuraci\('on utilizando algo como
+\fB\-f\-\fR,\fB\-\-no\-f\fR,
+\fB\-f=no\fR
+u otras muchas variaciones\&.
+.PP
+\fB\-t\fR, \fB\-\-tempdir\fR
+.RS 4
+El directorio temporal en el que se escribir\('an los ficheros de plantillas
+\fBdebconf\fR
+y los scripts de configuraci\('on extra\('idos\&. Opci\('on de configuraci\('on:
+APT::ExtractTemplates::TempDir
+.RE
+.PP
+\fB\-h\fR, \fB\-\-help\fR
+.RS 4
+Muestra un mensaje corto sobre el uso\&.
+.RE
+.PP
+\fB\-v\fR, \fB\-\-version\fR
+.RS 4
+Muestra la versi\('on del programa\&.
+.RE
+.PP
+\fB\-c\fR, \fB\-\-config\-file\fR
+.RS 4
+Fichero de configuraci\('on: Especifica el fichero de configuraci\('on a usar\&. El programa leer\('a el fichero de configuraci\('on predeterminado y, despu\('es, este fichero de configuraci\('on\&. Si necesita que ciertas opciones de configuraci\('on se definan antes que el an\('alisis de los de los ficheros de configuraci\('on predeterminados, defina un fichero con la variable de entorno
+\fBAPT_CONFIG\fR\&. Consulte
+\fBapt.conf\fR(5)
+para informaci\('on sobre la sintaxis\&.
+.RE
+.PP
+\fB\-o\fR, \fB\-\-option\fR
+.RS 4
+Define una opci\('on de configuraci\('on: Esto definir\('a una opci\('on arbitraria de configuraci\('on\&. La sintaxis es
+\fB\-o Algo::Cosa=cosa\fR\&.
+\fB\-o\fR
+y
+\fB\-\-option\fR
+se pueden usar varias veces para definir diferentes opciones\&.
+.RE
+.SH "V\('EASE TAMBI\('EN"
+.PP
+\fBapt.conf\fR(5)
+.SH "DIAGN\('OSTICOS"
+.PP
+\fBapt\-extracttemplates\fR
+devuelve cero si no hay ning\('un error, y el valor 100 en caso de error\&.
+.SH "BUGS"
+.PP
+\m[blue]\fBP\('agina de errores de APT\fR\m[]\&\s-2\u[1]\d\s+2\&. Si quiere informar de un error en APT, consulte
+/usr/share/doc/debian/bug\-reporting\&.txt
+o use la orden
+\fBreportbug\fR(1)\&.
+.SH "TRADUCCI\('ON"
+.PP
+La traducci\('on al espa\(~nol la realizaron Ismael Fanlo, Carlos Mestre, Rudy Godoy, Gustavo Saldumbide, Javier Fern\('andez\-Sanguino y Rub\('en Porras Campo entre los a\(~nos 2003 y 2004\&. La traducci\('on fue actualizada por Francisco Javier Cuadrado y Omar Campagne Polaino entre los a\(~nos 2009 y 2012 \&.
+.PP
+Tenga en cuenta que este documento puede contener secciones sin traducir\&. Esto es intencionado para evitar perder contenido cuando la traducci\('on no est\('a actualizada con respecto al documento original\&.
+.SH "AUTORES"
+.PP
+\fBJason Gunthorpe\fR
+.RS 4
+.RE
+.PP
+\fBEquipo de APT\fR
+.RS 4
+.RE
+.SH "NOTAS"
+.IP " 1." 4
+P\('agina de errores de APT
+.RS 4
+\%http://bugs.debian.org/src:apt
+.RE

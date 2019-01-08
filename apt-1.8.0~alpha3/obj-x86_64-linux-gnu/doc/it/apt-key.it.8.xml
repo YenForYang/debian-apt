@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+  "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % aptent SYSTEM "apt.ent"> %aptent;
+<!ENTITY % aptverbatiment SYSTEM "apt-verbatim.ent"> %aptverbatiment;
+<!ENTITY % aptvendor SYSTEM "apt-vendor.ent"> %aptvendor;
+]>
+
+<refentry>
+ <refentryinfo>
+   <!-- The last update date -->
+&apt-author.jgunthorpe;
+   &apt-author.team;
+   &apt-email;
+   &apt-product;
+   
+   <date>2016-11-22T00:00:00Z</date>
+ </refentryinfo>
+
+ <refmeta>
+   <refentrytitle>apt-key</refentrytitle>
+   <manvolnum>8</manvolnum>
+   <refmiscinfo class="manual">APT</refmiscinfo>
+ </refmeta>
+ 
+ 
+ <!-- Man page title -->
+<refnamediv>
+    <refname>apt-key</refname>
+    <refpurpose>strumento APT per la gestione delle chiavi</refpurpose>
+ </refnamediv>
+
+ &synopsis-command-apt-key;
+
+ <refsect1><title>Descrizione</title>
+   <para>
+   <command>apt-key</command> viene usato per gestire l'elenco delle chiavi
+usate da apt per autenticare i pacchetti. I pacchetti che sono stati
+autenticati usando queste chiavi verranno considerati fidati.
+   </para>
+   <para>
+   Notare che si desidera usare <command>apt-key</command> è necessaria
+l'installazione aggiuntiva della suite GNU Privacy Guard (pacchettizzata in
+<package>gnupg</package>). Espressamente per questo motivo l'uso
+programmatico (specialmente in script del manutentore per i pacchetti!) è
+fortemente sconsigliato. Inoltre il formato di output di tutti i comandi non
+è definito e può cambiare, e lo fa, ogni volta che cambiano i comandi
+sottostanti. <command>apt-key</command> cerca di rilevare questi usi e
+genera in questi casi avvertimenti sullo stderr.
+   </para>
+</refsect1>
+
+<refsect1><title>File di portachiavi gestiti</title>
+<para>apt-key gestisce nei file con l'estensione «<literal>gpg</literal>»
+solamente il formato binario OpenPGP (noto anche come «GPG key public
+ring»), non il formato di database keybox introdotto come file di
+portachiavi predefinito nelle versioni più nuove di &gpg;. I file di
+portachiavi binari pensati per essere usati con qualsiasi versione di apt
+dovrebbero perciò sempre essere creati con <command>gpg --export</command>.
+</para>
+<para>In alternativa, se tutti i sistemi che devono usare il portachiavi creato
+hanno una installata versione di apt almeno >= 1.4, si può utilizzare invece
+il formato armored ASCII con l'estensione «<literal>asc</literal>» che può
+essere creato con <command>gpg --armor --export</command>.
+</para>
+</refsect1>
+
+<refsect1><title>Comandi</title>
+   <variablelist>
+     <varlistentry><term><option>add</option> <option>&synopsis-param-filename;</option></term>
+     <listitem>
+     <para>
+       Aggiunge una nuova chiave all'elenco delle chiavi fidate. La chiave viene
+letta dal file specificato con il parametro &synopsis-param-filename; o, se
+il nome file è <literal>-</literal>, dallo standard input.
+     </para>
+     <para>
+     È di importanza critica verificare che le chiavi aggiunte manualmente usando
+<command>apt-key</command> appartengano al proprietario del repository per
+cui dichiarano di essere, altrimenti l'infrastruttura &apt-secure; viene
+completamente minata alla base.
+     </para>
+     <para>
+       <emphasis>Nota bene</emphasis>: invece di usare questo comando un
+portachiavi dovrebbe essere messo direttamente nella directory
+<filename>/etc/apt/trusted.gpg.d/</filename> con un nome descrittivo e con
+«<literal>gpg</literal>» o «<literal>asc</literal>» come estensione di file.
+     </para>
+     </listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>del</option> <option>&synopsis-param-keyid;</option></term>
+     <listitem>
+     <para>
+
+       Rimuove una chiave dall'elenco delle chiavi fidate.
+
+     </para>
+
+     </listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>export</option> <option>&synopsis-param-keyid;</option></term>
+     <listitem>
+     <para>
+
+        Visualizza sullo standard output l'&synopsis-param-keyid; della chiave.
+
+     </para>
+
+     </listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>exportall</option></term>
+     <listitem>
+     <para>
+
+        Visualizza sullo standard output tutte le chiavi fidate.
+
+     </para>
+
+     </listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>list</option>, <option>finger</option></term>
+     <listitem>
+     <para>
+
+       Elenca le chiavi fidate con le impronte digitali.
+
+     </para>
+
+     </listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>adv</option></term>
+     <listitem>
+     <para>
+     Passa opzioni avanzate a gpg. Con <command>adv --recv-key</command> si può,
+ad esempio, scaricare una chiave da un server di chiavi direttamente
+nell'insieme delle chiavi fidate. Notare che <emphasis>non</emphasis> viene
+effettuato alcun controllo, perciò è facile minare completamente
+l'infrastruttura &apt-secure; se viene usato senza cautela.
+     </para>
+
+     </listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>update</option> (deprecato)</term>
+     <listitem>
+     <para>
+       Aggiorna il portachiavi locale con il portachiavi dell'archivio e rimuove
+dal portachiavi locale le chiavi di archivio che non sono più valide. Il
+portachiavi degli archivi è fornito nel pacchetto
+<literal>archive-keyring</literal> delle diverse distribuzioni, ad esempio
+il pacchetto &keyring-package; in &keyring-distro;.
+     </para>
+     <para>
+       Notare che una distribuzione non ha più bisogno di usare questo comando, e
+di fatto non dovrebbe farlo, e invece fornisce file portachiavi direttamente
+nella directory <filename>/etc/apt/trusted.gpg.d/</filename>, dato che
+questo evita una dipendenza da <package>gnupg</package> ed è più facile, sia
+per i manutentori sia per gli utenti, gestire chiavi semplicemente
+aggiungendo e rimuovendo file.
+     </para>
+     </listitem>
+     </varlistentry>
+     
+     <varlistentry><term><option>net-update</option></term>
+     <listitem>
+     <para>
+
+       Effettua un aggiornamento funzionando in modo simile al comando
+<command>update</command> descritto prima, ma ottiene invece il portachiavi
+degli archivi da un URI e lo convalida usando una chiave master. Ciò
+richiede che &wget; sia installato, e una versione di APT configurata per
+avere un server da cui scaricare e un portachiavi master per la
+convalida. APT in Debian non supporta questo comando, ma fa affidamento sul
+comando <command>update</command>; APT in Ubuntu invece lo fa.
+
+     </para>
+
+     </listitem>
+     </varlistentry>
+   </variablelist>
+</refsect1>
+
+ <refsect1><title>Opzioni</title>
+<para>Notare che le opzioni devono essere definite prima dei comandi descritti
+nella sezione precedente.</para>
+   <variablelist>
+      <varlistentry><term><option>--keyring</option> <option>&synopsis-param-filename;</option></term>
+      <listitem><para>Con questa opzione è possibile specificare un particolare file portachiavi
+su cui deve operare il comando. Il comportamento predefinito esegue i
+comandi sul file <filename>trusted.gpg</filename>, così come su tutte le
+parti nella directory <filename>trusted.gpg.d</filename>;
+<filename>trusted.gpg</filename> è però il portachiavi primario il che
+significa, ad esempio, che le nuove chiavi sono aggiunte ad esso.
+      </para></listitem>
+      </varlistentry>
+   </variablelist>
+ </refsect1>
+
+ <refsect1><title>File</title>
+   <variablelist>
+
+     &file-trustedgpg;
+
+   </variablelist>
+
+</refsect1>
+
+<refsect1><title>Vedere anche</title>
+<para>
+&apt-get;, &apt-secure;
+</para>
+</refsect1>
+
+ &manbugs;
+ &manauthor;
+
+ <refsect1><title>&translation-title;</title>
+   <para>&translation-holder;</para>
+   <para>&translation-english;</para>
+ </refsect1>
+</refentry>
+

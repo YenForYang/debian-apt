@@ -1,0 +1,7 @@
+<map id="pkgCache::Namespace" name="pkgCache::Namespace">
+<area shape="rect" id="node2" href="$classpkgDepCache.xhtml" title="pkgDepCache" alt="" coords="5,80,117,107"/>
+<area shape="rect" id="node3" href="$classpkgOrderList.xhtml" title="pkgOrderList" alt="" coords="141,80,246,107"/>
+<area shape="rect" id="node4" href="$classpkgPackageManager.xhtml" title="pkgPackageManager" alt="" coords="270,80,426,107"/>
+<area shape="rect" id="node5" href="$classpkgDPkgPM.xhtml" title="pkgDPkgPM" alt="" coords="236,155,335,181"/>
+<area shape="rect" id="node6" href="$classpkgSimulate.xhtml" title="pkgSimulate" alt="" coords="359,155,463,181"/>
+</map>

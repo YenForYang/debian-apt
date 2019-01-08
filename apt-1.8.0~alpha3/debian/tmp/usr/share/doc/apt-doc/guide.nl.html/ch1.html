@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Hoofdstuk 1. Algemeen</title>
+    <meta name="generator" content="DocBook XSL Stylesheets V1.79.1"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="home" href="index.html" title="Gebruikershandleiding voor APT"/>
+    <link rel="up" href="index.html" title="Gebruikershandleiding voor APT"/>
+    <link rel="prev" href="index.html" title="Gebruikershandleiding voor APT"/>
+    <link rel="next" href="ch2.html" title="Hoofdstuk 2. apt-get"/>
+  </head>
+  <body>
+    <div class="navheader">
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Hoofdstuk 1. Algemeen</th>
+        </tr>
+        <tr>
+          <td align="left"><a accesskey="p" href="index.html">Terug</a> </td>
+          <th width="60%" align="center"> </th>
+          <td align="right"> <a accesskey="n" href="ch2.html">Volgende</a></td>
+        </tr>
+      </table>
+      <hr/>
+    </div>
+    <div class="chapter">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h1 class="title"><a id="ch1"/>Hoofdstuk 1. Algemeen</h1>
+          </div>
+        </div>
+      </div>
+      <div class="toc">
+        <p>
+          <strong>Inhoudsopgave</strong>
+        </p>
+        <dl class="toc">
+          <dt>
+            <span class="section">
+              <a href="ch1.html#s1.1">1.1. Anatomie van het pakketsysteem</a>
+            </span>
+          </dt>
+        </dl>
+      </div>
+      <p>
+Momenteel bevat het APT-pakket twee secties, de
+<span class="command"><strong>dselect</strong></span>-methode van APT en het commandoregelprogramma
+<span class="command"><strong>apt-get</strong></span>. Beide bieden een manier om pakketten te
+installeren en te verwijderen en nieuwe pakketten via het internet op te
+halen.
+</p>
+      <div class="section">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h2 class="title"><a id="s1.1"/>1.1. Anatomie van het pakketsysteem</h2>
+            </div>
+          </div>
+        </div>
+        <p>
+Het pakketsysteem van Debian maakt gebruik van een grote hoeveelheid aan
+informatie over elk pakket om te helpen verzekeren dat het eenvoudig en
+netjes in het systeem ingepast kan worden. Het meest prominente aspect van
+zijn functionaliteit is het vereistensysteem.
+</p>
+        <p>
+Het vereistensysteem laat individuele programma's toe om gebruik te maken
+van gemeenschappelijke elementen uit het systeem, zoals bibliotheken. Het
+vereenvoudigt het onderbrengen van weinig gebruikte aspecten van een
+programma in aparte pakketten om het aantal zaken dat een gewone gebruiker
+moet installeren, te beperken. Het laat ook toe te kiezen uit verschillende
+mailservers (mail transport agents), X-servers, enz.
+</p>
+        <p>
+Een eerste stap in het begrijpen van het vereistensysteem is het concept van
+een eenvoudige vereiste vatten. Een eenvoudige vereiste houdt in dat een
+pakket om behoorlijk te kunnen functioneren, vereist dat een ander pakket
+gelijktijdig geïnstalleerd wordt.
+</p>
+        <p>
+Bijvoorbeeld, mailcrypt is een emacs-uitbreiding die helpt bij het
+versleutelen van e-mail met GPG. Zonder dat GPG geïnstalleerd is, is
+mailcrypt nutteloos. Dus is mailcrypt afhankelijk van GPG (en is GPG een
+vereiste voor mailcrypt). Omdat mailcrypt een uitbreiding van emacs is, is
+het bovendien ook daarvan afhankelijk. Zonder emacs is het gewoon
+onbruikbaar.
+</p>
+        <p>
+Een andere belangrijke afhankelijkheid die u goed moet begrijpen is een
+conflicterende afhankelijkheid. Dit houdt in dat een pakket, mocht het
+tegelijk met een ander pakket geïnstalleerd zijn, niet zal werken en
+misschien zelfs heel schadelijk voor het systeem kan zijn. Neem bijvoorbeeld
+een mail transport agent (mailserver) zoals sendmail, exim of qmail. Het is
+niet mogelijk om er twee van te installeren, omdat ze allemaal op het
+netwerk moeten luisteren om mail te ontvangen. Mocht men er toch twee
+proberen te installeren, dan zou het systeem ernstig beschadigd raken en om
+die reden hebben alle mail transport agents een conflictafhankelijkheid
+tegenover alle andere mail transport agents.
+</p>
+        <p>
+Een bijkomende complicatie is dat de mogelijkheid bestaat dat een pakket
+zich als een ander pakket voordoet. Bedenk dat exim en sendmail voor vele
+doeleinden identiek zijn: allebei bezorgen ze e-mail en allebei kunnen ze
+overweg met een gemeenschappelijke interface. Daarom voorziet het
+pakketsysteem voor hen in de mogelijkheid om te verklaren dat ze allebei
+mail-transport-agents zijn. Dus verklaren exim en sendmail allebei dat ze
+een mail-transport-agent aanbieden. En andere pakketten die een mail
+transport agent nodig hebben, hebben mail-transport-agent als vereiste. Bij
+het manueel proberen repareren van pakketten kan dit tot heel wat verwarring
+leiden.
+</p>
+        <p>
+Aan een eenvoudige vereiste kan op elk moment al dan niet voldaan worden
+door pakketten die reeds geïnstalleerd zijn. APT probeert te helpen bij het
+oplossen van vereistenproblemen door een aantal automatische algoritmes aan
+te bieden die helpen bij het selecteren van te installeren pakketten.
+</p>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr/>
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td align="left"><a accesskey="p" href="index.html">Terug</a> </td>
+          <td align="center"> </td>
+          <td align="right"> <a accesskey="n" href="ch2.html">Volgende</a></td>
+        </tr>
+        <tr>
+          <td align="left" valign="top">Gebruikershandleiding voor APT </td>
+          <td align="center">
+            <a accesskey="h" href="index.html">Begin</a>
+          </td>
+          <td align="right" valign="top"> Hoofdstuk 2. apt-get</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

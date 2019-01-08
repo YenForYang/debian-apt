@@ -1,0 +1,854 @@
+'\" t
+.\"     Title: apt_preferences
+.\"    Author: APT-Team
+.\" Generator: DocBook XSL Stylesheets v1.79.1 <http://docbook.sf.net/>
+.\"      Date: 15\ \&August\ \&2015
+.\"    Manual: APT
+.\"    Source: APT 1.8.0~alpha3
+.\"  Language: German
+.\"
+.TH "APT_PREFERENCES" "5" "15\ \&August\ \&2015" "APT 1.8.0~alpha3" "APT"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+apt_preferences \- Voreinstellungssteuerdatei f\(:ur APT
+.SH "BESCHREIBUNG"
+.PP
+Die APT\-Einstellungsdatei
+/etc/apt/preferences
+und Teildateien im Verzeichnis
+/etc/apt/preferences\&.d/
+k\(:onnen benutzt werden, um zu steuern, welche Versionen von Paketen zur Installation ausgew\(:ahlt werden\&.
+.PP
+Es k\(:onnten mehrere Versionen eines Pakets zur Installation verf\(:ugbar sein, wenn die Datei
+\fBsources.list\fR(5)
+Bez\(:uge zu mehr als einer Distribution enth\(:alt (zum Beispiel
+stable
+und
+testing)\&. APT weist jeder verf\(:ugbaren Version eine Priorit\(:at zu\&. Unter Ber\(:ucksichtigung von Abh\(:angigkeitsbedingungen w\(:ahlt
+\fBapt\-get\fR
+die Version mit der h\(:ochsten Priorit\(:at zur Installation aus\&. Die APT\-Einstellungen setzen die Priorit\(:aten au\(sser Kraft, die APT den Paketversionen standardm\(:a\(ssig zuweist, was dem Benutzer die Kontrolle dar\(:uber gibt, welche zur Installation ausgew\(:ahlt wird\&.
+.PP
+Es k\(:onnten mehrere Instanzen der gleichen Version eines Paketes verf\(:ugbar sein, wenn die Datei
+\fBsources.list\fR(5)
+Bez\(:uge zu mehr als einer Quelle enth\(:alt\&. In diesem Fall l\(:adt
+\fBapt\-get\fR
+die Instanz herunter, die in der Datei
+\fBsources.list\fR(5)
+als erstes aufgelistet ist\&. Die APT\-Einstellungsdatei beeinflusst die Wahl der Instanz nicht, nur die Wahl der Version\&.
+.PP
+Eigenschaften sind in der Hand eines Systemadministrator ein gro\(sse St\(:arke, k\(:onnen aber auch sein gr\(:o\(sster Albtraum werden, wenn sie unvorsichtig benutzt werden\&. APT wird die Eigenschaften nicht in Frage stellen, so dass deshalb falsche Einstellungen zu nicht installierbaren Paketen oder falschen Entscheidungen w\(:ahrend des Upgrades f\(:uhren k\(:onnen\&. Sogar noch mehr Probleme treten auf, wenn mehrere Distributions\-Releases ohne gutes Verst\(:andnis der folgenden Abs\(:atze gemischt werden\&. Pakete, die in einem speziellen Release enthalten sind, sind nicht in \(:alteren und neueren Releases oder zusammen mit Paketen unterschiedlicher Releases getestet und funktionieren daher nicht immer wie erwartet\&. Sind wurden gewarnt\&.
+.PP
+Beachten Sie, dass die Dateien im Verzeichnis
+/etc/apt/preferences\&.d
+in alphanumerisch aufsteigender Reihenfolge ausgewertet werden und der folgenden Namenskonvention unterliegen: Die Dateien haben entweder keine oder
+\(Fcpref\(Fo
+als Dateierweiterung und sie enthalten nur alphanumerische Zeichen, Bindestriche (\-), Unterstriche (_) oder Punkte (\&.)\&. Andernfalls wird APT einen Hinweis ausgeben, dass es eine Datei ignoriert hat, falls die Datei nicht auf ein Muster in der Konfigurationsliste
+Dir::Ignore\-Files\-Silently
+passt \(en in diesem Fall wird sie stillschweigend ignoriert\&.
+.SS "APTs Standardpriorit\(:atszuweisungen"
+.PP
+Wenn es keine Einstellungsdatei gibt oder es in der Datei keinen Eintrag gibt, der sich auf eine bestimmte Version bezieht, dann ist die dieser Version zugewiesene Priorit\(:at, die Priorit\(:at der Distribution zu der die Version geh\(:ort\&. Es ist m\(:oglich, eine Distribution auszuzeichnen, \(Fcdas Ziel\-Release\(Fo, die eine h\(:ohere Priorit\(:at erh\(:alt, als dies bei anderen Distributionen standardm\(:a\(ssig der Fall ist\&. Das Ziel\-Release kann auf der
+\fBapt\-get\fR\-Befehlszeile oder in der APT\-Konfigurationsdatei
+/etc/apt/apt\&.conf
+gesetzt werden\&. Beachten Sie, dass dies Vorrang vor einer allgemeinen Priorit\(:at hat, die Sie, wie sp\(:ater beschrieben, in der Datei
+/etc/apt/preferences
+setzen, aber nicht vor bestimmten mit Pinning festgehaltenen Paketen\&. Beispielsweise
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+\fBapt\-get install \-t testing \fR\fB\fIirgendein_Paket\fR\fR
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+APT::Default\-Release "stable";
+.fi
+.if n \{\
+.RE
+.\}
+.PP
+Wenn das Ziel\-Release angegeben wurde, dann benutzt APT den folgenden Algorithmus, um die Priorit\(:aten der Versionen eines Paketes zu setzen\&. Zuweisung:
+.PP
+Priorit\(:at 1
+.RS 4
+zu den Versionen, die von Archiven kommen, die in deren
+Release\-Dateien als \(FcNotAutomatic: yes\(Fo markiert sind, aber
+\fInicht\fR
+als \(FcButAutomaticUpgrades: yes\(Fo wie das Archiv
+experimental
+von Debian\&.
+.RE
+.PP
+Priorit\(:at 100
+.RS 4
+zu der Version, die bereits installiert ist (wenn dies der Fall ist) und zu Versionen, die von Archiven kommen, die in deren
+Release\-Dateien als \(FcNotAutomatic: yes\(Fo und \(FcButAutomaticUpgrades: yes\(Fo markiert sind, wie das Debian\-Backports\-Archiv seit
+squeeze\-backports\&.
+.RE
+.PP
+Priorit\(:at 500
+.RS 4
+zu den Versionen, die nicht zum Ziel\-Release geh\(:oren\&.
+.RE
+.PP
+Priorit\(:at 990
+.RS 4
+zu den Versionen, die zum Ziel\-Release geh\(:oren\&.
+.RE
+Die h\(:ochste dieser Priorit\(:aten, deren Beschreibung zu der Version passt, wird der Version zugewiesen\&.
+.PP
+Wenn das Ziel\-Release nicht angegeben wurde, dann weist APT einfach allen installierten Paketversionen eine Priorit\(:at von 100 und allen nicht installierten Paketversionen eine Priorit\(:at von 500 zu, au\(sser wenn Versionen aus Archiven kommen, die in deren
+Release\-Dateien mit \(FcNotAutomatic: yes\(Fo markiert sind \(en diese Versionen erhalten die Priorit\(:at 1 oder die Priorit\(:at 100, falls sie zus\(:atzlich als \(FcButAutomaticUpgrades: yes\(Fo markiert sind\&.
+.PP
+APT wendet dann die folgenden Regeln an, aufgelistet in der Reihenfolge ihres Vorrangs, um zu bestimmen, in welcher Version das Paket zu installieren ist\&.
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+F\(:uhren Sie niemals ein Downgrade durch, au\(sser wenn die Priorit\(:at verf\(:ugbarer Pakete 1000 \(:ubersteigt\&. (\(FcDowngrading\(Fo ist das Installieren einer weniger aktuellen Version, an Stelle einer aktuelleren Version\&. Beachten Sie, dass keine Standardpriorit\(:at von APT 1000 \(:ubersteigt\&. So hohe Priorit\(:aten k\(:onnen nur durch die Einstellungsdatei gesetzt werden\&. Beachten Sie au\(sserdem, dass Downgrading eines Paketes riskant sein kann\&.)
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+installiert die Version mit der h\(:ochsten Priorit\(:at\&.
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Wenn zwei oder mehr Versionen die gleiche Priorit\(:at haben, wird die aktuellste installiert (das ist die mit der h\(:oheren Versionsnummer)\&.
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Wenn zwei oder mehr Versionen die gleiche Priorit\(:at und Versionsnummer haben, die Pakete sich aber entweder in ihren Metadaten unterscheiden oder die Option
+\-\-reinstall
+angegeben wurde, wird die nicht installierte installiert\&.
+.RE
+.PP
+In einer typischen Situation ist die Version eines Paketes (Priorit\(:at 100) nicht so aktuell, wie eine der verf\(:ugbaren Versionen, die in den Quellen in der Datei
+\fBsources.list\fR(5)
+aufgef\(:uhrt sind (Priorit\(:at 500 oder 990)\&. Dann wird ein Upgrade des Pakets durchgef\(:uhrt, wenn
+\fBapt\-get install \fR\fB\fIirgendein_Paket\fR\fR
+oder
+\fBapt\-get upgrade\fR
+ausgef\(:uhrt wird\&.
+.PP
+Seltener ist die installierte Version eines Pakets
+\fIneuer\fR
+als jede andere der verf\(:ugbaren Versionen\&. F\(:ur das Paket wird kein Downgrade durchgef\(:uhrt, wenn
+\fBapt\-get install \fR\fB\fIirgendein_Paket\fR\fR
+oder
+\fBapt\-get upgrade\fR
+ausgef\(:uhrt wird\&.
+.PP
+Manchmal ist die installierte Version eines Pakets aktueller, als die Version, die zum Ziel\-Release geh\(:ort, aber nicht so aktuell, wie eine Version, die zu einer anderen Distribution geh\(:ort\&. F\(:ur ein derartiges Paket wird tats\(:achlich ein Upgrade durchgef\(:uhrt, wenn
+\fBapt\-get install \fR\fB\fIirgendein_Paket\fR\fR
+oder
+\fBapt\-get upgrade\fR
+ausgef\(:uhrt wird, weil mindestens
+\fIeine\fR
+der verf\(:ugbaren Versionen eine h\(:ohere Priorit\(:at als die installierte Version hat\&.
+.SS "Die Auswirkungen von APT\-Einstellungen"
+.PP
+Die APT\-Einstellungsdatei erlaubt dem Systemverwalter die Zuweisung von Priorit\(:aten zu steuern\&. Die Datei besteht aus einem oder mehreren mehrzeiligen Datens\(:atzen, die durch leere Zeilen getrennt sind\&. Datens\(:atze k\(:onnen eine von zwei Gestalten haben, eine spezielle Gestalt oder eine allgemeine Gestalt\&.
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Die spezielle Gestalt weist die Priorit\(:at (eine \(FcPin\-Priorit\(:at\(Fo) einem oder mehreren angegebenen Paketen mit einer bestimmten Version oder einem bestimmten Versionsbereich zu\&. Der folgende Datensatz weist zum Beispiel allen Versionen des
+perl\-Pakets eine hohe Priorit\(:at zu, deren Versionsnummer mit \(Fc5\&.20\(Fo beginnt\&. Mehrere Pakete k\(:onnen durch Leerzeichen getrennt werden\&.
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+Package: perl
+Pin: version 5\&.20*
+Pin\-Priority: 1001
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Die allgemeine Gestalt weist allen Paketversionen in einer gegebenen Distribution (d\&.h\&. allen Versionen von Paketen, die in einer bestimmten
+Release\-Datei gelistet sind) oder allen Paketversionen, die von einer speziellen Internet\-Site kommen, die durch ihren vollst\(:andig dargestellten Domain\-Namen identifiziert wird, eine Priorit\(:at zu\&.
+.sp
+Dieser Eintrag in allgemeiner Form in der APT\-Einstellungsdatei gilt nur f\(:ur Gruppen von Paketen\&. Der folgende Eintrag weist zum Beispiel allen Paketversionen mit lokalem Ursprung eine hohe Priorit\(:at zu\&.
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+Package: *
+Pin: origin ""
+Pin\-Priority: 999
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+Eine Mahnung zur Vorsicht: Das hier benutzte Schl\(:usselwort ist \(Fcorigin\(Fo, was zum Abgleich mit einem Rechnernamen benutzt werden kann\&. Der folgende Eintrag wird allen Versionen eine hohe Priorit\(:at zuweisen, die auf dem Server verf\(:ugbar sind, der durch den Rechnernamen \(Fcftp\&.de\&.debian\&.org\(Fo identifiziert wird\&.
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+Package: *
+Pin: origin "ftp\&.de\&.debian\&.org"
+Pin\-Priority: 999
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+Dies sollte nicht mit der Herkunft einer Distribution verwechselt werden, wie sie in einer
+Release\-Datei angegeben wurde\&. Was dem \(FcOrigin:\(Fo\-Kennzeichen in einer
+Release\-Datei folgt, ist keine Internet\-Adresse, sondern ein Autoren\- oder Anbietername, wie \(FcDebian\(Fo oder \(FcXimian\(Fo\&.
+.sp
+Der folgende Datensatz weist allen Paketversionen, die zu Distributionen geh\(:oren, deren Archivname \(Fcunstable\(Fo ist, eine niedrige Priorit\(:at zu\&.
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+Package: *
+Pin: release a=unstable
+Pin\-Priority: 50
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+Der folgende Datensatz weist allen Paketversionen, die zu einer Distribution geh\(:oren, deren Codename \(Fcbuster\(Fo ist, eine hohe Priorit\(:at zu\&.
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+Package: *
+Pin: release n=buster
+Pin\-Priority: 900
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+Der folgende Datensatz weist allen Paketversionen, die zu einer Distribution geh\(:oren, deren Archivname \(Fcstable\(Fo und deren Release\-Nummer \(Fc9\(Fo ist, eine hohe Priorit\(:at zu\&.
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+Package: *
+Pin: release a=stable, v=9
+Pin\-Priority: 500
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+Die Auswirkungen des trennenden Kommas ist einem \(Fcund\(Fo in der Logik \(:ahnlich: Alle Bedingungen m\(:ussen erf\(:ullt werden, dass die Pin passt\&. Es gibt jedoch eine Ausnahme: Bei jedem Bedingungstyp (wie zwei \(Fca\(Fo\-Bedingungen) wird nur die letzte Bedingungen gepr\(:uft\&.
+.SS "Regul\(:are Ausdr\(:ucke und glob(7)\-Syntax"
+.PP
+APT unterst\(:utzt au\(sserdem Pinning mittels
+\fBglob\fR(7)\-Ausdr\(:ucken und regul\(:aren Ausdr\(:ucken, die von \(Fc/\(Fo umschlossen sind\&. Das folgende Beispiel weist beispielsweise allen Paketen aus Experimental die Priorit\(:at 500 zu, bei denen der Name mit \(Fcgnome\(Fo beginnt (wie ein
+\fBglob\fR(7)\-artiger Ausdruck) oder das Wort \(Fckde\(Fo enth\(:alt (wie ein erweiterter regul\(:arer POSIX\-Ausdruck, der von Schr\(:agstrichen umschlossen wird)\&.
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+Package: gnome* /kde/
+Pin: release a=experimental
+Pin\-Priority: 500
+.fi
+.if n \{\
+.RE
+.\}
+.PP
+Die Regel f\(:ur diese Ausdr\(:ucke ist, dass sie \(:uberall dort auftreten k\(:onnen, wo eine Zeichenkette auftreten kann\&. Somit weist die folgende Pin allen Paketen von einem Release seit xenial die Priorit\(:at 900 zu\&.
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+Package: *
+Pin: release n=xenial*
+Pin\-Priority: 990
+.fi
+.if n \{\
+.RE
+.\}
+.PP
+Falls ein regul\(:arer Ausdruck in einem
+Package\-Feld vorkommt, ist das Verhalten dasselbe, als wenn der regul\(:are Ausdruck durch eine Liste aller Paketnamen ersetzt w\(:urde, auf die er passt\&. Es ist noch nicht entschieden, wie sich dies in Zukunft \(:andern wird, daher sollten Sie immer zuerst Platzhalter\-Pins auflisten, so dass sie sp\(:ater spezielle Pins au\(sser Kraft setzen k\(:onnen\&. Das Muster \(Fc*\(Fo in einem \(FcPackage\(Fo\-Feld wird selbst nicht als ein
+\fBglob\fR(7)\-Ausdruck angesehen\&.
+.SS "Wie APT Priorit\(:aten interpretiert"
+.PP
+Die in der APT\-Einstellungsdatei zugewiesenen Priorit\(:aten (P) m\(:ussen positive oder negative Ganzzahlen sein\&. Sie werden wie folgt interpretiert (grob gesagt):
+.PP
+P >= 1000
+.RS 4
+veranlasst, dass eine Version installiert wird, selbst wenn dies ein Downgrade des Pakets durchf\(:uhrt
+.RE
+.PP
+990 <= P < 1000
+.RS 4
+veranlasst, dass eine Version installiert wird, auch wenn diese nicht vom Ziel\-Release kommt, au\(sser wenn die installierte Version aktueller ist
+.RE
+.PP
+500 <= P < 990
+.RS 4
+veranlasst, dass eine Version installiert wird, au\(sser wenn eine Version verf\(:ugbar ist, die zum Ziel\-Release geh\(:ort oder die installierte Version neuer ist
+.RE
+.PP
+100 <= P < 500
+.RS 4
+veranlasst, dass eine Version installiert wird, au\(sser wenn eine Version verf\(:ugbar ist, die zu einer anderen Distribution geh\(:ort oder die installierte Version neuer ist
+.RE
+.PP
+0 < P < 100
+.RS 4
+veranlasst, dass eine Version nur dann installiert wird, wenn es keine installierte Version des Pakets gibt
+.RE
+.PP
+P < 0
+.RS 4
+verhindert das Installieren der Version
+.RE
+.PP
+P = 0
+.RS 4
+hat kein definiertes Verhalten, verwenden Sie es nicht\&.
+.RE
+.PP
+Der erste Datensatz mit speziellem Format der zu einer verf\(:ugbaren Paketversion passt, legt die Priorit\(:at der Paketversion fest\&. Schl\(:agt dies fehl, wird die Priorit\(:at als Maximum aller Priorit\(:aten der Datens\(:atze mit generischem Format definiert, die zu einer verf\(:ugbaren Version passen\&. Datens\(:atze, die so definiert sind, dass sie andere Muster als \(Fc*\(Fo im Feld Pin verwenden, werden wie Datens\(:atze mit speziellem Format betrachtet\&.
+.PP
+Nehmen wir zum Beispiel an, die APT\-Einstellungsdatei enth\(:alt die drei bereits gezeigten Datens\(:atze:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+Package: perl
+Pin: version 5\&.20*
+Pin\-Priority: 1001
+
+Package: *
+Pin: origin ""
+Pin\-Priority: 999
+
+Package: *
+Pin: release unstable
+Pin\-Priority: 50
+.fi
+.if n \{\
+.RE
+.\}
+.PP
+Dann:
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Es wird die aktuellste verf\(:ugbare Version des Pakets
+perl
+installiert, so lange die Versionsnummer mit \(Fc5\&.20\(Fo anf\(:angt\&. Wenn
+\fIirgendeine\fR
+5\&.20*\-Version von
+perl
+verf\(:ugbar ist und die installierte Version 5\&.24* ist, dann wird von
+perl
+ein Downgrade durchgef\(:uhrt\&.
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Eine Version irgendeines anderen Pakets als
+perl, die vom lokalen System verf\(:ugbar ist, hat Priorit\(:at \(:uber andere Versionen, sogar wenn diese Versionen zum Ziel\-Release geh\(:oren\&.
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Eine Version eines Pakets, dessen Ursprung nicht das lokale System ist, aber ein anderer in
+\fBsources.list\fR(5)
+aufgelisteter Ort und der zu einer
+unstable\-Distribution geh\(:ort, wird nur installiert, falls es zur Installation ausgew\(:ahlt wurde und nicht bereits eine Version des Pakets installiert ist\&.
+.RE
+.sp
+.SS "Festlegung von Paketversion und Distributions\-Eigenschaften"
+.PP
+Die in der
+\fBsources.list\fR(5)\-Datei aufgelisteten Orte sollten
+Packages\- und
+Release\-Dateien bereitstellen, um die an diesem Ort verf\(:ugbaren Pakete zu beschreiben\&.
+.PP
+Die
+Packages\-Datei wird normalerweise im Verzeichnis
+\&.../dists/\fIDistributions\-Name\fR/\fIBestandteil\fR/\fIArchitektur\fR
+gefunden, zum Beispiel
+\&.../dists/stable/main/binary\-i386/Packages\&. Sie besteht aus einer Serie mehrzeiliger Datens\(:atze, einem f\(:ur jedes verf\(:ugbare Paket in diesem Verzeichnis\&. In jedem Datensatz sind nur zwei Zeilen zum Setzen der APT\-Priorit\(:aten relevant:
+.PP
+die Package:\-Zeile
+.RS 4
+gibt den Paketnamen an
+.RE
+.PP
+die Version:\-Zeile
+.RS 4
+gibt die Versionsnummer f\(:ur das genannte Paket an
+.RE
+.PP
+Die
+Release\-Datei ist normalerweise im Verzeichnis
+\&.../dists/\fIDistributionsname\fR
+zu finden, zum Beispiel
+\&.../dists/stable/Release
+oder
+\&.../dists/stretch/Release\&. Sie besteht aus einem einzelnen mehrzeiligen Datensatz, der auf
+\fIalle\fR
+Pakete im Verzeichnisbaum unterhalb des \(:ubergeordneten Verzeichnisses zutrifft\&. Anders als die
+Packages\-Datei sind nahezu alle Zeilen in einer
+Release\-Datei f\(:ur das Setzen von APT\-Priorit\(:aten relevant:
+.PP
+die Archive:\- oder Suite:\-Zeile
+.RS 4
+benennt das Archiv, zu dem alle Pakete im Verzeichnisbaum geh\(:oren\&. Die Zeile \(FcArchive: stable\(Fo oder \(FcSuite: stable\(Fo gibt zum Beispiel an, dass alle Pakete im Verzeichnisbaum unterhalb des der
+Release\-Datei \(:ubergeordneten Verzeichnisses sich in einem
+stable\-Archiv befinden\&. Diesen Wert in der APT\-Einstellungsdatei anzugeben w\(:urde die folgende Zeile ben\(:otigen:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+Pin: release a=stable
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.PP
+die Codename:\-Zeile
+.RS 4
+benennt den Codenamen, zu dem alle Pakete im Verzeichnisbaum geh\(:oren\&. Die Zeile \(FcCodename: buster\(Fo gibt zum Beispiel an, dass alle Pakete im Verzeichnisbaum unterhalb des der
+Release\-Datei \(:ubergeordneten Verzeichnisses zu einer Version mit Namen
+buster
+geh\(:oren\&. Diesen Wert in der APT\-Einstellungsdatei anzugeben w\(:urde die folgende Zeile ben\(:otigen:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+Pin: release n=buster
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.PP
+die Version:\-Zeile
+.RS 4
+benennt die Release\-Version\&. Die Pakete im Baum k\(:onnten zum Beispiel zur Debian\-Release\-Version 9 geh\(:oren\&. Beachten Sie, dass es normalerweise keine Versionsnummer f\(:ur
+testing\- und
+unstable\-Distributionen gibt, weil sie noch nicht ver\(:offentlicht wurden\&. Diese in der APT\-Einstellungsdatei anzugeben w\(:urde eine der folgenden Zeilen ben\(:otigen:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+Pin: release v=9
+Pin: release a=stable, v=9
+Pin: release 9
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.PP
+die Component:\-Zeile
+.RS 4
+benennt den Lizenzierungsbestandteil, die den Paketen im Verzeichnisbaum der
+Release\-Datei zugeordnet ist\&. Die Zeile \(FcComponent: main\(Fo gibt zum Beispiel an, dass alle Pakete im Verzeichnisbaum von der
+main\-Komponente stammen, was zur Folge hat, dass sie unter den Bedingungen der Debian\-Richtlinien f\(:ur Freie Software stehen\&. Diese Komponente in der APT\-Einstellungsdatei anzugeben w\(:urde die folgende Zeilen ben\(:otigen:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+Pin: release c=main
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.PP
+die Origin:\-Zeile
+.RS 4
+benennt den Urheber des Pakets im Verzeichnisbaum der
+Release\-Datei\&. Zumeist ist dies
+Debian\&. Um diesen Ursprung in der APT\-Einstellungsdatei anzugeben, w\(:urde die folgende Zeile ben\(:otigt:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+Pin: release o=Debian
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.PP
+die Label:\-Zeile
+.RS 4
+benennt die Beschriftung des Pakets im Verzeichnisbaum der
+Release\-Datei\&. Zumeist ist dies
+Debian\&. Diese Beschriftung in der APT\-Einstellungsdatei anzugeben w\(:urde die folgende Zeile ben\(:otigen:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+Pin: release l=Debian
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.PP
+Alle
+Packages\- und
+Release\-Dateien, die von Orten heruntergeladen werden, die in der Datei
+\fBsources.list\fR(5)
+aufgelistet sind, werden im Verzeichnis
+/var/lib/apt/lists
+oder in der von der Variablen
+Dir::State::Lists
+in der Datei
+apt\&.conf
+benannten Datei gespeichert\&. Die Datei
+debian\&.lcs\&.mit\&.edu_debian_dists_unstable_contrib_binary\-i386_Release
+enth\(:alt zum Beispiel die
+Release\-Datei, die von der Site
+debian\&.lcs\&.mit\&.edu
+f\(:ur die
+binary\-i386\-Architekturdateien von der
+contrib\-Bestandteil der
+unstable\-Distribution heruntergeladen wurde\&.
+.SS "Optionale Zeilen in einem APT\-Einstellungsdatensatz"
+.PP
+Optional kann jeder Datensatz in der APT\-Einstellungsdatei mit einer oder mehreren Zeilen beginnen, die mit dem Wort
+Explanation:
+anfangen\&. Dieses stellt einen Platz f\(:ur Kommentare bereit\&.
+.SH "BEISPIELE"
+.SS "Stable verfolgen"
+.PP
+Die folgende APT\-Einstellungsdatei wird APT veranlassen, allen Paketversionen eine h\(:ohere Priorit\(:at als die Vorgabe (500) zu geben, die zu einer
+stable\-Distribution geh\(:oren und eine ungeheuer niedrige Priorit\(:at zu Paketversionen, die zu anderen
+Debian\-Distributionen geh\(:oren\&.
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+Explanation: Deinstallieren oder nicht installieren von anderen von Debian
+Explanation: stammenden Paketversionen als denen der Stable\-Distribution
+Package: *
+Pin: release a=stable
+Pin\-Priority: 900
+
+Package: *
+Pin: release o=Debian
+Pin\-Priority: \-10
+.fi
+.if n \{\
+.RE
+.\}
+.PP
+Mit einer geeigneten
+\fBsources.list\fR(5)\-Datei und der obigen Einstellungsdatei wird jeder der folgenden Befehle APT veranlassen, ein Upgrade auf die neuste(n)
+stable\-Version(en) durchzuf\(:uhren\&.
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+apt\-get install \fIPaketname\fR
+apt\-get upgrade
+apt\-get dist\-upgrade
+.fi
+.if n \{\
+.RE
+.\}
+.PP
+Der folgende Befehl wird APT veranlassen, ein Upgrade des angegebenen Pakets auf die neuste Version der
+testing\-Distribution durchzuf\(:uhren\&. Von dem Paket wird kein weiteres Upgrade durchgef\(:uhrt, au\(sser wenn dieser Befehl wieder angegeben wird\&.
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+apt\-get install \fIPaket\fR/testing
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+.SS "Testing oder Unstable verfolgen"
+.PP
+Die folgende APT\-Einstellungsdatei wird APT veranlassen, Paketversionen der
+testing\-Distribution eine hohe Priorit\(:at, Paketversionen der
+unstable\-Distribution eine niedrigere Priorit\(:at und eine ungeheuer niedrige Priorit\(:at zu Paketversionen von anderen
+Debian\-Distributionen zuzuweisen\&.
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+Package: *
+Pin: release a=testing
+Pin\-Priority: 900
+
+Package: *
+Pin: release a=unstable
+Pin\-Priority: 800
+
+Package: *
+Pin: release o=Debian
+Pin\-Priority: \-10
+.fi
+.if n \{\
+.RE
+.\}
+.PP
+Mit einer geeigneten
+\fBsources.list\fR(5)\-Datei und der obigen Einstellungsdatei wird jeder der folgenden Befehle APT veranlassen, ein Upgrade auf die neuste(n)
+testing\-Version(en) durchzuf\(:uhren\&.
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+apt\-get install \fIPaketname\fR
+apt\-get upgrade
+apt\-get dist\-upgrade
+.fi
+.if n \{\
+.RE
+.\}
+.PP
+Der folgende Befehl wird APT veranlassen, ein Upgrade des angegebenen Pakets auf die neuste Version der
+unstable\-Distribution durchzuf\(:uhren\&. Danach wird
+\fBapt\-get upgrade\fR
+ein Upgrade des Pakets auf die aktuellste
+testing\-Version durchf\(:uhren, falls diese aktueller als die installierte Version ist, andernfalls auf die aktuellste
+unstable\-Version, wenn diese aktueller als die installierte Version ist\&.
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+apt\-get install \fIPaket\fR/unstable
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+.SS "Die Entwicklung eines Codename\-Releases verfolgen"
+.PP
+Die folgende APT\-Einstellungsdatei wird APT veranlassen, allen Paketen, die zu einem bestimmten Codenamen einer Distribution geh\(:oren, eine h\(:ohere Priorit\(:at als die Vorgabe (500) zu geben und Paketversionen, die zu anderen
+Debian\-Distributionen, Codenamen und Archiven geh\(:oren, eine ungeheuer niedrige Priorit\(:at zu geben\&. Beachten Sie, dass APT mit diesen APT\-Einstellungen der Migration eines Releases vom Archiv
+testing
+zu
+stable
+und sp\(:ater zu
+oldstable
+folgen wird\&. Wenn Sie zum Beispiel dem Fortschritt in
+testing
+folgen m\(:ochten, obwohl der Codename sich \(:andert, sollten Sie die Beispielkonfigurationen oberhalb benutzen\&.
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+Explanation: Deinstallieren oder nicht installieren von anderen von Debian
+Explanation: stammenden Paketversionen als denen der buster\-
+Explanation: oder Sid\-Distribution
+Package: *
+Pin: release n=buster
+Pin\-Priority: 900
+
+Explanation: Debian\-Unstable hat immer den Codenamen sid
+Package: *
+Pin: release a=sid
+Pin\-Priority: 800
+
+Package: *
+Pin: release o=Debian
+Pin\-Priority: \-10
+.fi
+.if n \{\
+.RE
+.\}
+.PP
+Mit einer geeigneten
+\fBsources.list\fR(5)\-Datei und der obigen Einstellungsdatei wird jeder der folgenden Befehle APT veranlassen, ein Upgrade auf die letzte(n) Version(en) im Release mit Codenamen
+buster
+durchzuf\(:uhren\&.
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+apt\-get install \fIPaketname\fR
+apt\-get upgrade
+apt\-get dist\-upgrade
+.fi
+.if n \{\
+.RE
+.\}
+.PP
+Der folgende Befehl wird APT veranlassen, ein Upgrade des angegebenen Pakets auf die neuste Version der
+sid\-Distribution durchzuf\(:uhren\&. Danach wird
+\fBapt\-get upgrade\fR
+ein Upgrade des Pakets auf die aktuellste
+buster\-Version durchf\(:uhren, wenn diese aktueller als die installierte Version ist, andernfalls auf die aktuellste
+sid\-Version, wenn diese aktueller als die installierte Version ist\&.
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+apt\-get install \fIPaket\fR/sid
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+.SH "DATEIEN"
+.PP
+/etc/apt/preferences
+.RS 4
+Version\-Einstellungsdatei\&. Hier k\(:onnen Sie "pinning" festlegen, d\&.h\&. eine Einstellung, um bestimmte Pakete aus einer separaten Quelle oder von einer anderen Version einer Distribution zu erhalten\&. Konfigurationselement:
+Dir::Etc::Preferences\&.
+.RE
+.PP
+/etc/apt/preferences\&.d/
+.RS 4
+Dateifragmente f\(:ur die Versionseinstellungen\&. Konfigurationselement:
+Dir::Etc::PreferencesParts\&.
+.RE
+.SH "SIEHE AUCH"
+.PP
+\fBapt-get\fR(8)
+\fBapt-cache\fR(8)
+\fBapt.conf\fR(5)
+\fBsources.list\fR(5)
+.SH "FEHLER"
+.PP
+\m[blue]\fBAPT\-Fehlerseite\fR\m[]\&\s-2\u[1]\d\s+2\&. Wenn Sie einen Fehler in APT berichten m\(:ochten, lesen Sie bitte
+/usr/share/doc/debian/bug\-reporting\&.txt
+oder den
+\fBreportbug\fR(1)\-Befehl\&. Verfassen Sie Fehlerberichte bitte auf Englisch\&.
+.SH "\(:UBERSETZUNG"
+.PP
+Die deutsche \(:Ubersetzung wurde 2009 von Chris Leick
+<c\&.leick@vollbio\&.de>
+in Zusammenarbeit mit dem deutschen l10n\-Team von Debian
+<debian\-l10n\-german@lists\&.debian\&.org>
+angefertigt\&.
+.PP
+Beachten Sie, dass diese \(:Ubersetzung Teile enthalten kann, die nicht \(:ubersetzt wurden\&. Dies ist so, damit kein Inhalt verloren geht, wenn die \(:Ubersetzung hinter dem Originalinhalt hinterherh\(:angt\&.
+.SH "AUTOR"
+.PP
+\fBAPT\-Team\fR
+.RS 4
+.RE
+.SH "FU\(ssNOTEN"
+.IP " 1." 4
+APT-Fehlerseite
+.RS 4
+\%http://bugs.debian.org/src:apt
+.RE

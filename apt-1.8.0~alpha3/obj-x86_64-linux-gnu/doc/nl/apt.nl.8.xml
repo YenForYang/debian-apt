@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+  "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % aptent SYSTEM "apt.ent"> %aptent;
+<!ENTITY % aptverbatiment SYSTEM "apt-verbatim.ent"> %aptverbatiment;
+<!ENTITY % aptvendor SYSTEM "apt-vendor.ent"> %aptvendor;
+]>
+
+<refentry>
+
+ <refentryinfo>
+   <!-- The last update date -->
+&apt-author.team;
+   &apt-email;
+   &apt-product;
+   
+   <date>2015-10-20T00:00:00Z</date>
+ </refentryinfo>
+ 
+ <refmeta>
+   <refentrytitle>apt</refentrytitle>
+   <manvolnum>8</manvolnum>
+   <refmiscinfo class="manual">APT</refmiscinfo>
+ </refmeta>
+ 
+ 
+ <!-- Man page title -->
+<refnamediv>
+    <refname>apt</refname>
+    <refpurpose>commandoregelinterface</refpurpose>
+ </refnamediv>
+
+ &synopsis-command-apt;
+
+ <refsect1><title>Omschrijving</title>
+   <para><command>apt</command> biedt een hogere commandoregelinterface voor het
+systeem van pakketbeheer. Het is bedoeld als een interface voor de
+eindgebruiker en standaard gebruikt het sommige opties op een manier die,
+vergeleken met meer gespecialiseerde APT-hulpmiddelen zoals &apt-get; en
+&apt-cache;, beter aangepast is aan interactief gebruik.
+   </para><para>
+   Ook de man-pagina is, in grote mate gelijk <command>apt</command> zelf,
+bedoeld als een interface voor de eindgebruiker. In die hoedanigheid
+vermeldt ze enkel de meest gebruikte commando's en opties. Deels is dit om
+niet op verschillende plaatsen met dezelfde informatie te komen en deels om
+te vermijden dat de lezer overstelpt zou worden door een overvloed aan
+opties en details.
+   </para>
+
+   <variablelist>
+     <varlistentry><term><option>update</option> (&apt-get;)</term>
+     <listitem><para><option>update</option> wordt gebruikt om pakketinformatie op te halen
+vanuit alle ingestelde pakketbronnen. Andere commando's werken met deze
+gegevens om bijvoorbeeld opwaarderingen van pakketten uit te voeren of om
+informatie op te zoeken en weer te geven over alle pakketten die beschikbaar
+zijn voor installatie.
+     </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>upgrade</option> (&apt-get;)</term>
+     <listitem><para><literal>upgrade</literal> wordt gebruikt om voor alle pakketten die
+momenteel op het systeem geïnstalleerd zijn, de opwaarderingen te
+installeren die beschikbaar zijn in de pakketbronnen die in het bestand
+&sources-list; geconfigureerd werden. Nieuwe pakketten zullen geïnstalleerd
+worden als dat noodzakelijk is om aan vereisten te voldoen, maar
+geïnstalleerde pakketten zullen nooit verwijderd worden. Indien de
+opwaardering van een pakket vereist dat een geïnstalleerd pakket verwijderd
+wordt, zal de opwaardering voor dat pakket niet uitgevoerd worden.
+     </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>full-upgrade</option> (&apt-get;)</term>
+     <listitem><para><literal>full-upgrade</literal> vervult de functie van upgrade, maar zal ook
+momenteel geïnstalleerde pakketten verwijderen als dat nodig is om het
+systeem volledig op te waarderen.
+     </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>install</option>, <option>remove</option>, <option>purge</option> (&apt-get;)</term>
+     <listitem><para>Voert de gevraagde actie uit op een of meer pakketten die opgegeven werden
+aan de hand van een &regex;, een &glob; (expansie) of een exacte
+pakketnaam. De gevraagde actie kan voor een specifiek pakket gewijzigd
+worden door aan de naam van dat pakket een plusteken (+) toe te voegen als
+dat pakket geïnstalleerd moet worden of een minteken (-) als het verwijderd
+moet worden.
+     </para><para>
+	   Een specifieke versie van een pakket kiezen voor installatie kan door de
+pakketnaam te laten volgen door een gelijkheidsteken (=) en de te selecteren
+versie van het pakket. Anderzijds kan de versie uit een specifieke
+distributie geselecteerd worden door de pakketnaam te laten volgen door een
+slash en de codenaam &debian-stable-codename;, &debian-testing-codename;,
+sid …) of de suitenaam ervan (stable, testing, unstable). Als om aan dit
+verzoek te kunnen voldoen, vereisten geïnstalleerd moeten worden, zullen de
+daarvoor geselecteerde versies ook uit deze release afkomstig zijn.
+     </para><para>
+	   Bij het verwijderen van een pakket worden alle verpakte gegevens verwijderd,
+maar de meestal kleine (aangepaste) gebruikersconfiguratiebestanden worden
+op het systeem achtergelaten voor het geval de verwijdering per ongeluk
+plaats vond. In dat geval volstaat het om een installatieverzoek uit te
+vaardigen voor het per ongeluk verwijderde pakket om zijn vroegere
+functionaliteit te herstellen. Daarentegen kunt u van deze restanten afraken
+door het commando <command>purge</command> te gebruiken, zelfs bij reeds
+verwijderde pakketten. Merk op dat dit geen enkele invloed heeft op
+eventuele gegevens of configuratie-instellingen die in uw thuismap
+opgeslagen zijn.
+     </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>autoremove</option> (&apt-get;)</term>
+     <listitem><para>
+	   <literal>autoremove</literal> wordt gebruikt om pakketten te verwijderen die
+automatisch geïnstalleerd werden om te voldoen aan de vereisten van andere
+pakketten en nu niet langer nodig zijn omdat de vereisten veranderden of
+omdat de pakketten die van die pakketten afhankelijk waren intussen
+verwijderd werden.
+     </para><para>
+	   U zou moeten nagaan of de lijst geen toepassingen bevat die u leren
+waarderen heeft, ook al waren ze ooit enkel geïnstalleerd als een vereiste
+voor een ander pakket. Een dergelijk pakket kunt u als handmatig
+geïnstalleerd markeren met &apt-mark;. Voor pakketten die u expliciet via
+<command>install</command> geïnstalleerd heeft, zal ook nooit voorgesteld
+worden om ze automatisch te verwijderderen.
+     </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>search</option> (&apt-cache;)</term>
+     <listitem><para><option>search</option> kan gebruikt worden om in de lijst van beschikbare
+pakketten te zoeken naar de opgegeven &regex;-term(en) en de gevonden
+overeenkomsten te tonen. Dit kan bijvoorbeeld nuttig zijn als u op zoek bent
+naar pakketten met een specifieke functionaliteit. Indien u op zoek bent
+naar een pakket dat een specifiek bestand bevat, gebruikt u best &apt-file;.
+     </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>show</option> (&apt-cache;)</term>
+     <listitem><para>Toont informatie over het/de opgegeven pakket(ten), onder meer welke zijn
+vereisten zijn, de installatie- en downloadgrootte, de broncode waarvan het
+pakket afkomstig is, de beschrijving van de inhoud van het pakket en nog
+veel meer. Het kan bijvoorbeeld nuttig zijn om die informatie te bekijken
+vooraleer u &apt; toestaat om een pakket te verwijderen of bij het zoeken
+naar nieuw te installeren pakketten.
+     </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>list</option> (werk-in-uitvoering)</term>
+     <listitem><para><literal>list</literal> is min of meer vergelijkbaar met <command>dpkg-query
+--list</command> in die zin dat het een lijst van pakketten kan weergeven
+die aan bepaalde criteria beantwoorden. Het kent het gebruik van
+expansiepatronen (&glob; patterns) voor het vergelijken van pakketnamen en
+het ondersteunt opties om geïnstalleerde (<option>--installed</option>),
+opwaardeerbare (<option>--upgradable</option>) of alle beschikbare
+(<option>--all-versions</option>) versies weer te geven.
+     </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>edit-sources</option> (werk-in-uitvoering)</term>
+     <listitem><para><literal>edit-sources</literal> laat u toe uw &sources-list;-bestanden te
+bewerken met de teksteditor van uw voorkeur terwijl het ook basale
+foutcontroles uitvoert.
+     </para></listitem>
+     </varlistentry>
+
+
+   </variablelist>
+ </refsect1>
+
+ <refsect1><title>Het gebruik in scripts en verschillen met ander APT-gereedschap</title>
+  <para>
+   Het commandoregelprogramma &apt; werd ontworpen als een instrument voor de
+eindgebruiker en het is mogelijk dat het gedrag ervan verschilt naargelang
+de versie van het programma. Hoewel ernaar gestreefd wordt om de neerwaartse
+compatibiliteit niet te verbreken, wordt ze ook niet gegarandeerd als blijkt
+dat een aanpassing gunstig is voor interactief gebruik.
+  </para><para>
+   Alle functionaliteit van &apt; is ook beschikbaar via toepassingsspecifiek
+APT-gereedschap zoals &apt-get; en &apt-cache;. &apt; wijzigt enkel de
+standaardwaarde van sommige opties (zie &apt-conf; en in het bijzonder het
+binaire toepassingsgebied). U zou er daarom de voorkeur aan moeten geven om
+in uw scripts deze commando's (met eventueel een aantal bijkomende opties)
+te gebruiken omdat die zoveel als mogelijk achterwaarts compatibel gehouden
+worden.
+   </para>
+ </refsect1>
+
+ <refsect1><title>Zie ook</title>
+   <para>&apt-get;, &apt-cache;, &sources-list;, &apt-conf;, &apt-config;, De APT
+Gebruikershandleiding in &guidesdir;, &apt-preferences;, de APT Howto.</para>
+ </refsect1>
+
+ <refsect1><title>Diagnostiek</title>
+   <para><command>apt</command> geeft de terugkeerwaarde nul bij een normaal verlopen
+operatie, het decimaal getal 100 in geval van een fout.</para>
+ </refsect1>
+ &manbugs;
+ <refsect1><title>&translation-title;</title>
+   <para>&translation-holder;</para>
+   <para>&translation-english;</para>
+ </refsect1>
+</refentry>

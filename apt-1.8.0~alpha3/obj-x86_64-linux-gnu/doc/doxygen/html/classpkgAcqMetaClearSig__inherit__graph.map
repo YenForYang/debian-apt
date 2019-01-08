@@ -1,0 +1,7 @@
+<map id="pkgAcqMetaClearSig" name="pkgAcqMetaClearSig">
+<area shape="rect" id="node2" href="$classpkgAcqMetaIndex.xhtml" title="An item that is responsible for downloading the meta&#45;index {{{ file (i.e., Release) itself and verify..." alt="" coords="23,304,162,331"/>
+<area shape="rect" id="node3" href="$classpkgAcqMetaBase.xhtml" title="the manager of a transaction " alt="" coords="25,229,160,256"/>
+<area shape="rect" id="node4" href="$classpkgAcqTransactionItem.xhtml" title="baseclass for the indexes files to manage them all together " alt="" coords="5,155,180,181"/>
+<area shape="rect" id="node5" href="$classpkgAcquire_1_1Item.xhtml" title="Represents the process by which a pkgAcquire object should retrieve a file or a collection of files..." alt="" coords="67,80,119,107"/>
+<area shape="rect" id="node6" href="$classWeakPointable.xhtml" title="WeakPointable" alt="" coords="33,5,152,32"/>
+</map>

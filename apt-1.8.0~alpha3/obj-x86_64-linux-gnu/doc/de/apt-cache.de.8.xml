@@ -1,0 +1,426 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+  "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % aptent SYSTEM "apt.ent"> %aptent;
+<!ENTITY % aptverbatiment SYSTEM "apt-verbatim.ent"> %aptverbatiment;
+<!ENTITY % aptvendor SYSTEM "apt-vendor.ent"> %aptvendor;
+]>
+
+<refentry>
+
+ <refentryinfo>
+   <!-- The last update date -->
+&apt-author.jgunthorpe;
+   &apt-author.team;
+   &apt-email;
+   &apt-product;
+   
+   <date>2016-08-16T00:00:00Z</date>
+ </refentryinfo>
+ 
+ <refmeta>
+   <refentrytitle>apt-cache</refentrytitle>
+   <manvolnum>8</manvolnum>
+   <refmiscinfo class="manual">APT</refmiscinfo>
+ </refmeta>
+ 
+ 
+ <!-- Man page title -->
+<refnamediv>
+    <refname>apt-cache</refname>
+    <refpurpose>den APT-Zwischenspeicher abfragen</refpurpose>
+ </refnamediv>
+
+ &synopsis-command-apt-cache;
+
+ <refsect1><title>Beschreibung</title>
+    <para>
+       <command>apt-cache</command> führt eine Vielzahl von Aktionen auf dem
+Paketzwischenspeicher von APT durch. <command>apt-cache</command> verändert
+nicht den Status des Systems, stellt aber Aktionen zum Suchen und Erzeugen
+von interessanten Ausgaben der Paket-Metadaten bereit. Die Metadaten werden
+mittels des Befehls »update« z.B. von <command>apt-get</command> beschafft
+und aktualisiert, so dass sie veraltet sein können, falls die letzte
+Aktualisierung zu lange her ist. Im Gegenzug funktioniert
+<command>apt-cache</command> unabhängig davon, ob die konfigurierten Quellen
+verfügbar sind (z.B. offline).
+    </para>
+
+   <para>Sofern nicht die <option>-h</option>-, oder <option>--help</option>-Option
+angegeben ist, muss einer der nachfolgend aufgeführten Befehle vorkommen.</para>
+
+   <variablelist>
+     <varlistentry><term><option>gencaches</option></term>
+     <listitem><para><literal>gencaches</literal> erzeugt den Paketzwischenspeicher von APT. Dies
+wird implizit durch alle Befehle erledigt, die diesen Zwischenspeicher
+benötigen, falls er fehlt oder veraltet ist.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>showpkg</option> <option><replaceable>&synopsis-pkg;</replaceable>…</option></term>
+     <listitem><para><literal>showpkg</literal> zeigt Informationen über die auf der Befehlszeile
+aufgelisteten Pakete. Die übrigen Argumente sind Paketnamen. Die verfügbaren
+Versionen und Rückwärtsabhängigkeiten jedes  aufgeführten Paketes werden
+ebenso aufgelistet, wie die Vorwärtsabhängigkeiten jeder
+Version. Vorwärtsabhängigkeiten (normale Abhängigkeiten) sind jene Pakete,
+von denen das betreffende Paket abhängt. Rückwärtsabhängigkeiten sind jene
+Pakete, die von dem betreffenden Paket abhängen. Deshalb müssen
+Vorwärtsabhängigkeiten für das Paket erfüllt werden, Rückwärtsabhängigkeiten
+allerdings nicht. <command>apt-cache showpkg libreadline2</command> würde
+zum Beispiel eine Ausgabe ähnlich der folgenden erzeugen:</para>
+     
+<informalexample><programlisting>
+Package: libreadline2
+Versions: 2.1-12(/var/state/apt/lists/foo_Packages),
+Reverse Depends: 
+  libreadlineg2,libreadline2
+  libreadline2-altdev,libreadline2
+Dependencies:
+2.1-12 - libc5 (2 5.4.0-0) ncurses3.0 (0 (null))
+Provides:
+2.1-12 - 
+Reverse Provides: 
+</programlisting></informalexample>
+			    
+     <para>Dadurch wird sichtbar, dass libreadline2, Version 2.1-12, von libc5 und
+ncurses3.0 abhängt, die installiert sein müssen, damit libreadline2
+funktioniert. libreadlineg2 und libreadline2-altdev hängen wiederum von
+libreadline2 ab. Wenn libreadline2 installiert ist, müssen außerdem libc5
+und ncurses3.0 (und ldso) installiert sein, libreadlineg2 und
+libreadline2-altdev nicht. Für die spezielle Bedeutung der restlichen
+Ausgabe ist es am besten, den APT-Quelltext zu konsultieren.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>stats</option></term><listitem><para><literal>stats</literal> zeigt einige Statistiken über den
+Zwischenspeicher. Es werden keine weiteren Argumente erwartet. Berichtete
+Statistiken sind:
+     <itemizedlist>
+       <listitem><para><literal>Gesamtzahl der Paketnamen</literal> ist die Gesamtzahl der im
+Zwischenspeicher gefundenen Pakete.</para>
+       </listitem>
+       
+       <listitem><para><literal>Gewöhnliche Pakete</literal> ist die Anzahl der regulären,
+gewöhnlichen Paketnamen. Diese sind Pakete, die eine
+Eins-zu-Eins-Entsprechung zwischen ihren Namen und den Namen, die andere
+Pakete für ihre Abhängigkeiten benutzen, tragen. Die Mehrzahl der Pakete
+fällt in diese Kategorie.</para>
+       </listitem>
+
+       <listitem><para><literal>Rein virtuelle Pakete</literal> ist die Anzahl der Pakete, die nur
+als ein virtueller Paketname existieren. Das kommt vor, wenn Pakete nur den
+virtuellen Paketnamen »bereitstellen« und aktuell kein Paket den Namen
+benutzt. Zum Beispiel ist im Debian-GNU/Linux-System »mail-transport-agent«
+ein rein virtuelles Paket. Mehrere Pakete stellen »mail-transport-agent«
+bereit, aber es gibt kein Paket mit dem Namen »mail-transport-agent«.</para>
+       </listitem>
+   
+       <listitem><para><literal>Eeinzelne virtuelle Pakete</literal> ist die Anzahl der Pakete mit
+nur einem Paket, das ein bestimmtes virtuelles Paket
+bereitstellt. »X11-text-viewer« ist zum Beispiel im Debian-GNU/Linux-System
+ein virtuelles Paket, aber nur ein Paket, xless, stellt »X11-text-viewer«
+bereit.</para>
+       </listitem>
+
+       <listitem><para><literal>Gemischte virtuelle Pakete</literal> ist die Anzahl der Pakete, die
+entweder ein bestimmtes virtuelles Paket bereitstellen oder den virtuellen
+Paketnamen als Paketnamen haben. »debconf« ist zum Beispiel sowohl ein
+tatsächliches Paket, wird aber auch vom Paket debconf-tiny bereitgestellt.</para>
+       </listitem>
+   
+       <listitem><para><literal>Fehlend</literal> ist die Anzahl der Paketnamen, auf die eine
+Abhängigkeit verweist, die aber von keinem Paket bereitgestellt
+wird. Fehlende Pakete könnten auftauchen, wenn nicht auf eine vollständige
+Distribution zugegriffen oder ein (echtes oder virtuelles) Paket aus einer
+Distribution entfernt wurde. Normalerweise wird auf sie von Conflicts oder
+Breaks-Angaben Bezug genommen.</para>
+       </listitem>
+
+       <listitem><para><literal>Gesamtzahl an unterschiedlichen</literal> Versionen ist die Anzahl
+der im Zwischenspeicher gefundenen Paketversionen. Wenn auf mehr als eine
+Distribution zugegriffen wird (zum Beispiel Stable und Unstable), kann
+dieser Wert deutlich größer als die gesamte Anzahl der Paketnamen sein.</para>
+       </listitem>
+
+       <listitem><para><literal>Gesamtzahl an Abhängigkeiten</literal> ist die Anzahl der
+Abhängigkeitsbeziehungen, den alle Pakete im Zwischenspeicher beanspruchen.</para>
+       </listitem>
+     </itemizedlist>
+     </para></listitem>
+     </varlistentry>
+     
+     <varlistentry><term><option>showsrc</option> <option><replaceable>&synopsis-pkg;</replaceable>…</option></term>
+     <listitem><para><literal>showsrc</literal> zeigt alle Quellpaketdatensätze, die den
+angegebenen Paketnamen entsprechen. Alle Versionen werden ebenso angezeigt,
+wie alle Datensätze, die den Namen für ein Binärpaket angeben. Verwenden Sie
+die Option <option>--only-source</option>, um nur Quellpaketnamen
+anzuzeigen.
+     </para></listitem>
+     </varlistentry>
+     
+     <varlistentry><term><option>dump</option></term>
+     <listitem><para><literal>dump</literal> zeigt eine kurze Programmauflistung von jedem Paket
+im Zwischenspeicher. Es dient in erster Linie der Fehlersuche.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>dumpavail</option></term>
+     <listitem><para><literal>dumpavail</literal> gibt eine Liste der verfügbaren Pakete auf der
+Standardausgabe aus. Dies ist für die Benutzung mit &dpkg; geeignet und wird
+von der &dselect;-Methode benutzt.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>unmet</option></term>
+     <listitem><para><literal>unmet</literal> zeigt die Zusammenfassung aller unerfüllten
+Abhängigkeiten im Paketzwischenspeicher.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>show</option> <option><replaceable>&synopsis-pkg;</replaceable>…</option></term>
+     <listitem><para><literal>show</literal> führt eine Funktion aus, die <command>dpkg
+--print-avail</command> ähnlich ist. Es zeigt die Paketdatensätze für die
+genannten Pakete.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>search</option> <option><replaceable>&synopsis-regex;</replaceable>…</option></term>
+     <listitem><para><literal>search</literal> führt eine Volltextsuche in der Liste aller
+verfügbaren Pakete für das angegebene reguläre Muster gemäß POSIX durch,
+siehe &regex;. Es durchsucht die Paketnamen und die Beschreibungen nach
+einem Vorkommen des regulären Ausdrucks und gibt den Paketnamen mit einer
+kurzen Beschreibung, einschließlich virtueller Paketnamen, aus. Wenn
+<option>--full</option> angegeben wurde, ist die Ausgabe gleich der, die
+<literal>show</literal> für jedes passende Paket erzeugt. Wenn
+<option>--names-only</option> angegeben wurde, wird die lange Beschreibung
+nicht durchsucht, sondern nur der Paketname und die bereitgestellten Pakete.</para>
+     <para>
+     Separate Argumente können benutzt werden, um mehrere Suchmuster anzugeben,
+die »und«-verknüpft werden.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>depends</option> <option><replaceable>&synopsis-pkg;</replaceable>…</option></term>
+     <listitem><para><literal>depends</literal> zeigt eine Liste von jeder Abhängigkeit, die ein
+Paket hat und alle möglichen anderen Pakete, die die Abhängigkeit erfüllen
+können.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>rdepends</option> <option><replaceable>&synopsis-pkg;</replaceable>…</option></term>
+     <listitem><para><literal>rdepends</literal> zeigt eine Liste von jeder
+Rückwärtsabhängigkeit, die ein Paket hat.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>pkgnames</option> <optional><replaceable>&synopsis-prefix;</replaceable></optional></term>
+     <listitem><para>Dieser Befehl gibt den Namen jedes Paketes aus, das APT kennt. Das optionale
+Argument ist ein passendes Präfix, um die Namensliste zu filtern. Die
+Ausgabe ist für die Benutzung in der Tabulatorvervollständigung in der Shell
+geeignet. Die Ausgabe wird extrem schnell generiert. Dieser Befehl wird am
+besten mit der <option>--generate</option>-Option benutzt.</para>
+     <para>Beachten Sie, dass ein Paket, das APT kennt, nicht notwendigerweise zum
+Herunterladen verfügbar, installierbar oder installiert ist, virtuelle
+Pakete sind z.B. auch in der generierten Liste aufgeführt.
+     </para></listitem>
+     </varlistentry>
+     
+     <varlistentry><term><option>dotty</option> <option><replaceable>&synopsis-pkg;</replaceable>…</option></term>
+     <listitem><para><literal>dotty</literal> nimmt eine Paketliste auf der Befehlszeile entgegen
+und generiert eine Ausgabe, die für die Benutzung durch dotty aus dem Paket
+<ulink url="http://www.research.att.com/sw/tools/graphviz/">GraphViz</ulink>
+geeignet ist. Das Ergebnis ist eine Zusammenstellung von Knoten und Kanten,
+die die Beziehung zwischen Paketen darstellen. Standardmäßig werden alle
+abhängigen Pakete ausfindig gemacht. Dies kann zu einem sehr großen
+Schaubild führen. Um die Ausgabe auf die Pakete zu beschränken, die auf der
+Befehlszeile eingegeben wurden, setzen Sie die Option
+<literal>APT::Cache::GivenOnly</literal>.</para>
+
+     <para>Die resultierenden Knoten haben mehrere Formen: Normale Pakete sind
+Kästchen, rein virtuelle Pakete sind Dreiecke, gemischt virtuelle Pakete
+sind Rauten, fehlende Pakete sind Sechsecke. Orange Kästchen bedeuten, dass
+die Rekursion beendet wurde (Pakete auf Blättern), blaue Linien sind
+Vorabhängigkeiten, grüne Linien sind Konflikte.</para>
+
+     <para>Vorsicht, dotty kann keine größeren Zusammenstellungen von Paketen grafisch
+darstellen.</para></listitem>
+     </varlistentry>
+     
+     <varlistentry><term><option>xvcg</option> <option><replaceable>&synopsis-pkg;</replaceable>…</option></term>
+	 <listitem><para>Das gleiche wie <literal>dotty</literal>, nur für xvcg vom <ulink
+url="http://rw4.cs.uni-sb.de/users/sander/html/gsvcg1.html">VCG-Werkzeug</ulink>.
+	 </para></listitem></varlistentry>
+
+	 <varlistentry><term><option>policy</option> <optional><replaceable>&synopsis-pkg;</replaceable>…</optional></term>
+     <listitem><para><literal>policy</literal> ist dazu gedacht, bei Fragen der Fehlersuche, die
+sich auf die Einstellungsdatei beziehen, zu helfen. Ohne Argumente gibt es
+die Prioritäten von jeder Quelle aus. Ansonsten gibt es umfangreiche
+Informationen über die Prioritätenauswahl der genannten Pakete aus.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>madison</option> <option><replaceable>&synopsis-pkg;</replaceable>…</option></term>
+     <listitem><para><literal>apt-cache</literal>s <literal>madison</literal>-Befehl versucht,
+das Ausgabeformat und eine Untermenge der Funktionalität des
+Debian-Archivververwaltungswerkzeuges <literal>madison</literal>
+nachzuahmen. Es zeigt verfügbare Versionen eines Pakets in
+Tabellenform. Anders als das eigentliche <literal>madison</literal> kann es
+nur Informationen für die Architektur anzeigen, für die APT Paketlisten
+heruntergeladen hat (<literal>APT::Architecture</literal>).</para></listitem>
+     </varlistentry>
+   </variablelist>
+ </refsect1>
+ 
+ <refsect1><title>Optionen</title>
+   &apt-cmdblurb;
+   
+   <variablelist>
+     <varlistentry><term><option>-p</option></term><term><option>--pkg-cache</option></term>
+     <listitem><para>wählt die Datei zum Speichern des Paketzwischenspeichers. Der
+Paketzwischenspeicher ist der primäre Zwischenspeicher, der von allen
+Aktionen benutzt wird. Konfigurationselement:
+<literal>Dir::Cache::pkgcache</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>-s</option></term><term><option>--src-cache</option></term>
+     <listitem><para>wählt die Datei zum Speichern des Quellenzwischenspeichers. Die Quelle wird
+nur von <literal>gencaches</literal> benutzt und sie speichert eine
+ausgewertete Version der Paketinformationen von entfernt liegenden
+Quellen. Wenn der Paketzwischenspeicher gebildet wird, wird der
+Quellenzwischenspeicher benutzt, um ein erneutes Auswerten aller
+Paketdateien zu vermeiden. Konfigurationselement:
+<literal>Dir::Cache::srcpkgcache</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>-q</option></term><term><option>--quiet</option></term>
+     <listitem><para>still; erzeugt eine Ausgabe, die für Protokollierung geeignet ist und
+Fortschrittsanzeiger weglässt. Mehr »q«s unterdrücken mehr Ausgaben, bis zu
+einem Maximum von 2. Sie können außerdem <option>-q=#</option> benutzen, um
+die Stillestufe zu setzen, was die Konfigurationsdatei außer Kraft
+setzt. Konfigurationselement: <literal>quiet</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>-i</option></term><term><option>--important</option></term>
+     <listitem><para>nur wichtige Abhängigkeiten ausgeben. Zur Benutzung mit
+<literal>unmet</literal> und <literal>depends</literal>. Veranlasst, dass
+nur Depends- und Pre-Depends-Beziehungen ausgegeben
+werden. Konfigurationselement: <literal>APT::Cache::Important</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>--no-pre-depends</option></term>
+		   <term><option>--no-depends</option></term>
+		   <term><option>--no-recommends</option></term>
+		   <term><option>--no-suggests</option></term>
+		   <term><option>--no-conflicts</option></term>
+		   <term><option>--no-breaks</option></term>
+		   <term><option>--no-replaces</option></term>
+		   <term><option>--no-enhances</option></term>
+		   <listitem><para>Standardmäßig geben <command>depends</command> und
+<command>rdepends</command> alle Abhängigkeiten aus. Dies kann mit diesen
+Schaltern optimiert werden, die den angegebenen Abhängigkeitstyp
+weglassen. Konfigurationselement:
+<literal>APT::Cache::Show<replaceable>Abhängigkeitstyp</replaceable></literal>
+z.B. <literal>APT::Cache::ShowRecommends</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>--implicit</option></term>
+	<listitem><para>Standardmäßig geben <command>depends</command> und
+<command>rdepends</command> nur Abhängigkeiten aus, die explizit in den
+Metadaten angegeben werden. Mit diesem Schalter werden auch Abhängigkeiten
+angezeigt, die implizit basierend auf den vorgefundenen Daten hinzugefügt
+werden. Ein <literal>Conflicts: foo</literal> sagt z.B. implizit, dass
+dieses Paket auch einen Konflikt mit dem Paket »foo« von jeder anderen
+Architektur hat. Konfigurationselement:
+<literal>APT::Cache::ShowImplicit</literal>.
+	</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>-f</option></term><term><option>--full</option></term>
+     <listitem><para>gibt die vollständigen Paketdatensätze beim Suchen
+aus. Konfigurationselement: <literal>APT::Cache::ShowFull</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>-a</option></term><term><option>--all-versions</option></term>
+     <listitem><para>gibt die vollständigen Datensätze für alle verfügbaren Versionen aus. Dies
+ist die Vorgabe. Um sie auszuschalten, benutzen Sie
+<option>--no-all-versions</option>. Wenn <option>--no-all-versions</option>
+angegeben ist, wird nur die Anwärterversion angezeigt (die, die zur
+Installation ausgewählt würde). Diese Option ist nur für den
+<literal>show</literal>-Befehl anwendbar. Konfigurationselement:
+<literal>APT::Cache::AllVersions</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>-g</option></term><term><option>--generate</option></term>
+     <listitem><para>führt das Neuerstellen des Paketzwischenspeichers aus, anstatt den
+Zwischenspeicher so zu benutzen, wie er ist. Das ist die Vorgabe. Um sie
+auszuschalten, benutzen Sie
+<option>--no-generate</option>. Konfigurationselement:
+<literal>APT::Cache::Generate</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>--names-only</option></term><term><option>-n</option></term>
+     <listitem><para>durchsucht nur das Paket und die bereitgestellten Paketnamen, nicht die
+Langbeschreibungen. Konfigurationselement:
+<literal>APT::Cache::NamesOnly</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>--all-names</option></term>
+     <listitem><para>lässt <literal>pkgnames</literal> alle Namen, einschließlich virtueller
+Pakete und fehlender Abhängigkeiten, ausgeben. Konfigurationselement:
+<literal>APT::Cache::AllNames</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>--recurse</option></term>
+     <listitem><para>macht <literal>depends</literal> und <literal>rdepends</literal> rekursiv,
+so dass alle erwähnten Pakete einmal ausgegeben
+werden. Konfigurationselement:
+<literal>APT::Cache::RecurseDepends</literal>.</para></listitem>
+     </varlistentry>
+
+      <varlistentry><term><option>--installed</option></term>
+      <listitem><para>
+      begrenzt die Ausgabe von <literal>depends</literal> und
+<literal>rdepends</literal> auf Pakete, die aktuell installiert
+sind. Konfigurationselement: <literal>APT::Cache::Installed</literal>.</para></listitem>
+      </varlistentry>
+
+      <varlistentry><term><option>--with-source</option> <option>&synopsis-param-filename;</option></term>
+      <listitem><para>
+      fügt die angegebene Datei als Quelle für Metadaten hinzu. Dies kann
+wiederholt werden, um mehrere Dateien hinzuzufügen. Unterstützt werden
+derzeit <literal>*.deb</literal>-, <literal>*.dsc</literal>-,
+<literal>*.changes</literal>-, <literal>Sources</literal>- und
+<literal>Packages</literal>-Dateien sowie Quellpaketverzeichnisse. Dateien
+werden nur basierend auf ihren Dateinamen abgeglichen, nicht auf ihrem
+Inhalt!</para>
+      <para><literal>Sources</literal> und <literal>Packages</literal> können in jedes
+von APT unterstützte Format komprimiert werden, so lange sie die korrekte
+Erweiterung haben. Falls Sie mehrere dieser Dateien in einem Verzeichnis
+speichern müssen, können Sie einen Namen Ihrer Wahl, bei dem das letzte
+Zeichen ein Unterstrich (»<literal>_</literal>«) ist,
+voranstellen. Beispiel: mein.beispiel_Packages.xz</para>
+      <para>Beachten Sie, dass diese Quellen als vertrauenswürdig angesehen werden
+(siehe &apt-secure;). Konfigurationselement:
+<literal>APT::Sources::With</literal>.</para></listitem>
+      </varlistentry>
+
+     &apt-commonoptions;
+     
+   </variablelist>
+ </refsect1>
+
+ <refsect1><title>Dateien</title>
+   <variablelist>
+     &file-sourceslist;
+     &file-statelists;
+   </variablelist>
+ </refsect1>
+
+ <refsect1><title>Siehe auch</title>
+   <para>&apt-conf;, &sources-list;, &apt-get;
+   </para>
+ </refsect1>
+
+ <refsect1><title>Diagnose</title>
+   <para><command>apt-cache</command> gibt bei normalen Aktionen 0 zurück, dezimal
+100 bei Fehlern.
+   </para>
+ </refsect1>
+
+ &manbugs;
+ 
+ <refsect1><title>&translation-title;</title>
+   <para>&translation-holder;</para>
+   <para>&translation-english;</para>
+ </refsect1>
+</refentry>

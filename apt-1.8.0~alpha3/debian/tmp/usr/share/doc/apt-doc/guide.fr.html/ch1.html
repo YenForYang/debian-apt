@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Chapitre 1. Généralités</title>
+    <meta name="generator" content="DocBook XSL Stylesheets V1.79.1"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="home" href="index.html" title="Guide d'utilisation d'APT"/>
+    <link rel="up" href="index.html" title="Guide d'utilisation d'APT"/>
+    <link rel="prev" href="index.html" title="Guide d'utilisation d'APT"/>
+    <link rel="next" href="ch2.html" title="Chapitre 2. apt-get"/>
+  </head>
+  <body>
+    <div class="navheader">
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Chapitre 1. Généralités</th>
+        </tr>
+        <tr>
+          <td align="left"><a accesskey="p" href="index.html">Précédent</a> </td>
+          <th width="60%" align="center"> </th>
+          <td align="right"> <a accesskey="n" href="ch2.html">Suivant</a></td>
+        </tr>
+      </table>
+      <hr/>
+    </div>
+    <div class="chapter">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h1 class="title"><a id="ch1"/>Chapitre 1. Généralités</h1>
+          </div>
+        </div>
+      </div>
+      <div class="toc">
+        <p>
+          <strong>Table des matières</strong>
+        </p>
+        <dl class="toc">
+          <dt>
+            <span class="section">
+              <a href="ch1.html#s1.1">1.1. Anatomie du système de gestion des paquets</a>
+            </span>
+          </dt>
+        </dl>
+      </div>
+      <p>
+Le paquet APT comporte actuellement deux parties : la méthode APT pour
+<span class="command"><strong>dselect</strong></span> et l'interface en ligne de commande
+<span class="command"><strong>apt-get</strong></span>. Les deux fournissent des méthodes d'installation
+et de suppression de paquets ainsi que de téléchargement de nouveaux paquets
+par Internet.
+</p>
+      <div class="section">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h2 class="title"><a id="s1.1"/>1.1. Anatomie du système de gestion des paquets</h2>
+            </div>
+          </div>
+        </div>
+        <p>
+Le système de gestion de paquets de Debian intègre de nombreuses
+informations associées à chaque paquet afin de garantir qu'il s'intègre
+proprement et facilement sur le système. Une des fonctionnalités les plus
+immédiatement visibles est le système de gestion des dépendances.
+</p>
+        <p>
+Le système de gestion des dépendances permet aux programmes de partage des
+éléments du système, tels que les bibliothèques de fonctions. Il permet
+d'isoler dans des paquets spécifiques certains parties moins utilisées des
+programmes afin de limiter le nombre d'éléments que l'utilisateur ordinaire
+a besoin d'installer. Ce système de gestion des dépendances permet également
+d'effectuer des choix parmi les divers agents de transport de courrier
+électronique, les serveurs X et d'autres cxomposants du système.
+</p>
+        <p>
+La première étape de compréhension de la gestion de dépendances est
+d'examiner le fonctionnement d'une dépendance simple. Une dépendance simple
+est le cas où un paquet donné a besoin qu'un autre paquet soit installé
+simultanément pour pouvoir fonctionner correctement.
+</p>
+        <p>
+Par example, mailcrypt est une extension à Emacs qui permet de gérer le
+courrier électronique chiffré avec GPG. Si GPG n'est pas installé, mailcrypt
+est inutile. Donc le paquet mailcrypt a une dépendance simple sur GPG. De
+plus, étant une extension à Emacs sans lequel il est totalement inutile, il
+a une dépendance simple sur emacs.
+</p>
+        <p>
+Un autre type de dépendance importante est la dépendance en conflit. Cela
+signifie qu'un paquet ne fonctionne pas lorsqu'il est installé en même temps
+qu'un autre paquet donné, ce qui peut même être dommageable pour le
+système. Un exemple est par exemple constitué par les agents de transport de
+courrier tels que sendmail, exim ou qmail. Il n'est pas possible d'installer
+deux agents de transport de courrier simultanément puisque les deux ont
+besoin d'être à l'écoute sur le réseau pour recevoir le courrier
+électronique. Installer deux programmes de ce type sur le même système
+pourrait conduire à des pertes de données, ce qui explique que tous les
+agents de transport de courrier électronique soient établis comme étant en
+conflit les uns avec les autres.
+</p>
+        <p>
+Il existe également la possibilité pour un paquet donné de prétendre être un
+autre paquet. Par exemple, exim et sendmail sont analogues sur de nombreux
+aspects ; ils servent tous deux à acheminer le courrier électronique et leur
+interface d'utilisation est la même. Pour cette raison, le système de
+gestion des paquets leur fournit la possibilité d'indiquer qu'ils sont
+chacun un agent de transport de courrier (« mail transport agent ») en
+indiquant qu'ils fournissent (« Provides ») « mail-transport-agent ». Ainsi,
+un paquet qui a besoin de cette fonctionnalité peut dépendre simplement d'un
+paquet « mail-transprot-agent ». Cette fonctionnalité utile peut toutefois
+rendre la correction de certains défauts des paquets plus complexe.
+</p>
+        <p>
+À un instant donné, une dépendance donnée peut être ou pas remplie par des
+paquets installés ou pas encore installés. APT tente donc de résoudre les
+problèmes de dépendances par l'intermédiaire d'un certain nombre
+d'algorithmes automatiques qui simplifient le choix des paquets à installer.
+</p>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr/>
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td align="left"><a accesskey="p" href="index.html">Précédent</a> </td>
+          <td align="center"> </td>
+          <td align="right"> <a accesskey="n" href="ch2.html">Suivant</a></td>
+        </tr>
+        <tr>
+          <td align="left" valign="top">Guide d'utilisation d'APT </td>
+          <td align="center">
+            <a accesskey="h" href="index.html">Sommaire</a>
+          </td>
+          <td align="right" valign="top"> Chapitre 2. apt-get</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

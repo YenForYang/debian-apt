@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>Usando o APT Offline</title><meta name="generator" content="DocBook XSL Stylesheets V1.79.1"/><meta name="description" content="Este documento descreve como usar o APT num ambiente sem rede, especificamente uma aproximação 'sneaker-net' para executar actualizações."/></head><body><div xml:lang="pt" class="book"><div class="titlepage"><div><div><br xmlns=""/><center xmlns=""><h1 xmlns="http://www.w3.org/1999/xhtml" class="title"><a id="idm1"/>Usando o APT Offline</h1></center><br xmlns=""/><hr xmlns=""/></div><div><div class="authorgroup"><center xmlns=""><div xmlns="http://www.w3.org/1999/xhtml" class="author"><h3 class="author">Jason Gunthorpe</h3><code class="email">&lt;<a class="email" href="mailto:jgg@debian.org">jgg@debian.org</a>&gt;</code></div></center></div></div><div><center xmlns=""><p xmlns="http://www.w3.org/1999/xhtml" class="releaseinfo">Versão 1.8.0~alpha3</p></center><hr xmlns=""/></div><div><p class="copyright">Copyright © 1999 Jason Gunthorpe</p></div><div><div class="legalnotice"><a id="idm14"/><p class="legalnotice-title"><strong>Aviso de Licença</strong></p><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+"APT" e este documento são software livre; você pode distribuí-lo e/ou
+modificá-lo sob os termos da GNU General Public License como publicada pela
+Free Software Foundation; seja na versão 2 da Licença, ou (por sua opção)
+qualquer versão posterior.
+</p></td></tr></table></para><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+Para mais detalhes em sistemas Debian, veja o ficheiro
+/usr/share/common-licenses/GPL para a licença completa.
+</p></td></tr></table></para></div></div><div><div class="abstract"><p class="title"><strong>Resumo</strong></p><p>
+Este documento descreve como usar o APT num ambiente sem rede,
+especificamente uma aproximação 'sneaker-net' para executar actualizações.
+</p></div></div></div><hr/></div><div class="toc"><p><strong>Índice</strong></p><dl class="toc"><dt><span class="chapter"><a href="#ch1">1. Introdução</a></span></dt><dd><dl><dt><span class="section"><a href="#s1.1">1.1. Visão geral</a></span></dt></dl></dd><dt><span class="chapter"><a href="#ch2">2. Usando o APT em ambas máquinas</a></span></dt><dd><dl><dt><span class="section"><a href="#s2.1">2.1. Visão geral</a></span></dt><dt><span class="section"><a href="#s2.2">2.2. O ficheiro de configuração</a></span></dt></dl></dd><dt><span class="chapter"><a href="#ch3">3. Usando APT e wget</a></span></dt><dd><dl><dt><span class="section"><a href="#s3.1">3.1. Visão geral</a></span></dt><dt><span class="section"><a href="#s3.2">3.2. Operação</a></span></dt></dl></dd></dl></div><div class="chapter"><div class="titlepage"><div><div><h1 class="title"><a id="ch1"/>Capítulo 1. Introdução</h1></div></div></div><div class="toc"><p><strong>Índice</strong></p><dl class="toc"><dt><span class="section"><a href="#s1.1">1.1. Visão geral</a></span></dt></dl></div><div class="section"><div class="titlepage"><div><div><h2 class="title"><a id="s1.1"/>1.1. Visão geral</h2></div></div></div><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+Normalmente o APT requer acesso directo a um arquivo Debian, seja duma media
+local ou através de rede. Outra queixa comum e que uma máquina Debian está
+numa ligação lenta, como um modem e outra máquina tem uma ligação muito
+rápida mas estão fisicamente distantes.
+</p></td></tr></table></para><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+A solução para isto é usar grandes médias amovíveis como um disco Zip ou um
+disco SuperDisk. Estes discos não são suficientemente grandes para armazenar
+o arquivo Debian inteiro mas podem facilmente conter um subconjunto
+suficientemente grande para a maioria dos utilizadores. A ideia é usar o APT
+para gerar uma lista de pacotes que são necessários e depois obter-los para
+o disco usando outra máquina com boa ligação. É até possível usar outra
+máquina Debian com APT ou usar um SO completamente diferente e uma
+ferramenta de download como o wget. Deixe <span class="emphasis"><em>remote host</em></span>
+representar a máquina que descarrega os pacotes, e <span class="emphasis"><em>target
+host</em></span> aquela com má ou nenhuma ligação.
+</p></td></tr></table></para><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+Isto é conseguido ao manipular criativamente o ficheiro de configuração do
+APT. A premissa essencial para dizer ao APT para procurar num disco pelos
+seus ficheiros de arquivo. Note que o disco deve estar formatado com um
+sistema de ficheiros que saiba lidar com nomes de ficheiros longos como o
+ext2, fat32 ou vfat.
+</p></td></tr></table></para></div></div><div class="chapter"><div class="titlepage"><div><div><h1 class="title"><a id="ch2"/>Capítulo 2. Usando o APT em ambas máquinas</h1></div></div></div><div class="toc"><p><strong>Índice</strong></p><dl class="toc"><dt><span class="section"><a href="#s2.1">2.1. Visão geral</a></span></dt><dt><span class="section"><a href="#s2.2">2.2. O ficheiro de configuração</a></span></dt></dl></div><div class="section"><div class="titlepage"><div><div><h2 class="title"><a id="s2.1"/>2.1. Visão geral</h2></div></div></div><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+Estando o APT disponível em ambas máquinas dá a configuração mais simples. A
+ideia básica é colocar uma cópia do ficheiro de estado no disco e usar a
+máquina remota para obter os ficheiros de pacotes mais recentes e decidir
+quais pacotes descarregar. A estrutura de directórios do disco deverá
+parecer-se com:
+</p></td></tr></table></para><screen xmlns=""><table><tr><td>   </td><td><pre xmlns="http://www.w3.org/1999/xhtml" class="screen">
+  /disc/
+    archives/
+       partial/
+    lists/
+       partial/
+    status
+    sources.list
+    apt.conf
+</pre></td></tr></table></screen></div><div class="section"><div class="titlepage"><div><div><h2 class="title"><a id="s2.2"/>2.2. O ficheiro de configuração</h2></div></div></div><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+O ficheiro de configuração deve dizer ao APT para armazenar os seus ficheiro
+no disco e usar os ficheiros de configuração do disco também. O sources.list
+deve conter os sites apropriados que deseja usar a partir da máquina remota,
+e o ficheiro de estado deve ser uma cópia de
+<span class="emphasis"><em>/var/lib/dpkg/status</em></span> a partir do <span class="emphasis"><em>target
+host</em></span>. Por favor note, se está a usar um arquivo local você deve
+usar copy URIs, a sintaxe é idêntica a file URIs.
+</p></td></tr></table></para><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+<span class="emphasis"><em>apt.conf</em></span> tem de conter a informação necessária para
+fazer o APT usar o disco:
+</p></td></tr></table></para><screen xmlns=""><table><tr><td>   </td><td><pre xmlns="http://www.w3.org/1999/xhtml" class="screen">
+ APT
+ {
+   /* Isto não é necessário se as duas máquinas forem da mesma arquitectura, diz
+      ao APT remoto que arquitectura tem a máquina de destino */
+   Architecture "i386";
+
+   Get::Download-Only "true";
+ };
+
+ Dir
+ {
+   /* Usa o disco para informação de estado e redirecciona o ficheiro de estado a partir de
+      the /var/lib/dpkg default */
+   State "/disc/";
+   State::status "status";
+
+   // Caches binárias serão armazenadas localmente
+   Cache::archives "/disc/archives/";
+   Cache "/tmp/";
+
+   // Localização da lista de fontes.
+   Etc "/disc/";
+ };
+</pre></td></tr></table></screen><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+Mais detalhes podem ser vistos ao examinar o manual do apt.conf e o exemplo
+de ficheiro de configuração em
+<span class="emphasis"><em>/usr/share/doc/apt/examples/apt.conf</em></span>.
+</p></td></tr></table></para><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+Na máquina de destino a primeira coisa a fazer é montar o disco e copiar
+<span class="emphasis"><em>/var/lib/dpkg/status</em></span> para ele. Você também precisa de
+criar os directórios delineados na Visão Geral,
+<span class="emphasis"><em>archives/partial/</em></span> e
+<span class="emphasis"><em>lists/partial/</em></span>. Depois leve o disco até à máquina
+remota e configure o sources.list. Na máquina remota execute o seguinte:
+</p></td></tr></table></para><screen xmlns=""><table><tr><td>   </td><td><pre xmlns="http://www.w3.org/1999/xhtml" class="screen">
+ # export APT_CONFIG="/disc/apt.conf"
+ # apt-get update
+ [ APT obtém os ficheiros de pacotes ]
+ # apt-get dist-upgrade
+ [ APT obtém todos os pacotes necessários para actualizar a máquina de destino ]
+</pre></td></tr></table></screen><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+O comando dist-upgrade pode ser substituído por qualquer outro comando APT
+standard, particularmente dselect-upgrade. Você até pode usar um front-end
+do APT como o <span class="emphasis"><em>dselect</em></span>. No entanto isto apresenta um
+problema ao comunicar as suas selecções de volta ao computador local.
+</p></td></tr></table></para><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+Agora o disco contém todos os ficheiros de índice e os arquivos necessários
+para actualizar a máquina de destino. Devolva o disco e corra:
+</p></td></tr></table></para><screen xmlns=""><table><tr><td>   </td><td><pre xmlns="http://www.w3.org/1999/xhtml" class="screen">
+  # export APT_CONFIG="/disc/apt.conf"
+  # apt-get check
+  [ APT gera uma cópia local dos ficheiros de cache ]
+  # apt-get --no-d -o dir::state::status=/var/lib/dpkg/status dist-upgrade
+  [ Ou qualquer outro comando APT ]
+</pre></td></tr></table></screen><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+Para uma função apropriada é necessário re-especificar que o ficheiro de
+estado seja o ficheiro local. Isto é muito importante!
+</p></td></tr></table></para><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+Se está a usar dselect você pode fazer a operação muito arriscada de copiar
+disc/status para /var/lib/dpkg/status para que quaisquer selecções que faça
+na máquina remota sejam actualizadas. Eu recomendo altamente que as pessoas
+apenas façam selecções na máquina local - mas isto pode nem sempre ser
+possível. NÃO copie o ficheiro de estado se entretanto correu o dpkg ou o
+APT!!
+</p></td></tr></table></para></div></div><div class="chapter"><div class="titlepage"><div><div><h1 class="title"><a id="ch3"/>Capítulo 3. Usando APT e wget</h1></div></div></div><div class="toc"><p><strong>Índice</strong></p><dl class="toc"><dt><span class="section"><a href="#s3.1">3.1. Visão geral</a></span></dt><dt><span class="section"><a href="#s3.2">3.2. Operação</a></span></dt></dl></div><div class="section"><div class="titlepage"><div><div><h2 class="title"><a id="s3.1"/>3.1. Visão geral</h2></div></div></div><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+<span class="emphasis"><em>wget</em></span> é uma ferramenta popular e portável de download
+que pode correr praticamente em qualquer máquina. Ao contrário do método
+acima, este requer que a máquina Debian já tenha uma lista de pacotes
+disponíveis.
+</p></td></tr></table></para><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+A ideia básica é criar um disco que tem apenas os ficheiros de arquivo
+descarregados do site remoto. Isto é feito ao usar a opção --print-uris no
+apt-get e depois preparar um script wget para realmente ir buscar os
+pacotes.
+</p></td></tr></table></para></div><div class="section"><div class="titlepage"><div><div><h2 class="title"><a id="s3.2"/>3.2. Operação</h2></div></div></div><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+Ao contrário da técnica anterior, não são necessários ficheiros de
+configuração especiais. Nós usamos meramente os comandos standard do APT
+para gerar a lista de ficheiros.
+</p></td></tr></table></para><screen xmlns=""><table><tr><td>   </td><td><pre xmlns="http://www.w3.org/1999/xhtml" class="screen">
+ # apt-get dist-upgrade 
+ [ Escolha não quando perguntado, certifique-se que está contente com as acções ]
+ # apt-get -qq --print-uris dist-upgrade &gt; uris
+ # awk '{print "wget -O " $2 " " $1}' &lt; uris &gt; /disc/wget-script
+</pre></td></tr></table></screen><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+Qualquer comando além do dist-upgrade pode ser usado aqui, incluindo
+dselect-upgrade.
+</p></td></tr></table></para><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+O ficheiro /disc/wget-script irá agora conter uma lista de comandos do wget
+para executar de modo a obter os arquivos necessários. Este script deve ser
+corrido com o directório actual sendo o ponto de montagem do disco para que
+grave os resultados no disco.
+</p></td></tr></table></para><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+A máquina remota deverá fazer algo como
+</p></td></tr></table></para><screen xmlns=""><table><tr><td>   </td><td><pre xmlns="http://www.w3.org/1999/xhtml" class="screen">
+  # cd /disc
+  # sh -x ./wget-script
+  [ wait.. ]
+</pre></td></tr></table></screen><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+Após os arquivos serem descarregados e o disco retornado à máquina Debian, a
+instalação pode prosseguir usando,
+</p></td></tr></table></para><screen xmlns=""><table><tr><td>   </td><td><pre xmlns="http://www.w3.org/1999/xhtml" class="screen">
+  # apt-get -o dir::cache::archives="/disc/" dist-upgrade
+</pre></td></tr></table></screen><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+O qual irá usar os arquivos já obtidos e que estão no disco.
+</p></td></tr></table></para></div></div></div></body></html>

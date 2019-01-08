@@ -1,0 +1,10 @@
+<map id="FileFdPrivate" name="FileFdPrivate">
+<area shape="rect" id="node2" href="$classBufferedWriteFileFdPrivate.xhtml" title="BufferedWriteFileFdPrivate" alt="" coords="159,5,353,32"/>
+<area shape="rect" id="node3" href="$classBz2FileFdPrivate.xhtml" title="Bz2FileFdPrivate" alt="" coords="191,56,321,83"/>
+<area shape="rect" id="node4" href="$classDirectFileFdPrivate.xhtml" title="DirectFileFdPrivate" alt="" coords="184,107,328,133"/>
+<area shape="rect" id="node5" href="$classGzipFileFdPrivate.xhtml" title="GzipFileFdPrivate" alt="" coords="189,157,323,184"/>
+<area shape="rect" id="node6" href="$classLz4FileFdPrivate.xhtml" title="Lz4FileFdPrivate" alt="" coords="193,208,319,235"/>
+<area shape="rect" id="node7" href="$classLzmaFileFdPrivate.xhtml" title="LzmaFileFdPrivate" alt="" coords="186,259,326,285"/>
+<area shape="rect" id="node8" href="$classPipedFileFdPrivate.xhtml" title="PipedFileFdPrivate" alt="" coords="185,309,327,336"/>
+<area shape="rect" id="node9" href="$classZstdFileFdPrivate.xhtml" title="ZstdFileFdPrivate" alt="" coords="189,360,323,387"/>
+</map>

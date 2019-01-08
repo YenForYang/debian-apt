@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+  "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % aptent SYSTEM "apt.ent"> %aptent;
+<!ENTITY % aptverbatiment SYSTEM "apt-verbatim.ent"> %aptverbatiment;
+<!ENTITY % aptvendor SYSTEM "apt-vendor.ent"> %aptvendor;
+]>
+
+<refentry>
+
+ <refentryinfo>
+   &apt-author.jgunthorpe;
+   &apt-author.team;
+   &apt-email;
+   &apt-product;
+   <date>2013-11-30T00:00:00Z</date>
+ </refentryinfo>
+
+ <refmeta>
+   <refentrytitle>apt-cdrom</refentrytitle>
+   <manvolnum>8</manvolnum>
+   <refmiscinfo class="manual">APT</refmiscinfo>
+ </refmeta>
+ 
+ 
+ <!-- Man page title -->
+<refnamediv>
+    <refname>apt-cdrom</refname>
+    <refpurpose>strumento APT per la gestione dei CD-ROM</refpurpose>
+ </refnamediv>
+
+ &synopsis-command-apt-cdrom;
+
+ <refsect1><title>Descrizione</title>
+   <para><command>apt-cdrom</command> è usato per aggiungere un nuovo CD-ROM alla
+lista delle fonti disponibili per APT. <command>apt-cdrom</command> si
+prende cura di determinare la struttura del disco e anche di correggere
+possibili errori di masterizzazione e di verificare i file indice.   
+   </para>
+
+   <para>Per aggiungere dei CD al sistema APT è necessario usare
+<command>apt-cdrom</command>, in quanto ciò non può essere fatto
+manualmente. Inoltre ogni disco in un insieme di più CD deve essere inserito
+e scansionato separatamente per tenere conto di possibili errori di
+masterizzazione.
+   </para>
+
+   <para>A meno che non venga fornita l'opzione <option>-h</option> o
+<option>--help</option>, deve essere presente uno dei comandi seguenti.</para>
+
+    <variablelist>
+     <varlistentry><term><option>add</option></term>
+     <listitem><para><literal>add</literal> è usato per aggiungere un nuovo disco alla lista
+delle fonti. Smonterà il device del CD-ROM, chiederà di inserire un disco e
+poi procederà alla sua scansione e copierà i file indice. Se il disco non ha
+una directory <filename>.disk/</filename> corretta, verrà chiesto un titolo
+descrittivo.
+     </para>
+
+     <para>APT usa un identificativo per i CD-ROM per tenere traccia di quale disco è
+attualmente nel lettore e mantiene un database di questi identificativi nel
+file <filename>&statedir;/cdroms.list</filename>.
+     </para>
+     </listitem>
+     </varlistentry>
+     
+     <varlistentry><term><option>ident</option></term>
+     <listitem><para>Uno strumento di debug per riportare l'identità del disco corrente così come
+il nome dei file memorizzato.
+     </para>
+     </listitem>
+     </varlistentry>
+    </variablelist>
+ </refsect1>
+
+ <refsect1><title>Opzioni</title>
+   &apt-cmdblurb;
+   
+   <variablelist>
+     <varlistentry><term><option>--no-auto-detect</option></term><term><option>--cdrom</option></term>
+     <listitem><para>Non cercare di rilevare automaticamente il percorso del CD-ROM. Solitamente
+usato insieme all'opzione <option>--cdrom</option>. Voce di configurazione:
+<literal>Acquire::cdrom::AutoDetect</literal>.
+     </para>
+     </listitem>
+     </varlistentry>
+     
+
+     <varlistentry><term><option>-d</option></term><term><option>--cdrom</option></term>
+     <listitem><para>Punto di mount; specifica la posizione in cui montare il CD-ROM. Questo
+punto di mount deve essere elencato nel file <filename>/etc/fstab</filename>
+e configurato correttamente. Voce di configurazione:
+<literal>Acquire::cdrom::mount</literal>.
+     </para>
+     </listitem>
+     </varlistentry>
+     
+     <varlistentry><term><option>-r</option></term><term><option>--rename</option></term>
+     <listitem><para>Rinomina un disco; cambia l'etichetta di un disco o soppianta l'etichetta
+originale del disco. Questa opzione farà sì che <command>apt-cdrom</command>
+chieda una nuova etichetta. Voce di configurazione:
+<literal>APT::CDROM::Rename</literal>.
+     </para>
+     </listitem>
+     </varlistentry>
+     
+     <varlistentry><term><option>-m</option></term><term><option>--no-mount</option></term>
+     <listitem><para>Non montare; impedisce ad <command>apt-cdrom</command> di montare e smontare
+il punto di mount. Voce di configurazione:
+<literal>APT::CDROM::NoMount</literal>.
+     </para>
+     </listitem>
+     </varlistentry>
+     
+     <varlistentry><term><option>-f</option></term><term><option>--fast</option></term>
+     <listitem><para>Copia rapida; assume che i file dei pacchetti siano validi e non verifica
+ogni pacchetto. Questa opzione dovrebbe essere usata solo se
+<command>apt-cdrom</command> è stato già eseguito sul disco e non ha
+rilevato alcun errore. Voce di configurazione:
+<literal>APT::CDROM::Fast</literal>.
+     </para>
+     </listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>-a</option></term><term><option>--thorough</option></term>
+     <listitem><para>Scansione approfondita dei file Package; questa opzione può essere
+necessaria con alcuni dischi delle vecchie Debian 1.1/1.2 in cui i file
+Package si trovano in posti inconsueti. La scansione dei CD richiederà molto
+più tempo, ma troverà tutti i file.
+     </para>
+     </listitem>
+     </varlistentry>
+     
+     <varlistentry><term><option>-n</option></term>
+                   <term><option>--just-print</option></term>
+                   <term><option>--recon</option></term>
+                   <term><option>--no-act</option></term>
+     <listitem><para>Nessun cambiamento; non cambia il file &sources-list; e non scrive i file
+indice. Tuttavia ogni cosa è comunque verificata. Voce di configurazione:
+<literal>APT::CDROM::NoAct</literal>.
+     </para>
+     </listitem>
+     </varlistentry> 
+
+     &apt-commonoptions;
+
+   </variablelist>
+ </refsect1>
+
+ <refsect1><title>Vedere anche</title>
+   <para>&apt-conf;, &apt-get;, &sources-list;
+   </para>
+ </refsect1>
+
+ <refsect1><title>Diagnostica</title>
+   <para><command>apt-cdrom</command> restituisce zero in caso di funzionamento
+normale e il valore decimale 100 in caso di errore.
+   </para>
+ </refsect1>
+
+ &manbugs;
+
+ <refsect1><title>&translation-title;</title>
+   <para>&translation-holder;</para>
+   <para>&translation-english;</para>
+ </refsect1>
+</refentry>
+

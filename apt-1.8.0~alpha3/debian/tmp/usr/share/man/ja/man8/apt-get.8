@@ -1,0 +1,712 @@
+'\" t
+.\"     Title: apt-get
+.\"    Author: Gunthorpe Jason[FAMILY Given]
+.\" Generator: DocBook XSL Stylesheets v1.79.1 <http://docbook.sf.net/>
+.\"      Date: 14\ \&10 月\ \&2018
+.\"    Manual: APT
+.\"    Source: APT 1.8.0~alpha3
+.\"  Language: Japanese
+.\"
+.TH "APT\-GET" "8" "14\ \&10 月\ \&2018" "APT 1.8.0~alpha3" "APT"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "名前"
+apt-get \- APT パッケージ操作ユーティリティ \-\- コマンドラインインターフェース
+.SH "概要"
+.HP \w'\fBapt\-get\fR\ 'u
+\fBapt\-get\fR [\fB\-asqdyfmubV\fR] [\fB\-o=\fR\fB\fI設定文字列\fR\fR] [\fB\-c=\fR\fB\fI設定ファイル\fR\fR] [\fB\-t=\fR\fB\fI対象リリース\fR\fR] [\fB\-a=\fR\fB\fIアーキテクチャ\fR\fR] {update | upgrade | dselect\-upgrade | dist\-upgrade | install\ \fIパッケージ\fR\ [{=\fIパッケージバージョン番号\fR\ |\ /\fI対象リリース\fR}]...  | remove\ \fIパッケージ\fR...  | purge\ \fIパッケージ\fR...  | source\ \fIパッケージ\fR\ [{=\fIパッケージバージョン番号\fR\ |\ /\fI対象リリース\fR}]...  | build\-dep\ \fIパッケージ\fR\ [{=\fIパッケージバージョン番号\fR\ |\ /\fI対象リリース\fR}]...  | download\ \fIパッケージ\fR\ [{=\fIパッケージバージョン番号\fR\ |\ /\fI対象リリース\fR}]...  | check | clean | autoclean | autoremove | {\-v\ |\ \-\-version} | {\-h\ |\ \-\-help}}
+.SH "説明"
+.PP
+\fBapt\-get\fR
+は、パッケージを操作するコマンドラインツールで、APT ライブラリを用いる他のツールのユーザ側「バックエンド」といえるものです。「フロントエンド」インターフェースには、\fBaptitude\fR(8),
+\fBsynaptic\fR(8),
+\fBwajig\fR(1)
+などがあります。
+.PP
+\fB\-h\fR
+オプションや
+\fB\-\-help\fR
+オプションを除き、以下に挙げるコマンドが必要です。
+.PP
+\fBupdate\fR
+.RS 4
+updateは、取得元からパッケージインデックスファイルの再同期を行うのに使用します。利用可能なパッケージのインデックスは、/etc/apt/sources\&.list
+に記述した場所から取得します。例えば Debian アーカイブを利用する際、このコマンドが
+Packages\&.gz
+ファイルを検索することで、新規または更新されたパッケージの情報が利用可能となります。update
+は、upgrade
+や
+dist\-upgrade
+を行う前に常に実行してください。前もってパッケージファイルのサイズを知ることができないため、全体の進捗メータは正しく表示されません。
+.RE
+.PP
+\fBupgrade\fR
+.RS 4
+upgrade
+は、現在システムにインストールされている全パッケージの最新バージョンを、/etc/apt/sources\&.list
+に列挙した取得元からインストールするのに使用します。現在インストール中のパッケージに新しいバージョンがあれば更新しますが、いかなる時も現在インストール中のパッケージの削除は行いませんし、インストールしていないパッケー所の取得・インストールは行いません。対象のパッケージが、他のパッケージのインストール状態を変更せずに更新できない場合は、現在のバージョンのままとなります。最初に
+update
+を実行しておき、\fBapt\-get\fR
+にパッケージの新しいバージョンがあることを知らせる必要があります。
+.RE
+.PP
+\fBdist\-upgrade\fR
+.RS 4
+dist\-upgrade
+は、upgrade
+の機能に加え、新バージョンのパッケージに対する依存関係の変更を知的に操作します。\fBapt\-get\fR
+は「洗練された」競合解決システムを持ち、必要とあらば比較的重要でないパッケージを犠牲にして、最重要パッケージの更新を試みます。そのため
+dist\-upgrade
+は、いくつかのパッケージを削除する可能性があります。/etc/apt/sources\&.list
+ファイルには、必要なパッケージファイルを検索する場所のリストが含まれています。特定のパッケージ向けに、一般的な設定を上書きする機構については、\fBapt_preferences\fR(5)
+をご覧ください。
+.RE
+.PP
+\fBdselect\-upgrade\fR
+.RS 4
+dselect\-upgrade
+は、伝統的な Debian GNU/Linux パッケージ管理フロントエンドの
+\fBdselect\fR(1)
+と共に使用されます。dselect\-upgrade
+は、\fBdselect\fR(1)
+で作られた利用可能パッケージのStatus
+フィールドの変更を追跡し、その状態を反映させるのに必要なアクションを実行します。(例えば、古いパッケージの削除や新しいパッケージのインストールなど)
+.RE
+.PP
+\fBinstall\fR
+.RS 4
+install
+の後には、インストールや更新したいパッケージを 1 つ以上指定します。指定するパッケージは、完全なファイル名ではなくパッケージ名です (例えば Debian システムでは、apt\-utils_1\&.8\&.0~alpha3_amd64\&.deb
+ではなく
+apt\-utils
+を引数として与えます)。インストールするよう指定したすべてのパッケージに対し、依存パッケージも含めて取得・インストールを行います。/etc/apt/sources\&.list
+ファイルを、要求するパッケージの場所を特定するのに使用します。パッケージ名の後ろに (空白を含まず) ハイフンが追加されている場合、そのパッケージがインストールされていれば削除します。同様に、インストールするパッケージを明示するのにプラス記号も使用できます。この記号は apt\-get の競合解決システムの判断を上書きするのに利用される可能性があります。
+.sp
+パッケージにイコール記号とバージョンを続けることで、選択したバージョンのパッケージをインストールすることができます。つまり、指定のバージョンのパッケージをインストールするように選択する、ということです。別の方法としては、ディストリビューションを特定するのに、パッケージ名に続けて、スラッシュとディストリビューションのバージョンやアーカイブ名 (stable, testing, unstable) を記述できます。
+.sp
+バージョン選択機構はダウングレードにも使用できるため、注意して使用しなければなりません。
+.sp
+システムにインストール済みのパッケージを、すべてアップグレードするのではなく、いくつかのパッケージをアップグレードする場合にも、このターゲットを使用できます。現在インストールされているパッケージすべての最新版をインストールする "upgrade" ターゲットと異なり、"install" は指定したパッケージの最新版のみをインストールします。単純にアップグレードしたいパッケージ名を指定してください。より新しいバージョンが利用できる場合、そのパッケージ (と前述の依存関係にあるパッケージ) をダウンロード・インストールします。
+.sp
+最後に、\fBapt_preferences\fR(5)
+機構により、特定のパッケージに対するインストールポリシーを作成できます。
+.sp
+構文に \*(Aq\&.\*(Aq, \*(Aq?\*(Aq, \*(Aq*\*(Aq を含み、パッケージ名がマッチしなかった場合、POSIX 正規表現であると見なし、データベース内の全パッケージ名に対して適用します。マッチしたパッケージすべてがインストール(もしくは削除)されます。\*(Aqlo\&.*\*(Aq のような文字列は、\*(Aqhow\-lo\*(Aq や \*(Aqlowest\*(Aq にマッチすることに注意してください。そうしたくなければ、\*(Aq^\*(Aq や \*(Aq$\*(Aq を付けるか、もっと詳しい正規表現を指定してください。
+.RE
+.PP
+\fBremove\fR
+.RS 4
+remove
+は、パッケージが削除されることを除き、install
+と同様です。削除されたパッケージの設定ファイルは、システムに残ったままになることに注意してください。プラス記号がパッケージ名に (間に空白を含まずに) 付加されると、識別されたパッケージを、削除ではなくインストールします。
+.RE
+.PP
+\fBpurge\fR
+.RS 4
+パッケージが削除かつ完全削除 (すべての設定ファイルも削除) されるのを除き、purge
+は
+remove
+と同じです。
+.RE
+.PP
+\fBsource\fR
+.RS 4
+source
+は、\fBapt\-get\fR
+にソースパッケージを取得させます。APT はどのソースパッケージを取得するか決めるため、利用可能なパッケージを検査します。その後、デフォルトリリースから最新の利用可能なソースパッケージを見つけ、カレントディレクトリへダウンロードします。デフォルトリリースは、可能であれば、APT::Default\-Release
+オプション、\fB\-t\fR
+オプション、パッケージごとの
+pkg/release
+構文で指定します。
+.sp
+The arguments are interpreted as binary and source package names\&. See the
+\fB\-\-only\-source\fR
+option if you want to change that\&.
+.sp
+ソースパッケージは、\fBsources.list\fR(5)
+ファイルの
+deb\-src
+行により、バイナリパッケージと分けて管理されます。つまり、ソースを取得したいリポジトリを、それぞれ追加する必要があるということです。こうしないと、誤った (古すぎ・新しすぎな) ソースバージョンを取得したり、何も取得できなくなります。
+.sp
+\fB\-\-compile\fR
+オプションを指定すると、\fBdpkg\-buildpackage\fR
+を用いて、\fB\-\-host\-architecture\fR
+オプションで定義したアーキテクチャのバイナリ \&.deb パッケージをコンパイルします。\fB\-\-download\-only\fR
+を指定すると、ソースパッケージを展開しません。
+.sp
+パッケージと同様に、ソース名の後ろにイコールと取得したいバージョンを置くと、指定したバージョンのソースを取得できます。APT::Get::Only\-Source
+オプションが暗黙のうちに有効になっているため、ソースパッケージ名とバージョンに厳密に一致させています。
+.sp
+ソースパッケージはインストールされず、バイナリパッケージのように
+\fBdpkg\fR
+データベースで管理されないことに注意してください。ソースの tarball のように、単にカレントディレクトリにダウンロードします。
+.RE
+.PP
+\fBbuild\-dep\fR
+.RS 4
+build\-dep
+は、ソースパッケージの構築依存関係を満たすように、パッケージのインストール・削除を行います。デフォルトでは、パッケージをネイティブに構築する依存関係を満たします。お望みなら、\fB\-\-host\-architecture\fR
+オプションにより、別のホストアーキテクチャを指定できます。
+.sp
+The arguments are interpreted as binary or source package names\&. See the
+\fB\-\-only\-source\fR
+option if you want to change that\&.
+.RE
+.PP
+\fBcheck\fR
+.RS 4
+check
+は、パッケージキャッシュの更新や壊れた依存関係をチェックする診断ツールです。
+.RE
+.PP
+\fBdownload\fR
+.RS 4
+download
+は、与えたバイナリパッケージを、カレントディレクトリにダウンロードします。
+.RE
+.PP
+\fBclean\fR
+.RS 4
+clean
+は、取得したパッケージのローカルリポジトリを掃除します。/var/cache/apt/archives/
+と
+/var/cache/apt/archives/partial/
+からロックファイル以外すべて削除します。
+.RE
+.PP
+\fBautoclean\fR (および \fBauto\-clean\fR 1\&.1 以降の別名)
+.RS 4
+clean
+のように、autoclean
+は取得したパッケージのローカルリポジトリを掃除します。違いは、もうダウンロードされることがないパッケージファイルや、ほとんど不要なパッケージファイルのみを削除することです。このため、キャッシュは、制御不能になるほど成長することなく、長期にわたって維持することができます。設定オプション
+APT::Clean\-Installed
+に off をセットしていれば、インストール済みのパッケージファイルが削除されるのを防ぐことができます。
+.RE
+.PP
+\fBautoremove\fR (および \fBauto\-remove\fR 1\&.1 以降の別名)
+.RS 4
+autoremove
+は、他のパッケージの依存関係を満たすために自動的にインストールされ、もう必要なくなったパッケージを削除するのに使用します。
+.RE
+.PP
+\fBchangelog\fR
+.RS 4
+changelog
+は、パッケージの changelog をダウンロードし、\fBsensible\-pager\fR
+で表示します。デフォルトでは、インストールされているバージョンの changelog を表示します。しかし、\fBinstall\fR
+コマンドと同じオプションを指定することができます。
+.RE
+.PP
+\fBindextargets\fR
+.RS 4
+デフォルトでは
+\fBapt\-get update\fR
+でダウンロードすることができるすべてのデータファイル (別名インデックスターゲット) に関する情報の deb822 形式のリストを表示します。出力形式を変更する、またレコードをフィルタするデフォルト出力の行を受け付けるための
+\fB\-\-format\fR
+オプションをサポートします。コマンドは主に、ダウンロードしたファイルの情報やファイル名を取得するために、APT を扱う外部ツール用のインターフェースとして使用されます。そして、外部ツールが自身で再度ダウンロードする代わりに使用することができます。詳細なドキュメントはここでは省略しますが、代わりに
+apt\-doc
+パッケージに収録されている
+doc/acquire\-additional\-files\&.txt
+で見つけることができます。
+.RE
+.SH "オプション"
+.PP
+ここで設定オプションとして説明したコマンドラインオプションは、 すべて設定ファイルを使用して設定できます。 設定ファイルに書いた真偽値をとるオプションは
+\fB\-f\-\fR,\fB\-\-no\-f\fR,
+\fB\-f=no\fR
+などのようにして上書きできます。
+.PP
+\fB\-\-no\-install\-recommends\fR
+.RS 4
+「推奨」パッケージをインストールする依存関係と見なしません。設定項目:
+APT::Install\-Recommends
+.RE
+.PP
+\fB\-\-install\-suggests\fR
+.RS 4
+「提案」パッケージをインストールする依存関係と見なします。設定項目:
+APT::Install\-Suggests
+.RE
+.PP
+\fB\-d\fR, \fB\-\-download\-only\fR
+.RS 4
+ダウンロードのみ \- パッケージファイルの取得のみを行い、展開・インストールを行いません。設定項目:
+APT::Get::Download\-Only
+.RE
+.PP
+\fB\-f\fR, \fB\-\-fix\-broken\fR
+.RS 4
+修復 \- 依存関係が壊れたシステムの修正を試みます。このオプションを install や remove と一緒に使うときは、APT が解決法を推測するので、パッケージを指定しなくてもかまいません。どのパッケージを指定しても、完全に問題を解決します。APT 自体は、システムに存在する破損したパッケージ依存関係を許すことができないので、初めて APT を実行する場合、このオプションが必要になることがあります。システムの依存関係構造にかなり問題がある場合は、手動で修正するよう要求することもあります。(通常は、問題のあるパッケージを取り除くのに
+\fBdpkg \-\-remove\fR
+を使用します) このオプションを
+\fB\-m\fR
+オプションと同時に使用すると、エラーになる状況があるかもしれません。設定項目:
+APT::Get::Fix\-Broken
+.RE
+.PP
+\fB\-m\fR, \fB\-\-ignore\-missing\fR, \fB\-\-fix\-missing\fR
+.RS 4
+欠落パッケージの無視 \- パッケージが取得できなかったり、(パッケージの破損で) 取得した後の整合性チェックに失敗した場合、そのパッケージの処理を保留し最後まで処理を続けます。このオプションを
+\fB\-f\fR
+オプションと同時に使用すると、エラーになる状況があるかもしれません。パッケージをインストールするよう選択している (特にコマンドラインでの操作する) 場合や、ダウンロードできなかった場合に、なにも表示せず保留することになります。設定項目:
+APT::Get::Fix\-Missing
+.RE
+.PP
+\fB\-\-no\-download\fR
+.RS 4
+パッケージのダウンロードを無効にします。これはすでにダウンロードした \&.deb に対してのみ APT を行う場合に、\fB\-\-ignore\-missing\fR
+と併せて使うのがよいでしょう。設定項目:
+APT::Get::Download
+.RE
+.PP
+\fB\-q\fR, \fB\-\-quiet\fR
+.RS 4
+静粛 \- 進捗表示を省略し、ログをとるのに便利な出力を行います。最大 2 つまで q を重ねることでより静粛にできます。また、\fB\-q=#\fR
+のように静粛レベルを指定して、設定ファイルを上書きすることもできます。静粛レベル 2 は
+\fB\-y\fR
+を含んでいることに注意してください。APT が意図しない決定を行うかもしれないので \-d, \-\-print\-uris, \-s のような操作を行わないオプションをつけずに \-qq を使用するべきではありません。設定項目:
+quiet
+.RE
+.PP
+\fB\-s\fR, \fB\-\-simulate\fR, \fB\-\-just\-print\fR, \fB\-\-dry\-run\fR, \fB\-\-recon\fR, \fB\-\-no\-act\fR
+.RS 4
+何もしない \- 現在のシステム状態に基づいて起こるイベントのシミュレーションを行い、実際にはシステムを変更しません。ロックは無効になる (\fBDebug::NoLocking\fR) ので、\fBapt\-get\fR
+実行中にシステムの状態が変化する可能性があります。シミュレーションは root 以外のユーザが実行できますが、シミュレーションを歪めるすべての apt 設定への読み取りアクセス権を持っていない可能性があります。この警告を表す通知は、root 以外のユーザではデフォルトで表示されます (\fBAPT::Get::Show\-User\-Simulation\-Note\fR)。設定項目:
+APT::Get::Simulate
+.sp
+シミュレートの結果、\fBdpkg\fR
+の動作を表す一連の行のそれぞれに、設定 (Conf)、削除 (Remv)、展開 (Inst) を表示します。角カッコは壊れたパッケージを表し、(まれに) 空の角カッコは大した問題ではないことを表します。
+.RE
+.PP
+\fB\-y\fR, \fB\-\-yes\fR, \fB\-\-assume\-yes\fR
+.RS 4
+プロンプトへの自動承諾 \- すべてのプロンプトに自動的に "yes" と答え、非対話的に実行します。保留したパッケージの状態を変更したり、必須パッケージを削除するような不適切な状況の場合、apt\-get
+は処理を中断します。設定項目:
+APT::Get::Assume\-Yes
+.RE
+.PP
+\fB\-\-assume\-no\fR
+.RS 4
+全ての質問に、自動的に "no" と答えます。設定項目:
+APT::Get::Assume\-No
+.RE
+.PP
+\fB\-\-no\-show\-upgraded\fR
+.RS 4
+更新される全パッケージの表示を行いません。設定項目:
+APT::Get::Show\-Upgraded
+.RE
+.PP
+\fB\-V\fR, \fB\-\-verbose\-versions\fR
+.RS 4
+更新・インストールするパッケージのバージョンをすべて表示します。設定項目:
+APT::Get::Show\-Versions
+.RE
+.PP
+\fB\-a\fR, \fB\-\-host\-architecture\fR
+.RS 4
+このオプションは、\fBapt\-get source \-\-compile\fR
+で構築するパッケージのアーキテクチャや、どのようにクロス依存関係を解決するかを制御します。デフォルトでは未定義で、これはホストアーキテクチャは、(APT::Architecture
+で定義した) ビルドアーキテクチャと同じという意味になります。設定項目:
+APT::Get::Host\-Architecture。
+.RE
+.PP
+\fB\-P\fR, \fB\-\-build\-profiles\fR
+.RS 4
+このオプションは、\fBapt\-get source \-\-compile\fR
+でパッケージをビルドする際に有効化するビルドプロファイルや、どのようにクロス依存関係を解決するかを制御します。デフォルトでは有効化するビルドプロファイルはありません。コンマで連結することで複数のビルドプロファイルを有効化できます。設定項目:
+APT::Get::Host\-Architecture
+.RE
+.PP
+\fB\-b\fR, \fB\-\-compile\fR, \fB\-\-build\fR
+.RS 4
+ソースパッケージをダウンロード後、コンパイルします。設定項目:
+APT::Get::Compile
+.RE
+.PP
+\fB\-\-ignore\-hold\fR
+.RS 4
+保留パッケージの無視 \- パッケージの保留指示を無視して
+\fBapt\-get\fR
+を行います。dist\-upgrade
+と共に使用し、パッケージを大量に、保留解除するのに便利です。設定項目:
+APT::Ignore\-Hold
+.RE
+.PP
+\fB\-\-with\-new\-pkgs\fR
+.RS 4
+upgrade
+と併せて使った場合に新しいパッケージのインストールを許可します。これは新しい依存をインストールするために既にインストールされているパッケージを更新する必要がある場合に有用です。パッケージを保留する代わりに
+upgrade
+がパッケージをアップグレードして新しい依存をインストールします。このオプションと併せて使った場合、upgrade
+がパッケージを削除することはなく、新規追加を許可するだけであることに注意してください。設定項目:
+APT::Get::Upgrade\-Allow\-New
+.RE
+.PP
+\fB\-\-no\-upgrade\fR
+.RS 4
+パッケージ更新なし \-
+install
+と同時に使用すると、no\-upgrade
+は、コマンドラインで指定したパッケージが、すでにインストールしてある場合に更新を行いません。設定項目:
+APT::Get::Upgrade
+.RE
+.PP
+\fB\-\-only\-upgrade\fR
+.RS 4
+新規パッケージインストールなし \-
+install
+と同時に使用すると、only\-upgrade
+は、すでにインストールされているパッケージのみをアップグレードし、新しいパッケージのインストール要求を無視します。設定項目:
+APT::Get::Only\-Upgrade
+.RE
+.PP
+\fB\-\-allow\-downgrades\fR
+.RS 4
+ダウングレードを行う場合でも、確認なしで実行してしまう危険なオプションです。よほどの状況でなければ、使うべきではありません。このオプションを使うと、システムを破壊しかねません! 設定項目:
+APT::Get::allow\-downgrades。APT 1\&.1 で導入されました。
+.RE
+.PP
+\fB\-\-allow\-remove\-essential\fR
+.RS 4
+強制承諾 \- 必要不可欠なものを削除する場合でも、確認なしで実行してしまう危険なオプションです。よほどの状況でなければ、使うべきではありません。force\-yes
+を使うと、システムを破壊しかねません! 設定項目:
+APT::Get::allow\-remove\-essential。APT 1\&.1 で導入されました。
+.RE
+.PP
+\fB\-\-allow\-change\-held\-packages\fR
+.RS 4
+強制承諾 \- 保持されたパッケージを変更する場合でも、確認なしで実行してしまう危険なオプションです。よほどの状況でなければ、使うべきではありません。このオプションを使うと、システムを破壊しかねません! 設定項目:
+APT::Get::allow\-change\-held\-packages。APT 1\&.1 で導入されました。
+.RE
+.PP
+\fB\-\-force\-yes\fR
+.RS 4
+Force yes; this is a dangerous option that will cause apt to continue without prompting if it is doing something potentially harmful\&. It should not be used except in very special situations\&. Using
+force\-yes
+can potentially destroy your system! Configuration Item:
+APT::Get::force\-yes\&. This is deprecated and replaced by
+\fB\-\-allow\-unauthenticated\fR
+,
+\fB\-\-allow\-downgrades\fR
+,
+\fB\-\-allow\-remove\-essential\fR
+,
+\fB\-\-allow\-change\-held\-packages\fR
+in 1\&.1\&.
+.RE
+.PP
+\fB\-\-print\-uris\fR
+.RS 4
+インストールするファイルを取得する代わりに、その URI を表示します。URI には、パス、対象ファイル名、ファイルサイズ、予測される MD5 ハッシュが含まれています。出力したファイル名が、常にリモートサイトのファイル名と一致するわけではない、ということに注意してください! これは
+source
+コマンド、update
+コマンドでも動作します。update
+で使用したときには、MD5 やファイルサイズを含みません。このとき、圧縮ファイルの展開はユーザの責任において行ってください。設定項目:
+APT::Get::Print\-URIs
+.RE
+.PP
+\fB\-\-purge\fR
+.RS 4
+削除する際、「削除」ではなく「完全削除」を行います。「完全削除」を行うと指示したパッケージ名の後には、アスタリスク ("*") が付きます。\fBremove \-\-purge\fR
+は
+\fBpurge\fR
+コマンドと等価です。 設定項目:
+APT::Get::Purge
+.RE
+.PP
+\fB\-\-reinstall\fR
+.RS 4
+すでに最新版がインストールされていても、パッケージを再インストールします。設定項目:
+APT::Get::ReInstall
+.RE
+.PP
+\fB\-\-list\-cleanup\fR
+.RS 4
+この機能はデフォルトで ON になっています。OFF にするには
+\-\-no\-list\-cleanup
+としてください。ON の場合、\fBapt\-get\fR
+は古くなったファイルを確実に消去するため、自動的に
+/var/lib/apt/lists
+の中身を管理します。これを OFF にするのは、取得元リストを頻繁に変更する時ぐらいでしょう。設定項目:
+APT::Get::List\-Cleanup
+.RE
+.PP
+\fB\-t\fR, \fB\-\-target\-release\fR, \fB\-\-default\-release\fR
+.RS 4
+このオプションは、ポリシーエンジンへのデフォルト入力を制御します。また、指定されたリリース文字列を使用し、デフォルト pin を優先度 990 で作成します。これは、/etc/apt/preferences
+にある一般設定を上書きします。pin で留めるのを明示されたパッケージには、このオプションの値は影響を与えません。つまりこのオプションで、どの配布パッケージを取得するかを簡単に管理します。一般的な例としては、\fB\-t \*(Aq2\&.1*\*(Aq\fR,
+\fB\-t unstable\fR,
+\fB\-t sid\fR
+のようになります。設定項目:
+APT::Default\-Release。\fBapt_preferences\fR(5)
+のマニュアルページも参照してください。
+.RE
+.PP
+\fB\-\-trivial\-only\fR
+.RS 4
+「重要でない」操作のみを行います。これは論理的に
+\fB\-\-assume\-yes\fR
+の仲間と見なせます。\fB\-\-assume\-yes\fR
+は質問にすべて yes と答えますが、\fB\-\-trivial\-only\fR
+はすべて no と答えます。設定項目:
+APT::Get::Trivial\-Only
+.RE
+.PP
+\fB\-\-no\-remove\fR
+.RS 4
+パッケージが削除される状況になったとき、プロンプトを表示せず中断します。設定項目:
+APT::Get::Remove
+.RE
+.PP
+\fB\-\-auto\-remove\fR, \fB\-\-autoremove\fR
+.RS 4
+コマンドが
+install
+か
+remove
+である場合、このオプションは使用していない依存しているパッケージを削除し、autoremove
+コマンドのように動作します。設定項目:
+APT::Get::AutomaticRemove
+.RE
+.PP
+\fB\-\-only\-source\fR
+.RS 4
+source
+コマンドと
+build\-dep
+コマンドでのみ意味があります。指定されたソース名がバイナリテーブルにマップされないようにします。これは、このオプションを指定すると、バイナリパッケージ名を受け付けて対応するソースパッケージを探すのではなく、引数にソースパッケージ名しか受け付けなくなる、ということです。設定項目:
+APT::Get::Only\-Source
+.RE
+.PP
+\fB\-\-diff\-only\fR, \fB\-\-dsc\-only\fR, \fB\-\-tar\-only\fR
+.RS 4
+ソースアーカイブの diff ファイルや dsc ファイル、tar ファイルのダウンロードのみを行います。設定項目:
+APT::Get::Diff\-Only,
+APT::Get::Dsc\-Only,
+APT::Get::Tar\-Only
+.RE
+.PP
+\fB\-\-arch\-only\fR
+.RS 4
+構築依存関係の解決を、アーキテクチャに依存したもののみ行います。設定項目:
+APT::Get::Arch\-Only
+.RE
+.PP
+\fB\-\-indep\-only\fR
+.RS 4
+構築依存関係の解決を、アーキテクチャに依存しないもののみ行います。設定項目:
+APT::Get::Arch\-Only
+.RE
+.PP
+\fB\-\-allow\-unauthenticated\fR
+.RS 4
+パッケージが認証できない場合は無視してください。プロンプトは表示されません。ローカルリポジトリでの作業中には有用ですが、ユーザ自身が別の方法でデータの信憑性を確保していない場合は、セキュリティ上の重大なリスクになります。\fBsources.list\fR(5)
+エントリ用の
+\fBTrusted\fR
+オプションの使用は、通常グローバルオーバーライドよりも優先されるはずです。設定項目:
+APT::Get::AllowUnauthenticated
+.RE
+.PP
+\fB\-\-no\-allow\-insecure\-repositories\fR
+.RS 4
+設定された取得元から検証できないデータを取得する update コマンドを禁止します。APT は、有効な暗号による署名のないリポジトリ用の update コマンドで失敗します。概念と影響の詳細については
+\fBapt-secure\fR(8)
+も参照してください。設定項目:
+Acquire::AllowInsecureRepositories
+.RE
+.PP
+\fB\-\-allow\-releaseinfo\-change\fR
+.RS 4
+Allow the update command to continue downloading data from a repository which changed its information of the release contained in the repository indicating e\&.g a new major release\&. APT will fail at the update command for such repositories until the change is confirmed to ensure the user is prepared for the change\&. See also
+\fBapt-secure\fR(8)
+for details on the concept and configuration\&.
+.sp
+Specialist options (\-\-allow\-releaseinfo\-change\-\fIfield\fR) exist to allow changes only for certain fields like
+origin,
+label,
+codename,
+suite,
+version
+and
+defaultpin\&. See also
+\fBapt_preferences\fR(5)\&. Configuration Item:
+Acquire::AllowReleaseInfoChange\&.
+.RE
+.PP
+\fB\-\-show\-progress\fR
+.RS 4
+パッケージのインストール、アップグレード、削除時にユーザにとってわかりやすい形で進捗情報をターミナルウィンドウ内に表示します。このデータの機械的に解析できるバージョンについては apt の doc ディレクトリにある README\&.progress\-reporting を見てください。設定項目:
+Dpkg::Progress、
+Dpkg::Progress\-Fancy
+.RE
+.PP
+\fB\-\-with\-source\fR \fB\fIファイル名\fR\fR
+.RS 4
+メタ情報のソースとして指定したファイルを追加します。指定を繰り返すと複数のファイルを追加できます。さらなる詳細については
+\fBapt-cache\fR(8)
+の
+\fB\-\-with\-source\fR
+の説明を見てください。
+.RE
+.PP
+\fB\-h\fR, \fB\-\-help\fR
+.RS 4
+使い方の短い要約を表示します。
+.RE
+.PP
+\fB\-v\fR, \fB\-\-version\fR
+.RS 4
+プログラムのバージョンを表示します。
+.RE
+.PP
+\fB\-c\fR, \fB\-\-config\-file\fR
+.RS 4
+設定ファイル。 使用する設定ファイルを指定します。 このプログラムは、デフォルト設定ファイルを読んでから、この設定ファイルを読みます。 この設定をデフォルト設定ファイルよりも前に読む必要がある場合、
+\fBAPT_CONFIG\fR
+環境変数に指定してください。構文については
+\fBapt.conf\fR(5)
+をご覧ください。
+.RE
+.PP
+\fB\-o\fR, \fB\-\-option\fR
+.RS 4
+設定オプションのセット。任意の設定オプションをセットします。 構文
+\fB\-o Foo::Bar=bar\fR
+となります。 異なるオプションを設定するため、\fB\-o\fR
+と
+\fB\-\-option\fR
+は、 複数回使用できます。
+.RE
+.SH "ファイル"
+.PP
+/etc/apt/sources\&.list
+.RS 4
+パッケージ取得元の場所。 設定項目:
+Dir::Etc::SourceList
+.RE
+.PP
+/etc/apt/sources\&.list\&.d/
+.RS 4
+パッケージ取得元の場所のファイル断片 設定項目:
+Dir::Etc::SourceParts
+.RE
+.PP
+/etc/apt/apt\&.conf
+.RS 4
+APT 設定ファイル。 設定項目:
+Dir::Etc::Main
+.RE
+.PP
+/etc/apt/apt\&.conf\&.d/
+.RS 4
+APT 設定ファイル断片。 設定項目:
+Dir::Etc::Parts
+.RE
+.PP
+/etc/apt/preferences
+.RS 4
+バージョンプリファレンスファイル。 ここに "pin"の設定を行います。 つまり、別々の取得元や異なるディストリビューションのバージョンの、 どこからパッケージを取得するかを設定します。 設定項目:
+Dir::Etc::Preferences
+.RE
+.PP
+/etc/apt/preferences\&.d/
+.RS 4
+バージョンプリファレンスファイル断片。 設定項目:
+Dir::Etc::PreferencesParts
+.RE
+.PP
+/var/cache/apt/archives/
+.RS 4
+取得済みパッケージファイル格納エリア。 設定項目:
+Dir::Cache::Archives
+.RE
+.PP
+/var/cache/apt/archives/partial/
+.RS 4
+取得中パッケージファイル格納エリア。 設定項目:
+Dir::Cache::Archives
+(暗黙で
+partial
+を追加)
+.RE
+.PP
+/var/lib/apt/lists/
+.RS 4
+\fBsources.list\fR(5)
+に指定した、パッケージリソースごとの状態情報格納エリア。 設定項目:
+Dir::State::Lists
+.RE
+.PP
+/var/lib/apt/lists/partial/
+.RS 4
+取得中状態情報格納エリア。 設定項目:
+Dir::State::Lists
+(暗黙で
+partial
+を追加)
+.RE
+.SH "関連項目"
+.PP
+\fBapt-cache\fR(8),
+\fBapt-cdrom\fR(8),
+\fBdpkg\fR(1),
+\fBsources.list\fR(5),
+\fBapt.conf\fR(5),
+\fBapt-config\fR(8),
+\fBapt-secure\fR(8), /usr/share/doc/apt\-doc/ にある APT ユーザガイド,
+\fBapt_preferences\fR(5), APT Howto
+.SH "診断メッセージ"
+.PP
+\fBapt\-get\fR
+は正常終了時に 0 を返します。エラー時には十進の 100 を返します。
+.SH "バグ"
+.PP
+\m[blue]\fBAPT バグページ\fR\m[]\&\s-2\u[1]\d\s+2
+をご覧ください。 APT のバグを報告する場合は、
+/usr/share/doc/debian/bug\-reporting\&.txt
+や
+\fBreportbug\fR(1)
+コマンドをご覧ください。
+.SH "翻訳"
+.PP
+倉澤 望
+<nabetaro@debian\&.or\&.jp>
+(2003\-2006,2009\-2012), Takuma Yamada
+<tyamada@takumayamada\&.com>
+(2016), Debian JP Documentation ML
+<debian\-doc@debian\&.or\&.jp>
+.PP
+この翻訳文書には未訳部分が含まれている可能性があることに 注意してください。 翻訳がオリジナルに追従できていない場合、 内容を失わないようにこのようにしています。
+.SH "著者"
+.PP
+\fBGunthorpe Jason[FAMILY Given]\fR
+.RS 4
+.RE
+.PP
+\fB[FAMILY Given]\fR
+.RS 4
+.RE
+.SH "注記"
+.IP " 1." 4
+APT バグページ
+.RS 4
+\%http://bugs.debian.org/src:apt
+.RE

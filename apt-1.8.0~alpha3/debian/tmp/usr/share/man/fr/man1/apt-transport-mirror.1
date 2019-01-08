@@ -1,0 +1,175 @@
+'\" t
+.\"     Title: apt-transport-mirror
+.\"    Author: \('Equipe de d\('eveloppement d\*(AqAPT
+.\" Generator: DocBook XSL Stylesheets v1.79.1 <http://docbook.sf.net/>
+.\"      Date: 09\ \&d\('ecembre\ \&2017
+.\"    Manual: APT
+.\"    Source: APT 1.8.0~alpha3
+.\"  Language: French
+.\"
+.TH "APT\-TRANSPORT\-MIRR" "1" "09\ \&d\('ecembre\ \&2017" "APT 1.8.0~alpha3" "APT"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NOM"
+apt-transport-mirror \- Transport d\*(AqAPT pour une s\('election plus automatique du miroir
+.SH "DESCRIPTION"
+.PP
+Ce transport d\*(AqAPT ne met pas en \(oeuvre un protocole pour acc\('eder tout seul \(`a des d\('ep\(^ots locaux ou distants, mais obtenir une liste de miroirs et redirige toutes les requ\(^etes vers le(s) miroir(s) choisi(s) dans cette liste, en y acc\('edant gr\(^ace \(`a d\*(Aqautres transports tels que
+\fBapt-transport-http\fR(1)\&. La fonctionnalit\('e de base est disponible depuis apt\ \&0\&.7\&.24, mais n\*(Aqa \('et\('e document\('ee qu\*(Aq\(`a partir d\*(Aqapt\ \&1\&.6 qui fournit une version totalement retravaill\('ee du transport et des fonctionnalit\('es prises en charge\&. Veuillez noter qu\*(Aqun transport n\*(Aqest jamais appel\('e directement par l\*(Aqutilisateur, mais utilis\('e par les outils d\*(AqAPT s\*(Aqappuyant sur la configuration de l\*(Aqutilisateur\&.
+.PP
+Si la r\('ecup\('eration d\*(Aqun fichier \(`a partir d\*(Aqun miroir \('echoue, la m\('ethode assure qu\*(Aqun autre miroir possible de la liste est automatiquement essay\('e jusqu\*(Aq\(`a ce que le fichier soit r\('ecup\('er\('e ou qu\*(Aqil ne reste plus de miroir sur la liste, g\('erant de fa\(,con transparente les indisponibilit\('es de serveur ou d\*(Aqautres probl\(`emes similaires\&.
+.PP
+Les implications de s\('ecurit\('e du transport d\('ependent des consid\('erations de s\('ecurit\('e, associ\('ees au transport, qui ont pr\('esid\('e \(`a l\*(Aqacquisition de la liste de miroirs et des transports impliqu\('es dans l\*(Aqaccession au(x) miroir(s) choisi(s) par le transport\&.
+.SH "OPTIONS"
+.PP
+Ce transport ne poss\(`ede pas d\*(Aqoption de configuration pour le moment\&. La s\('election du miroir est bas\('ee uniquement sur les miroirs offerts dans la liste de miroirs et des fichiers qu\*(AqAPT doit se procurer\&.
+.SS "Format de la liste de miroirs"
+.PP
+Une liste de miroirs contient une ou plusieurs lignes qui sp\('ecifient chacune l\*(AqURI d\*(Aqun miroir\&. Les lignes vides et celles commen\(,cant par un caract\(`ere di\(`ese (#) sont ignor\('ees\&. Un URI d\('ebute toujours par un sch\(`eme d\*(AqURI qui d\('efinit le transport utilis\('e pour ce miroir\&. Si, par exemple, l\*(AqURI d\('ebute par
+http:, le transport responsable est
+\fBapt-transport-http\fR(1)
+qui pourrait avoir des exigences particuli\(`eres pour le format du reste de l\*(AqURI\&.
+.PP
+Les m\('etadonn\('ees d\*(Aqun miroir peuvent \(^etre plac\('ees sur la m\(^eme ligne, s\('epar\('ees de l\*(AqURI par une tabulation\&. De multiples \('el\('ements de m\('etadonn\('ees peuvent \(^etre eux\-m\(^emes s\('epar\('es par des tabulations ou des espaces\&. (C\*(Aqest une fonctionnalit\('e avanc\('ee seulement disponible avec apt\ \&>=\ \&1\&.6\&. Les versions d\*(AqAPT ant\('erieures \('echoueront \(`a analyser les listes de miroirs utilisant cette fonctionnalit\('e\&.)
+.PP
+Depuis apt\ \&1\&.6, l\*(Aqutilisation de listes de miroirs compress\('ees est aussi g\('er\('ee\&. Veuillez noter que le nom de fichier de la liste de miroirs doit sp\('ecifier l\*(Aqalgorithme de compression utilis\('e\ \&; il n\*(Aqy a pas d\*(Aqauto\-d\('etection bas\('ee sur le contenu du fichier\&.
+.SS "S\('election du miroir par les m\('etadonn\('ees"
+.PP
+Comme cela est sp\('ecifi\('e dans le format, un miroir peut avoir des m\('etadonn\('ees suppl\('ementaires attach\('ees pour \('eviter qu\*(Aqil soit s\('electionn\('e pour la r\('ecup\('eration d\*(Aqun fichier qui ne correspond pas \(`a ces m\('etadonn\('ees\&. De cette fa\(,con, la liste de miroirs peut contenir par exemple des miroirs partiels fournissant seulement certaines architectures et APT choisira automatiquement un autre miroir pour les fichiers requ\('erant une architecture non list\('ee\&. Sont prises en charge les limites li\('ees \(`a l\*(Aqarchitecture (arch), au nom de code de la version (codename), aux composants du d\('ep\(^ot o\(`u se trouve le fichier (component), \(`a la langue \(`a laquelle le fichier s\*(Aqapplique (lang), au nom de la suite de la version
+suite) et au type du fichier (type)\&.
+.SS "Ordre de repli pour les miroirs"
+.PP
+Si aucune priorit\('e n\*(Aqest donn\('ee \(`a un miroir par la cl\('e de m\('etadonn\('ee
+priority, l\*(Aqordre de contact des miroirs est al\('eatoire\&. Si un ensemble particulier de miroirs doit \(^etre essay\('e avant que n\*(Aqimporte lequel des autres ensembles ne le soit, une priorit\('e peut \(^etre sp\('ecifi\('ee explicitement\&. Les miroirs avec les num\('eros les plus bas sont essay\('es en premier\&. Les miroirs qui n\*(Aqont pas de priorit\('e explicite portent par d\('efaut le num\('ero le plus \('elev\('e possible, et donc, sont essay\('es en dernier\&. Le choix entre les miroirs de m\(^eme priorit\('e est aussi al\('eatoire\&.
+.SS "Transports permis dans une liste de miroir"
+.PP
+La disponibilit\('e et le choix des transports dans une liste de miroirs sont limit\('es par la mani\(`ere dont le client APT acc\(`ede \(`a la liste des miroirs\&. Si un transport local comme
+file
+ou
+copy
+est utilis\('e, la liste de miroirs peut aussi inclure des sources locales, alors qu\*(Aqune liste de miroirs atteinte par
+http
+ne le peut pas\&. Par ailleurs, une liste de miroirs ne peut pas contenir une liste de miroirs ou d\*(Aqautres transports enveloppants (comme
+apt\-transport\-tor)\&. Voir la documentation sur ces transports pour conna\(^itre la mani\(`ere de les utiliser avec la m\('ethode miroir\&.
+.PP
+Veuillez noter que les versions d\*(AqAPT ant\('erieures \(`a\ \&1\&.6 ne prennent pas en charge d\*(Aqautres transports que
+http\&.
+.SH "EXEMPLES"
+.SS "Exemple basique"
+.PP
+Voici un exemple basique de liste de miroirs prise en charge par toutes les versions d\*(AqAPT avec une m\('ethode de miroir (>=\ \&0\&.7\&.24) dans lequel le client choisira n\*(Aqimporte lequel des trois miroirs\ \&:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+http://ftp\&.de\&.debian\&.org/debian/
+http://ftp\&.us\&.debian\&.org/debian/
+http://deb\&.debian\&.org/debian/
+.fi
+.if n \{\
+.RE
+.\}
+.PP
+Si un fichier avec ce contenu est stock\('e sur la machine sous le nom de
+/etc/apt/mirrorlist\&.txt, il peut \(^etre utilis\('e comme cela dans
+\fBsources.list\fR(5)
+(\(`a partir d\*(Aqapt\ \&1\&.6)\ \&:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+deb mirror+file:/etc/apt/mirrorlist\&.txt stretch main
+.fi
+.if n \{\
+.RE
+.\}
+.PP
+Toutes les versions de la m\('ethode miroir prennent en charge une liste de miroirs accessible par HTTP, aussi, dans la mesure o\(`u elle est disponible \(`a l\*(Aqadresse
+http://apt\&.example\&.org/mirror\&.lst, l\*(Aqentr\('ee de sources\&.list ci\-dessus peut \(^etre \('ecrite plut\(^ot ainsi\ \&:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+deb mirror://apt\&.example\&.org/mirror\&.lst stretch main
+.fi
+.if n \{\
+.RE
+.\}
+.PP
+Veuillez noter que depuis apt\ \&1\&.6, l\*(Aqutilisation de
+mirror+http
+est pr\('ef\('erable \(`a
+mirror
+pour uniformiser\&. La fonctionnalit\('e est la m\(^eme\&.
+.SS "Exemple de s\('election du miroir avec des m\('etadonn\('ees am\('elior\('ees"
+.PP
+Comme cela est expliqu\('e dans la d\('efinition de format, les versions d\*(AqAPT ant\('erieures \(`a\ \&1\&.6 ne prennent pas cela en charge et \('echoueront \(`a analyser la liste de miroirs\&. L\*(Aqexemple de liste de miroirs est complexe intentionnellement pour montrer certains aspects de la s\('election\&. La configuration suivante est suppos\('ee\ \&: le premier miroir est un miroir local accessible par la m\('ethode \(Fo\ \&file\ \&\(Fc, mais possiblement incomplet\ \&; le second miroir poss\(`ede une excellente connexion, c\*(Aqest un miroir partiel dans la mesure o\(`u il ne contient que des fichiers li\('es aux architectures
+amd64
+et
+all\&. Les miroirs restants sont des miroirs ordinaires qui devraient \(^etre contact\('es seulement si les pr\('ec\('edents ne fonctionnent pas\&.
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+file:/srv/local/debian/mirror/	priority:1 type:index
+http://partial\&.example\&.org/mirror/	priority:2 arch:amd64 arch:all type:deb
+http://ftp\&.us\&.debian\&.org/debian/	type:deb
+http://ftp\&.de\&.debian\&.org/debian/	type:deb
+https://deb\&.debian\&.org/debian/
+.fi
+.if n \{\
+.RE
+.\}
+.PP
+Dans une configuration avec cette liste de miroirs, le premier miroir sera utilis\('e pour t\('el\('echarger tous les fichiers d\*(Aqindex en supposant que la liste de miroirs elle\-m\(^eme est atteinte par un transport local comme
+file\&. Si ce n\*(Aqest pas le cas, si le miroir est inaccessible ou s\*(Aqil ne contient pas le fichier requis, un autre miroir sera utilis\('e pour r\('ecup\('erer le fichier, choisi selon le type du fichier\ \&: un fichier d\*(Aqindex sera servi par le dernier miroir de la liste, tandis qu\*(Aqun paquet de l\*(Aqarchitecture
+amd64
+est servi par le second et ceux, par exemple, de l\*(Aqarchitecture
+i386
+par un des trois derniers\&.
+.SH "BOGUES"
+.PP
+\m[blue]\fBPage des bogues d\*(AqAPT\fR\m[]\&\s-2\u[1]\d\s+2\&. Si vous souhaitez signaler un bogue \(`a propos d\*(AqAPT, veuillez lire
+/usr/share/doc/debian/bug\-reporting\&.txt
+ou utiliser la commande
+\fBreportbug\fR(1)\&.
+.SH "TRADUCTEURS"
+.PP
+J\('er\(^ome Marant, Philippe Batailler, Christian Perrier
+<bubulle@debian\&.org>
+(2000, 2005, 2009, 2010), \('Equipe de traduction francophone de Debian
+<debian\-l10n\-french@lists\&.debian\&.org>
+.PP
+Veuillez noter que cette traduction peut contenir des parties non traduites\&. Cela est volontaire, pour \('eviter de perdre du contenu quand la traduction est l\('eg\(`erement en retard sur le contenu d\*(Aqorigine\&.
+.SH "AUTEUR"
+.PP
+\fB\('Equipe de d\('eveloppement d\*(AqAPT\fR
+.RS 4
+.RE
+.SH "NOTES"
+.IP " 1." 4
+Page des bogues d'APT
+.RS 4
+\%http://bugs.debian.org/src:apt
+.RE

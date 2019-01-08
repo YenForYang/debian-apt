@@ -1,0 +1,1414 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+  "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % aptent SYSTEM "apt.ent"> %aptent;
+<!ENTITY % aptverbatiment SYSTEM "apt-verbatim.ent"> %aptverbatiment;
+<!ENTITY % aptvendor SYSTEM "apt-vendor.ent"> %aptvendor;
+]>
+
+<refentry>
+
+ <refentryinfo>
+   &apt-author.jgunthorpe;
+   &apt-author.team;
+   <author>
+     &apt-name.dburrows;
+     <contrib>Initiële documentatie bij Debug::*.</contrib>
+     <email>dburrows@debian.org</email>
+   </author>
+   <!-- The last update date -->
+&apt-email;
+   &apt-product;
+   
+   <date>2018-12-10T00:00:00Z</date>
+ </refentryinfo>
+ 
+ <refmeta>
+   <refentrytitle>apt.conf</refentrytitle>
+   <manvolnum>5</manvolnum>
+   <refmiscinfo class="manual">APT</refmiscinfo>
+ </refmeta>
+ 
+ 
+ <!-- Man page title -->
+<refnamediv>
+    <refname>apt.conf</refname>
+    <refpurpose>Configuratiebestand van APT</refpurpose>
+ </refnamediv>
+
+ <refsect1><title>Omschrijving</title>
+   <para><filename>/etc/apt/apt.conf</filename> is het hoofdconfiguratiebestand dat
+gebruikt wordt door alle gereedschappen uit de gereedschappensuite van APT,
+maar het is bijlange na niet de enige plaats waar opties ingesteld kunnen
+worden. De suite gebruikt ook een gemeenschappelijke parser voor de
+commandoregel om zo een uniforme omgeving aan te bieden.</para>
+
+   <orderedlist>
+      <para>Als een gereedschap van APT opstart, zal het de configuratiebestanden in de
+volgende volgorde lezen:</para>
+      <listitem><para>het bestand dat in de omgevingsvariabele <envar>APT_CONFIG</envar>
+gespecificeerd wordt (voor zover dit het geval is)</para></listitem>
+      <listitem><para>alle bestanden uit <literal>Dir::Etc::Parts</literal> in oplopende
+alfabetische volgorde die ofwel geen extensie of "<literal>conf</literal>"
+als extensie van de bestandsnaam hebben en waarvan de inhoud enkel
+alfanumerieke tekens, koppeltekens (-), laag liggende streepjes (_) en
+punten (.) bevat. Anders zal APT melding maken van het feit dat het een
+bestand genegeerd heeft, tenzij dat bestand overeenkomt met een patroon uit
+de configuratielijst <literal>Dir::Ignore-Files-Silently</literal>. In dat
+laatste geval zal het bestand stilzwijgend genegeerd worden.</para></listitem>
+      <listitem><para>het hoofdconfiguratiebestand zoals bepaald door
+<literal>Dir::Etc::main</literal></para></listitem>
+      <listitem><para>alle opties die in de subboom met binairspecifieke configuraties ingesteld
+waren, worden verplaatst naar het basisniveau van de boomstructuur.</para></listitem>
+      <listitem><para>de opties die aan de commandoregel ingegeven werden om de
+configuratierichtlijnen te overschrijven of om nog meer
+configuratiebestanden in te lezen.</para></listitem>
+   </orderedlist>
+   </refsect1>
+   <refsect1><title>Syntaxis</title>
+   <para>Het configuratiebestand is opgevat als een boom met opties die gegroepeerd
+worden in functionele groepen. De notatie van optiespecificaties gebeurt aan
+de hand van dubbele dubbelpunten. <literal>APT::Get::Assume-Yes</literal>
+bijvoorbeeld, is een optie binnen de gereedschapsgroep APT voor het
+gereedschap Get. Opties worden niet overgeërfd van oudergroepen.</para> 
+
+   <para>Op het vlak van de syntaxis volgt de configuratietaal het model dat gebruikt
+wordt door gereedschappen als bind en dhcp. Regels die beginnen met
+<literal>//</literal> worden als commentaar behandeld (genegeerd) evenals
+alle tekst tussen <literal>/*</literal> en <literal>*/</literal> naar het
+voorbeeld van commentaar in C/C++. Elke regel heeft de vorm
+<literal>APT::Get::Assume-Yes "true";</literal>. De aanhalingstekens en de
+afsluitende puntkomma zijn nodig. De waarde moet op een regel staan en er
+wordt geen vorm van aaneenschakeling van tekenreeksen toegepast. Waarden
+mogen geen backslashes of extra aanhalingstekens bevatten. Optienamen worden
+gevormd met behulp van alfanumerieke lettertekens en de tekens "/-:._+". Een
+nieuw bereik wordt geopend met een accolade, op de volgende manier:</para>
+
+<informalexample><programlisting>   
+APT {
+  Get {
+    Assume-Yes "true";
+    Fix-Broken "true";
+  };
+};
+</programlisting></informalexample>
+
+   <para>en er worden regeleinden gebruikt om de leesbaarheid te verbeteren. Men kan
+een lijst aanmaken door een bereik te openen dat een enkele tekenreeks bevat
+die tussen aanhalingstekens staat en die gevolgd wordt door een
+puntkomma. Men kan meerdere items opnemen die van elkaar gescheiden worden
+door een puntkomma.</para>
+
+<informalexample><programlisting>   
+DPkg::Pre-Install-Pkgs {"/usr/sbin/dpkg-preconfigure --apt";};
+</programlisting></informalexample>
+
+   <para>In het algemeen vormt het voorbeeldconfiguratiebestand &configureindex; een
+goede richtlijn voor hoe een configuratiebestand er moet uitzien.</para>
+
+   <para>In de namen van configuratie-items speelt het gebruik van hoofd- of kleine
+letters geen rol. In het voorgaande voorbeeld zou u dus ook
+<literal>dpkg::pre-install-pkgs</literal> kunnen gebruiken.</para>
+
+   <para>Als een lijst gedefinieerd wordt zijn namen voor configuratie-items
+optioneel, zoals hierboven in het voorbeeld
+<literal>DPkg::Pre-Install-Pkgs</literal> te zien is. Indien u geen naam
+opgeeft, zal een nieuw item gewoon een nieuwe optie toevoegen aan de
+lijst. Indien u wel een naam opgeeft kunt u de optie op dezelfde wijze
+overschrijven als om het even welke andere optie door aan de optie een
+nieuwe waarde toe te kennen.</para>
+
+   <para>Er werden twee bijzondere commando's gedefinieerd:
+<literal>#include</literal> (dat afgeraden wordt en niet ondersteund wordt
+door alternatieve toepassingen) en
+<literal>#clear</literal>. <literal>#include</literal> voegt het opgegeven
+bestand in, tenzij de bestandsnaam op een slash eindigt. In dat laatste
+geval wordt de hele map ingevoegd. <literal>#clear</literal> wordt gebruikt
+om een gedeelte van de configuratieboom te wissen. Het opgegeven element en
+alle eronder vallende elementen worden verwijderd. (Merk op dat ook deze
+regels op een puntkomma moeten eindigen).</para>
+
+   <para>
+   Het commando <literal>#clear</literal> is de enige manier om een lijst of
+een volledig bereik te wissen. Een bereik heropenen (of de hierna beschreven
+syntaxis met een toegevoegde <literal>::</literal> gebruiken) zal eerder
+ingevoerde items <emphasis>niet</emphasis> overschrijven. Opties kunnen
+enkel overschreven worden door hen een nieuwe waarde te geven - lijsten en
+bereiken kunnen niet overschreven worden, enkel gewist.
+   </para>
+
+   <para>Alle APT-gereedschap kan overweg met de optie -o die toelaat om aan de
+commandoregel een willekeurige configuratierichtlijn op te geven. De
+syntaxis is een volledige optienaam (bijvoorbeeld
+<literal>APT::Get::Assume-Yes</literal>) gevolgd door een gelijkheidsteken
+en vervolgens de nieuwe waarde voor de optie. Om een nieuw element aan een
+lijst toe te voegen, voegt u aan het eind van de lijstnaam een
+<literal>::</literal>. (Zoals u wellicht vermoedde, kan aan de commandoregel
+de bereik-syntaxis niet gebruikt worden.)</para>
+
+   <para>
+   Merk op dat het toevoegen van een item aan een lijst met
+<literal>::</literal> enkel werkt met een item per regel en dat u dit niet
+moet gebruiken in combinatie met de bereik-syntaxis (die impliciet
+<literal>::</literal> toevoegt). Beide syntactische vormen combineren lokt
+een fout uit waarop sommige gebruikers ongelukkiglijk zullen voortbouwen:
+een optie met de ongewone naam "<literal>::</literal>" maar die zich voorts
+gedraagt als elke andere optie die een naam heeft. Dit veroorzaakt veel
+problemen. Vooreerst zullen gebruikers die meerdere regels in deze
+<emphasis>verkeerde</emphasis> syntaxis schrijven in de hoop ze aan een
+lijst toe te voegen, het tegenovergestelde bereiken, aangezien enkel de
+laatste waardetoekenning aan deze optie "<literal>::</literal>" gebruikt zal
+worden. Toekomstige versies van APT zullen foutmeldingen geven en ophouden
+met werken als ze dit foutieve gebruik tegenkomen. Gelieve voorlopig
+dergelijke opdrachten te corrigeren, vermits APT zich er niet expliciet over
+beklaagt.
+   </para>
+ </refsect1>
+
+ <refsect1><title>De APT-groep</title>
+   <para>Deze groep opties regelt het algemeen gedrag van APT en bevat ook de opties
+die alle gereedschappen gemeen hebben.</para>
+
+   <variablelist>
+     <varlistentry><term><option>Architecture</option></term>
+     <listitem><para>Systeemarchitectuur; stelt de te gebruiken architectuur in bij het ophalen
+van bestanden en het verwerken van pakketlijsten. De interne standaard is
+die architectuur waarvoor apt gecompileerd werd.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>Architectures</option></term>
+     <listitem><para>
+     Alle door het systeem ondersteunde architecturen. Bijvoorbeeld zijn CPU's
+die de instructieset <literal>amd64</literal> (ook <literal>x86-64</literal>
+genoemd) gebruiken, ook in staat om programma's uit te voeren die
+gecompileerd werden voor de instructieset <literal>i386</literal>
+(<literal>x86</literal>). Deze lijst wordt gebruikt bij het ophalen van
+bestanden en het verwerken van pakketlijsten. De initiële standaard is
+altijd de systeemeigen architectuur (<literal>APT::Architecture</literal>)
+en vreemde architecturen worden aan de standaardlijst toegevoegd wanneer ze
+geregistreerd worden via het commando <command>dpkg
+--add-architecture</command>.
+     </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>Compressor</option></term>
+     <listitem><para>
+     Dit bereik definieert welke compressieformaten ondersteund worden, hoe
+compressie en decompressie uitgevoerd kunnen worden indien de ondersteuning
+voor dit formaat niet rechtstreeks ingebouwd is in apt en het definieert een
+kostwaarde die aangeeft hoe duur het is om iets in dit formaat te
+comprimeren. De volgende configuratiestanza laat bij wijze van voorbeeld apt
+toe om bestanden met de goedkope bestandsextensie
+<literal>.reversed</literal> zowel te downloaden en te decomprimeren als aan
+te maken en op te slaan, waarbij apt voor het comprimeren en decomprimeren
+het commando <command>rev</command> zal gebruiken zonder bijkomende
+commandoregelparameters:</para>
+<informalexample><programlisting>
+APT::Compressor::rev {
+	Name "rev";
+	Extension ".reversed";
+	Binary "rev";
+	CompressArg {};
+	UncompressArg {};
+	Cost "10";
+};
+</programlisting></informalexample>
+     </listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>Build-Profiles</option></term>
+     <listitem><para>
+     Lijst met alle bouwprofielen die gebruikt worden bij het oplossen van de
+bouwvereisten met weglating van het naamruimte-prefix
+"<literal>profile.</literal>". Standaard is deze lijst
+leeg. <envar>DEB_BUILD_PROFILES</envar>, zoals het door &dpkg-buildpackage;
+gebruikt wordt, overschrijft de lijstnotatie.
+     </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>Default-Release</option></term>
+     <listitem><para>De release waarvandaan pakketten standaard geïnstalleerd moeten worden als
+er meer dan een versie van beschikbaar is. Bevat releasenaam, codenaam of
+releaseversie. Voorbeelden: 'stable', 'testing', 'unstable',
+'&debian-stable-codename;', '&debian-testing-codename;', '4.0', '5.0*'. Zie
+ook &apt-preferences;.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>Ignore-Hold</option></term>
+     <listitem><para>Tegengehouden pakketten negeren. Deze globale optie doet de probleemoplosser
+tegengehouden pakketten negeren bij zijn besluitvorming.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>Clean-Installed</option></term>
+     <listitem><para>Staat standaard aan. Wanneer de functie autoclean (automatisch opruimen) aan
+staat, zal ze automatisch alle pakketten verwijderen die niet langer
+gedownload kunnen worden uit de cache. Als ze uitgezet staat, zullen ook
+pakketten die lokaal geïnstalleerd werden, niet opgeruimd worden - maar merk
+wel op dat APT geen rechtstreeks middel ter beschikking stelt om een
+dergelijk pakket opnieuw te installeren.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>Immediate-Configure</option></term>
+     <listitem><para>
+     Staat standaard aan, hetgeen APT ertoe aanzet om bij een
+installatie/opwaarderingsoperatie essentiële en belangrijke pakketten zo
+snel mogelijk te installeren om zo het effect van een falende aanroep van
+&dpkg; te beperken. Indien deze optie uitgezet werd, behandelt APT een
+belangrijk pakket op dezelfde manier als een extra pakket: tussen het
+uitpakken van pakket A en de configuratie ervan kunnen er vele andere
+uitpak- en configuratieoperaties uitgevoerd worden voor andere niet-verwante
+pakketten B, C, enz. Indien een van deze operaties
+ een mislukte aanroep van &dpkg; uitlokt (bijvoorbeeld omdat een script van
+de pakketonderhouder van pakket B een fout produceert), zal dit een
+systeemtoestand opleveren waarbij pakket A uitgepakt maar niet
+geconfigureerd is, waardoor er geen garantie meer bestaat dat alle pakketten
+die van A afhangen, nog langer zullen werken, aangezien aan die
+afhankelijkheid niet langer voldaan wordt.
+     </para><para>
+     Een markering voor onmiddellijke configuratie wordt ook toegepast in het
+potentieel problematische geval van circulaire afhankelijkheden, aangezien
+een vereiste met de vlag 'er onmiddellijk aan voldoen' het equivalent is van
+een voorvereiste. In theorie laat dit APT toe om een situatie te herkennen
+waarin het geen onmiddellijke configuratie kan uitvoeren, zijn werkzaamheden
+in dat geval af te breken en de gebruiker voor te stellen om de optie
+tijdelijk uit te zetten zodat de operatie voortgezet kan worden. Noteer dat
+hier het woord "theorie" gebruikt werd. In het echte leven heeft men een
+dergelijk probleem slechts zelden ervaren en dan was het omdat in een
+niet-stabiele versie van de distributie het pakket in kwestie foutieve
+vereisten had of omdat het systeem zich reeds in een beschadigde toestand
+bevond. U zou deze optie dus niet blindweg mogen uitschakelen, omdat het
+hierboven beschreven scenario niet het enige probleem is dat deze optie in
+eerste instantie kan helpen voorkomen.
+     </para><para>
+     Voor u, met deze optie uitgezet, een grote operatie zoals
+<literal>dist-upgrade</literal> uitvoert, zou u het pakket dat APT niet
+onmiddellijk kan configureren, expliciet moeten proberen te installeren met
+<literal>install</literal>. Maar zorg er ook zeker voor om uw probleem te
+rapporteren aan uw distributie en aan het APT-team met de onderstaande
+buglink. Zo kunnen zij werken aan het verbeteren of het corrigeren van de
+opwaarderingsprocedure.
+     </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>Force-LoopBreak</option></term>
+     <listitem><para>
+     Zet deze optie nooit aan tenzij u <emphasis>echt</emphasis> weet wat u
+doet. Ze laat APT toe om tijdelijk een essentieel pakket te verwijderen om
+een lus van Conflicts/Conflicts of Conflicts/Pre-Depends tussen twee
+essentiële pakketten te doorbreken. <emphasis>Een dergelijke lus zou nooit
+mogen voorkomen en is een zorgwekkende bug</emphasis>. Deze optie zal werken
+als die essentiële pakketten niet <command>tar</command>,
+<command>gzip</command>, <command>libc</command>, <command>dpkg</command>,
+<command>dash</command> zijn of iets waarvan deze pakketten afhankelijk
+zijn.
+     </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>Cache-Start</option></term><term><option>Cache-Grow</option></term><term><option>Cache-Limit</option></term>
+     <listitem><para>Sinds versie 0.7.26 gebruikt APT een in het geheugen geladen cachebestand
+van variabele grootte waarin de informatie over beschikbare bestanden
+opgeslagen ligt. <literal>Cache-Start</literal> werkt als een hint voor de
+grootte die de cache uiteindelijk zal aannemen en is daarom de hoeveelheid
+geheugen die APT bij het opstarten zal aanvragen. De standaardwaarde is
+20971520 bytes (~20 MB). Merk op dat dit volume geheugenruimte beschikbaar
+moet zijn voor APT, anders zal het wellicht op een onelegante wijze
+falen. Voor apparaten met beperkt geheugen zou deze waarde dus verlaagd
+moeten worden, terwijl ze verhoogd zou moeten worden op systemen met veel
+geconfigureerde pakketbronnen. <literal>Cache-Grow</literal> geeft aan, in
+bytes met een standaard van 1048576 (~1 MB), hoeveel de cachegrootte
+uitgebreid zal worden in het geval de ruimte gedefinieerd door
+<literal>Cache-Start</literal> niet volstaat. Steeds weer zal dit bijkomend
+geheugenvolume toegevoegd worden totdat uiteindelijk de cachegrootte
+uitgebreid genoeg is om alle informatie in op te slaan of totdat de
+<literal>Cache-Limit</literal> bereikt wordt. De standaardinstelling voor
+<literal>Cache-Limit</literal> is 0, hetgeen staat voor geen limiet. Indien
+<literal>Cache-Grow</literal> ingesteld wordt op 0, wordt de automatische
+uitbreiding van de cache uitgeschakeld.
+     </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>Build-Essential</option></term>
+     <listitem><para>Bepaalt welke pakketten beschouwd worden als essentiële bouwvereisten.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>Get</option></term>
+     <listitem><para>De onderafdeling Get regelt het gereedschap &apt-get; raadpleeg de
+documentatie daarover voor meer informatie over de opties in kwestie.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>Cache</option></term>
+     <listitem><para>De onderafdeling Cache regelt het gereedschap &apt-cache; raadpleeg de
+documentatie daarover voor meer informatie over de opties in kwestie.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>CDROM</option></term>
+     <listitem><para>De onderafdeling CDROM regelt het gereedschap &apt-cdrom; raadpleeg de
+documentatie daarover voor meer informatie over de opties in kwestie.</para></listitem>
+     </varlistentry>
+   </variablelist>
+ </refsect1>
+
+ <refsect1><title>De Acquire-groep</title>
+   <para>De opties die tot de groep <literal>Acquire</literal> behoren, regelen het
+downloaden van pakketten evenals de verschillende ophaalmethodes ("acquire
+methods") die verantwoordelijk zijn voor het downloaden zelf (zie ook
+&sources-list;).</para>
+
+   <variablelist>
+     <varlistentry><term><option>Check-Date</option></term>
+	 <listitem><para>
+	 Beveiligingsgerelateerde optie die standaard waar (true) is en die
+tijdgerelateerde toetsingen mogelijk maakt. Deze optie uitschakelen betekent
+dat de tijd op de machine niet betrouwbaar is. Zodoende zal APT alle
+tijdgerelateerde toetsen uitschakelen, zoals
+<option>Check-Valid-Until</option> of controleren of de datum in het
+datumveld van een release-bestand zich niet in de toekomst situeert.
+	 </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>Max-FutureTime</option></term>
+	 <listitem><para>Maximum tijd (in seconden) voor het tijdstip waarop het
+<filename>Release</filename>-bestand aangemaakt werd (zoals vermeld in de
+koptekst <literal>Date</literal>), dat het als geldig beschouwd moet
+worden. De standaardwaarde is <literal>10</literal>. Archiefspecifieke
+instellingen kunnen aangemaakt worden door het label van het archief toe te
+voegen aan de optienaam. Bij voorkeur kan voor specifieke regels uit
+&sources-list; hetzelfde bereikt worden door daar de optie
+<option>Date-Max-Future</option> te gebruiken.
+	 </para></listitem>
+     </varlistentry>
+     <varlistentry><term><option>Check-Valid-Until</option></term>
+     <listitem><para>
+     Deze met beveiliging verband houdende optie staat standaard ingesteld op
+waar (true), aangezien het plaatsen van een vervaldatum op de validering van
+een Release-bestand langdurige zogenaamde replay-aanvallen kan voorkomen. Ze
+kan gebruikers ook helpen om spiegelservers te identificeren die niet langer
+bijgewerkt worden, al is deze functionaliteit afhankelijk van een juist
+werkende klok op het systeem van de gebruiker. Onderhouders van archieven
+worden aangemoedigd om Release-bestanden aan te maken met een koptekst
+<literal>Valid-Until</literal>, maar als ze dat niet doen of indien er een
+striktere waarde nodig is, kan de onderstaande optie
+<literal>Max-ValidTime</literal> gebruikt worden. In plaats van deze globale
+vervanging zou bij voorkeur de optie <option>Check-Valid-Until</option> voor
+regels in &sources-list; gebruikt moeten worden om de toets op een
+selectieve manier uit te zetten.
+     </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>Max-ValidTime</option></term>
+	 <listitem><para>Maximum tijd (in seconden) na het tijdstip waarop het
+<filename>Release</filename>-bestand aangemaakt werd (zoals vermeld in de
+koptekst <literal>Date</literal>), dat het als geldig beschouwd moet
+worden. Indien het Release-bestand zelf een koptekst
+<literal>Valid-Until</literal> bevat wordt de meest recente van beide data
+als vervaldatum genomen. De standaardwaarde is <literal>0</literal> hetgeen
+staat voor "onbeperkt geldig". Archiefspecifieke instellingen kunnen
+aangemaakt worden door de naam van het archief toe te voegen aan de
+optienaam. Hetzelfde effect kan voor specifieke regels uit &sources-list;
+bereikt worden door daar de optie <option>Valid-Until-Max</option> te
+gebruiken, wat bij voorkeur gedaan zou moeten worden.
+	 </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>Min-ValidTime</option></term>
+	 <listitem><para>Minimum tijd (in seconden) na het tijdstip waarop het
+<filename>Release</filename>-bestand aangemaakt werd (zoals vermeld in de
+koptekst <literal>Date</literal>), dat het als geldig beschouwd moet
+worden. Gebruik dit indien u beroep moet doen op een zelden bijgewerkte
+(lokale) spiegelserver van een vaker bijgewerkt archief met een koptekst
+<literal>Valid-Until</literal>. Dit is te verkiezen boven het volledig
+uitschakelen van de controle van de vervaldatum. Archiefspecifieke
+instellingen kunnen en zouden moeten gebruikt worden door de naam van het
+archief toe te voegen aan de optienaam. Hetzelfde effect kan voor specifieke
+regels uit &sources-list; bereikt worden door daar de optie
+<option>Valid-Until-Min</option> te gebruiken, wat bij voorkeur gedaan zou
+moeten worden.
+	 </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>AllowTLS</option></term>
+     <listitem><para>
+     Sta toe dat de interne TLS-ondersteuning uit de http-methode gebruikt
+wordt. Indien deze waarde ingesteld wordt op false, wordt ondersteuning voor
+TLS in de eigen methodes van apt volledig uitgeschakeld (met uitzondering
+van de op curl gebaseerde https-methode). TLS-gerelateerde functies zullen
+niet langer aangeroepen worden.
+     </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>PDiffs</option></term>
+	 <listitem><para>Tracht de wijzigingen aan indexen (zoals de bestanden
+<filename>Packages</filename>), <literal>PDiffs</literal> genaamd, op te
+halen in plaats van de volledige bestanden. Standaard ingesteld op waar. Dit
+kan voor specifieke regels in &sources-list; of specifieke indexbestanden
+ingesteld worden door daar de optie <option>PDiffs</option> te gebruiken,
+wat bij voorkeur gedaan zou moeten worden.</para>
+	 <para>Er zijn ook twee subopties beschikbaar om het gebruik van PDiffs te
+beperken: <literal>FileLimit</literal> kan gebruikt worden om het maximum
+aantal PDiff-bestanden op te geven die gedownload zouden mogen worden om een
+bestand bij te werken. <literal>SizeLimit</literal> van zijn kant geeft aan
+hoe groot het percentage van alle patches samen mag zijn vergeleken met de
+grootte van het bestand waarop ze betrekking hebben. Indien een van beide
+limieten overschreden wordt, wordt het ganse bestand gedownload in plaats
+van de patches.
+	 </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>By-Hash</option></term>
+	 <listitem><para>Tracht indexen te downloaden via een URI die opgebouwd wordt op basis van de
+frommelcontrolesom van het verwachte bestand, eerder dan via een welbekende
+stabiele bestandsnaam. Dit staat standaard ingesteld op waar (true), maar
+als de pakketbron aangeeft dat dit niet ondersteund wordt, wordt het
+automatisch uitgeschakeld. Het gebruik ervan kan verplicht worden met de
+bijzondere waarde "force". Dit kan voor specifieke regels in &sources-list;
+of specifieke indexbestanden ingesteld worden door daar de optie
+<option>By-Hash</option> te gebruiken, wat bij voorkeur gedaan zou moeten
+worden.
+	 </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>Queue-Mode</option></term>
+     <listitem><para>Wachtrijmodus; <literal>Queue-Mode</literal> kan ofwel
+<literal>host</literal> ofwel <literal>access</literal> zijn en bepaalt hoe
+APT de parallellisatie van uitgaande verbindingen
+organiseert. <literal>host</literal> betekent dat een verbinding per
+doelcomputer geopend wordt, <literal>access</literal> wil zeggen dat een
+verbinding per URI-type geopend wordt.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>Retries</option></term>
+     <listitem><para>Aantal uit te voeren pogingen. Indien dit niet nul is, zal APT bij een
+mislukte poging het opgegeven aantal nieuwe pogingen doen om een bestand op
+te halen.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>Source-Symlinks</option></term>
+     <listitem><para>Gebruik symbolische koppelingen voor bronarchieven. Indien dit op true
+(waar) ingesteld staat, zal geen kopie van een bronarchief gemaakt worden
+als een symbolische koppeling mogelijk is. Waar is de standaardinstelling.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>http</option> <option>https</option></term>
+     <listitem><para>De opties in deze gebieden configureren APT's ophaaltransportmethodes voor
+de protocollen HTTP en HTTPS en worden gedocumenteerd in de respectieve
+man-pagina's &apt-transport-http; en &apt-transport-https;.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>ftp</option></term>
+     <listitem><para>
+     <literal>ftp::Proxy</literal> stelt de te gebruiken standaard-proxy in voor
+URI's van het type FTP. De standaardvorm ervan is
+<literal>ftp://[[user][:pass]@]host[:port]/</literal>. Proxy's kunnen ook
+per computer ingesteld worden volgens het schema
+<literal>ftp::Proxy::&lt;host&gt;</literal>, waarbij het bijzondere
+trefwoord <literal>DIRECT</literal> betekent dat geen proxy's gebruikt
+worden. Indien geen van de bovenstaande instellingen opgegeven werd, zal de
+omgevingsvariabele <envar>ftp_proxy</envar> gebruikt worden. Om een
+FTP-proxy te gebruiken zult u het script <literal>ftp::ProxyLogin</literal>
+in het configuratiebestand moeten instellen. Dit item omschrijft de te
+verzenden commando's die de proxy-server moeten laten weten waarmee hij een
+verbinding moet maken. Raadpleeg &configureindex; voor een voorbeeld van hoe
+dit moet gedaan worden. De substitutievariabelen die de overeenkomstige
+URI-component vertegenwoordigen, zijn <literal>$(PROXY_USER)</literal>,
+<literal>$(PROXY_PASS)</literal>, <literal>$(SITE_USER)</literal>,
+<literal>$(SITE_PASS)</literal>, <literal>$(SITE)</literal> en
+<literal>$(SITE_PORT)</literal>.</para>
+
+     <para>De optie <literal>timeout</literal> stelt de tijdslimiet in die gehanteerd
+moet worden door de timer die door deze methode gebruikt wordt. Deze waarde
+is zowel van toepassing op de tijdslimiet van de verbinding als op die van
+de data-overdracht.</para>
+
+     <para>Meerdere instellingen zijn beschikbaar om de passieve modus te
+controleren. Over het algemeen is het veilig om de passieve modus aan te
+laten staan. Hij werkt in praktisch elke omgeving. Toch vereisen sommige
+situaties het uitschakelen van de passieve modus en het gebruik in de plaats
+daarvan van FTP in poortmodus. Dit kan globaal gebeuren of voor verbindingen
+die langs een proxy passeren of voor een specifieke computer. (raadpleeg
+voor voorbeelden het voorbeeldconfiguratiebestand).</para>
+
+     <para>Het is mogelijk om proxy voor FTP over HTTP te laten verlopen door de
+omgevingsvariabele <envar>ftp_proxy</envar> in te stellen op een URL van het
+type HTTP - zie de eerdere bespreking van de http-methode voor de
+syntaxis. U kunt dit niet in het configuratiebestand instellen en het
+gebruik van FTP over HTTP wordt niet aangeraden omwille van zijn geringe
+efficiëntie.</para>
+
+     <para>De instelling <literal>ForceExtended</literal> regelt het gebruik van de
+RFC2428 commando's <literal>EPSV</literal> en
+<literal>EPRT</literal>. Standaard staat ze uitgeschakeld (ingesteld op
+false), hetgeen betekent dat deze commando's enkel gebruikt worden indien de
+controleverbinding van het type IPv6 is. Deze instelling aanzetten
+(instellen op true) verplicht het gebruik van deze commando's zelfs bij
+verbindingen van het type IPv4. Merk op dat de meeste FTP-servers RFC2428
+niet ondersteunen.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>cdrom</option></term>
+     <listitem><para>
+     Voor URI's die de methode <literal>cdrom</literal> gebruiken is het
+aankoppelpunt, <literal>cdrom::Mount</literal>, de enige optie die
+geconfigureerd kan worden. Dit moet het aankoppelpunt voor het CD-station
+(of DVD-station of wat dan ook) zijn zoals vermeld in
+<filename>/etc/fstab</filename>. Het is mogelijk om te voorzien in
+vervangende commando's voor de aankoppelings- en afkoppelingsoperaties als
+het niet mogelijk is om het aankoppelpunt in fstab op te nemen. De syntaxis
+is om <literallayout>/cdrom/::Mount "foo";</literallayout> binnen het
+<literal>cdrom</literal>-blok te plaatsen. Het is belangrijk dat ook de
+nakomende slash gebruikt wordt. Afkoppelingsopdrachten kunnen opgegeven
+worden door UMount te gebruiken.
+     </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>gpgv</option></term>
+     <listitem><para>
+     Voor URI's van het type GPGV is de enige optie die geconfigureerd kan worden
+<literal>gpgv::Options</literal>. Ze geeft bijkomende parameters door aan
+gpgv.
+     </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>CompressionTypes</option></term>
+     <listitem><para>Lijst van compressietypes die door de methodes voor het ophalen van
+pakketten begrepen worden. Bestanden zoals <filename>Packages</filename>
+kunnen in verschillende compressieformaten beschikbaar zijn. Standaard
+kunnen de ophaalmethodes veel gebruikelijke formaten zoals
+<command>xz</command> en <command>gzip</command> decomprimeren en opnieuw
+comprimeren. Met dit bereik kunnen de ondersteunde formaten doorzocht
+worden, kunnen er wijzigingen in aangebracht worden en kan ondersteuning
+voor nog andere formaten toegevoegd worden (zie ook
+<option>APT::Compressor</option>). De syntaxis hiervoor is: <synopsis>Acquire::CompressionTypes::<replaceable>FileExtension</replaceable> "<replaceable>Methodname</replaceable>";</synopsis>
+     </para><para>Voorts kan de subgroep <literal>Order</literal> gebruikt worden om te
+bepalen in welke volgorde het ophaalsysteem de gecomprimeerde bestanden zal
+trachten te downloaden. Eerst zal het ophaalsysteem het eerste
+compressietype proberen en als dat mislukt het volgende uit deze lijst. Om
+dus een type boven een ander te laten verkiezen moet u het gewoon vooraan in
+de lijst plaatsen. Nog niet vermelde standaardtypes zullen impliciet aan het
+einde van de lijst toegevoegd worden. Zo kan bijvoorbeeld <synopsis>Acquire::CompressionTypes::Order:: "gz";</synopsis> gebruikt worden om met <command>gzip</command>
+gecomprimeerde bestanden te verkiezen boven alle andere formaten. Indien
+<command>xz</command> moet verkozen worden boven <command>gzip</command> en
+<command>bzip2</command>, moet de configuratie-instelling er als volgt
+uitzien: <synopsis>Acquire::CompressionTypes::Order { "xz"; "gz"; };</synopsis>. Het is onnodig om
+<literal>bz2</literal> expliciet aan de lijst toe te voegen, aangezien het
+er automatisch aan toegevoegd zal worden.</para>
+     <para>Merk op dat op het ogenblik van uitvoering gekeken zal worden naar
+<literal>Dir::Bin::<replaceable>Naam-van-de-Methode</replaceable></literal>.
+Indien deze optie ingesteld werd en ondersteuning voor dit formaat niet
+rechtstreeks ingebouwd is in apt, zal de methode enkel gebruikt worden
+indien dat bestand bestaat. Voor de methode <literal>bzip2</literal>
+bijvoorbeeld, is de (ingebouwde) instelling: <literallayout>Dir::Bin::bzip2 "/bin/bzip2";</literallayout>. Merk ook op dat de lijstitems die aan de
+commandoregel opgegeven worden, toegevoegd zullen worden achteraan de lijst
+die in de configuratiebestanden vermeld wordt, maar voorafgaand aan de
+standaarditems. Om in dit geval een type boven die uit de
+configuratiebestanden te verkiezen, kunt u de optie rechtstreeks instellen -
+niet in de lijstopmaak. Dit zal de gedefinieerde lijst niet opheffen. Het
+zal de lijst enkel laten beginnen met dat type.</para>
+     <para>Het bijzondere type <literal>uncompressed</literal> kan gebruikt worden om
+voorrang te geven aan niet-gecomprimeerde bestanden. Maar u dient te weten
+dat de meeste archieven geen niet-gecomprimeerde bestanden aanbieden, zodat
+dit type grotendeels enkel bruikbaar is voor lokale spiegelservers.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>GzipIndexes</option></term>
+	 <listitem><para>
+	 Indexen (Packages, Sources, of Translations) die met <literal>gzip</literal>
+gecomprimeerd werden en die u downloadt, laat u best in gecomprimeerde vorm
+op de lokale computer staan in plaats van ze uit te pakken. Dit spaart heel
+wat schijfruimte, zij het ten koste van een intensiever CPU-gebruik tijdens
+het opbouwen van de lokale pakketcaches. Standaard staat dit uit.
+	 </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>Languages</option></term>
+     <listitem><para>De subsectie Languages regelt welke
+<filename>Translation</filename>-bestanden gedownload worden en in welke
+volgorde APT probeert de vertaalde beschrijvingen weer te geven. APT zal
+proberen de eerste beschikbare beschrijving weer te geven in de eerst
+vermelde taal. Talen kunnen gedefinieerd worden aan de hand van een korte of
+een lange taalcode. Merk op dat niet elk archief voor elke taal een
+<filename>Translation</filename>-bestand aanbiedt - zeker de lange taalcodes
+zijn zeldzaam.</para>
+     <para>De lijst bevat standaard "environment" en
+"en". "<literal>environment</literal>" heeft hier een speciale betekenis: op
+het moment van uitvoering zal het vervangen worden door de taalcodes die
+afgeleid worden uit de omgevingsvariabele
+<literal>LC_MESSAGES</literal>. Het zorgt er ook voor dat deze niet tweemaal
+voorkomen in de lijst. Als <literal>LC_MESSAGES</literal> op "C" ingesteld
+staat, wordt enkel het bestand <filename>Translation-en</filename> (als het
+beschikbaar is) gebruikt.Om APT te dwingen geen Translation-bestand te
+gebruiken, moet u de instelling <literal>Acquire::Languages=none</literal>
+gebruiken. Ook de code "<literal>none</literal>" is er een met een speciale
+betekenis. Ze zorgt ervoor dat niet verder gezocht wordt naar een passend
+<filename>Translation</filename>-bestand. Ze vertelt APT ook om die
+vertalingen wel te downloaden zonder ze effectief te gebruiken tenzij er in
+de omgeving talen gespecificeerd worden. Het volgende voorbeeld zal dus in
+de context van een Engelse lokalisatie resulteren in de volgorde "en, de" en
+in een Duitse lokalisatie in "de, en". Merk op dat "fr" wel gedownload
+wordt, maar niet gebruikt tenzij APT in de context van een Franse
+lokalisatie gebruikt wordt (in dat geval zou de volgorde "fr, de, en"
+zijn). <programlisting>Acquire::Languages { "environment"; "nl"; "de"; "en"; "none"; "fr"; };</programlisting></para>
+     <para>Noot: om te voorkomen dat er problemen zouden ontstaan door het feit dat APT
+uitgevoerd wordt in verschillende omgevingen (bijvoorbeeld door
+verschillende gebruikers of door andere programma's) zullen alle
+Translation-bestanden die te vinden zijn in
+<filename>/var/lib/apt/lists/</filename> toegevoegd worden aan het eind van
+de lijst (na een impliciet "<literal>none</literal>").</para>
+     </listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>ForceIPv4</option></term>
+	 <listitem><para>
+         Afdwingen dat enkel het IPv4-protocol gebruikt wordt bij het downloaden.
+	 </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>ForceIPv6</option></term>
+	 <listitem><para>
+         Afdwingen dat enkel het IPv6-protocol gebruikt wordt bij het downloaden.
+	 </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>MaxReleaseFileSize</option></term>
+	 <listitem><para>
+           De maximale bestandsgrootte van de bestanden
+Release/Release.gpg/InRelease. Standaard is dat 10MB.
+	 </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>EnableSrvRecords</option></term>
+	 <listitem><para>
+           Deze optie regelt of apt de DNS SRV server record zoals dat in RFC 2782
+gespecificeerd wordt, zal gebruiken om een alternatieve server te selecteren
+om mee te verbinden. Standaard is dit "true" (aangezet).
+	 </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>AllowInsecureRepositories</option></term>
+	 <listitem><para>
+	   Aan update-operaties de toestemming geven om data-bestanden op te halen van
+pakketbronnen zonder afdoende beveiligingsinformatie. De standaardwaarde is
+"<literal>false</literal>". Concept, implicaties en alternatieven worden
+uiteengezet in &apt-secure;.
+	 </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>AllowWeakRepositories</option></term>
+	 <listitem><para>
+	   Aan update-operaties de toestemming geven om data-bestanden op te halen van
+pakketbronnen die beveiligingsinformatie leveren, maar waarvan de
+cryptografie niet langer als voldoende krachtig beschouwd wordt. De
+standaardwaarde is "<literal>false</literal>". Concept, implicaties en
+alternatieven worden uiteengezet in &apt-secure;.
+	 </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>AllowDowngradeToInsecureRepositories</option></term>
+	 <listitem><para>
+	   Toelaten dat een pakketbron die voorheen een gpg-ondertekening had, tijdens
+een update-bewerking niet langer ondertekend is. Als een pakketbron die
+vroeger betrouwbaar was, geen geldige ondertekening meer heeft, zal apt de
+update-bewerking weigeren uit te voeren. Deze optie kan gebruikt worden om
+die beveiliging op te heffen. Bijna zeker zult u deze optie nooit willen
+activeren. Standaard is ze ingesteld op <literal>false</literal>. Concept,
+implicaties en alternatieven worden uiteengezet in &apt-secure;.
+	 </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>Changelogs::URI</option> bereik</term>
+	<listitem><para>
+	  Het ophalen van changelogs (bestanden met de registratie van aangebrachte
+wijzigingen) kan enkel gebeuren als er een URI gekend is waar ze opgehaald
+kunnen worden. Bij voorkeur vermeldt het bestand Release dit in het veld
+'Changelogs'. Indien er geen dergelijk veld is, wordt het veld Label/Origin
+van het Release-bestand gebruikt om na te gaan of er een optie
+<literal>Acquire::Changelogs::URI::Label::<replaceable>LABEL</replaceable></literal>
+of
+<literal>Acquire::Changelogs::URI::Origin::<replaceable>ORIGINE</replaceable></literal>
+bestaat en als dat het geval is, wordt die waarde gebruikt. De waarde in het
+Release-bestand kan vervangen worden door
+<literal>Acquire::Changelogs::URI::Override::Label::<replaceable>LABEL</replaceable></literal>
+of
+<literal>Acquire::Changelogs::URI::Override::Origin::<replaceable>ORIGINE</replaceable></literal>.
+De waarde ervan zou een normale URI naar een tekstbestand moeten zijn,
+behalve dat de pakketspecifieke gegevens vervangen worden door de
+plaatshouder <literal>@CHANGEPATH@</literal>. De waarde daarvan is: 1. als
+het pakket uit een onderdeel afkomstig is (bijv. <literal>main</literal>),
+vormt dit het eerste deel, anders wordt het weggelaten, 2. de eerste letter
+van de pakketnaam van het bronpakket, behalve als de naam van het bronpakket
+begint met '<literal>lib</literal>'. In dat laatste geval zullen het de
+eerste vier letters zijn. 3. De volledige naam van het
+bronpakket. 4. nogmaals de volledige naam en 5. de versie van de
+broncode. Het eerste (in voorkomend geval), tweede, derde en vierde deel
+worden gescheiden door een slash ('<literal>/</literal>') en tussen het het
+vierde en het vijfde deel staat een laag liggend streepje
+('<literal>_</literal>'). De speciale waarde '<literal>no</literal>' kan
+gebruikt worden voor deze optie om aan te geven dat deze bron niet gebruikt
+kan worden om er changelog-bestanden op te halen. In dat geval zal een
+andere bron geprobeerd worden als die er is.
+	</para></listitem>
+    </varlistentry>
+
+   </variablelist>
+ </refsect1>
+
+ <refsect1><title>Programmaspecifieke configuratie</title>
+    <para>In het bijzonder omwille van de introductie van het binaire programma
+<command>apt</command>, kan het zinvol zijn om bepaalde opties enkel voor
+een specifiek programma in te stellen. Want zelfs opties die eruit zien
+alsof ze enkel betrekking hebben op een bepaald programma, zoals
+<option>APT::Get::Show-Versions</option>, hebben zowel uitwerking op
+<command>apt-get</command> als op <command>apt</command>.
+    </para>
+    <para>Een optie enkel instellen voor een specifiek programma kan gerealiseerd
+worden door die optie in te stellen binnen het bereik
+<option>Binary::<replaceable>specifiek-programma</replaceable></option>. De
+optie <option>APT::Get::Show-Versions</option> enkel voor
+<command>apt</command> instellen, kan bijvoorbeeld gebeuren door in plaats
+daarvan <option>Binary::apt::APT::Get::Show-Versions</option> in te stellen.</para>
+    <para>Merk op dat, zoals we hogerop in het onderdeel BESCHRIJVING zagen, u geen
+programmaspecifieke opties kunt instellen aan de commandoregel zelf en ook
+niet in configuratiebestanden die via de commandoregel ingelezen worden.</para>
+ </refsect1>
+
+ <refsect1><title>Mappen</title>
+
+   <para>De sectie <literal>Dir::State</literal> bevat mappen die de lokale
+statusinformatie aanbelangen. <literal>lists</literal> is de map waarin de
+opgehaalde pakketlijsten geplaatst moeten worden en
+<literal>status</literal> is de naam van het statusbestand van
+&dpkg;. <literal>preferences</literal> is de naam van het
+<filename>preferences</filename>-bestand van
+APT. <literal>Dir::State</literal> bevat de standaardmap die als prefix
+gebruikt moet worden bij alle subitems die niet beginnen met
+<filename>/</filename> of <filename>./</filename>.</para>
+
+   <para><literal>Dir::Cache</literal> bevat locaties die de lokale cache-informatie
+aanbelangen, zoals de twee pakketcaches <literal>srcpkgcache</literal> en
+<literal>pkgcache</literal>, alsook de plaats waarin opgehaalde archieven
+geplaatst worden, <literal>Dir::Cache::archives</literal>. Het aanmaken van
+caches kan uitgezet worden door <literal>pkgcache</literal> of
+<literal>srcpkgcache</literal> in te stellen op <literal>""</literal>. Dit
+zal het opstarten vertragen, maar schijfruimte besparen. Het valt wellicht
+te verkiezen de pkgcache uit te zetten eerder dan de srcpkgcache. Net zoals
+dit het geval is bij <literal>Dir::State</literal> ligt de standaardmap
+vervat in <literal>Dir::Cache</literal>.</para>
+
+   <para><literal>Dir::Etc</literal> bevat de locatie van
+configuratiebestanden. <literal>sourcelist</literal> geeft de locatie aan
+van de lijst met pakketbronnen en <literal>main</literal> is het standaard
+configuratiebestand (een instelling die geen uitwerking heeft, tenzij ze
+staat in het configuratiebestand dat door <envar>APT_CONFIG</envar>)
+gespecificeerd wordt.</para>
+
+   <para>De instelling <literal>Dir::Parts</literal> leest in lexicale volgorde alle
+configuratiefragmenten uit de opgegeven map in. Nadien wordt het
+hoofdconfiguratiebestand geladen.</para>
+
+   <para>Naar binaire programma's wordt verwezen door
+<literal>Dir::Bin</literal>. <literal>Dir::Bin::Methods</literal> geeft de
+locatie op van de methodeverwerkers en <literal>gzip</literal>,
+<literal>bzip2</literal>, <literal>lzma</literal>, <literal>dpkg</literal>,
+<literal>apt-get</literal> <literal>dpkg-source</literal>
+<literal>dpkg-buildpackage</literal> and <literal>apt-cache</literal> geven
+de locatie van de respectieve programma's op.</para>
+
+   <para>
+     Het configuratie-item <literal>RootDir</literal> heeft een speciale
+betekenis. Als het ingesteld werd, zullen alle paden relatief zijn ten
+opzichte van <literal>RootDir</literal>, <emphasis>zelfs paden die absoluut
+gespecificeerd werden</emphasis>. Dus als bijvoorbeeld
+<literal>RootDir</literal> ingesteld staat op
+<filename>/tmp/staging</filename> en <literal>Dir::State::status</literal>
+op <filename>/var/lib/dpkg/status</filename>, dan zal naar het statusbestand
+gezocht worden in
+<filename>/tmp/staging/var/lib/dpkg/status</filename>. Indien u enkel een
+voorvoegsel voor relatieve paden wilt instellen, gebruikt u eerder
+<literal>Dir</literal>.
+   </para>
+
+   <para>
+      De lijst <literal>Ignore-Files-Silently</literal> kan gebruikt worden om op
+te geven welke bestanden APT stilzwijgend moet negeren bij het verwerken van
+de fragmenten uit de mappen die fragmenten bevatten. Standaard worden
+bestanden die eindigen op <literal>.disabled</literal>,
+<literal>~</literal>, <literal>.bak</literal> of
+<literal>.dpkg-[a-z]+</literal> stilzwijgend genegeerd. Zoals bij de laatste
+standaardwaarde vastgesteld kan worden, kunnen deze patronen gebruik maken
+van de syntaxis voor reguliere expressies.
+   </para>
+ </refsect1>
+ 
+ <refsect1><title>APT in DSelect</title>
+   <para>   
+   Als APT gebruikt wordt als een methode van &dselect; sturen verschillende
+configuratierichtlijnen het standaardgedrag aan. Deze zijn te vinden in de
+sectie <literal>DSelect</literal>.</para>
+   
+   <variablelist>
+     <varlistentry><term><option>Clean</option></term>
+     <listitem><para>Modus voor het opschonen van de cache; deze kan een van de volgende waarden
+zijn: <literal>always</literal>, <literal>prompt</literal>,
+<literal>auto</literal>, <literal>pre-auto</literal> en
+<literal>never</literal>.  <literal>always</literal> en
+<literal>prompt</literal> verwijderen na het opwaarderen alle pakketten uit
+de cache, <literal>prompt</literal> (de standaardwaarde) doet dit
+voorwaardelijk.  <literal>auto</literal> verwijdert enkel die pakketten die
+niet langer gedownload kunnen worden (bijvoorbeeld omdat ze door een nieuwe
+versie vervangen zijn).  <literal>pre-auto</literal> voert deze actie uit
+vooraleer nieuwe pakketten gedownload worden.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>options</option></term>
+     <listitem><para>De inhoud van deze variabele wordt in de vorm van commandoregelopties
+doorgegeven aan &apt-get; als dit commando in de installatiefase uitgevoerd
+wordt.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>Updateoptions</option></term>
+     <listitem><para>De inhoud van deze variabele wordt in de vorm van commandoregelopties
+doorgegeven aan &apt-get; als dit commando in de fase van bijwerken
+uitgevoerd wordt.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>PromptAfterUpdate</option></term>
+     <listitem><para>Indien ingesteld op true (waar) zal de operatie [U]pdate in &dselect; altijd
+om bevestiging vragen vooraleer voort te gaan. De standaardinstelling is om
+enkel in geval van een fout om invoer te vragen.</para></listitem>
+     </varlistentry>
+   </variablelist>
+ </refsect1>
+ 
+ <refsect1><title>Hoe APT &dpkg; aanroept</title>
+   <para>Verschillende configuratierichtlijnen regelen de manier waarop APT &dpkg;
+aanroept. Deze zijn te vinden in de sectie <literal>DPkg</literal>.</para>
+
+   <variablelist>
+     <varlistentry><term><option>options</option></term>
+     <listitem><para>Dit is een lijst van aan &dpkg; door te geven opties. De lijstnotatie moet
+gebruikt worden om de opties op te geven en elk lijstitem wordt als een
+apart argument aan &dpkg; doorgegeven.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>Path</option></term>
+     <listitem><para>This is a string that defines the <envar>PATH</envar> environment variable
+used when running dpkg. It may be set to any valid value of that environment
+variable; or the empty string, in which case the variable is not changed.</para></listitem>
+     </varlistentry>
+     
+     <varlistentry><term><option>Pre-Invoke</option></term><term><option>Post-Invoke</option></term>
+     <listitem><para>Dit is een lijst van shell-opdrachten die voor/na het aanroepen van &dpkg;
+uitgevoerd moeten worden. Zoals dit het geval is bij
+<literal>options</literal> moet de lijstnotatie gebruikt worden. De
+commando's worden in volgorde gestart met behulp van
+<filename>/bin/sh</filename>. Indien er een mislukt, dan breekt APT af.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>Pre-Install-Pkgs</option></term>
+     <listitem><para>Dit is een lijst van shell-opdrachten die voor het aanroepen van &dpkg;
+uitgevoerd moeten worden. Zoals dit het geval is bij
+<literal>options</literal> moet de lijstnotatie gebruikt worden. De
+commando's worden in volgorde gestart met behulp van
+<filename>/bin/sh</filename>. Indien er een mislukt, dan breekt APT af. APT
+zal de bestandsnaam van elk .deb-bestand dat het gaat installeren doorgeven
+aan de commando's. Dit gebeurt met een naam per regel op de gevraagde
+bestandsindicator, die standaard ingesteld staat op standaardinvoer.</para>
+
+     <para>Versie 2 van dit protocol stuurt meer informatie naar de gevraagde
+bestandsindicator: een regel met de tekst <literal>VERSION 2</literal>, de
+configuratieruimte voor APT en een lijst van pakketacties met informatie
+over bestandsnaam en versie.</para>
+
+     <para>Elke regel met een configuratierichtlijn heeft de vorm
+<literal>key=value</literal> (sleutel=waarde). Bijzondere tekens
+(gelijkheidstekens, regeleinden, niet-afdrukbare tekens, aanhalingstekens en
+percenttekens in <literal>key</literal> en regeleinden, niet-afdrukbare
+tekens en percenttekens in <literal>value</literal>) worden met %
+gecodeerd. Lijsten worden voorgesteld door meerdere
+<literal>key::=value</literal> (sleutel::=waarde) regels met eenzelfde
+sleutel. De configuratiesectie eindigt met een lege regel.</para>
+
+     <para>In Versie 2 bestaan regels in verband met een pakketactie uit vijf velden:
+pakketnaam (zonder architectuuropgave, zelfs indien niet-systeemeigen), oude
+versie, richting van de versiewijziging (&lt; voor opwaarderingen, &gt; voor
+degradaties, = voor geen wijziging), nieuwe versie, actie. De versievelden
+zijn "-" voor helemaal geen versie (bijvoorbeeld wanneer een pakket voor het
+eerst geïnstalleerd wordt; geen versie wordt behandeld als ouder dan gelijk
+welke echte versie, waardoor het een opwaardering betreft, aangeduid als
+<literal>- &lt; 1.23.4</literal>). Het actieveld is "**CONFIGURE**" als het
+pakket geconfigureerd gaat worden, "**REMOVE**" als het verwijderd gaat
+worden of de bestandsnaam van een .deb-bestand als het uitgepakt gaat
+worden.</para>
+
+     <para>In Versie 3 volgt na elk versieveld de architectuur van die versie, hetgeen
+"-" is voor geen versie, en een veld met de aanduiding van het
+MultiArch-type (multiarchitectuurtype) "same" (zelfde), "foreign"
+(niet-systeemeigen), "allowed" (toegestaan) of "none" (geen). Merk op dat
+"none" een incorrecte typenaam is die om redenen van compatibiliteit
+behouden werd. Het moet als "no" geïnteerpreteerd worden en gebruikers
+worden aangemoedigd om beide te ondersteunen.</para>
+
+     <para>De protocolversie die voor het commando
+<literal><replaceable>cmd</replaceable></literal> gebruikt moet worden, kan
+gekozen worden door
+<literal>DPkg::Tools::options::<replaceable>cmd</replaceable>::Version</literal>
+dienovereenkomstig in te stellen. Standaard is dit versie 1. Indien APT de
+gevraagde versie niet ondersteunt, zal het in de plaats daarvan de
+informatie weergeven volgens het protocol van de hoogste ondersteunde
+versie.
+     </para>
+
+     <para>De bestandsindicator die gebruikt moet worden om de informatie door te
+sturen kan aangevraagd worden met
+<literal>DPkg::Tools::options::<replaceable>cmd</replaceable>::InfoFD</literal>.
+Dit staat standaard op <literal>0</literal> ingesteld, wat staat voor de
+standaardinvoer. Deze functionaliteit is beschikbaar sinds versie
+0.9.11. Men kan nagaan of deze optie ondersteund wordt door te kijken naar
+de omgevingsvariabele <envar>APT_HOOK_INFO_FD</envar> die ter confirmatie
+het cijfer bevat dat staat voor de gebruikte bestandsindicator.</para>
+     </listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>Run-Directory</option></term>
+     <listitem><para>APT gaat naar deze map vooraleer &dpkg; aan te roepen. Standaard is dit
+<filename>/</filename>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>Build-options</option></term>
+     <listitem><para>Deze opties worden doorgegeven aan &dpkg-buildpackage; bij het compileren
+van pakketten. Het standaardgedrag is om ondertekening uit te zetten en alle
+binaire bestanden te produceren.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>DPkg::ConfigurePending</option></term>
+     <listitem><para>Indien deze optie ingesteld staat zal APT <command>dpkg --configure
+--pending</command> aanroepen om &dpkg; alle nodige configuraties en
+triggers te laten afhandelen. Standaard staat deze optie automatisch
+aan. Maar ze uitzetten kan nuttig zijn indien u APT meerdere keren op rij
+wenst uit te voeren - bijvoorbeeld in een installatieprogramma. In een
+dergelijk scenario kunt u deze optie uitschakelen voor alle keren dat APT
+uitgevoerd wordt, behalve voor de laatste keer.</para></listitem>
+     </varlistentry>
+   </variablelist>
+ </refsect1>
+
+ <refsect1>
+   <title>De opties Periodic en Archives</title>
+   <para>De optiegroepen <literal>APT::Periodic</literal> en
+<literal>APT::Archives</literal> configureren het gedrag van de periodieke
+bijwerkingen die door apt uitgevoerd worden en die door het script
+<literal>/usr/lib/apt/apt.systemd.daily</literal> uitgelokt
+worden. Raadpleeg het begin van dit script voor een beknopte documentatie
+over deze opties.
+   </para>
+ </refsect1>
+
+ <refsect1>
+   <title>Debugopties</title>
+   <para>
+     Als opties in de sectie <literal>Debug::</literal> geactiveerd worden, heeft
+dit tot gevolg dat er met behulp van de bibliotheken van
+<literal>apt</literal> debug-informatie gestuurd wordt naar de
+standaardstroom voor foutmeldingen van het programma in kwestie, of dat
+bijzondere modi van dat programma aangezet worden die vooral nuttig zijn om
+het gedrag van apt te debuggen. De meeste van deze opties zijn niet
+interessant voor een gewone gebruiker. Slechts enkele kunnen dat wel zijn:
+
+     <itemizedlist>
+       <listitem>
+	 <para>
+	   <literal>Debug::pkgProblemResolver</literal> levert uitvoer op over de
+beslissingen die genomen werden door <literal>dist-upgrade, upgrade,
+install, remove, purge</literal>.
+	 </para>
+       </listitem>
+
+       <listitem>
+	 <para>
+	   <literal>Debug::NoLocking</literal> schakelt elke vorm van
+bestandsvergrendeling uit. Dit kan bruikbaar zijn voor het uitvoeren van
+sommige operaties (bijvoorbeeld <literal>apt-get -s install</literal>) als
+niet-systeembeheerder.
+	 </para>
+       </listitem>
+
+       <listitem>
+	 <para>
+	   <literal>Debug::pkgDPkgPM</literal> geeft de werkelijke commandoregel weer
+telkens <literal>apt</literal> &dpkg; aanroept.
+	 </para>
+       </listitem>
+
+       <listitem>
+	 <para>
+	   <!-- TODO: provide a
+	   motivating example, except I haven't a clue why you'd want
+	   to do this. -->
+<literal>Debug::IdentCdrom</literal> schakelt het opnemen van
+statfs-gegevens in de ID's van CD's uit.  
+	 </para>
+       </listitem>
+     </itemizedlist>
+   </para>
+
+   <para>
+     Hieronder volgt een volledige lijst van de debug-opties van apt.
+   </para>
+
+   <variablelist>
+     <varlistentry>
+       <term><option>Debug::Acquire::cdrom</option></term>
+
+       <listitem>
+	 <para>
+	   Weergeven van informatie in verband met het benaderen van pakketbronnen van
+het type <literal>cdrom://</literal>.
+	 </para>
+       </listitem>
+     </varlistentry>
+
+     <varlistentry>
+       <term><option>Debug::Acquire::ftp</option></term>
+
+       <listitem>
+	 <para>
+	   Weergeven van informatie in verband met het downloaden van pakketten met
+behulp van FTP.
+	 </para>
+       </listitem>
+     </varlistentry>
+
+     <varlistentry>
+       <term><option>Debug::Acquire::http</option></term>
+
+       <listitem>
+	 <para>
+	   Weergeven van informatie in verband met het downloaden van pakketten met
+behulp van HTTP.
+	 </para>
+       </listitem>
+     </varlistentry>
+
+     <varlistentry>
+       <term><option>Debug::Acquire::https</option></term>
+
+       <listitem>
+	 <para>
+	   Weergeven van informatie in verband met het downloaden van pakketten met
+behulp van HTTPS.
+	 </para>
+       </listitem>
+     </varlistentry>
+
+     <varlistentry>
+       <term><option>Debug::Acquire::gpgv</option></term>
+
+       <listitem>
+	 <para>
+	   Weergeven van informatie in verband met het verifiëren van cryptografische
+handtekeningen met behulp van <literal>gpg</literal>.
+	 </para>
+       </listitem>
+     </varlistentry>
+
+     <varlistentry>
+       <term><option>Debug::aptcdrom</option></term>
+
+       <listitem>
+	 <para>
+	   Informatie tonen over het proces van benaderen van verzamelingen pakketten
+op CD's.
+	 </para>
+       </listitem>
+     </varlistentry>
+
+     <varlistentry>
+       <term><option>Debug::BuildDeps</option></term>
+       <listitem>
+	 <para>
+	   Beschrijft het proces van het oplossen van bouwvereisten door &apt-get;.
+	 </para>
+       </listitem>
+     </varlistentry>
+
+     <varlistentry>
+       <term><option>Debug::Hashes</option></term>
+       <listitem>
+	 <para>
+	   Iedere cryptografische frommel weergeven die door de bibliotheken van
+<literal>apt</literal> aangemaakt wordt.
+	 </para>
+       </listitem>
+     </varlistentry>
+
+     <varlistentry>
+       <term><option>Debug::IdentCDROM</option></term>
+       <listitem>
+	 <para>
+	   Bij het aanmaken van een ID voor een CD geen informatie toevoegen die
+afkomstig is van <literal>statfs</literal>, namelijk het aantal gebruikte en
+vrije blokken op het bestandssysteem van de CD.
+	 </para>
+       </listitem>
+     </varlistentry>
+
+     <varlistentry>
+       <term><option>Debug::NoLocking</option></term>
+       <listitem>
+	 <para>
+	   Elke vorm van bestandsvergrendeling uitzetten. Dit maakt het bijvoorbeeld
+mogelijk om gelijktijdig twee processen van het type <quote><literal>apt-get
+update</literal></quote> uit te voeren.
+	 </para>
+       </listitem>
+     </varlistentry>
+
+     <varlistentry>
+       <term><option>Debug::pkgAcquire</option></term>
+
+       <listitem>
+	 <para>
+	   In een logbestand opschrijven wanneer items toegevoegd worden aan of
+verwijderd uit de algemene download-wachtrij.
+	 </para>
+       </listitem>
+     </varlistentry>
+
+     <varlistentry>
+       <term><option>Debug::pkgAcquire::Auth</option></term>
+       <listitem>
+	 <para>
+	   Statusberichten en fouten weergeven die verband houden met het controleren
+van de controlesom en de cryptografische handtekening van gedownloade
+bestanden.
+	 </para>
+       </listitem>
+     </varlistentry>
+
+     <varlistentry>
+       <term><option>Debug::pkgAcquire::Diffs</option></term>
+       <listitem>
+	 <para>
+	   Informatie weergeven over het downloaden en verwerken van de diff's
+(bestanden die de aangebrachte wijzigingen bijhouden) voor de
+pakketindexbestanden en over fouten die daarmee verband houden.
+	 </para>
+       </listitem>
+     </varlistentry>
+
+     <varlistentry>
+       <term><option>Debug::pkgAcquire::RRed</option></term>
+
+       <listitem>
+	 <para>
+	   Informatie weergeven in verband met het patchen van de pakketlijsten van apt
+wanneer niet de volledige indexbestanden maar enkel de diff's (aangebrachte
+wijzigingen) gedownload worden.
+	 </para>
+       </listitem>
+     </varlistentry>
+
+     <varlistentry>
+       <term><option>Debug::pkgAcquire::Worker</option></term>
+
+       <listitem>
+	 <para>
+	   Alle interacties met de sub-processen die het downloaden werkelijk
+uitvoeren, neerschrijven in een logbestand.
+	 </para>
+       </listitem>
+     </varlistentry>
+
+     <varlistentry>
+       <term><option>Debug::pkgAutoRemove</option></term>
+
+       <listitem>
+	 <para>
+	   Gebeurtenissen in een logbestand opschrijven die verband houden met de
+status van pakketten die automatisch geïnstalleerd werden en met het
+verwijderen van niet-gebruikte pakketten.
+	 </para>
+       </listitem>
+     </varlistentry>
+
+     <varlistentry>
+       <term><option>Debug::pkgDepCache::AutoInstall</option></term>
+       <listitem>
+	 <para>
+	   Debug-berichten genereren waarin beschreven wordt welke pakketten
+automatisch geïnstalleerd worden om aan vereisten te voldoen. Dit komt
+overeen met de initiële doorloop van het type auto-install die bijvoorbeeld
+door <literal>apt-get install</literal> uitgevoerd wordt. Het komt niet
+overeen met het volledige systeem van apt voor het oplossen van
+vereistenproblemen. Raadpleeg in dat verband
+<literal>Debug::pkgProblemResolver</literal>.
+	 </para>
+       </listitem>
+     </varlistentry>
+
+     <varlistentry>
+       <term><option>Debug::pkgDepCache::Marker</option></term>
+       <listitem>
+        <para>
+           Debug-berichten genereren waarin beschreven wordt welke pakketten een
+markering krijgen van het type keep/install/remove
+(vasthouden/installeren/verwijderen) terwijl de ProblemResolver
+(probleemoplosser) zijn werk verricht. Elke toevoeging of verwijdering kan
+bijkomende acties uitlokken en die worden onder het originele item
+weergegeven met een insprong van twee extra spaties. Het formaat van elke
+regel is <literal>MarkKeep</literal>, <literal>MarkDelete</literal> of
+<literal>MarkInstall</literal> gevolgd door <literal>pakketnaam &lt;a.b.c
+-&gt; d.e.f | x.y.z&gt; (sectie)</literal>, waarbij <literal>a.b.c</literal>
+de huidige versie van het pakket is, <literal>d.e.f</literal> de versie is
+waarvan de installatie overwogen wordt en <literal>x.y.z</literal> een
+recentere versie wiens installatie (omwille van een lagere pin-score) echter
+niet overwogen wordt. Die beide laatste kunnen weggelaten worden als ze niet
+bestaan of als ze dezelfde versie hebben als de geïnstalleerde
+versie. <literal>section</literal> is de naam van de sectie waarin het
+pakket zich bevindt.
+        </para>
+       </listitem>
+     </varlistentry>
+
+     <varlistentry>
+       <term><option>Debug::pkgDPkgPM</option></term>
+       <listitem>
+	 <para>
+	   Als &dpkg; aangeroepen wordt, weergeven wat de exacte commandoregel is
+waarmee het aangeroepen wordt, waarbij de argumenten door een enkele spatie
+van elkaar gescheiden worden.
+	 </para>
+       </listitem>
+     </varlistentry>
+
+     <varlistentry>
+       <term><option>Debug::pkgDPkgProgressReporting</option></term>
+       <listitem>
+	 <para>
+	   Alle gegevens die van &dpkg; verkregen worden over de
+statusbestandsindicator en alle fouten die zich voordoen bij het ontleden
+ervan weergeven.
+	 </para>
+       </listitem>
+     </varlistentry>
+
+     <varlistentry>
+       <term><option>Debug::pkgOrderList</option></term>
+
+       <listitem>
+	 <para>
+	   Een opvolging doen van het algoritme dat beslist over de volgorde waarin
+<literal>apt</literal> pakketten zou moeten doorgeven aan &dpkg;.
+	 </para>
+       </listitem>
+     </varlistentry>
+
+     <varlistentry>
+       <term><option>Debug::pkgPackageManager</option></term>
+
+       <listitem>
+	 <para>
+	   Statusberichten tonen bij het volgen van de stappen die bij het aanroepen
+van &dpkg; gezet worden.
+	 </para>
+       </listitem>
+     </varlistentry>
+
+     <varlistentry>
+       <term><option>Debug::pkgPolicy</option></term>
+
+       <listitem>
+	 <para>
+	   De prioriteit weergeven van elke pakketlijst bij het opstarten.
+	 </para>
+       </listitem>
+     </varlistentry>
+
+     <varlistentry>
+       <term><option>Debug::pkgProblemResolver</option></term>
+
+       <listitem>
+	 <para>
+	   Het uitvoeren van het oplossen van vereistenproblemen volgen (dit is enkel
+van toepassing op wat gebeurt als zich een complex vereistenprobleem
+voordoet).
+	 </para>
+       </listitem>
+     </varlistentry>
+
+     <varlistentry>
+       <term><option>Debug::pkgProblemResolver::ShowScores</option></term>
+       <listitem>
+        <para>
+          Een lijst weergeven van alle geïnstalleerde pakketten met hun berekende
+scores zoals die door de pkgProblemResolver gebruikt worden. De
+pakketbeschrijving is identiek aan wat in
+<literal>Debug::pkgDepCache::Marker</literal> beschreven werd.
+        </para>
+       </listitem>
+     </varlistentry>
+
+     <varlistentry>
+       <term><option>Debug::sourceList</option></term>
+
+       <listitem>
+	 <para>
+	   Informatie weergeven over de leveranciers die in
+<filename>/etc/apt/vendors.list</filename> vermeld worden.
+	 </para>
+       </listitem>
+     </varlistentry>
+
+     <varlistentry>
+       <term><option>Debug::RunScripts</option></term>
+       <listitem>
+        <para>
+          De externe commando's tonen die aangeroepen worden door
+apt-uitbreidingen. Dit houdt bijvoorbeeld de configuratieopties
+<literal>DPkg::{Pre,Post}-Invoke</literal> of
+<literal>APT::Update::{Pre,Post}-Invoke</literal> in.
+        </para>
+       </listitem>
+     </varlistentry>
+
+
+
+   <!-- 2009/07/11 Currently used nowhere. The corresponding code
+is commented.
+     <varlistentry>
+
+       <term><literal>Debug::Vendor</literal></term>
+
+       <listitem>
+	 <para>
+	   Print information about each vendor.
+	 </para>
+       </listitem>
+     </varlistentry>
+-->
+</variablelist>
+ </refsect1>
+ 
+ <refsect1><title>Voorbeelden</title>
+   <para>&configureindex; is een configuratiebestand dat voorbeeldwaarden toont voor
+alle mogelijke opties.</para>
+ </refsect1>
+ 
+ <refsect1><title>Bestanden</title>
+   <variablelist>
+      &file-aptconf;
+   </variablelist>
+ </refsect1>
+ 
+ <refsect1><title>Zie ook</title>
+   <para><!-- ? reading apt.conf -->
+&apt-cache;, &apt-config;, &apt-preferences;.</para>
+ </refsect1>
+
+ &manbugs;
+ 
+ <refsect1><title>&translation-title;</title>
+   <para>&translation-holder;</para>
+   <para>&translation-english;</para>
+ </refsect1>
+</refentry>
+

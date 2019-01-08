@@ -1,0 +1,17 @@
+<map id="apt&#45;pkg/cacheset.h" name="apt&#45;pkg/cacheset.h">
+<area shape="rect" id="node14" href="$pkgcache_8h.xhtml" title="pkgCache &#45; Structure definitions for the cache file " alt="" coords="1611,528,1761,555"/>
+<area shape="rect" id="node21" href="$cachefile_8h_source.xhtml" title="apt&#45;pkg/cachefile.h" alt="" coords="1773,80,1919,107"/>
+<area shape="rect" id="node18" href="$cacheiterators_8h_source.xhtml" title="apt&#45;pkg/cacheiterators.h" alt="" coords="1399,603,1581,629"/>
+<area shape="rect" id="node22" href="$depcache_8h_source.xhtml" title="apt&#45;pkg/depcache.h" alt="" coords="2281,453,2432,480"/>
+<area shape="rect" id="node27" href="$acquire_8h.xhtml" title="apt&#45;pkg/acquire.h" alt="" coords="469,453,605,480"/>
+<area shape="rect" id="node33" href="$policy_8h_source.xhtml" title="apt&#45;pkg/policy.h" alt="" coords="2029,379,2154,405"/>
+<area shape="rect" id="node35" href="$sourcelist_8h_source.xhtml" title="apt&#45;pkg/sourcelist.h" alt="" coords="1596,155,1747,181"/>
+<area shape="rect" id="node34" href="$versionmatch_8h_source.xhtml" title="apt&#45;pkg/versionmatch.h" alt="" coords="2080,453,2257,480"/>
+<area shape="rect" id="node36" href="$tagfile_8h_source.xhtml" title="apt&#45;pkg/tagfile.h" alt="" coords="2815,453,2944,480"/>
+<area shape="rect" id="node39" href="$metaindex_8h_source.xhtml" title="apt&#45;pkg/metaindex.h" alt="" coords="1357,229,1516,256"/>
+<area shape="rect" id="node40" href="$indexfile_8h_source.xhtml" title="apt&#45;pkg/indexfile.h" alt="" coords="1205,379,1349,405"/>
+<area shape="rect" id="node41" href="$pkgrecords_8h_source.xhtml" title="apt&#45;pkg/pkgrecords.h" alt="" coords="1338,453,1498,480"/>
+<area shape="rect" id="node42" href="$srcrecords_8h_source.xhtml" title="apt&#45;pkg/srcrecords.h" alt="" coords="1058,453,1213,480"/>
+<area shape="rect" id="node43" href="$init_8h_source.xhtml" title="apt&#45;pkg/init.h" alt="" coords="1487,304,1597,331"/>
+<area shape="rect" id="node44" href="$pkgsystem_8h_source.xhtml" title="apt&#45;pkg/pkgsystem.h" alt="" coords="1474,379,1634,405"/>
+</map>

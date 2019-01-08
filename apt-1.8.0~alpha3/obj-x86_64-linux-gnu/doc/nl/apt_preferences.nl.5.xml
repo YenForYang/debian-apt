@@ -1,0 +1,744 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+  "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % aptent SYSTEM "apt.ent"> %aptent;
+<!ENTITY % aptverbatiment SYSTEM "apt-verbatim.ent"> %aptverbatiment;
+<!ENTITY % aptvendor SYSTEM "apt-vendor.ent"> %aptvendor;
+]>
+
+<refentry>
+
+ <refentryinfo>
+   <!-- The last update date -->
+&apt-author.team;
+   &apt-email;
+   &apt-product;
+   
+   <date>2015-08-15T00:00:00Z</date>
+ </refentryinfo>
+
+ <refmeta>
+   <refentrytitle>apt_preferences</refentrytitle>
+   <manvolnum>5</manvolnum>
+   <refmiscinfo class="manual">APT</refmiscinfo>
+ </refmeta>
+
+ 
+ <!-- Man page title -->
+<refnamediv>
+    <refname>apt_preferences</refname>
+    <refpurpose>Bestand om de voorkeursinstellingen voor APT te beheren</refpurpose>
+ </refnamediv>
+
+<refsect1>
+<title>Omschrijving</title>
+<para>Het bestand met de voorkeursinstellingen voor APT,
+<filename>/etc/apt/preferences</filename>, en de bestandsfragmenten uit de
+map <filename>/etc/apt/preferences.d/</filename> kunnen gebruikt worden om
+in te stellen welke versie van een pakket voor installatie geselecteerd zal
+worden.</para>
+
+<para>Indien het bestand &sources-list; verwijzingen bevat naar meer dan een
+uitgave (bijvoorbeeld <literal>stable</literal> en
+<literal>testing</literal>), dan kunnen meerdere versies van eenzelfde
+pakket beschikbaar zijn voor installatie. APT kent aan elke beschikbare
+versie een prioriteit toe. Rekening houdend met eventuele beperkingen ten
+gevolge van vereisten, zal <command>apt-get</command> de versie met de
+grootste prioriteit uitkiezen voor installatie. De voorkeursinstellingen
+voor APT overschrijven de prioriteiten die APT standaard aan pakketversies
+toekent, waardoor de gebruiker controle verwerft over welk pakket voor
+installatie uitgekozen wordt.</para>
+
+<para>Meerdere exemplaren van eenzelfde versie kunnen beschikbaar zijn indien het
+bestand &sources-list; verwijzingen bevat naar meer dan een pakketbron. In
+dat geval zal <command>apt-get</command> het exemplaar downloaden dat eerst
+vermeld wordt in het bestand &sources-list; De APT-voorkeuren hebben geen
+invloed op de keuze van het exemplaar, enkel op de versiekeuze.</para>
+
+<para>Voorkeuren leggen veel macht in de handen van een systeembeheerder, maar ze
+kunnen ook tot zijn grootste nachtmerrie uitgroeien als er niet zorgvuldig
+mee omgesprongen wordt! APT zal de voorkeuren niet in vraag
+stellen. Daardoor kunnen foute instellingen leiden tot niet-installeerbare
+pakketten of tot het nemen van foute beslissingen bij het opwaarderen van
+pakketten. Nog meer problemen kunnen ontstaan als verschillende uitgaven
+door elkaar gebruikt worden zonder een goed begrip van de volgende
+paragrafen. Pakketten uit een specifieke uitgave worden niet uitgetest voor
+(en werken daarom niet altijd als verwacht in) eerdere of latere uitgaves of
+samen met andere pakketten uit verschillende uitgaves. U bent gewaarschuwd.</para>
+
+<para>Noteer dat de bestanden uit de map
+<filename>/etc/apt/preferences.d</filename> in oplopende alfanumerieke
+volgorde ontleed worden en dat hun naam aan de volgende conventie moet
+beantwoorden: de bestanden hebben ofwel geen bestandsnaamextensie ofwel is
+dat "<literal>pref</literal>" en ze bevatten enkel alfanumerieke tekens,
+koppeltekens (-), lage streepjes (_) en punten (.). In het andere geval zal
+APT melding maken van het feit dat het een bestand overgeslagen heeft,
+tenzij dat bestand overeenkomt met een patroon uit de configuratielijst
+<literal>Dir::Ignore-Files-Silently</literal>. In dat laatste geval zal het
+stilzwijgend overgeslagen worden.</para>
+
+<refsect2><title>Door APT standaard toegekende prioriteiten</title>
+
+<para>Indien het bestand preferences niet bestaat of indien het geen item bevat
+dat op een specifieke versie betrekking heeft, dan wordt aan die versie de
+prioriteit toegekend van de uitgave waartoe die versie behoort. Men kan een
+bepaalde uitgave uitkiezen als "the target release" (de doelrelease), die
+dan een hogere prioriteit krijgt dan standaard aan andere uitgaven gegeven
+wordt. De doelrelease kan aan de commandoregel van
+<command>apt-get</command> ingesteld worden of in
+<filename>/etc/apt/apt.conf</filename>, het configuratiebestand van
+APT. Merk op dat deze instelling voorrang heeft op gelijk welke algemene
+prioriteitsinstelling die u vastlegt in het bestand
+<filename>/etc/apt/preferences</filename> waarover we het later hebben, maar
+geen voorrang op specifieke gepinde pakketten. Bijvoorbeeld <programlisting>
+<command>apt-get install -t testing <replaceable>een-bepaald-pakket</replaceable></command>
+</programlisting> <programlisting>
+APT::Default-Release "stable";
+</programlisting>
+</para>
+
+<para>Indien de doelrelease opgegeven werd, dan gebruikt APT het volgende
+algoritme om de prioriteiten van de versies van een pakket te bepalen. Het
+toekennen van:
+
+<variablelist>
+<varlistentry>
+<term>prioriteit 1</term>
+<listitem><simpara>aan de versies die afkomstig zijn uit archieven die volgens hun
+<filename>Release</filename>-bestanden gemarkeerd staan als "NotAutomatic:
+yes" maar <emphasis>niet</emphasis> als "ButAutomaticUpgrades: yes", zoals
+bijvoorbeeld het Debian-archief <literal>experimental</literal>.</simpara></listitem>
+</varlistentry>
+
+<varlistentry>
+<term>prioriteit 100</term>
+<listitem><simpara>aan de reeds geïnstalleerde versie (als er een is) en aan de versies die
+afkomstig zijn van archieven die volgens hun
+<filename>Release</filename>-bestanden gemarkeerd staan als "NotAutomatic:
+yes" en "ButAutomaticUpgrades: yes", zoals bijvoorbeeld het Debian-archief
+backports sinds <literal>squeeze-backports</literal>.
+</simpara></listitem>
+</varlistentry>
+
+<varlistentry>
+<term>prioriteit 500</term>
+<listitem><simpara>aan de versies die niet behoren tot de doelrelease.</simpara></listitem>
+</varlistentry>
+
+<varlistentry>
+<term>prioriteit 990</term>
+<listitem><simpara>aan de versies die behoren tot de doelrelease.</simpara></listitem>
+</varlistentry>
+</variablelist>
+
+De hoogste van deze prioriteiten waarvan de beschrijving overeenkomt met de
+versie wordt aan die versie toegekend.
+</para>
+
+<para>Indien er geen doelrelease opgegeven werd, dan kent APT gewoonweg prioriteit
+100 toe aan alle geïnstalleerde pakketversies en prioriteit 500 aan alle
+niet-geïnstalleerde pakketversies, behalve aan versies die afkomstig zijn
+uit archieven die volgens hun <filename>Release</filename>-bestanden
+gemarkeerd staan als "NotAutomatic: yes" - deze versies krijgen de
+prioriteit 1 of de prioriteit 100 als ze bovendien ook gemarkeerd staan als
+"ButAutomaticUpgrades: yes".</para>
+
+<para>Om uit te maken welke versie van een pakket geïnstalleerd moet worden, past
+APT dan de volgende regels toe, vermeld in volgorde van prioriteit.
+<itemizedlist>
+<listitem><simpara>Nooit een degradatie uitvoeren tenzij de prioriteit van een beschikbaar
+pakket groter is dan 1000. ("Degraderen" (downgrading) betekent het
+installeren van een minder recente versie van een pakket ter vervanging van
+een recentere versie. Noteer dat geen enkele van de standaardprioriteiten
+die APT gebruikt, groter dan 1000 is. Dergelijke hoge prioriteiten kunnen
+enkel in het bestand preferences ingesteld worden. Merk ook op dat het
+degraderen van een pakket riskant kan zijn.)</simpara></listitem>
+<listitem><simpara>De versie met de hoogste prioriteit installeren.</simpara></listitem>
+<listitem><simpara>Indien twee of meer versies eenzelfde prioriteit hebben, het meest recente
+installeren (dat is die met het hoogste versienummer).</simpara></listitem>
+<listitem><simpara>De niet-geïnstalleerde versie installeren indien twee of meer versies
+eenzelfde prioriteit en hetzelfde versienummer hebben maar er op het gebied
+van de metadata toch een onderling verschil is, of indien de optie
+<literal>--reinstall</literal> gebruikt werd.</simpara></listitem>
+</itemizedlist>
+</para>
+
+<para>In een gewone situatie is de geïnstalleerde versie van een pakket
+(prioriteit 100) minder recent dan een van de versies die beschikbaar is in
+een pakketbron die in het bestand &sources-list; vermeld wordt (prioriteit
+500 of 990). In dat geval zal het pakket opgewaardeerd worden als de
+opdracht <command>apt-get install
+<replaceable>een-bepaald-pakket</replaceable></command> of <command>apt-get
+upgrade</command> uitgevoerd wordt.
+</para>
+
+<para>Een minder vaak voorkomende situatie is die waarbij de geïnstalleerde versie
+van een pakket <emphasis>recenter</emphasis> is dan welke andere beschikbare
+versie ook. Bij het uitvoeren van de opdracht apt-get install
+<command><replaceable>een-bepaald-pakket</replaceable></command> of
+<command>apt-get upgrade</command> zal het pakket dan niet gedegradeerd
+worden.</para>
+
+<para>Soms is de geïnstalleerde versie van een pakket recenter dan de versie van
+de doelrelease, maar niet zo recent als een versie van een andere
+distributie. Zo een pakket zal wel degelijk opgewaardeerd worden als
+<command>apt-get install
+<replaceable>een-bepaald-pakket</replaceable></command> of <command>apt-get
+upgrade</command> uitgevoerd wordt, omdat minstens <emphasis>een</emphasis>
+van de beschikbare versies een hogere prioriteit heeft dan de geïnstalleerde
+versie.</para>
+</refsect2>
+
+<refsect2><title>Het effect van de voorkeursinstellingen voor APT</title>
+
+<para>Het APT-bestand preferences laat de systeembeheerder toe het toekennen van
+prioriteiten te regelen. Het bestand bestaat uit een of meer structuren die
+uit meerdere regels bestaan en van elkaar gescheiden worden door lege
+regels. De structuren kunnen een van de twee volgende vormen aannemen: een
+specifieke vorm of een algemene vorm.
+<itemizedlist>
+<listitem>
+<simpara>De specifieke vorm kent een prioriteit (een "Pin-Priority") toe aan een of
+meer opgegeven pakketten met een specifieke versie of binnen een
+versiebereik. De volgende structuur geeft bijvoorbeeld een hoge prioriteit
+aan alle versies van het pakket <filename>perl</filename> waarvan het
+versienummer begint met "<literal>&good-perl;</literal>". Meerdere pakketten
+kunnen van elkaar gescheiden worden met spaties.</simpara>
+
+<programlisting>
+Package: perl
+Pin: version &good-perl;*
+Pin-Priority: 1001
+</programlisting>
+</listitem>
+
+<listitem><simpara>De algemene vorm kent een prioriteit toe aan alle pakketversies in een
+bepaalde distributie (dit betekent alle versies van pakketten die vermeld
+worden in een bepaald <filename>Release</filename>-bestand) of aan alle
+pakketversies die afkomstig zijn van een bepaalde internetsite,  zoals
+aangegeven door de unieke volledige domeinnaam (fully qualified domain name)
+van de site.</simpara>
+
+<simpara>Zo een item in het preferences-bestand van APT dat aan de algemene vorm
+beantwoordt, is enkel op groepen pakketten van toepassing. De volgende
+structuur kent bijvoorbeeld een hoge prioriteit toe aan alle pakketversies
+die op de lokale site beschikbaar zijn.</simpara>
+
+<programlisting>
+Package: *
+Pin: origin ""
+Pin-Priority: 999
+</programlisting>
+
+<simpara>Een aanmaning tot voorzichtigheid: het gebruikte trefwoord hier is
+"<literal>origin</literal>" dat gebruikt kan worden om een computernaam te
+vergelijken. De volgende structuur kent een hoge prioriteit toe aan alle
+versies die te verkrijgen zijn op de server die met de computernaam
+"ftp.de.debian.org" geïdentificeerd wordt.</simpara>
+<programlisting>
+Package: *
+Pin: origin "ftp.de.debian.org"
+Pin-Priority: 999
+</programlisting>
+<simpara>Men mag dit <emphasis>niet</emphasis> verwarren met de oorsprong (Origin)
+van een distributie zoals die in een <filename>Release</filename>-bestand
+vermeld wordt. Wat in een <filename>Release</filename>-bestand op het label
+"Origin:" volgt is geen internetadres, maar een auteur of de naam van een
+leverancier, zoals "Debian" of "Ximian".</simpara>
+
+<simpara>De volgende structuur kent een lage prioriteit toe aan alle pakketversies
+die behoren tot gelijk welke distributie die "<literal>unstable</literal>"
+als archiefnaam heeft.</simpara>
+
+<programlisting>
+Package: *
+Pin: release a=unstable
+Pin-Priority: 50
+</programlisting>
+
+<simpara>De volgende structuur kent een hoge prioriteit toe aan alle pakketversies
+die behoren tot om het even welke distributie met de codenaam
+"<literal>&debian-testing-codename;</literal>".</simpara>
+
+<programlisting>
+Package: *
+Pin: release n=&debian-testing-codename;
+Pin-Priority: 900
+</programlisting>
+
+<simpara>De volgende structuur kent een hoge prioriteit toe aan alle pakketversies
+die behoren tot om het even welke uitgave die "<literal>stable</literal>"
+als archiefnaam heeft en die "<literal>&debian-stable-version;</literal>"
+als releaseversienummer heeft.</simpara>
+
+<programlisting>
+Package: *
+Pin: release a=stable, v=&debian-stable-version;
+Pin-Priority: 500
+</programlisting>
+</listitem>
+</itemizedlist>
+
+Het effect van de kommaoperator is vergelijkbaar met een "en" in de logica:
+aan alle voorwaarden moet voldaan zijn opdat er een overeenkomst zou zijn
+met de pin. Er is één uitzondering: voor om het even welk type voorwaarde
+(zoals twee "a"-voorwaarden) geldt dat enkel de laatste dergelijke
+voorwaarde getoetst wordt.
+</para>
+
+</refsect2>
+
+<refsect2><title>Reguliere expressies en &glob; syntaxis</title>
+<para>
+APT ondersteunt bij het pinnen ook het gebruik van &glob;-expressies, en
+reguliere expressies die door slashes ingesloten worden. Het volgende
+voorbeeld geeft prioriteit 500 aan alle pakketten uit experimental waarvan
+de naam begint met gnome (als een &glob;-achtige expressie) of het woord kde
+(als een in slashes ingesloten POSIX uitgebreide reguliere expressie) bevat.
+</para>
+
+<programlisting>
+Package: gnome* /kde/
+Pin: release a=experimental
+Pin-Priority: 500
+</programlisting>
+
+<para>
+De regel voor deze expressies is dat ze overal kunnen voorkomen waar een
+tekenreeks kan voorkomen. De volgende pin kent dus een prioriteit 990 toe
+aan alle pakketten van een uitgave die begint met &ubuntu-codename;.
+</para>
+
+<programlisting>
+Package: *
+Pin: release n=&ubuntu-codename;*
+Pin-Priority: 990
+</programlisting>
+
+<para>
+Indien een reguliere expressie voorkomt in een
+<literal>Package</literal>-veld, dan lokt dit hetzelfde gedrag uit als
+wanneer deze reguliere expressie vervangen zou worden door een lijst met
+alle pakketnamen die ermee overeenkomen. Het is nog niet beslist of dit in
+de toekomst anders zal worden. U moet dus altijd jokertekenpins eerst
+plaatsen, zodat latere specifieke pins die kunnen overschrijven. Het patroon
+"<literal>*</literal>" in een Package-veld wordt op zichzelf niet als een
+&glob;-expressie beschouwd.
+</para>
+</refsect2>
+
+
+
+
+
+<refsect2>
+<title>Hoe APT prioriteiten interpreteert</title>
+
+<para>
+Prioriteiten (P) die in het preferences-bestand van APT toegekend worden,
+moeten positieve of negatieve gehele getallen zijn. Zij worden (grof
+geschetst) als volgt geïnterpreteerd:
+
+<variablelist>
+<varlistentry>
+<term>P &gt;= 1000</term>
+<listitem><simpara>heeft de installatie van een versie tot gevolg ook al houdt dit een
+degradatie van het pakket in</simpara></listitem>
+</varlistentry>
+<varlistentry>
+<term>990 &lt;= P &lt; 1000</term>
+<listitem><simpara>heeft de installatie van een versie tot gevolg ook al is ze niet van de
+doelrelease afkomstig, tenzij de geïnstalleerde versie recenter is</simpara></listitem>
+</varlistentry>
+<varlistentry>
+<term>500 &lt;= P &lt; 990</term>
+<listitem><simpara>heeft de installatie van een versie tot gevolg tenzij er een versie uit de
+doelrelease beschikbaar is of de geïnstalleerde versie recenter is</simpara></listitem>
+</varlistentry>
+<varlistentry>
+<term>100 &lt;= P &lt; 500</term>
+<listitem><simpara>heeft de installatie van een versie tot gevolg tenzij er een versie uit een
+andere distributie beschikbaar is of de geïnstalleerde versie recenter is</simpara></listitem>
+</varlistentry>
+<varlistentry>
+<term>0 &lt; P &lt; 100</term>
+<listitem><simpara>heeft de installatie van een versie tot gevolg enkel en alleen als er geen
+versie van het pakket geïnstalleerd is</simpara></listitem>
+</varlistentry>
+<varlistentry>
+<term>P &lt; 0  </term>
+<listitem><simpara>voorkomt dat de versie geïnstalleerd wordt</simpara></listitem>
+</varlistentry>
+<varlistentry>
+<term>P = 0</term>
+<listitem><simpara>heeft ongedefinieerd gedrag; niet te gebruiken.</simpara></listitem>
+</varlistentry>
+</variablelist>
+</para>
+
+<para>
+Het eerste record van specifieke aard dat een overeenkomst oplevert met een
+beschikbare pakketversie, bepaalt de prioriteit van die pakketversie. Bij
+gebrek daaraan wordt de prioriteit van het pakket vastgelegd op het maximum
+van al de prioriteiten die gedefinieerd worden door records van algemene
+aard waarmee die versie een overeenkomst oplevert. Records die bij middel
+van andere patronen dan "*" in het Pin-veld gedefinieerd worden, worden
+behandeld als records van specifieke aard.
+</para>
+
+<para>Veronderstel bijvoorbeeld dat het APT-bestand preferences de drie structuren
+bevat die we eerder bespraken:</para>
+
+<programlisting>
+Package: perl
+Pin: version &good-perl;*
+Pin-Priority: 1001
+
+Package: *
+Pin: origin ""
+Pin-Priority: 999
+
+Package: *
+Pin: release unstable
+Pin-Priority: 50
+</programlisting>
+
+<para>Dan is dit het gevolg:
+<itemizedlist>
+<listitem><simpara>De meest recente beschikbare versie van het pakket <literal>perl</literal>
+zal geïnstalleerd worden, zolang het versienummer van die versie begint met
+"<literal>&good-perl;</literal>". Indien er <emphasis>een of
+andere</emphasis> &good-perl;* versie van <literal>perl</literal>
+beschikbaar is en de geïnstalleerde versie is &bad-perl;*, dan zal
+<literal>perl</literal> gedegradeerd worden.</simpara></listitem>
+<listitem><simpara>Een versie van om het even welk ander pakket dan <literal>perl</literal> dat
+vanaf het lokale systeem beschikbaar is, heeft prioriteit over andere
+versies, zelfs versies uit de doelrelease.
+</simpara></listitem>
+<listitem><simpara>Een versie van een pakket waarvan de origine niet het lokale systeem is,
+maar een andere site die in &sources-list; vermeld wordt, en die tot een
+<literal>unstable</literal> distributie behoort, wordt enkel geïnstalleerd
+als het geselecteerd werd om geïnstalleerd te worden en er niet reeds een
+versie van het pakket geïnstalleerd is.
+</simpara></listitem>
+</itemizedlist>
+</para>
+</refsect2>
+
+<refsect2>
+<title>Het vaststellen van pakketversie en distributie-eigenschappen</title>
+
+<para>De locaties die in het bestand &sources-list; vermeld worden, moeten de
+bestanden <filename>Packages</filename> en <filename>Release</filename>
+aanbieden om de pakketten te beschrijven die op die locatie ter beschikking
+staan. </para>
+
+<para>Het bestand <filename>Packages</filename> bevindt zich normaal in de map
+<filename>.../dists/<replaceable>distributienaam</replaceable>/<replaceable>component</replaceable>/<replaceable>architectuur</replaceable></filename>,
+bijvoorbeeld
+<filename>.../dists/stable/main/binary-i386/Packages</filename>. Het bevat
+een reeks structuren, die uit meerdere regels bestaan, een per pakket dat in
+die map beschikbaar is. In elke structuur zijn slechts twee regels relevant
+voor het instellen van APT-prioriteiten:
+<variablelist>
+<varlistentry>
+<term>de regel <literal>Package:</literal></term>
+<listitem><simpara>vermeldt de pakketnaam</simpara></listitem>
+</varlistentry>
+<varlistentry>
+<term>de regel <literal>Version:</literal></term>
+<listitem><simpara>vermeldt het versienummer van het genoemde pakket</simpara></listitem>
+</varlistentry>
+</variablelist>
+</para>
+
+<para>Het bestand <filename>Release</filename> bevindt zich normaal in de map
+<filename>.../dists/<replaceable>distributienaam</replaceable></filename>,
+bijvoorbeeld  <filename>.../dists/stable/Release</filename>, of
+<filename>.../dists/&debian-stable-codename;/Release</filename>. Het bevat
+een enkele structuur bestaande uit meerdere regels, die van toepassing is op
+<emphasis>alle</emphasis> pakketten uit de volledige mappenboom die zich
+onder diens bovenliggende map bevindt. In tegenstelling tot wat het geval is
+voor het bestand <filename>Packages</filename>, zijn praktisch alle regels
+uit een <filename>Release</filename>-bestand relevant voor het instellen van
+de APT-prioriteiten:
+
+<variablelist>
+<varlistentry>
+<term>de regel <literal>Archive:</literal> of de regel <literal>Suite:</literal></term>
+<listitem><simpara>benoemt het archief waartoe alle pakketten uit de mappenboom
+behoren. Bijvoorbeeld de regel "Archive: stable" of "Suite: stable" geeft
+aan dat alle pakketten uit de mappenboom die zich onder de bovenliggende map
+van het bestand <filename>Release</filename> bevindt, deel uitmaken van een
+<literal>stable</literal> archief. Om deze waarde op te geven in het
+APT-bestand preferences is de volgende regel nodig:
+</simpara>
+<programlisting>
+Pin: release a=stable
+</programlisting>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term>de regel <literal>Codename:</literal></term>
+<listitem><simpara>benoemt de codenaam waartoe alle pakketten in de mappenboom behoren. De
+regel "Codename: &debian-testing-codename;" geeft bijvoorbeeld aan dat alle
+pakketten uit de mappenboom die zich onder de bovenliggende map van het
+<filename>Release</filename>-bestand bevindt, tot een versie behoren die de
+naam <literal>&debian-testing-codename;</literal> draagt. Om deze waarde op
+te geven in het APT-bestand preferences is de volgende regel nodig:
+</simpara>
+<programlisting>
+Pin: release n=&debian-testing-codename;
+</programlisting>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term>de regel <literal>Version:</literal></term>
+<listitem><simpara>benoemt de releaseversie. De pakketten uit de boomstructuur zouden
+bijvoorbeeld kunnen komen uit de Debian releaseversie
+&debian-stable-version;. Merk op dat er normaal geen versienummer bestaat
+voor de distributies <literal>testing</literal> en
+<literal>unstable</literal> omdat ze nog niet uitgegeven werden.  Om dit op
+te geven in het APT-bestand preferences is een van de volgende regels nodig.
+</simpara>
+
+<programlisting>
+Pin: release v=&debian-stable-version;
+Pin: release a=stable, v=&debian-stable-version;
+Pin: release &debian-stable-version;
+</programlisting>
+
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term>de regel <literal>Component:</literal></term>
+<listitem><simpara>benoemt de licentiecomponent van de pakketten uit de mappenboom van het
+<filename>Release</filename>-bestand. De lijn "Component: main" bijvoorbeeld
+geeft aan dat alle pakketten uit de mappenboom behoren tot de component
+<literal>main</literal>, hetgeen inhoudt dat hun licentie in overeenstemming
+is met de Vrije Softwarerichtlijnen van Debian. Om deze component op te
+geven in het APT-bestand preferences is de volgende regel nodig:
+</simpara>
+<programlisting>
+Pin: release c=main
+</programlisting>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term>de regel <literal>Origin:</literal></term>
+<listitem><simpara>benoemt de maker van de pakketten uit de mappenboom van het
+<filename>Release</filename>-bestand. Meest gebruikelijk is dat
+<literal>Debian</literal>. Om deze oorsprong op te geven in het APT-bestand
+preferences is de volgende regel nodig:
+</simpara>
+<programlisting>
+Pin: release o=Debian
+</programlisting>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term>de regel <literal>Label:</literal></term>
+<listitem><simpara>benoemt het etiket van de pakketten uit de mappenboom van het
+<filename>Release</filename>-bestand. Meest gebruikelijk is dat
+<literal>Debian</literal>. Om dit etiket op te geven in het APT-bestand
+preferences is de volgende regel nodig:
+</simpara>
+<programlisting>
+Pin: release l=Debian
+</programlisting>
+</listitem>
+</varlistentry>
+</variablelist>
+</para>
+
+<para>Alle <filename>Packages</filename>- en
+<filename>Release</filename>-bestanden die opgehaald worden van locaties die
+in het bestand &sources-list; vermeld staan, worden opgeslagen in de map
+<filename>/var/lib/apt/lists</filename> of in het bestand dat in het bestand
+<filename>apt.conf</filename> door de variabele
+<literal>Dir::State::Lists</literal> genoemd wordt. Het bestand
+<filename>debian.lcs.mit.edu_debian_dists_unstable_contrib_binary-i386_Release</filename>
+bevat bijvoorbeeld het <filename>Release</filename>-bestand dat opgehaald
+werd van de site <literal>debian.lcs.mit.edu</literal> en dat betrekking
+heeft op bestanden voor de architectuur <literal>binary-i386</literal> uit
+de component <literal>contrib</literal> van de distributie
+<literal>unstable</literal>.</para>
+</refsect2>
+
+<refsect2>
+<title>Facultatieve regels van een structuur in het bestand preferences van APT</title>
+
+<para>In het APT-bestand preferences kan elke structuur facultatief beginnen met
+een of meer regels waarvan het eerste woord <literal>Explanation:</literal>
+is. Zo wordt ruimte gemaakt voor commentaar.</para>
+</refsect2>
+</refsect1>
+
+<refsect1>
+<title>Voorbeelden</title>
+<refsect2>
+<title>De distributie Stable volgen</title>
+
+<para>Het volgende preferences-bestand van APT doet APT een hogere prioriteit dan
+standaard (500) toekennen aan alle pakketversies die tot een
+<literal>stable</literal>-distributie behoren en een buitensporig lage
+prioriteit aan pakketversies die tot andere
+<literal>Debian</literal>-distributies behoren. <programlisting>
+Explanation: Installeer geen van Debian afkomstige pakketten met andere
+Explanation: versies dan die uit de distributie stable of verwijder ze anders
+Package: *
+Pin: release a=stable
+Pin-Priority: 900
+
+Package: *
+Pin: release o=Debian
+Pin-Priority: -10
+</programlisting>
+</para>
+
+<para>Met een passend bestand &sources-list; en het bovenstaande
+preferences-bestand, zal elk van de volgende commando's APT ertoe aanzetten
+om op te waarderen naar de nieuwste versie(s) uit
+<literal>stable</literal>. <programlisting>
+apt-get install <replaceable>pakketnaam</replaceable>
+apt-get upgrade
+apt-get dist-upgrade
+</programlisting>
+</para>
+
+<para>Het volgende commando zal APT ertoe aanzetten om het opgegeven pakket op te
+waarderen naar de allernieuwste versie uit de distributie
+<literal>testing</literal>. Het pakket zal niet opnieuw opgewaardeerd worden
+tenzij die opdracht terug gegeven wordt. <programlisting>
+apt-get install <replaceable>pakket</replaceable>/testing
+</programlisting>
+</para>
+</refsect2>
+
+ <refsect2>
+ <title>Testing of Unstable volgen</title>
+
+<para>Het volgende preferences-bestand van APT doet APT een hoge prioriteit
+toekennen aan pakketversies uit de distributie <literal>testing</literal>,
+een lagere prioriteit aan pakketversies uit de distributie
+<literal>unstable</literal> en een buitensporig lage prioriteit aan
+pakketversies die tot andere <literal>Debian</literal>-distributies
+behoren. <programlisting>
+Package: *
+Pin: release a=testing
+Pin-Priority: 900
+
+Package: *
+Pin: release a=unstable
+Pin-Priority: 800
+
+Package: *
+Pin: release o=Debian
+Pin-Priority: -10
+</programlisting>
+</para>
+
+<para>Met een passend bestand &sources-list; en het bovenstaande
+preferences-bestand, zal elk van de volgende commando's APT ertoe aanzetten
+om op te waarderen naar de nieuwste versie(s) uit
+<literal>testing</literal>. <programlisting>
+apt-get install <replaceable>pakketnaam</replaceable>
+apt-get upgrade
+apt-get dist-upgrade
+</programlisting>
+</para>
+
+<para>Het volgende commando zal APT ertoe aanzetten om het opgegeven pakket op te
+waarderen naar de allernieuwste versie uit de distributie
+<literal>unstable</literal>. Nadien zal <command>apt-get upgrade</command>
+het pakket opwaarderen naar de nieuwste versie uit
+<literal>testing</literal> als die recenter is dan de geïnstalleerde versie
+en anders naar de nieuwste versie uit <literal>unstable</literal> als die
+recenter is dan de geïnstalleerde versie. <programlisting>
+apt-get install <replaceable>pakket</replaceable>/unstable
+</programlisting>
+</para>
+</refsect2>
+
+
+<refsect2>
+<title>De evolutie van een uitgave volgen aan de hand van zijn codenaam</title>
+
+<para>Het volgende preferences-bestand van APT doet APT een hogere prioriteit dan
+standaard (500) toekennen aan alle pakketversies die tot een distributie met
+de opgegeven codenaam behoren en een buitensporig lage prioriteit aan
+pakketversies die tot andere <literal>Debian</literal>-distributies,
+-codenamen en -archieven behoren. Merk op dat met deze APT-voorkeur APT de
+overgang van een release zal volgen vanuit het archief
+<literal>testing</literal> naar <literal>stable</literal> en later
+<literal>oldstable</literal>. Indien u bijvoorbeeld de voortgang in
+<literal>testing</literal> wilt volgen ongeacht de veranderende codenaam,
+dan moet u de hierboven gegeven configuratievoorbeelden
+gebruiken. <programlisting>
+Explanation: Installeer geen van Debian afkomstige pakketversies behalve 
+Explanation: die uit de distributie met codenaam &debian-testing-codename; of sid
+Explanation: of verwijder ze in het andere geval
+Package: *
+Pin: release n=&debian-testing-codename;
+Pin-Priority: 900
+
+Explanation: Debian unstable heeft steeds de codenaam sid
+Package: *
+Pin: release n=sid
+Pin-Priority: 800
+
+Package: *
+Pin: release o=Debian
+Pin-Priority: -10
+</programlisting>
+</para>
+
+<para>Met een passend bestand &sources-list; en het bovenstaande
+preferences-bestand, zal elk van de volgende commando's APT ertoe aanzetten
+om op te waarderen naar de nieuwste versie(s) uit de release met de codenaam
+<literal>&debian-testing-codename;</literal>.  <programlisting>
+apt-get install <replaceable>pakketnaam</replaceable>
+apt-get upgrade
+apt-get dist-upgrade
+</programlisting>
+</para>
+
+<para>Het volgende commando zal APT ertoe bewegen om het opgegeven pakket op te
+waarderen naar de nieuwste versie uit de distributie
+<literal>sid</literal>. Nadien zal de opdracht <command>apt-get
+upgrade</command> het pakket opwaarderen naar de meest recente versie uit
+<literal>&debian-testing-codename;</literal> indien dat een meer recente
+versie is dan die welke geïnstalleerd is of anders naar de meest recente
+versie uit <literal>sid</literal> indien dat een meer recente versie is dan
+die welke geïnstalleerd is. <programlisting>
+apt-get install <replaceable>pakket</replaceable>/sid
+</programlisting>
+</para>
+</refsect2>
+</refsect1>
+
+<refsect1>
+<title>Bestanden</title>
+  <variablelist>
+    &file-preferences;
+  </variablelist>
+</refsect1>
+
+<refsect1>
+<title>Zie ook</title>
+<para>&apt-get; &apt-cache; &apt-conf; &sources-list;
+</para>
+</refsect1>
+
+ &manbugs;
+
+ <refsect1><title>&translation-title;</title>
+   <para>&translation-holder;</para>
+   <para>&translation-english;</para>
+ </refsect1>
+</refentry>

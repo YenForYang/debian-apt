@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+  "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % aptent SYSTEM "apt.ent"> %aptent;
+<!ENTITY % aptverbatiment SYSTEM "apt-verbatim.ent"> %aptverbatiment;
+<!ENTITY % aptvendor SYSTEM "apt-vendor.ent"> %aptvendor;
+]>
+
+<refentry>
+
+ <refentryinfo>
+   <!-- The last update date -->
+&apt-author.team;
+   &apt-email;
+   &apt-product;
+   
+   <date>2017-12-09T00:00:00Z</date>
+ </refentryinfo>
+
+ <refmeta>
+   <refentrytitle>apt-transport-mirror</refentrytitle>
+   <manvolnum>1</manvolnum>
+   <refmiscinfo class="manual">APT</refmiscinfo>
+ </refmeta>
+
+ 
+ <!-- Man page title -->
+<refnamediv>
+    <refname>apt-transport-mirror</refname>
+    <refpurpose>Transport d'APT pour une sélection plus automatique du miroir</refpurpose>
+ </refnamediv>
+
+<refsect1><title>Description</title>
+<para>Ce transport d'APT ne met pas en œuvre un protocole pour accéder tout seul à
+des dépôts locaux ou distants, mais obtenir une liste de miroirs et redirige
+toutes les requêtes vers le(s) miroir(s) choisi(s) dans cette liste, en y
+accédant grâce à d'autres transports tels que &apt-transport-http;. La
+fonctionnalité de base est disponible depuis apt 0.7.24, mais n'a été
+documentée qu'à partir d'apt 1.6 qui fournit une version totalement
+retravaillée du transport et des fonctionnalités prises en charge. Veuillez
+noter qu'un transport n'est jamais appelé directement par l'utilisateur,
+mais utilisé par les outils d'APT s'appuyant sur la configuration de
+l'utilisateur.</para>
+<para>Si la récupération d'un fichier à partir d'un miroir échoue, la méthode
+assure qu'un autre miroir possible de la liste est automatiquement essayé
+jusqu'à ce que le fichier soit récupéré ou qu'il ne reste plus de miroir sur
+la liste, gérant de façon transparente les indisponibilités de serveur ou
+d'autres problèmes similaires.</para>
+<para>Les implications de sécurité du transport dépendent des considérations de
+sécurité, associées au transport, qui ont présidé à l'acquisition de la
+liste de miroirs et des transports impliqués dans l'accession au(x)
+miroir(s) choisi(s) par le transport.</para>
+</refsect1>
+
+<refsect1><title>Options</title>
+<para>Ce transport ne possède pas d'option de configuration pour le moment. La
+sélection du miroir est basée uniquement sur les miroirs offerts dans la
+liste de miroirs et des fichiers qu'APT doit se procurer.</para>
+
+<refsect2><title>Format de la liste de miroirs</title>
+<para>Une liste de miroirs contient une ou plusieurs lignes qui spécifient chacune
+l'URI d'un miroir. Les lignes vides et celles commençant par un caractère
+dièse (<literal>#</literal>) sont ignorées. Un URI débute toujours par un
+schème d'URI qui définit le transport utilisé pour ce miroir. Si, par
+exemple, l'URI débute par <literal>http:</literal>, le transport responsable
+est &apt-transport-http; qui pourrait avoir des exigences particulières pour
+le format du reste de l'URI.</para>
+<para>Les métadonnées d'un miroir peuvent être placées sur la même ligne, séparées
+de l'URI par une tabulation. De multiples éléments de métadonnées peuvent
+être eux-mêmes séparés par des tabulations ou des espaces. (C'est une
+fonctionnalité avancée seulement disponible avec apt >= 1.6. Les versions
+d'APT antérieures échoueront à analyser les listes de miroirs utilisant
+cette fonctionnalité.)</para>
+<para>Depuis apt 1.6, l'utilisation de listes de miroirs compressées est aussi
+gérée. Veuillez noter que le nom de fichier de la liste de miroirs doit
+spécifier l'algorithme de compression utilisé ; il n'y a pas
+d'auto-détection basée sur le contenu du fichier.</para>
+</refsect2>
+
+<refsect2><title>Sélection du miroir par les métadonnées</title>
+<para>Comme cela est spécifié dans le format, un miroir peut avoir des métadonnées
+supplémentaires attachées pour éviter qu'il soit sélectionné pour la
+récupération d'un fichier qui ne correspond pas à ces métadonnées. De cette
+façon, la liste de miroirs peut contenir par exemple des miroirs partiels
+fournissant seulement certaines architectures et APT choisira
+automatiquement un autre miroir pour les fichiers requérant une architecture
+non listée. Sont prises en charge les limites liées à l'architecture
+(<literal>arch</literal>), au nom de code de la version
+(<literal>codename</literal>), aux composants du dépôt où se trouve le
+fichier (<literal>component</literal>), à la langue à laquelle le fichier
+s'applique (<literal>lang</literal>), au nom de la suite de la version
+<literal>suite</literal>) et au type du fichier (<literal>type</literal>).</para>
+</refsect2>
+
+<refsect2><title>Ordre de repli pour les miroirs</title>
+<para>Si aucune priorité n'est donnée à un miroir par la clé de métadonnée
+<literal>priority</literal>, l'ordre de contact des miroirs est
+aléatoire. Si un ensemble particulier de miroirs doit être essayé avant que
+n'importe lequel des autres ensembles ne le soit, une priorité peut être
+spécifiée explicitement. Les miroirs avec les numéros les plus bas sont
+essayés en premier. Les miroirs qui n'ont pas de priorité explicite portent
+par défaut le numéro le plus élevé possible, et donc, sont essayés en
+dernier. Le choix entre les miroirs de même priorité est aussi aléatoire.</para>
+</refsect2>
+
+<refsect2><title>Transports permis dans une liste de miroir</title>
+<para>La disponibilité et le choix des transports dans une liste de miroirs sont
+limités par la manière dont le client APT accède à la liste des miroirs. Si
+un transport local comme <literal>file</literal> ou <literal>copy</literal>
+est utilisé, la liste de miroirs peut aussi inclure des sources locales,
+alors qu'une liste de miroirs atteinte par <literal>http</literal> ne le
+peut pas. Par ailleurs, une liste de miroirs ne peut pas contenir une liste
+de miroirs ou d'autres transports enveloppants (comme
+<package>apt-transport-tor</package>). Voir la documentation sur ces
+transports pour connaître la manière de les utiliser avec la méthode miroir.</para>
+<para>Veuillez noter que les versions d'APT antérieures à 1.6 ne prennent pas en
+charge d'autres transports que <literal>http</literal>.</para>
+</refsect2>
+</refsect1>
+
+<refsect1><title>Exemples</title>
+<refsect2><title>Exemple basique</title>
+<para>Voici un exemple basique de liste de miroirs prise en charge par toutes les
+versions d'APT avec une méthode de miroir (>= 0.7.24) dans lequel le client
+choisira n'importe lequel des trois miroirs :</para>
+<literallayout>
+http://ftp.de.debian.org/debian/
+http://ftp.us.debian.org/debian/
+http://deb.debian.org/debian/
+</literallayout>
+<para>Si un fichier avec ce contenu est stocké sur la machine sous le nom de
+<filename>/etc/apt/mirrorlist.txt</filename>, il peut être utilisé comme
+cela dans &sources-list; (à partir d'apt 1.6) :</para>
+<literallayout>
+deb mirror+file:/etc/apt/mirrorlist.txt &debian-stable-codename; main
+</literallayout>
+<para>Toutes les versions de la méthode miroir prennent en charge une liste de
+miroirs accessible par HTTP, aussi, dans la mesure où elle est disponible à
+l'adresse <literal>http://apt.example.org/mirror.lst</literal>, l'entrée de
+sources.list ci-dessus peut être écrite plutôt ainsi :</para>
+<literallayout>
+deb mirror://apt.example.org/mirror.lst &debian-stable-codename; main
+</literallayout>
+<para>Veuillez noter que depuis apt 1.6, l'utilisation de
+<literal>mirror+http</literal> est préférable à <literal>mirror</literal>
+pour uniformiser. La fonctionnalité est la même.</para>
+</refsect2>
+<refsect2><title>Exemple de sélection du miroir avec des métadonnées améliorées</title>
+<para>Comme cela est expliqué dans la définition de format, les versions d'APT
+antérieures à 1.6 ne prennent pas cela en charge et échoueront à analyser la
+liste de miroirs. L'exemple de liste de miroirs est complexe
+intentionnellement pour montrer certains aspects de la sélection. La
+configuration suivante est supposée : le premier miroir est un miroir local
+accessible par la méthode « file », mais possiblement incomplet ; le second
+miroir possède une excellente connexion, c'est un miroir partiel dans la
+mesure où il ne contient que des fichiers liés aux architectures
+<literal>amd64</literal> et <literal>all</literal>. Les miroirs restants
+sont des miroirs ordinaires qui devraient être contactés seulement si les
+précédents ne fonctionnent pas.
+</para>
+<literallayout>
+file:/srv/local/debian/mirror/	priority:1 type:index
+http://partial.example.org/mirror/	priority:2 arch:amd64 arch:all type:deb
+http://ftp.us.debian.org/debian/	type:deb
+http://ftp.de.debian.org/debian/	type:deb
+https://deb.debian.org/debian/
+</literallayout>
+<para>Dans une configuration avec cette liste de miroirs, le premier miroir sera
+utilisé pour télécharger tous les fichiers d'index en supposant que la liste
+de miroirs elle-même est atteinte par un transport local comme
+<literal>file</literal>. Si ce n'est pas le cas, si le miroir est
+inaccessible ou s'il ne contient pas le fichier requis, un autre miroir sera
+utilisé pour récupérer le fichier, choisi selon le type du fichier : un
+fichier d'index sera servi par le dernier miroir de la liste, tandis qu'un
+paquet de l'architecture <literal>amd64</literal> est servi par le second et
+ceux, par exemple, de l'architecture <literal>i386</literal> par un des
+trois derniers.</para>
+
+</refsect2>
+</refsect1>
+
+ &manbugs;
+
+ <refsect1><title>&translation-title;</title>
+   <para>&translation-holder;</para>
+   <para>&translation-english;</para>
+ </refsect1>
+</refentry>

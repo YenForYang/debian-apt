@@ -1,0 +1,425 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>Podręcznik użytkownika APT</title><meta name="generator" content="DocBook XSL Stylesheets V1.79.1"/><meta name="description" content="Dokument zawiera opis używania menadżera pakietów APT."/></head><body><div xml:lang="pl" class="book"><div class="titlepage"><div><div><br xmlns=""/><center xmlns=""><h1 xmlns="http://www.w3.org/1999/xhtml" class="title"><a id="idm1"/>Podręcznik użytkownika APT</h1></center><br xmlns=""/><hr xmlns=""/></div><div><div class="authorgroup"><center xmlns=""><div xmlns="http://www.w3.org/1999/xhtml" class="author"><h3 class="author">Jason Gunthorpe</h3><code class="email">&lt;<a class="email" href="mailto:jgg@debian.org">jgg@debian.org</a>&gt;</code></div></center></div></div><div><center xmlns=""><p xmlns="http://www.w3.org/1999/xhtml" class="releaseinfo">Version 1.8.0~alpha3</p></center><hr xmlns=""/></div><div><p class="copyright">Copyright © 1998 Jason Gunthorpe</p></div><div><div class="legalnotice"><a id="idm14"/><p class="legalnotice-title"><strong>License Notice</strong></p><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+"APT" i ten dokument są oprogramowaniem wolnodostępnym, które można
+rozpowszechniać oraz zmieniać zgodnie z postanowieniami drugiej albo (wedle
+uznania) dowolnej późniejszej wersji "Ogólnej Licencji Publicznej GNU" (GNU
+General Public License) publikowanej przez "Fundację Wolnego Oprogramowania
+(Free Software Foundation).
+</p></td></tr></table></para></div></div><div><div class="legalnotice"><a id="idm17"/><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+Więcej szczegółów można uzyskać, przeglądając plik zawierający pełen tekst
+licencji (w systemach Debian jest to plik /usr/share/common-licenses/GPL).
+</p></td></tr></table></para></div></div><div><div class="abstract"><p class="title"><strong>Abstrakt</strong></p><p>
+Dokument zawiera opis używania menadżera pakietów APT.
+</p></div></div></div><hr/></div><div class="toc"><p><strong>Spis treści</strong></p><dl class="toc"><dt><span class="chapter"><a href="#ch1">1. Ogólne</a></span></dt><dd><dl><dt><span class="section"><a href="#s1.1">1.1. Budowa systemu pakietów</a></span></dt></dl></dd><dt><span class="chapter"><a href="#ch2">2. apt-get</a></span></dt><dt><span class="chapter"><a href="#ch3">3. DSelect</a></span></dt><dt><span class="chapter"><a href="#ch4">4. Interfejs</a></span></dt><dd><dl><dt><span class="section"><a href="#s4.1">4.1. Uruchamianie</a></span></dt><dt><span class="section"><a href="#s4.2">4.2. Raport stanu</a></span></dt><dd><dl><dt><span class="section"><a href="#s4.2.1">4.2.1. Lista dodatkowych pakietów</a></span></dt><dt><span class="section"><a href="#s4.2.2">4.2.2. Pakiety przeznaczone do usunięcia</a></span></dt><dt><span class="section"><a href="#s4.2.3">4.2.3. Lista nowych pakietów</a></span></dt><dt><span class="section"><a href="#s4.2.4">4.2.4. Lista zatrzymanych pakietów</a></span></dt><dt><span class="section"><a href="#s4.2.5">4.2.5. Ostrzeżenie o zmianie zatrzymanych pakietów</a></span></dt><dt><span class="section"><a href="#s4.2.6">4.2.6. Podsumowanie</a></span></dt></dl></dd><dt><span class="section"><a href="#s4.3">4.3. Wyświetlanie stanu przetwarzania</a></span></dt><dt><span class="section"><a href="#s4.4">4.4. Dpkg</a></span></dt></dl></dd></dl></div><div class="chapter"><div class="titlepage"><div><div><h1 class="title"><a id="ch1"/>Rozdział 1. Ogólne</h1></div></div></div><div class="toc"><p><strong>Spis treści</strong></p><dl class="toc"><dt><span class="section"><a href="#s1.1">1.1. Budowa systemu pakietów</a></span></dt></dl></div><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+Pakiet APT składa się z dwóch części: z metody APT programu
+<span class="command"><strong>dselect</strong></span> oraz z programu <span class="command"><strong>apt-get</strong></span>
+będącego interfejsem linii poleceń. Obie części pozwalają na instalowanie i
+usuwanie pakietów oraz na pobieranie nowych pakietów z Internetu.
+</p></td></tr></table></para><div class="section"><div class="titlepage"><div><div><h2 class="title"><a id="s1.1"/>1.1. Budowa systemu pakietów</h2></div></div></div><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+System pakietów Debiana zawiera sporą ilość informacji skojarzonych z każdym
+pakietem, zapewniających integralność pakietów w systemie. Najbardziej
+widoczną cechą systemu pakietów jest system zależności.
+</p></td></tr></table></para><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+System zależności pozwala poszczególnym programom używać wspólnych elementów
+systemu, takich jak biblioteki. Upraszcza także umieszczanie rzadko
+używanych części programów w oddzielnych pakietach, tak aby zmniejszyć
+liczbę pakietów instalowanych przez przeciętnego użytkownika. Pozwala także
+wybierać programy odpowiedzialne za dostarczanie poczty, serwery X-ów itp.
+</p></td></tr></table></para><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+Pierwszym krokiem potrzebnym do zrozumienia systemu zależności jest
+zrozumienie koncepcji prostej zależności. Prosta zależność oznacza, że dany
+pakiet do poprawnego działania wymaga zainstalowania innego pakietu.
+</p></td></tr></table></para><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+Na przykład mailcrypt jest rozszerzeniem edytora emacs, umożliwiającym
+szyfrowanie e-maili za pomocą programu GPG. Bez zainstalowanego pakietu GPG,
+mailcrypt jest bezużyteczny, dlatego mailcrypt zawiera prostą zależność od
+GPG. Ma także prostą zależność od pakietu emacs, ponieważ jest rozszerzeniem
+emacsa, więc i bez emacsa jest równie bezużyteczny.
+</p></td></tr></table></para><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+Inną ważną zależnością, którą należy zrozumieć, jest konflikt. Oznacza to,
+że dany pakiet może nie działać albo może być szkodliwy dla systemu, jeżeli
+razem z nim jest zainstalowany inny pakiet. Jako przykład rozważmy program
+odpowiedzialny za dostarczanie poczty (ang. "mail transport agent") taki jak
+sendmail, exim lub qmail. Nie jest możliwe jednoczesne zainstalowanie dwóch
+takich programów, ponieważ oba musiałyby nasłuchiwać na tym samym porcie
+sieciowym, żeby odebrać e-maile. Próba zainstalowanie obu poważnie uszkodzi
+system. Dlatego też wszystkie programy obsługi dostarczania poczty są w
+konflikcie ze wszystkimi innymi programami obsługującymi dostarczanie
+poczty.
+</p></td></tr></table></para><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+Dodatkową komplikacją jest możliwość, że dany pakiet może udawać inny
+pakiet. Proszę rozważyć jako przykład, że  exim i sendmail praktycznie rzecz
+biorąc są identyczne - oba dostarczają pocztę, oba mają wspólny
+interfejs. Dlatego też system pakietów daje im możliwość zadeklarowania, że
+oba są programami obsługującymi dostarczanie poczty.Tak więc zarówno exim,
+jak i sendmail deklarują, że dostarczają pakiet o nazwie
+mail-transport-agent, od którego mogą zależeć pakiety, wymagające do swojego
+działania programu obsługi poczty. Może to być bardzo mylące podczas próby
+ręcznego naprawiania zależności pakietów.
+</p></td></tr></table></para><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+W dowolnym czasie pojedyncza zależność może być lub nie być spełniona przez
+obecnie zainstalowane pakiety. ATP próbuje rozwiązać zależności używając
+pewnej liczby algorytmów pomagających w wyborze pakietów do zainstalowania.
+</p></td></tr></table></para></div></div><div class="chapter"><div class="titlepage"><div><div><h1 class="title"><a id="ch2"/>Rozdział 2. apt-get</h1></div></div></div><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+<span class="command"><strong>apt-get</strong></span> dostarcza prostego sposobu na zainstalowanie
+pakietów z linii poleceń. W przeciwieństwie do <span class="command"><strong>dpkg</strong></span>,
+<span class="command"><strong>apt-get</strong></span> nie posługuje się nazwami plików ".deb", lecz
+używa nazw pakietów i może zainstalować tylko archiwa ".deb" ze
+skonfigurowanych <span class="emphasis"><em>źródeł</em></span>.
+</p></td></tr></table></para><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+Pierwszą rzeczą <a href="#ftn.idm41" class="footnote" id="idm41"><sup class="footnote">[1]</sup></a>, którą należy zrobić
+przed użyciem <span class="command"><strong>apt-get</strong></span> jest pobranie listy pakietów (ze
+<span class="emphasis"><em>źródeł</em></span> wymienionych w pliku sources.list(5)), tak żeby
+APT wiedział, jakie pakiety są dostępne. Robi się to za pomocą polecenia
+<code class="literal">apt-get update</code>. Na przykład:
+</p></td></tr></table></para><screen xmlns=""><table><tr><td>   </td><td><pre xmlns="http://www.w3.org/1999/xhtml" class="screen">
+# apt-get update
+Pob: http://ftp.de.debian.org/debian-non-US/ stable/binary-i386/ Packages
+Pob: http://llug.sep.bnl.gov/debian/ testing/contrib Packages
+Czytanie list pakietów... Gotowe
+Budowanie drzewa zależności... Gotowe
+</pre></td></tr></table></screen><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+Po zaktualizowaniu można użyć następnych poleceń:
+</p></td></tr></table></para><variablelist xmlns=""><table><tr><td>   </td><td><div xmlns="http://www.w3.org/1999/xhtml" class="variablelist"><dl class="variablelist"><dt><span class="term">upgrade</span></dt><dd><p>
+Upgrade spróbuje delikatnie zaktualizować cały system. Upgrade nigdy nie
+zainstaluje nowego pakietu ani nie usunie istniejącego pakiety, ani też nie
+zaktualizuje pakietu do wersji powodującej, że inny pakiet przestanie
+działać. Można używać tego polecenia codziennie do w miarę bezpiecznych
+aktualizacji systemu. Upgrade wypisze listę pakietów, których nie potrafił
+zaktualizować, co zazwyczaj oznacza, że zależą one od nowych pakietów lub są
+w konflikcie z innymi pakietami. Można wymusić instalację takich pakietów,
+używając do tego <span class="command"><strong>dselect</strong></span> lub <code class="literal">apt-get
+install</code>.
+</p></dd><dt><span class="term">install</span></dt><dd><p>
+Install jest używane do instalowania pakietów przez podanie ich
+nazwy. Pakiet jest automatycznie pobierany i instalowany. Może być to
+użyteczne, gdy już zna się nazwę pakietu do zainstalowania i nie chce się
+uruchamiać graficznego interfejsu wyboru pakietów. Można podać dowolną
+liczbę nazw pakietów do zainstalowania - wszystkie będą pobrane. Install
+próbuje automatycznie rozwiązać problemy z zależnościami w podanych
+pakietach, wypisze podsumowanie i poprosi o potwierdzenie, jeśli zamierza
+zmienić cokolwiek innego niż pakiety podane jako jego argumenty.
+</p></dd><dt><span class="term">dist-upgrade</span></dt><dd><p>
+Dist-upgrade powoduje całkowitą aktualizację systemu i jest zaprojektowany
+do uproszczenia aktualizacji z jednego wydania Debiana do kolejnego. Używa
+wyrafinowanych algorytmów do określenia najlepszego zbioru pakietów do
+zainstalowania, aktualizacji lub usunięcia, tak aby zaktualizować jak
+najwięcej pakietów w systemie do nowszego wydania. W niektórych sytuacjach,
+może być prościej użyć dist-upgrade niż ręcznie rozwiązywać zależności w
+programie <span class="command"><strong>dselect</strong></span>. Kiedy dist-upgrade zakończy działanie,
+można użyć programu <span class="command"><strong>dselect</strong></span> do zainstalowania pominiętych
+pakietów.
+</p><p>
+Jest ważne, aby dokładnie przyjrzeć się temu, co dist-upgrade zamierza
+zrobić, gdyż jego decyzje mogą czasami zdumiewać.
+</p></dd></dl></div></td></tr></table></variablelist><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+Zachowanie programu <span class="command"><strong>apt-get</strong></span> można kontrolować za pomocą
+opcji linii poleceń szczegółowo opisanych w stronie podręcznika ekranowego
+<span class="citerefentry"><span class="refentrytitle">apt-get</span>(8)</span>.
+Najbardziej użyteczną z nich jest <code class="literal">-d</code>, która nie instaluje
+pobranych plików. Jeśli system musi pobrać dużą liczbę pakietów,
+instalowanie ich może być niepożądane, jeśli coś pójdzie nie tak. Jeśli
+użyto <code class="literal">-d</code>, to pobrane archiwa można zainstalować, ponownie
+uruchamiając polecenie, które spowodowało ich pobranie, tym razem bez opcji
+<code class="literal">-d</code>.
+</p></td></tr></table></para><div class="footnotes"><br/><hr/><div id="ftn.idm41" class="footnote"><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml"><a href="#idm41" class="para"><sup class="para">[1] </sup></a> Aby używać serwera proxy, należy najpierw ustawić zmienną środowiskową
+http_proxy, proszę przeczytać sources.list(5) </p></td></tr></table></para></div></div></div><div class="chapter"><div class="titlepage"><div><div><h1 class="title"><a id="ch3"/>Rozdział 3. DSelect</h1></div></div></div><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+Metoda APT <span class="command"><strong>dselect</strong></span> dostarcza kompletnego systemu APT w
+interfejsie użytkownika programu wyboru pakietów
+<span class="command"><strong>dselect</strong></span>. <span class="command"><strong>dselect</strong></span> może być użyty do
+wybrania pakietów przeznaczonych do zainstalowania lub usunięcia, a APT
+zainstaluje lub usunie te pakiety.
+</p></td></tr></table></para><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+Aby włączyć metodę APT należy wybrać opcję "[A] Dostęp" w programie
+<span class="command"><strong>dselect</strong></span> , a następnie wybrać metodę APT. Użytkownik
+zostanie poproszony o skonfigurowanie listy <span class="emphasis"><em>źródeł</em></span>,
+będących lokalizacjami, z których będą pobierane pakiety. Mogą być to strony
+internetowe, lokalne serwery lustrzane Debiana lub CD-ROM-y. Każde źródło
+może dostarczać tylko fragmentu pełnego archiwum Debiana, a APT
+automatycznie połączy je w kompletny zbiór pakietów. Jeśli używany jest
+CD-ROM, to dobrym pomysłem jest podanie najpierw jego, a potem podanie
+mirrorów umożliwiających dostęp do najnowszych wersji pakietów zawierających
+poprawki błędów. APT automatycznie użyje pakietów z CD-ROM-u zanim zacznie
+pobierać pakiety z Internetu.
+</p></td></tr></table></para><screen xmlns=""><table><tr><td>   </td><td><pre xmlns="http://www.w3.org/1999/xhtml" class="screen">
+  Ustawianie listy źródłowych lokalizacji dystrybucji
+
+ Proszę podać bazowy URL dystrybucji Debiana.
+ Obsługiwane schematy połączeń to: http ftp file
+
+ Przykłady:
+      file:/mnt/debian,
+      ftp://ftp.debian.org/debian,
+      http://ftp.pl.debian.org/debian,
+
+
+ URL [http://llug.sep.bnl.gov/debian]:
+</pre></td></tr></table></screen><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+Ustawianie źródeł zaczyna się od pytania o bazową lokalizację
+Debiana. Domyślną wartością jest mirror HTTP. Następnie użytkownik jest
+pytany o dystrybucję do pobrania.
+</p></td></tr></table></para><screen xmlns=""><table><tr><td>   </td><td><pre xmlns="http://www.w3.org/1999/xhtml" class="screen">
+ Proszę podać znacznik dystrybucji do pobrania lub ścieżkę do pliku
+ pakietów kończącą się znakiem "/". Zazwyczaj znacznikiem dystrybucji
+ jest coś w rodzaju: stable unstable testing non-US
+
+ Dystrybucja [stable]:
+</pre></td></tr></table></screen><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+Dystrybucja odnosi się do wersji Debiana:
+<span class="emphasis"><em>stable</em></span>(stabilna) to najnowsza wydana wersja, a
+<span class="emphasis"><em>unstable</em></span> (niestabilna) to wersja
+rozwojowa. <span class="emphasis"><em>non-US</em></span> jest dostępna tylko na wybranych
+serwerach lustrzanych i zawiera pakiety, które wykorzystują technologie
+szyfrowania danych lub inne rzeczy, które nie mogą być eksportowane z
+serwerów umieszczonych w Stanach Zjednoczonych. Importowanie tych pakietów
+do Stanów Zjednoczonych jest jednakże legalne.
+</p></td></tr></table></para><screen xmlns=""><table><tr><td>   </td><td><pre xmlns="http://www.w3.org/1999/xhtml" class="screen">
+ Proszę podać komponenty do pobrania
+ Zazwyczaj komponentem jest coś w rodzaju: main contrib non-free
+
+ Komponenty [main contrib non-free]:
+</pre></td></tr></table></screen><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+Lista komponentów jest listą pod-dystrybucji do pobrania. Dystrybucja jest
+podzielona ze względu na licencje oprogramowania: main (główna) zawiera
+pakiety zgodne z DFSG ("Wytycznymi Debiana w sprawie Wolnego
+Oprogramowania"),contrib i non-free zawierają pakiety, które zawierają
+restrykcje związane z ich używaniem lub rozpowszechnianiem.
+</p></td></tr></table></para><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+Można dodać dowolną liczbę źródeł. Skrypt konfigurujący będzie kontynuował
+odpytywanie użytkownika dopóty, dopóki nie poda wszystkich źródeł, które
+chciał skonfigurować.
+</p></td></tr></table></para><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+Przed rozpoczęciem używania programu <span class="command"><strong>dselect</strong></span> należy w
+menu tego programu wybrać "[U] Aktualizacja", abyzaktualizować listę
+dostępnych pakietów. To polecenie jest nadzbiorem polecenia <code class="literal">apt-get
+update</code>, zapewniającym programowi <span class="command"><strong>dselect</strong></span> dostęp
+do pobranych informacji o pakietach. "[U] Aktualizacja" musi być wykonana,
+nawet jeśli wcześniej uruchomiono <code class="literal">apt-get update</code>.
+</p></td></tr></table></para><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+Następnie można wybrać pakiety do zainstalowania, używając opcji "[S]
+Wybór", a potem zainstalować te pakiety opcją "[I] Instalacja". Używanie
+metody APT czyni opcje "[C] Konfiguracja" i "[R] Usuwanie" bezużytecznymi,
+gdyż "[I] Instalacja" przeprowadza również te dwie operacje.
+</p></td></tr></table></para><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+Domyślnie APT automatycznie usunie pliki pakietów (.deb), gdy tylko zostaną
+zainstalowane. Aby zmienić to zachowanie, proszę umieścić
+<code class="literal">Dselect::clean "prompt";</code> w /etc/apt/apt.conf.
+</p></td></tr></table></para></div><div class="chapter"><div class="titlepage"><div><div><h1 class="title"><a id="ch4"/>Rozdział 4. Interfejs</h1></div></div></div><div class="toc"><p><strong>Spis treści</strong></p><dl class="toc"><dt><span class="section"><a href="#s4.1">4.1. Uruchamianie</a></span></dt><dt><span class="section"><a href="#s4.2">4.2. Raport stanu</a></span></dt><dd><dl><dt><span class="section"><a href="#s4.2.1">4.2.1. Lista dodatkowych pakietów</a></span></dt><dt><span class="section"><a href="#s4.2.2">4.2.2. Pakiety przeznaczone do usunięcia</a></span></dt><dt><span class="section"><a href="#s4.2.3">4.2.3. Lista nowych pakietów</a></span></dt><dt><span class="section"><a href="#s4.2.4">4.2.4. Lista zatrzymanych pakietów</a></span></dt><dt><span class="section"><a href="#s4.2.5">4.2.5. Ostrzeżenie o zmianie zatrzymanych pakietów</a></span></dt><dt><span class="section"><a href="#s4.2.6">4.2.6. Podsumowanie</a></span></dt></dl></dd><dt><span class="section"><a href="#s4.3">4.3. Wyświetlanie stanu przetwarzania</a></span></dt><dt><span class="section"><a href="#s4.4">4.4. Dpkg</a></span></dt></dl></div><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+Metoda APT programu <span class="command"><strong>dselect</strong></span> i program
+<span class="command"><strong>apt-get</strong></span> dzielą wspólny interfejs. Jest to prosty system,
+który najpierw informuje użytkownika, co będzie zrobione, a następnie to
+robi. <a href="#ftn.idm106" class="footnote" id="idm106"><sup class="footnote">[2]</sup></a> Po wyświetleniu podsumowania
+informującego o tym, co będzie zrobione, APT wyświetla komunikaty dotyczące
+postępu przeprowadzanych operacji, tak żeby można było oszacować czas
+pozostały do ich zakończenia.
+</p></td></tr></table></para><div class="section"><div class="titlepage"><div><div><h2 class="title"><a id="s4.1"/>4.1. Uruchamianie</h2></div></div></div><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+Przed każdą operacją, z wyjątkiem update, APT przeprowadza pewne akcje
+przygotowujące wewnętrzny stan. Sprawdza również stan systemu. Te same
+operacje można przeprowadzić w dowolnej chwili, uruchamiając
+<code class="literal">apt-get check</code>.
+</p></td></tr></table></para><screen xmlns=""><table><tr><td>   </td><td><pre xmlns="http://www.w3.org/1999/xhtml" class="screen">
+# apt-get check
+Czytanie list pakietów... Gotowe
+Budowanie drzewa zależności... Gotowe
+</pre></td></tr></table></screen><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+Pierwszą rzeczą, którą robi, jest wczytanie wszystkich plików pakietów do
+pamięci. APT używa  buforowania, tak żeby przyspieszyć tę operację przy
+następnym uruchomieniu. Jeśli nie znajdzie niektórych plików pakietów, to
+wypisze ostrzeżenie, a te pakiety zignoruje.
+</p></td></tr></table></para><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+Końcową operacją jest szczegółowa analiza zależności w systemie. Sprawdzana
+jest każda zależność każdego pakietu zainstalowanego lub rozpakowanego. W
+razie wykrycia problemów z zależnościami <span class="command"><strong>apt-get</strong></span> wypisze
+odpowiedni komunikat i odmówi dalszego działania.
+</p></td></tr></table></para><screen xmlns=""><table><tr><td>   </td><td><pre xmlns="http://www.w3.org/1999/xhtml" class="screen">
+# apt-get check
+Czytanie list pakietów... Gotowe
+Budowanie drzewa zależności... Gotowe
+Należy uruchomić "apt --fix-broken install", aby je naprawić.
+Następujące pakiety mają niespełnione zależności:
+  9fonts: Wymaga: xlib6g ale nie jest zainstalowany
+  uucp: Wymaga: mailx ale nie jest zainstalowany
+  blast: Wymaga: xlib6g (&gt;= 3.3-5) ale nie jest zainstalowany
+  adduser: Wymaga: perl-base ale nie jest zainstalowany
+  aumix: Wymaga: libgpmg1 but ale nie jest zainstalowany
+  debiandoc-sgml: Wymaga: sgml-base ale nie jest zainstalowany
+  bash-builtins: Wymaga: bash (&gt;= 2.01) but 2.0-3 is installed
+  cthugha: Wymaga: svgalibg1 but it is not installed
+           Wymaga: xlib6g (&gt;= 3.3-5) ale nie jest zainstalowany
+  libreadlineg2: Jest w konflikcie z: libreadline2 (&lt;&lt; 2.1-2.1)
+</pre></td></tr></table></screen><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+Powyższy przykład przedstawia system mający wiele problemów, włączając to
+poważny problem z libreadlineg2. Każdy pakiet mający niespełnione zależności
+jest wypisywany w osobnej linii razem z niespełnionymi zależnościami. Podane
+jest również krótkie wyjaśnienie dotyczące przyczyny problemu.
+</p></td></tr></table></para><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+Są dwie przyczyny, z których powodu system może być zepsuty w powyższy
+sposób. Pierwszą jest to, że <span class="command"><strong>dpkg</strong></span> podczas aktualizacji
+systemu nie zauważył jakiejś subtelnej relacji między pakietami<a href="#ftn.idm123" class="footnote" id="idm123"><sup class="footnote">[3]</sup></a>. Drugą przyczyną jest wystąpienie błędu w czasie
+instalowania pakietu. W takim przypadku pakiet może być rozpakowany, mimo że
+pakiety od niego zależące nie są zainstalowane.
+</p></td></tr></table></para><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+Druga przyczyna jest o wiele mniej poważna niż pierwsza, ponieważ APT
+wymusza pewne więzy integralności dotyczące kolejności instalowania
+pakietów. W obu przypadkach przekazanie programowi
+<span class="command"><strong>apt-get</strong></span> opcji <code class="literal">-f</code> wymusi na APT
+znalezienie rozwiązania umożliwiającego mu kontynuowanie działania. Metoda
+APT programu <span class="command"><strong>dselect</strong></span> zawsze przekazuje opcję
+<code class="literal">-f</code>, aby móc kontynuować po wystąpieniu błędu w skryptach
+opiekunów pakietów.
+</p></td></tr></table></para><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+Jednak gdy opcja <code class="literal">-f</code> jest używana do poprawienia
+zależności w poważnie uszkodzonym systemie (pierwsza z opisanych wyżej
+przyczyn), możliwe jest że albo od razu zwróci błąd, albo nie powiedzie się
+sekwencja instalowania pakietów. W obu przypadkach należy poprawić
+zależności ręcznie, używając do tego dpkg (być może przekazując mu opcje
+wymuszające "--force-..."), w takim stopniu, aby umożliwić działanie
+systemowi APT.
+</p></td></tr></table></para></div><div class="section"><div class="titlepage"><div><div><h2 class="title"><a id="s4.2"/>4.2. Raport stanu</h2></div></div></div><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+Przed rozpoczęciem przetwarzania <span class="command"><strong>apt-get</strong></span> wyświetli raport
+zawierający informacje o tym, co będzie zrobione. W ogólności raport ten
+zależy od typu wykonywanej operacji, jednakże występuje w nim kilka
+elementów wspólnych dla wszystkich typów. We wszystkich wypadkach
+wyświetlane są informacje o końcowym stanie, brana jest pod uwagę opcja
+<code class="literal">-f</code>, a także wszystkie istotne działania wykonywanego
+polecenia.
+</p></td></tr></table></para><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s4.2.1"/>4.2.1. Lista dodatkowych pakietów</h3></div></div></div><screen xmlns=""><table><tr><td>   </td><td><pre xmlns="http://www.w3.org/1999/xhtml" class="screen">
+Zostaną zainstalowane następujące dodatkowe pakiety:
+  libdbd-mysql-perl xlib6 zlib1 xzx libreadline2 libdbd-msql-perl
+  mailpgp xdpkg fileutils pinepgp zlib1g xlib6g perl-base
+  bin86 libgdbm1 libgdbmg1 quake-lib gmp2 bcc xbuffy
+  squake pgp-i python-base debmake ldso perl libreadlineg2
+  ssh
+</pre></td></tr></table></screen><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+Lista dodatkowych pakietów wyświetla wszystkie pakiety, które będą
+zainstalowane lub zaktualizowane oprócz tych wymienionych w linii
+poleceń. Jest generowana tylko dla polecenia
+<code class="literal">install</code>. Wymienione pakiety są najczęściej wynikiem
+automatycznej instalacji.
+</p></td></tr></table></para></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s4.2.2"/>4.2.2. Pakiety przeznaczone do usunięcia</h3></div></div></div><screen xmlns=""><table><tr><td>   </td><td><pre xmlns="http://www.w3.org/1999/xhtml" class="screen">
+Następujące pakiety zostaną USUNIĘTE:
+  xlib6-dev xpat2 tk40-dev xkeycaps xbattle xonix
+  xdaliclock tk40 tk41 xforms0.86 ghostview xloadimage xcolorsel
+  xadmin xboard perl-debug tkined xtetris libreadline2-dev perl-suid
+  nas xpilot xfig
+</pre></td></tr></table></screen><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+Lista pakietów przeznaczonych do usunięcia wyświetla wszystkie pakiety,
+które zostaną usunięte z systemu. Może być pokazana dla każdej operacji i
+powinna być szczegółowo przeanalizowana, aby zapewnić, że żaden istotny
+pakiet nie będzie usunięty. W szczególności opcja <code class="literal">-f</code> może
+wygenerować sporo pakietów do usunięcia, także w przypadku jej użycia należy
+szczególnie dokładnie przeanalizować wyświetlany raport. Lista może zawierać
+pakiety usuwane z powodu ich tylko częściowego zainstalowania, wynikającego
+być może z przerwania wcześniejszej instalacji.
+</p></td></tr></table></para></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s4.2.3"/>4.2.3. Lista nowych pakietów</h3></div></div></div><screen xmlns=""><table><tr><td>   </td><td><pre xmlns="http://www.w3.org/1999/xhtml" class="screen">
+Zostaną zainstalowane następujące NOWE pakiety:
+  zlib1g xlib6g perl-base libgdbmg1 quake-lib gmp2 pgp-i python-base
+</pre></td></tr></table></screen><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+Lista nowych pakietów to proste przypomnienie o tym, co się stanie. Wypisane
+pakiety nie są obecnie zainstalowane w systemie, ale będą, kiedy APT skończy
+działanie.
+</p></td></tr></table></para></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s4.2.4"/>4.2.4. Lista zatrzymanych pakietów</h3></div></div></div><screen xmlns=""><table><tr><td>   </td><td><pre xmlns="http://www.w3.org/1999/xhtml" class="screen">
+Następujące pakiety zostały zatrzymane:
+  compface man-db tetex-base msql libpaper svgalib1
+  gs snmp arena lynx xpat2 groff xscreensaver
+</pre></td></tr></table></screen><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+Jeśli aktualizowany jest cały system, to jest możliwe, że nowe wersje
+pakietów nie będą mogły być zainstalowane, ponieważ wymagają nowych pakietów
+lub są w konflikcie z już zainstalowanymi pakietami. W takim wypadku pakiet
+pojawi się na liście pakietów zatrzymanych. Najlepszym sposobem na
+zainstalowanie takich pakietów jest użycie <code class="literal">apt-get
+install</code> lub rozwiązanie problemów z zależnościami za pomocą
+programu <span class="command"><strong>dselect</strong></span>.
+</p></td></tr></table></para></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s4.2.5"/>4.2.5. Ostrzeżenie o zmianie zatrzymanych pakietów</h3></div></div></div><screen xmlns=""><table><tr><td>   </td><td><pre xmlns="http://www.w3.org/1999/xhtml" class="screen">
+Zostaną zmienione następujące zatrzymane pakiety:
+  cvs
+</pre></td></tr></table></screen><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+Czasami można poprosić APT o zainstalowanie pakietu, który jest
+zatrzymany. W takim przypadku wypisywane jest ostrzeżenie o zmianie
+zatrzymanego pakietu. Może się to zdarzyć tylko podczas dist-upgrade lub
+install.
+</p></td></tr></table></para></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s4.2.6"/>4.2.6. Podsumowanie</h3></div></div></div><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+APT zakończy raport podsumowaniem wszystkich zmian, które przeprowadzi.
+</p></td></tr></table></para><screen xmlns=""><table><tr><td>   </td><td><pre xmlns="http://www.w3.org/1999/xhtml" class="screen">
+206 aktualizowanych, 8 nowo instalowanych, 25 usuwanych i 51 nieaktualizowanych.
+12 nie w pełni zainstalowanych lub usuniętych.
+Konieczne pobranie 65.7M/66.7M archiwów. Po rozpakowaniu zostanie użyte 26.5M.
+</pre></td></tr></table></screen><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+Pierwsza linia podsumowania jest uproszczoną wersją powyższych list i
+zawiera liczbę aktualizacji  - to jest pakietów już zainstalowanych, których
+nowsze wersje są dostępne. W drugiej linii wyświetlono liczbę nie do końca
+skonfigurowanych pakietów, prawdopodobnie w wyniku przerwania poprzedniej
+instalacji. Ostatnia linia zawiera dane dotyczące miejsca na dysku. Pierwsza
+para liczb odnosi się do rozmiaru plików archiwum: pierwsza liczba oznacza
+liczbę bajtów, które muszą zostać pobrane ze zdalnych serwerów, a druga -
+całkowity rozmiar wszystkich żądanych archiwów. Kolejna liczba oznacza
+różnicę rozmiarów pomiędzy obecnie zainstalowanymi pakietami, a nowo
+instalowanymi pakietami. W przybliżeniu odpowiada przestrzeni dysku, która
+będzie zajęta w /usr po zakończeniu instalacji. Wartość ta może wskazywać na
+zwolnienie miejsca na dysku, jeśli usuwana jest duża liczba pakietów.
+</p></td></tr></table></para><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+Używając opcji -u, można wygenerować raport pokazujący pakiety przeznaczone
+do aktualizacji, podobny do tego pokazanego w poprzednim przykładzie.
+</p></td></tr></table></para></div></div><div class="section"><div class="titlepage"><div><div><h2 class="title"><a id="s4.3"/>4.3. Wyświetlanie stanu przetwarzania</h2></div></div></div><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+Podczas pobierania archiwów i plików pakietów APT wyświetla serię
+komunikatów o stanie.
+</p></td></tr></table></para><screen xmlns=""><table><tr><td>   </td><td><pre xmlns="http://www.w3.org/1999/xhtml" class="screen">
+# apt-get update
+Pob:1 http://ftp.de.debian.org/debian-non-US/ stable/non-US/ Packages
+Pob:2 http://llug.sep.bnl.gov/debian/ testing/contrib Packages
+Traf http://llug.sep.bnl.gov/debian/ testing/main Packages
+Pob:4 http://ftp.de.debian.org/debian-non-US/ unstable/binary-i386/ Packages
+Pob:5 http://llug.sep.bnl.gov/debian/ testing/non-free Packages
+11% [5 testing/non-free `Oczekiwane na nagłówki' 0/32.1k 0%] 2203b/s 1m52s
+</pre></td></tr></table></screen><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+Linie zaczynające się od <span class="emphasis"><em>Pob:</em></span> są wypisywane, kiedy APT
+zaczyna pobierać plik, a ostatnia linia oznacza postęp pobierania. Pierwsza
+wartość podana w procentach określa całkowity procent pobierania wszystkich
+plików. Niestety rozmiar plików Package nie jest znany, tak więc
+<code class="literal">apt-get update</code> estymuje procent wykonanego pobierania, co
+powoduje pewne nieścisłości.
+</p></td></tr></table></para><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+Następna sekcja linii statusu powtarza się dla każdego wątku pobierania,
+oznacza przeprowadzanie operacji i podaje kilka użytecznych informacji na
+temat tego, co się dzieje. Czasem sekcja ta zawiera komunikat
+<span class="emphasis"><em>Tworzenie procesu potomnego</em></span>, co oznacza, że system
+operacyjny ładuje moduł pobierania. Pierwszym słowem po znaku "[" jest
+liczba pobrań, dokładnie taka jaka jest pokazana liczba linii historii
+pobrań. Następnie w skróconej formie wyświetlana jest nazwa pobieranego
+obiektu. W przypadku archiwów nazwa ta będzie zawierać nazwę pobieranego
+pakietu.
+</p></td></tr></table></para><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+W pojedynczych cudzysłowach podawany jest komunikat wskazujący na postęp
+tworzenia połączenia pobierania danych. Zazwyczaj postęp ten jest sekwencją
+zdarzeń od <span class="emphasis"><em>Podłączanie</em></span> przez <span class="emphasis"><em>Oczekiwanie na
+nagłówki</em></span> do <span class="emphasis"><em>Pobieranie</em></span> lub
+<span class="emphasis"><em>Wznawianie</em></span>. Końcową wartością jest liczba bajtów
+pobranych ze zdalnego serwera. Kiedy tylko pobieranie się rozpocznie,
+wartość ta jest wyświetlana jw formacie typu <code class="literal">102/10.2k</code>,
+co oznacza, że pobrano 102 bajty, a oczekuje się jeszcze pobrania 10.2
+kilobajtów. Aby zaoszczędzić miejsce, całkowity rozmiar jest zawsze
+wyświetlany jako w postaci 4-znakowej. Po rozmiarze następuje procentowy
+wskaźnik postępu pobierania danego pliku. Przedostatnim elementem jest
+bieżąca średnia prędkość pobierania, która jest aktualizowane co każde 5
+sekund i odzwierciedla tempo pobierania w tym okresie. W końcu wyświetlany
+jest estymowany czas pobierania, regularnie aktualizowany i
+odzwierciedlający czas pozostały do zakończenia pobierania przy założeniu
+utrzymania się pokazanego tempa pobierania.
+</p></td></tr></table></para><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+Linia stanu jest aktualizowana co każde pół sekundy, aby na bieżąco
+informować użytkownika o postępie pobierania, podczas gdy linie "Pob:" są
+przesuwane w dół, gdy tylko zacznie się pobieranie nowego pliku. Ponieważ
+linia stanu jest ciągle zmieniana, wyjście programu nie jest odpowiednie do
+przekierowania do pliku. Aby usunąć linie stanu, należy użyć opcji
+<code class="literal">-q</code>.
+</p></td></tr></table></para></div><div class="section"><div class="titlepage"><div><div><h2 class="title"><a id="s4.4"/>4.4. Dpkg</h2></div></div></div><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml">
+APT używa programu <span class="command"><strong>dpkg</strong></span> do instalowania archiwów i
+przełączy się do interfejsu <span class="command"><strong>dpkg</strong></span>, gdy tylko zakończy
+pobieranie plików. <span class="command"><strong>dpkg</strong></span> może również zadawać pytania
+podczas przetwarzania pakietów, a same pakiety także mogą zadawać
+pytania. Każde pytanie zazwyczaj jest poprzedzone opisem, a same pytania są
+zbyt zróżnicowane, by je tutaj opisać.
+</p></td></tr></table></para></div><div class="footnotes"><br/><hr/><div id="ftn.idm106" class="footnote"><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml"><a href="#idm106" class="para"><sup class="para">[2] </sup></a> Metoda programu <span class="command"><strong>dselect</strong></span> jest tak naprawdę zbiorem
+skryptów wywołujących <span class="command"><strong>apt-get</strong></span>. Metoda ta ma jednakże
+większą funkcjonalność niż sam program <span class="command"><strong>apt-get</strong></span>. </p></td></tr></table></para></div><div id="ftn.idm123" class="footnote"><para xmlns=""><table><tr><td>   </td><td><p xmlns="http://www.w3.org/1999/xhtml"><a href="#idm123" class="para"><sup class="para">[3] </sup></a> APT rozważa wszystkie znane zależności i próbuje nie dopuścić do zepsucia
+pakietów. </p></td></tr></table></para></div></div></div></div></body></html>

@@ -1,0 +1,5 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" href="$classpkgDepCache_1_1InRootSetFunc.xhtml" title="An arbitrary predicate on packages. " alt="" coords="5,5,216,32"/>
+<area shape="rect" id="node2" href="$classpkgDepCache_1_1DefaultRootSetFunc.xhtml" title="Returns true for packages matching a regular expression in APT::NeverAutoRemove. " alt="" coords="264,27,461,69"/>
+<area shape="rect" id="node3" href="$classConfiguration_1_1MatchAgainstConfig.xhtml" title="match a string against a configurable list of patterns " alt="" coords="8,57,213,98"/>
+</map>

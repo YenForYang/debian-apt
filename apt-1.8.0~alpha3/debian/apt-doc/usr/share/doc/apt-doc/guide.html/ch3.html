@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Chapter 3. DSelect</title>
+    <meta name="generator" content="DocBook XSL Stylesheets V1.79.1"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="home" href="index.html" title="APT User's Guide"/>
+    <link rel="up" href="index.html" title="APT User's Guide"/>
+    <link rel="prev" href="ch2.html" title="Chapter 2. apt-get"/>
+    <link rel="next" href="ch4.html" title="Chapter 4. The Interface"/>
+  </head>
+  <body>
+    <div class="navheader">
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Chapter 3. DSelect</th>
+        </tr>
+        <tr>
+          <td align="left"><a accesskey="p" href="ch2.html">Prev</a> </td>
+          <th width="60%" align="center"> </th>
+          <td align="right"> <a accesskey="n" href="ch4.html">Next</a></td>
+        </tr>
+      </table>
+      <hr/>
+    </div>
+    <div class="chapter">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h1 class="title"><a id="ch3"/>Chapter 3. DSelect</h1>
+          </div>
+        </div>
+      </div>
+      <p>
+The APT <span class="command"><strong>dselect</strong></span> method provides the complete
+APT system with the <span class="command"><strong>dselect</strong></span> package selection
+GUI. <span class="command"><strong>dselect</strong></span> is used to select the packages to be
+installed or removed and APT actually installs them.
+</p>
+      <p>
+To enable the APT method you need to select [A]ccess in
+<span class="command"><strong>dselect</strong></span> and then choose the APT method. You will be
+prompted for a set of <span class="emphasis"><em>Sources</em></span> which are places to fetch
+archives from. These can be remote Internet sites, local Debian mirrors or
+CD-ROMs. Each source can provide a fragment of the total Debian archive, APT
+will automatically combine them to form a complete set of packages. If you
+have a CD-ROM then it is a good idea to specify it first and then specify a
+mirror so that you have access to the latest bug fixes. APT will automatically
+use packages on your CD-ROM before downloading from the Internet.
+</p>
+      <pre class="screen">
+   Set up a list of distribution source locations
+
+ Please give the base URL of the debian distribution.
+ The access schemes I know about are: http file
+
+ For example:
+      file:/mnt/debian,
+      ftp://ftp.debian.org/debian,
+      http://ftp.de.debian.org/debian,
+
+
+ URL [http://llug.sep.bnl.gov/debian]:
+</pre>
+      <p>
+The <span class="emphasis"><em>Sources</em></span> setup starts by asking for the base of the
+Debian archive, defaulting to a HTTP mirror. Next it asks for the distribution
+to get.
+</p>
+      <pre class="screen">
+ Please give the distribution tag to get or a path to the
+ package file ending in a /. The distribution
+ tags are typically something like: stable unstable testing non-US
+
+ Distribution [stable]:
+</pre>
+      <p>
+The distribution refers to the Debian version in the archive,
+<span class="emphasis"><em>stable</em></span> refers to the latest released version
+and <span class="emphasis"><em>unstable</em></span> refers to the developmental
+version. <span class="emphasis"><em>non-US</em></span> is only available on some mirrors
+and refers to packages that contain encryption technology or other
+things that cannot be exported from the United States. Importing these
+packages into the US is legal however.
+</p>
+      <pre class="screen">
+ Please give the components to get
+ The components are typically something like: main contrib non-free
+
+ Components [main contrib non-free]:
+</pre>
+      <p>
+The components list refers to the list of sub distributions to fetch. The
+distribution is split up based on software licenses, main being DFSG free
+packages while contrib and non-free contain things that have various
+restrictions placed on their use and distribution.
+</p>
+      <p>
+Any number of sources can be added, the setup script will continue to prompt
+until you have specified all that you want.
+</p>
+      <p>
+Before starting to use <span class="command"><strong>dselect</strong></span> it is necessary to update
+the available list by selecting [U]pdate from the menu. This is a superset of
+<code class="literal">apt-get update</code> that makes the fetched information available
+to <span class="command"><strong>dselect</strong></span>. [U]pdate must be performed even if
+<code class="literal">apt-get update</code> has been run before.
+</p>
+      <p>
+You can then go on and make your selections using [S]elect and then perform
+the installation using [I]nstall. When using the APT method the [C]onfig and
+[R]emove commands have no meaning, the [I]nstall command performs both of
+them together.
+</p>
+      <p>
+By default APT will automatically remove the package (.deb) files once they
+have been successfully installed. To change this behavior place
+<code class="literal">Dselect::clean "prompt";</code> in /etc/apt/apt.conf.
+</p>
+    </div>
+    <div class="navfooter">
+      <hr/>
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td align="left"><a accesskey="p" href="ch2.html">Prev</a> </td>
+          <td align="center"> </td>
+          <td align="right"> <a accesskey="n" href="ch4.html">Next</a></td>
+        </tr>
+        <tr>
+          <td align="left" valign="top">Chapter 2. apt-get </td>
+          <td align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td align="right" valign="top"> Chapter 4. The Interface</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

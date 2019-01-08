@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+  "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % aptent SYSTEM "apt.ent"> %aptent;
+<!ENTITY % aptverbatiment SYSTEM "apt-verbatim.ent"> %aptverbatiment;
+<!ENTITY % aptvendor SYSTEM "apt-vendor.ent"> %aptvendor;
+]>
+
+<refentry>
+
+ <refentryinfo>
+   <!-- The last update date -->
+&apt-author.moconnor;
+   &apt-author.team;
+   &apt-email;
+   &apt-product;
+   
+   <date>2015-09-25T00:00:00Z</date>
+ </refentryinfo>
+ 
+ <refmeta>
+   <refentrytitle>apt-mark</refentrytitle>
+   <manvolnum>8</manvolnum>
+   <refmiscinfo class="manual">APT</refmiscinfo>
+ </refmeta>
+ 
+ 
+ <!-- Man page title -->
+<refnamediv>
+    <refname>apt-mark</refname>
+    <refpurpose>toon verschillende instellingen van een pakket, stel ze in of maak ze
+ongedaan</refpurpose>
+ </refnamediv>
+
+ &synopsis-command-apt-mark;
+
+ <refsect1><title>Omschrijving</title>
+    <para><command>apt-mark</command> kan gebruikt worden als een geïntegreerd
+frontend waarmee verschillende instellingen van een pakket ingesteld kunnen
+worden, zoals een pakket als automatisch/handmatig geïnstalleerd markeren of
+wijzigingen aanbrengen aan <command>dpkg</command>-selecties zoals
+handhaven, installeren, verwijderen, wissen, welke bijvoorbeeld door
+<command>apt-get dselect-upgrade</command> en <command>aptitude</command>
+gerespecteerd worden.
+   </para>
+   </refsect1><refsect1><title>Automatisch en handmatig geïnstalleerde pakketten</title>
+   <para>
+     Indien u vraagt dat een pakket geïnstalleerd wordt en er worden als gevolg
+daarvan andere pakketten geïnstalleerd om aan de vereisten te voldoen, dan
+worden die laatste pakketten gemarkeerd als automatisch geïnstalleerd,
+terwijl het pakket dat u expliciet installeerde als handmatig geïnstalleerd
+gemarkeerd wordt. Wanneer een automatisch geïnstalleerd pakket door geen
+enkel handmatig geïnstalleerd pakket meer vereist wordt, zal het als niet
+langer noodzakelijk beschouwd worden en bijvoorbeeld
+<command>apt-get</command> of <command>aptitude</command> zullen op zijn
+minst voorstellen om het te verwijderen.
+   </para>
+   <variablelist>
+     <varlistentry><term><option>auto</option></term>
+	 <listitem><para><literal>auto</literal> wordt gebruikt om een pakket als automatisch
+geïnstalleerd te markeren. Dit zal tot gevolg hebben dat dit pakket
+verwijderd wordt als er geen handmatig geïnstalleerde pakketten meer zijn
+die dat pakket nodig hebben.
+       </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>manual</option></term>
+	 <listitem><para><literal>manual</literal> wordt gebruikt om een pakket als handmatig
+geïnstalleerd te markeren. Dit zal voorkomen dat het pakket automatisch
+wordt verwijderd als geen andere pakketten ervan afhankelijk zijn.
+       </para></listitem>
+     </varlistentry>
+
+       <varlistentry><term><option>showauto</option></term>
+	 <listitem><para><literal>showauto</literal> wordt gebruikt om een lijst weer te geven van
+automatisch geïnstalleerde pakketten, waarbij elk pakket op een nieuwe regel
+staat. Als geen pakket opgegeven wordt, zullen alle automatisch
+geïnstalleerde pakketten weergegeven worden. Indien wel pakketten opgegeven
+worden, zullen enkel die pakketten weergegeven worden die automatisch
+geïnstalleerd werden.
+       </para></listitem>
+     </varlistentry>
+
+       <varlistentry><term><option>showmanual</option></term>
+	 <listitem><para><literal>showmanual</literal> kan op dezelfde manier als
+<literal>showauto</literal> gebruikt worden, behalve dat in dit geval een
+lijst van manueel geïnstalleerde pakketten weergegeven zal worden.
+       </para></listitem>
+     </varlistentry>
+   </variablelist>
+
+   <refsect2><title>Opties</title>
+     <variablelist>
+       <varlistentry>
+	 <term><option>-f=&synopsis-param-filename;</option></term>
+	 <term><option>--file=&synopsis-param-filename;</option></term>
+	 <listitem><para>
+	   De status van een pakket lezen van/schrijven naar het bestand waarvan de
+naam opgegeven werd met de parameter &synopsis-param-filename; en geen
+gebruik maken van de standaardlocatie die
+<filename>extended_status</filename> is in de map die vermeld wordt in het
+configuratie-item: <literal>Dir::State</literal>.
+	 </para></listitem>
+       </varlistentry>
+     </variablelist>
+   </refsect2>
+
+ </refsect1><refsect1><title>Voorkomen dat een pakket gewijzigd wordt</title>
+   <variablelist>
+     <varlistentry><term><option>hold</option></term>
+	 <listitem><para><literal>hold</literal> wordt gebruikt om een pakket als te handhaven te
+markeren. Dit zal voorkomen dat het pakket automatisch geïnstalleerd,
+opgewaardeerd of verwijderd wordt.
+       </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>unhold</option></term>
+	 <listitem><para><literal>unhold</literal> wordt gebruikt om een eerder ingestelde status
+tegengehouden ongedaan te maken, zodat opnieuw alle acties toegelaten zijn.
+       </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>showhold</option></term>
+	 <listitem><para><literal>showhold</literal> wordt gebruikt om op dezelfde manier als voor de
+andere show-opdrachten een lijst weer te geven van pakketten die
+tegengehouden worden.
+       </para></listitem>
+     </varlistentry>
+   </variablelist>
+ </refsect1><refsect1><title>Het installeren, verwijderen en wissen van pakketten inplannen</title>
+ <para>
+    Sommige frontends zoals <command>apt-get dselect-upgrade</command> kunnen
+gebruikt worden om eerder geplande wijzigingen aan de installatiestatus van
+pakketten toe te passen. Deze wijzigingen kunnen ingepland worden met de
+commando's <option>install</option>, <option>remove</option> (ook gekend als
+<option>deinstall</option>) en <option>purge</option>. Pakketten met een
+specifieke selectie kunnen respectievelijk met <option>showinstall</option>,
+<option>showremove</option> en <option>showpurge</option> weergegeven
+worden. Meer informatie over deze zogenaamde dpkg-selecties vindt u in
+&dpkg;.
+ </para>
+ </refsect1>
+
+ <refsect1><title>Opties</title>
+   <variablelist>
+     &apt-commonoptions;
+   </variablelist>
+ </refsect1>
+
+ <refsect1><title>Bestanden</title>
+   <variablelist>
+	&file-extended_states;
+   </variablelist>
+ </refsect1>
+
+ <refsect1><title>Zie ook</title>
+    <para><phrase>&apt-get;,&aptitude;,&apt-conf;</phrase></para>
+ </refsect1>
+
+ <refsect1><title>Diagnostiek</title>
+   <para><command>apt-mark</command> geeft de terugkeerwaarde nul bij een normaal
+verlopen operatie, niet-nul in geval van een fout.</para>
+ </refsect1>
+
+ &manbugs;
+ 
+ <refsect1><title>&translation-title;</title>
+   <para>&translation-holder;</para>
+   <para>&translation-english;</para>
+ </refsect1>
+</refentry>

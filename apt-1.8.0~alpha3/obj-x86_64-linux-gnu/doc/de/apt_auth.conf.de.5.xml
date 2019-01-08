@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+  "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % aptent SYSTEM "apt.ent"> %aptent;
+<!ENTITY % aptverbatiment SYSTEM "apt-verbatim.ent"> %aptverbatiment;
+<!ENTITY % aptvendor SYSTEM "apt-vendor.ent"> %aptvendor;
+]>
+
+<refentry>
+
+ <refentryinfo>
+   <!-- The last update date -->
+&apt-author.team;
+   &apt-email;
+   &apt-product;
+   
+   <date>2018-12-03T00:00:00Z</date>
+ </refentryinfo>
+
+ <refmeta>
+   <refentrytitle>apt_auth.conf</refentrytitle>
+   <manvolnum>5</manvolnum>
+   <refmiscinfo class="manual">APT</refmiscinfo>
+ </refmeta>
+
+ 
+ <!-- Man page title -->
+<refnamediv>
+    <refname>apt_auth.conf</refname>
+    <refpurpose>Anmeldungskonfigurationsdatei für APT-Quellen und Proxys</refpurpose>
+ </refnamediv>
+
+<refsect1><title>Beschreibung</title>
+<para>Auf APT-Konfigurationsdateien wie &sources-list; oder &apt-conf; muss jeder
+mittels APT-Werkzeugen zugreifen können, um auf alle paketbezogenen
+Informationen, wie die in einem Depot verfügbaren Pakete, Zugriff zu
+haben. Anmeldeinformationen, die zur Verbindung mit einem Proxy oder zum
+Herunterladen von Daten aus einem Depot erforderlich sind, sollten im
+Gegensatz dazu nicht für jeden zugänglich sein und daher nicht in einer
+Datei, auf die jedermann Zugriffsrechte hat, abgelegt werden.</para>
+
+<para>The APT auth.conf file <filename>/etc/apt/auth.conf</filename>, and .conf
+files inside <filename>/etc/apt/auth.conf.d</filename> can be used to store
+login information in a netrc-like format with restrictive file permissions.</para>
+</refsect1>
+
+<refsect1><title>Netrc-ähnliches Format</title>
+<para>Das hier definierte Format ist dem Format der von
+<citerefentry><refentrytitle><command>ftp</command></refentrytitle><manvolnum>1</manvolnum></citerefentry>
+und ähnlichen Programmen, die mit Servern interagieren, benutzten Datei
+<filename>~/.netrc</filename> ähnlich. Es ist eine einfaches kürzelbasiertes
+Format, bei dem die folgenden Kürzel erkannt werden; unbekannte Kürzel
+werden ignoriert. Kürzel können durch Leerzeichen, Tabulatoren oder
+Zeilenumbrüche voneinander getrennt werden.</para>
+
+<variablelist>
+<varlistentry>
+<term><literal>machine</literal>
+<replaceable>Rechnername</replaceable>[:<replaceable>Port</replaceable>][/<replaceable>Pfad</replaceable>]</term>
+<listitem><para>Einträge werden nachgeschlagen, indem das Kürzel
+<emphasis><literal>machine</literal></emphasis> gesucht wird, das dem
+Rechnernamen des URIs entspricht, für das APT Anmeldeinformationen
+benötigt. Das Netrc-Format kann durch Angabe einer Portnummer erweitert
+werden. Falls kein Port angegeben wurde, passt das Kürzel zu allen
+Ports. Vergleichbar ist der Pfad optional und nur benötigt und nützlich,
+falls mehrere Depots mit unterschiedlichen Anmeldeinformationen auf
+demselben Server liegen. Ein Maschinenkürzel mit einem Pfad passt, falls der
+Pfad in dem URI mit dem im Kürzel angegebenen Pfad beginnt. Sobald ein
+Treffer erzielt wurde, werden die nachfolgenden Kürzel verarbeitet. Dies
+endet, wenn das Dateiende erreicht wurde oder ein anderes
+<emphasis><literal>machine</literal></emphasis>-Kürzel auftritt.</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term><literal>login</literal> <replaceable>Name</replaceable></term>
+<listitem><para>der zu verwendende Benutzername</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term><literal>password</literal> <replaceable>Zeichenkette</replaceable></term>
+<listitem><para>das zu verwendende Passwort</para></listitem>
+</varlistentry>
+
+</variablelist>
+
+</refsect1>
+
+<refsect1><title>Beispiel</title>
+<para>Anmeldeinformationen für einen Benutzer namens <literal>apt</literal> mit
+dem Passwort <literal>debian</literal> für den &sources-list;-Eintrag
+<literallayout>deb http://example.org/debian &debian-stable-codename; main</literallayout> können direkt im Eintrag
+bereitgestellt werden: <literallayout>deb http://apt:debian@example.org/debian &debian-stable-codename; main</literallayout>. Alternativ kann ein Eintrag wie der folgende in der Datei
+»auth.conf« verwendet werden: <literallayout>machine example.org
+login apt
+password debian</literallayout>. Oder alternativ in einer einzelnen Zeile: <literallayout>machine example.org login apt password debian</literallayout>. Falls Sie dies präziser mögen, werden all
+diese Zeilen auf den Beispieleintrag angewendet: <literallayout>machine example.org/deb login apt password debian
+machine example.org/debian login apt password debian
+machine example.org/debian/ login apt password debian
+</literallayout>. Andererseits wird keine der folgenden Zeilen
+angewendet: <literallayout>machine example.org:80 login apt password debian
+machine example.org/deb/ login apt password debian
+machine example.org/ubuntu login apt password debian
+machine example.orga login apt password debian
+machine example.net login apt password debian
+</literallayout>.
+</para>
+</refsect1>
+
+<refsect1><title>Hinweise</title>
+<para>Rudimentäre Unterstützung für diese Funktionalität ist seit Version 0.7.25
+vorhanden, allerdings war sie jahrelang nicht dokumentiert. Die
+Dokumentation wurde in Version 1.5 hinzugefügt, außerdem wurde die
+Implementierung geringfügig verändert. Um eine maximale
+Rückwärtskompatibilität zu gewährleisten, sollten Sie mehrere
+<literal>machine</literal>-Kürzel mit demselben Rechnernamen vermeiden,
+falls Sie aber mehrere benötigen, sollte für alle ein Pfad im
+<literal>machine</literal>-Kürzel angegeben werden.</para>
+</refsect1>
+
+<refsect1>
+<title>Dateien</title>
+  <variablelist>
+     <varlistentry><term><filename>/etc/apt/auth.conf</filename></term>
+	<listitem><para>Anmeldeinformationen für APT-Quellen und -Proxys in einem Netrc-ähnlichen
+Format. Konfigurationselement: <literal>Dir::Etc::netrc</literal>.</para></listitem>
+     </varlistentry>
+     <varlistentry><term><filename>/etc/apt/auth.conf.d/*.conf</filename></term>
+	<listitem><para>Login information for APT sources and proxies in a netrc-like format.
+Configuration Item: <literal>Dir::Etc::netrcparts</literal>.</para></listitem>
+     </varlistentry>
+  </variablelist>
+</refsect1>
+
+<refsect1>
+<title>Siehe auch</title>
+<para>&apt-conf;, &sources-list;
+</para>
+</refsect1>
+
+ &manbugs;
+
+ <refsect1><title>&translation-title;</title>
+   <para>&translation-holder;</para>
+   <para>&translation-english;</para>
+ </refsect1>
+</refentry>

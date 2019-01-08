@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Kapitel 1. Allgemein</title>
+    <meta name="generator" content="DocBook XSL Stylesheets V1.79.1"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="home" href="index.html" title="APT-Benutzerhandbuch"/>
+    <link rel="up" href="index.html" title="APT-Benutzerhandbuch"/>
+    <link rel="prev" href="index.html" title="APT-Benutzerhandbuch"/>
+    <link rel="next" href="ch2.html" title="Kapitel 2. apt-get"/>
+  </head>
+  <body>
+    <div class="navheader">
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Kapitel 1. Allgemein</th>
+        </tr>
+        <tr>
+          <td align="left"><a accesskey="p" href="index.html">Zurück</a> </td>
+          <th width="60%" align="center"> </th>
+          <td align="right"> <a accesskey="n" href="ch2.html">Weiter</a></td>
+        </tr>
+      </table>
+      <hr/>
+    </div>
+    <div class="chapter">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h1 class="title"><a id="ch1"/>Kapitel 1. Allgemein</h1>
+          </div>
+        </div>
+      </div>
+      <div class="toc">
+        <p>
+          <strong>Inhaltsverzeichnis</strong>
+        </p>
+        <dl class="toc">
+          <dt>
+            <span class="section">
+              <a href="ch1.html#s1.1">1.1. Anatomie des Paketsystems</a>
+            </span>
+          </dt>
+        </dl>
+      </div>
+      <p>
+Das Paket APT enthält derzeit zwei Abschnitte, die
+APT-<span class="command"><strong>dselect</strong></span>-Methode und die Benutzerschnittstelle
+<span class="command"><strong>apt-get</strong></span> für die Befehlszeile. Beide stellen eine
+Möglichkeit bereit, Pakete zu installieren, zu entfernen, sowie neue Pakete
+aus dem Internet herunterzuladen.
+</p>
+      <div class="section">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h2 class="title"><a id="s1.1"/>1.1. Anatomie des Paketsystems</h2>
+            </div>
+          </div>
+        </div>
+        <p>
+Das Debian-Paketierungssystem besitzt eine große Anzahl von Informationen,
+die mit jedem Paket verbunden sind, um zu helfen sicherzustellen, dass es
+ordentlich und leicht in das System integriert wird. Das bekannteste seiner
+Funktionen ist das Abhängigkeitssystem.
+</p>
+        <p>
+Das Abhängigkeitssystem erlaubt individuellen Programmen, Gebrauch von
+gemeinsam im System benutzten Elementen, wie Bibliotheken, zu machen. Es
+vereinfacht, selten benutze Teile eines Programms in separaten Paketen zu
+platzieren, um die Zahl von Dingen zu verringern, die der
+Durchschnittsanwender installieren sollte. Außerdem erlaubt es die Auswahl
+von E-Mail-Transport-Programmen, X-Servern und so weiter.
+</p>
+        <p>
+Der erste Schritt zum Verständnis des Abhängigkeitssystems besteht darin,
+das Konzept einer einfachen Abhängigkeit zu begreifen. Die Bedeutung einer
+einfachen Abhängigkeit besteht darin, dass ein Paket ein anderes Paket
+benötigt, das zu gleichen Zeit installiert sein muss, um ordentlich zu
+funktionieren.
+</p>
+        <p>
+Mailcrypt ist zum Beispiel eine Emacs-Erweiterung, die hilft, E-Mails mit
+GPG zu verschlüsseln. Ohne installiertes GPG ist Mailcrypt unbrauchbar,
+deshalb hat Mailcrypt eine einfache Abhängigkeit von GPG. Da es außerdem
+eine Emacs-Erweiterung ist, hat es ebenfalls eine einfache Abhängigkeit von
+Emacs. Ohne Emacs ist es komplett unbenutzbar.
+</p>
+        <p>
+Die andere wichtige Abhängigkeit, die es zu verstehen gilt, ist eine in
+Konflikt stehende Abhängigkeit. Das bedeutet, dass das Paket, wenn es mit
+einem anderen Paket installiert ist, nicht funktioniert und möglicherweise
+extrem schädlich für das System sein könnte. Stellen Sie sich als Beispiel
+einen E-Mail-Transport-Programmen wie Sendmail, Exim oder QMail vor. Es ist
+nicht möglich, zwei E-Mail-Transport-Programmen installiert zu haben, da
+beide im Netzwerk auf zu empfangende E-Mails warten. Der Versuch, zwei zu
+installieren, würde das System ernsthaft beschädigen, weshalb alle
+E-Mail-Transport-Programmen in Konflikt stehende Abhängigkeiten mit allen
+anderen E-Mail-Transport-Programmen haben.
+</p>
+        <p>
+Als zusätzliche Komplikation besteht die Möglichkeit, dass ein Paket
+vortäuscht, ein anderes Paket zu sein. Bedenken Sie, dass Exim und Sendmail
+in vieler Hinsicht identisch sind – sie liefern beide E-Mails aus und
+verstehen eine gemeinsame Schnittstelle. Daher hat das Paketsystem die
+Möglichkeit, beide als E-Mail-Transport-Programmen zu deklarieren. Deshalb
+deklarieren Exim und Sendmail, dass sie einen E-Mail-Transport-Programmen
+bereitstellen und andere Pakete, die einen E-Mail-Transport-Programmen
+benötigen, dass sie von einem E-Mail-Transport-Programmen abhängen. Die kann
+zu großer Verwirrung führen, wenn manuell versucht wird, Pakete zu
+reparieren.
+</p>
+        <p>
+Zu jedem Zeitpunkt könnte eine einzelne Abhängigkeit von Paketen erfüllt
+werden, die bereits installiert sind oder auch nicht. APT versucht beim
+Auflösen von Abhängigkeitsproblemen zu helfen, indem es eine Anzahl
+automatischer Algorithmen bereitstellt, die bei der Auswahl von Paketen zur
+Installation helfen.
+</p>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr/>
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td align="left"><a accesskey="p" href="index.html">Zurück</a> </td>
+          <td align="center"> </td>
+          <td align="right"> <a accesskey="n" href="ch2.html">Weiter</a></td>
+        </tr>
+        <tr>
+          <td align="left" valign="top">APT-Benutzerhandbuch </td>
+          <td align="center">
+            <a accesskey="h" href="index.html">Zum Anfang</a>
+          </td>
+          <td align="right" valign="top"> Kapitel 2. apt-get</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

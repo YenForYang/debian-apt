@@ -1,0 +1,12 @@
+Package: apt-utils-dbgsym
+Source: apt
+Version: 1.8.0~alpha3
+Auto-Built-Package: debug-symbols
+Architecture: amd64
+Maintainer: APT Development Team <deity@lists.debian.org>
+Installed-Size: 2076
+Depends: apt-utils (= 1.8.0~alpha3)
+Section: debug
+Priority: optional
+Description: debug symbols for apt-utils
+Build-Ids: 38e1d5970ad3228b9934e9d682a299aa87d497b8 6f3ee6f8d2634d86d27e9d85f4e296b1127929aa 74ccd867fa4bb7469bf7bf6f315fec88449e36b5 cb47821f2458b1e08cc18ee5365ee4c07d511e98 fea9d236b30daf3006d4bd48b78d0bc03ca1e04e

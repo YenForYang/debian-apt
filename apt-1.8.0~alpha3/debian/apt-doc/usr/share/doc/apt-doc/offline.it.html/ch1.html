@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Capitolo 1. Introduzione</title>
+    <meta name="generator" content="DocBook XSL Stylesheets V1.79.1"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="home" href="index.html" title="Usare APT offline"/>
+    <link rel="up" href="index.html" title="Usare APT offline"/>
+    <link rel="prev" href="index.html" title="Usare APT offline"/>
+    <link rel="next" href="ch2.html" title="Capitolo 2. Usare APT su entrambe le macchine"/>
+  </head>
+  <body>
+    <div class="navheader">
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Capitolo 1. Introduzione</th>
+        </tr>
+        <tr>
+          <td align="left"><a accesskey="p" href="index.html">Indietro</a> </td>
+          <th width="60%" align="center"> </th>
+          <td align="right"> <a accesskey="n" href="ch2.html">Avanti</a></td>
+        </tr>
+      </table>
+      <hr/>
+    </div>
+    <div class="chapter">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h1 class="title"><a id="ch1"/>Capitolo 1. Introduzione</h1>
+          </div>
+        </div>
+      </div>
+      <div class="toc">
+        <p>
+          <strong>Indice</strong>
+        </p>
+        <dl class="toc">
+          <dt>
+            <span class="section">
+              <a href="ch1.html#s1.1">1.1. Panoramica</a>
+            </span>
+          </dt>
+        </dl>
+      </div>
+      <div class="section">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h2 class="title"><a id="s1.1"/>1.1. Panoramica</h2>
+            </div>
+          </div>
+        </div>
+        <p>
+Normalmente APT richiede l'accesso diretto ad un archivio Debian, attraverso
+un supporto locale o la rete. Un problema comune è che una macchina Debian
+ha un collegamento lento, come un modem, e un'altra macchina ha una
+connessione veloce, ma le due sono fisicamente distanti.
+</p>
+        <p>
+La soluzione è usare supporti rimovibili grandi come un disco Zip o uno
+SuperDisk. Questi dischi non sono grandi abbastanza per memorizzare l'intero
+archivio Debian, ma possono facilmente contenere un sottoinsieme
+sufficientemente grande per la maggior parte degli utenti. L'idea è di usare
+APT per generare un elenco di pacchetti che sono necessari e poi scaricarli
+nel disco usando un'altra macchina con una buona connettività. È possibile
+anche usare un'altra macchina Debian con APT o usare un sistema operativo
+completamente diverso e uno strumento per scaricare file come wget. In
+questo documento con <span class="emphasis"><em>host remoto</em></span> viene indicata la
+macchina che scarica i pacchetti, e <span class="emphasis"><em>host di
+destinazione</em></span> è quella senza connessione o con una connessione non
+buona.
+</p>
+        <p>
+Questo viene ottenuto modificando in modo particolare il file di
+configurazione di APT. Come premessa essenziale, si deve dire ad APT di
+cercare in un disco i suoi file archivio. Notare che il disco deve essere
+formattato con un file system che può gestire i nomi di file lunghi, come
+ext2, fat32 o vfat.
+</p>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr/>
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td align="left"><a accesskey="p" href="index.html">Indietro</a> </td>
+          <td align="center"> </td>
+          <td align="right"> <a accesskey="n" href="ch2.html">Avanti</a></td>
+        </tr>
+        <tr>
+          <td align="left" valign="top">Usare APT offline </td>
+          <td align="center">
+            <a accesskey="h" href="index.html">Partenza</a>
+          </td>
+          <td align="right" valign="top"> Capitolo 2. Usare APT su entrambe le macchine</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

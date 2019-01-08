@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Capítulo 3. Usando APT e wget</title>
+    <meta name="generator" content="DocBook XSL Stylesheets V1.79.1"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="home" href="index.html" title="Usando o APT Offline"/>
+    <link rel="up" href="index.html" title="Usando o APT Offline"/>
+    <link rel="prev" href="ch2.html" title="Capítulo 2. Usando o APT em ambas máquinas"/>
+  </head>
+  <body>
+    <div class="navheader">
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Capítulo 3. Usando APT e wget</th>
+        </tr>
+        <tr>
+          <td align="left"><a accesskey="p" href="ch2.html">Anterior</a> </td>
+          <th width="60%" align="center"> </th>
+          <td align="right"> </td>
+        </tr>
+      </table>
+      <hr/>
+    </div>
+    <div class="chapter">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h1 class="title"><a id="ch3"/>Capítulo 3. Usando APT e wget</h1>
+          </div>
+        </div>
+      </div>
+      <div class="toc">
+        <p>
+          <strong>Índice</strong>
+        </p>
+        <dl class="toc">
+          <dt>
+            <span class="section">
+              <a href="ch3.html#s3.1">3.1. Visão geral</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="section">
+              <a href="ch3.html#s3.2">3.2. Operação</a>
+            </span>
+          </dt>
+        </dl>
+      </div>
+      <div class="section">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h2 class="title"><a id="s3.1"/>3.1. Visão geral</h2>
+            </div>
+          </div>
+        </div>
+        <p>
+<span class="emphasis"><em>wget</em></span> é uma ferramenta popular e portável de download
+que pode correr praticamente em qualquer máquina. Ao contrário do método
+acima, este requer que a máquina Debian já tenha uma lista de pacotes
+disponíveis.
+</p>
+        <p>
+A ideia básica é criar um disco que tem apenas os ficheiros de arquivo
+descarregados do site remoto. Isto é feito ao usar a opção --print-uris no
+apt-get e depois preparar um script wget para realmente ir buscar os
+pacotes.
+</p>
+      </div>
+      <div class="section">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h2 class="title"><a id="s3.2"/>3.2. Operação</h2>
+            </div>
+          </div>
+        </div>
+        <p>
+Ao contrário da técnica anterior, não são necessários ficheiros de
+configuração especiais. Nós usamos meramente os comandos standard do APT
+para gerar a lista de ficheiros.
+</p>
+        <pre class="screen">
+ # apt-get dist-upgrade 
+ [ Escolha não quando perguntado, certifique-se que está contente com as acções ]
+ # apt-get -qq --print-uris dist-upgrade &gt; uris
+ # awk '{print "wget -O " $2 " " $1}' &lt; uris &gt; /disc/wget-script
+</pre>
+        <p>
+Qualquer comando além do dist-upgrade pode ser usado aqui, incluindo
+dselect-upgrade.
+</p>
+        <p>
+O ficheiro /disc/wget-script irá agora conter uma lista de comandos do wget
+para executar de modo a obter os arquivos necessários. Este script deve ser
+corrido com o directório actual sendo o ponto de montagem do disco para que
+grave os resultados no disco.
+</p>
+        <p>
+A máquina remota deverá fazer algo como
+</p>
+        <pre class="screen">
+  # cd /disc
+  # sh -x ./wget-script
+  [ wait.. ]
+</pre>
+        <p>
+Após os arquivos serem descarregados e o disco retornado à máquina Debian, a
+instalação pode prosseguir usando,
+</p>
+        <pre class="screen">
+  # apt-get -o dir::cache::archives="/disc/" dist-upgrade
+</pre>
+        <p>
+O qual irá usar os arquivos já obtidos e que estão no disco.
+</p>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr/>
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td align="left"><a accesskey="p" href="ch2.html">Anterior</a> </td>
+          <td align="center"> </td>
+          <td align="right"> </td>
+        </tr>
+        <tr>
+          <td align="left" valign="top">Capítulo 2. Usando o APT em ambas máquinas </td>
+          <td align="center">
+            <a accesskey="h" href="index.html">Início</a>
+          </td>
+          <td align="right" valign="top"> </td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+  "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % aptent SYSTEM "apt.ent"> %aptent;
+<!ENTITY % aptverbatiment SYSTEM "apt-verbatim.ent"> %aptverbatiment;
+<!ENTITY % aptvendor SYSTEM "apt-vendor.ent"> %aptvendor;
+]>
+
+<refentry>
+ <refentryinfo>
+   <!-- The last update date -->
+&apt-author.jgunthorpe;
+   &apt-author.team;
+   &apt-email;
+   &apt-product;
+   
+   <date>2016-08-06T00:00:00Z</date>
+ </refentryinfo>
+
+ <refmeta>
+   <refentrytitle>apt-secure</refentrytitle>
+   <manvolnum>8</manvolnum>
+   <refmiscinfo class="manual">APT</refmiscinfo>
+ </refmeta>
+
+
+ 
+
+ 
+ 
+ <!-- NOTE: This manpage has been written based on the
+     Securing Debian Manual ("Debian Security
+     Infrastructure" chapter) and on documentation
+     available at the following sites:
+     http://wiki.debian.net/?apt06
+     http://www.syntaxpolice.org/apt-secure/
+     http://www.enyo.de/fw/software/apt-secure/
+-->
+<!-- TODO: write a more verbose example of how it works with 
+     a sample similar to 
+     http://www.debian-administration.org/articles/174
+     ?
+-->
+<!-- Man page title -->
+<refnamediv>
+    <refname>apt-secure</refname>
+    <refpurpose>APT アーカイブ認証サポート</refpurpose>
+ </refnamediv>
+
+ <refsect1><title>説明</title>
+   <para>
+   Starting with version 0.6, <command>APT</command> contains code that does
+signature checking of the Release file for all repositories. This ensures
+that data like packages in the archive can't be modified by people who have
+no access to the Release file signing key. Starting with version 1.1
+<command>APT</command> requires repositories to provide recent
+authentication information for unimpeded usage of the repository. Since
+version 1.5 changes in the information contained in the Release file about
+the repository need to be confirmed before APT continues to apply updates
+from this repository.
+   </para>
+
+   <para>
+   注意: &apt-get;、&aptitude;、&synaptic; といった APT
+ベースのパッケージ管理フロントエンドは全てこの新しい証明機能をサポートしています。この man ページでは単純化するためだけに、その全てを参照するのに
+<literal>APT</literal> を使っています。
+   </para>
+</refsect1>
+
+ <refsect1><title>Unsigned Repositories</title>
+   <para>
+   アーカイブに署名されていない Release ファイルがある、または Release ファイルが全くない場合は、現在の APT バージョンは
+<command>update</command>
+操作によるそこからのダウンロードをデフォルトで拒否し、ダウンロードを強制した場合でも、インストール要求に証明されていないアーカイブからのパッケージが含まれる場合には
+<command>apt-get</command> のようなフロントエンドは明示的な確認を要求します。
+   </para>
+
+   <para>
+   設定オプション <option>Acquire::AllowInsecureRepositories</option> に
+<literal>true</literal> を設定するとどの APT クライアントでも警告だけを出すように強制できます。&sources-list;
+オプション <literal>allow-insecure=yes</literal>
+を使うと個々のリポジトリについて安全でないことを許可するようにもできます。安全でないリポジトリは全く勧められるものではなく、apt
+にそのサポート継続を強制させるオプションは全て最終的には削除されることに注意してください。ユーザ側では警告についても無効化する
+<option>Trusted</option> オプションを利用することもできますが、&sources-list;
+で述べているように、その影響を必ず理解してください。
+   </para>
+
+   <para>
+   以前は証明されていたけれども <command>update</command>
+操作の結果その効力がなくなったリポジトリについては、安全でないリポジトリの利用を許可あるいは禁止するオプションに関わらず、どの APT
+クライアントでもエラーを出します。追加で
+<option>Acquire::AllowDowngradeToInsecureRepositories</option> に
+<literal>true</literal> をセットするか &sources-list; のオプション
+<literal>allow-downgrade-to-insecure=yes</literal>
+を個々のリポジトリに設定することでこのエラーを無視させることもできます。
+   </para>
+</refsect1>
+
+ <refsect1><title>Signed Repositories</title>
+   <para>
+   APT アーカイブからエンドユーザまでの信頼の輪は、いくつかのステップで構成されています。<command>apt-secure</command>
+は、この輪の最後のステップで、「アーカイブを信頼する」ということは、パッケージに悪意のあるコードが含まれていないことを信頼するということではなく、アーカイブメンテナを信頼するということを意味します。これは、アーカイブの完全性が保たれていることを保証するのは、アーカイブメンテナの責任だということです。
+   </para>
+
+   <para>apt-secure
+はパッケージレベルの署名検証は行いません。そのようなツールが必要な場合は、<command>debsig-verify</command> や
+<command>debsign</command> (debsig-verify パッケージと devscripts
+パッケージでそれぞれ提供されています) を確認してください。</para>
+
+   <para>
+   Debian における信頼の輪は、(例えば) 新しいパッケージやパッケージの新バージョンを、メンテナが Debian
+アーカイブにアップロードすることから始まります。これが有効になるには、アップロードの際に、Debian メンテナキーリング
+(debian-keyring パッケージに収録) にあるメンテナのキーで署名する必要があります。メンテナのキーは、キーの所有者の ID
+を確保するため、事前に確立した手続きの後で、他のメンテナに署名されています。同様の手順は、すべての Debian
+ベースのディストリビューションに存在します。
+   </para>
+
+   <para>
+   アップロードされたパッケージが検証されてアーカイブに格納されると、メンテナの署名を取り外し、パッケージのチェックサムを計算して、Packages
+ファイルに格納します。その後、全 Packages ファイルのチェックサムを計算して、Release ファイルに格納します。Release
+ファイルは、その &keyring-distro; リリースのアーカイブキーで署名され、&keyring-distro; ミラーサイトでパッケージや
+Packages ファイルとともに配布されます。このキーは、<package>debian-archive-keyring</package>
+パッケージに収録されている、&keyring-distro; アーカイブキーリングに含まれます。
+   </para>
+
+   <para>
+   エンドユーザは誰でも、Release
+ファイルの署名をチェックし、パッケージのチェックサムを抽出して、手でダウンロードしたパッケージのチェックサムと比較できます。また、APT
+が自動的に行うのに任せることもできます。
+   </para>
+
+   <para>以上は、パッケージごとの署名チェックとは違うことに注意してください。以下のように考えられる 2 種類の攻撃を防ぐよう設計されています。
+   </para>
+
+    <itemizedlist>
+       <listitem><para><literal>ネットワーク中間者攻撃</literal>。署名をチェックしないと、悪意あるエージェントがパッケージダウンロードプロセスに割り込んだり、ネットワーク構成要素
+(ルータ、スイッチなど) の制御や、悪漢サーバへのネットワークトラフィックのリダイレクトなど (ARP スプーフィング攻撃や DNS
+スプーフィング攻撃) で、悪意あるソフトウェアを掴まされたりします。</para></listitem>
+ 
+       <listitem><para><literal>ミラーネットワーク感染</literal>。署名をチェックしないと、悪意あるエージェントがミラーホストに感染し、このホストからダウンロードしたユーザすべてに、悪意あるソフトウェアが伝播するようにファイルを変更できます。</para></listitem>
+    </itemizedlist>
+
+   <para>しかしこれは、(パッケージに署名する) マスターサーバ自体の侵害や、Release
+ファイルに署名するのに使用したキーの漏洩を防げません。いずれにせよ、この機構はパッケージごとの署名を補完することができます。</para>
+</refsect1>
+
+<refsect1><title>Information changes</title>
+   <para>
+   A Release file contains beside the checksums for the files in the repository
+also general information about the repository like the origin, codename or
+version number of the release.
+   </para><para>
+   This information is shown in various places so a repository owner should
+always ensure correctness. Further more user configuration like
+&apt-preferences; can depend and make use of this information. Since version
+1.5 the user must therefore explicitly confirm changes to signal that the
+user is sufficiently prepared e.g. for the new major release of the
+distribution shipped in the repository (as e.g. indicated by the codename).
+   </para>
+</refsect1>
+
+<refsect1><title>ユーザ設定</title>
+   <para>
+   <command>apt-key</command> は、リポジトリを信頼するために APT
+が使用するキーリストを管理するプログラムです。信頼されたキーのリストにキーを追加または削除するために使用することができます。キーが署名することができるアーカイブは、&sources-list;
+中の <option>Signed-By</option> を介して制限可能です。
+   </para><para>
+   デフォルトのインストールでは、すでにデフォルトのリポジトリからセキュアにパッケージを取得するためにすべてのキーが含まれていることに注意してください。そのため、サードパーティのリポジトリを追加している場合は
+<command>apt-key</command> で操作する必要があります。
+   </para><para>
+   新しいキーを追加するためには、まずキーをダウンロードする必要があります
+(取得する際には、信頼できる通信チャネルを使用するよう、特に留意してください)。取得したキーを、<command>apt-key</command>
+で追加し、<command>apt-get update</command> を実行してください。以上により、apt
+は設定済みのアーカイブから、<filename>InRelease</filename> ファイルや
+<filename>Release.gpg</filename> ファイルをダウンロード・検証できるようになります。
+   </para>
+</refsect1>
+
+<refsect1><title>Repository Configuration</title>
+   <para>
+   あなたがメンテナンスしているアーカイブで、アーカイブ署名を提供したい場合、以下のようにしてください。
+   </para>
+
+     <itemizedlist>
+       <listitem><para>既に存在しているのでなければ、<emphasis>最上位 Release
+ファイルを作成してください</emphasis>。<command>apt-ftparchive release</command>
+(apt-utils で提供) を実行すると、作成できます。</para></listitem>
+   
+      <listitem><para><emphasis>署名</emphasis>します。<command>gpg --clearsign -o InRelease
+Release</command> や <command>gpg -abs -o Release.gpg Release</command>
+を実行して、署名してください。</para></listitem>
+
+      <listitem><para>
+      <emphasis>キーのフィンガープリントを公開</emphasis>します。これにより、ユーザは、アーカイブ内のファイルを認証するためにインポートする必要があるキーを知るでしょう。これは、ディストリビューションのアップデートとキーの更新を後で自動的に行うことができる
+&keyring-package; を実行する &keyring-distro; のような独自のキーリングパッケージで鍵を公開するのが最善です。
+      </para></listitem>
+
+      <listitem><para>
+      <emphasis>アーカイブとキーを追加する方法について説明します</emphasis>。ユーザがセキュアにキーを取得できない場合は、上述の信頼の輪が壊れています。ユーザのキー追加を助けることができる方法は、アーカイブとすでに信頼のウェブを活用するように
+(ディストリビューションのデフォルトのリポジトリのように)
+設定している別のアーカイブユーザに含まれたあなたのキーリングパッケージを持つまでは、アーカイブと対象者に依存します。
+      </para></listitem>
+
+    </itemizedlist>
+
+    <para>アーカイブの内容に変化がある場合 (新しいパッケージの追加や削除)、アーカイブメンテナは前述の最初の 2 ステップに従わなければなりません。</para>
+
+</refsect1>
+
+<refsect1><title>関連項目</title> 
+<para> 
+&apt-conf;, &apt-get;, &sources-list;, &apt-key;, &apt-ftparchive;,
+&debsign;, &debsig-verify;, &gpg;
+</para>
+
+<para>詳細な背景情報を検証するのなら、Securing Debian Manual (harden-doc パッケージにも収録) の <ulink
+url="http://www.debian.org/doc/manuals/securing-debian-howto/ch7">Debian
+Security Infrastructure</ulink> 章や、V. Alex Brennen による <ulink
+url="http://www.cryptnet.net/fdp/crypto/strong_distro.html" >Strong
+Distribution HOWTO</ulink> をご覧ください。  </para>
+
+</refsect1>
+
+ &manbugs;
+ &manauthor;
+
+<refsect1><title>マニュアルページ作者</title> 
+
+<para>このマニュアルページは Javier Fernández-Sanguino Peña, Isaac Jones, Colin Walters,
+Florian Weimer, Michael Vogt の作業を元にしています。
+</para>
+
+</refsect1>
+ 
+
+ <refsect1><title>&translation-title;</title>
+   <para>&translation-holder;</para>
+   <para>&translation-english;</para>
+ </refsect1>
+</refentry>

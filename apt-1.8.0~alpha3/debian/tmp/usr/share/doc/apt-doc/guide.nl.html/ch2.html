@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Hoofdstuk 2. apt-get</title>
+    <meta name="generator" content="DocBook XSL Stylesheets V1.79.1"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="home" href="index.html" title="Gebruikershandleiding voor APT"/>
+    <link rel="up" href="index.html" title="Gebruikershandleiding voor APT"/>
+    <link rel="prev" href="ch1.html" title="Hoofdstuk 1. Algemeen"/>
+    <link rel="next" href="ch3.html" title="Hoofdstuk 3. DSelect"/>
+  </head>
+  <body>
+    <div class="navheader">
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Hoofdstuk 2. apt-get</th>
+        </tr>
+        <tr>
+          <td align="left"><a accesskey="p" href="ch1.html">Terug</a> </td>
+          <th width="60%" align="center"> </th>
+          <td align="right"> <a accesskey="n" href="ch3.html">Volgende</a></td>
+        </tr>
+      </table>
+      <hr/>
+    </div>
+    <div class="chapter">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h1 class="title"><a id="ch2"/>Hoofdstuk 2. apt-get</h1>
+          </div>
+        </div>
+      </div>
+      <p>
+<span class="command"><strong>apt-get</strong></span> biedt een eenvoudige manier om aan de
+commandoregel pakketten te installeren. Anders dan <span class="command"><strong>dpkg</strong></span>
+beheerst <span class="command"><strong>apt-get</strong></span> niet het behandelen van
+.deb-bestanden. Het werkt met de eigenlijke naam van het pakket en kan enkel
+.deb-archieven installeren vanuit een <span class="emphasis"><em>Source</em></span>
+(pakketbron).
+</p>
+      <p>
+Het eerste <a href="#ftn.idm41" class="footnote" id="idm41"><sup class="footnote">[1]</sup></a> wat men moet doen vooraleer
+<span class="command"><strong>apt-get</strong></span> te gebruiken, is de pakketlijst ophalen uit de
+<span class="emphasis"><em>Sources</em></span> (pakketbronnen), zodat het op de hoogte is van
+de beschikbare pakketten. Dit doet men met <code class="literal">apt-get
+update</code>. Bijvoorbeeld:
+</p>
+      <pre class="screen">
+# apt-get update
+Ophalen van http://ftp.de.debian.org/debian-non-US/ stable/binary-i386/ Packages
+Ophalen van http://llug.sep.bnl.gov/debian/ testing/contrib Packages
+Pakketlijsten worden ingelezen... Klaar
+Boom van vereisten wordt opgebouwd... Klaar
+</pre>
+      <p>
+Na het bijwerken van de pakketlijst kunnen verschillende commando's gebruikt
+worden.
+</p>
+      <div class="variablelist">
+        <dl class="variablelist">
+          <dt>
+            <span class="term">upgrade</span>
+          </dt>
+          <dd>
+            <p>
+Upgrade zal proberen om op een gematigde manier het hele systeem bij te
+werken. Upgrade zal nooit een nieuw pakket installeren of een bestaand
+pakket verwijderen en het zal ook nooit een pakket bijwerken dat een ander
+pakket onbruikbaar zou kunnen maken. Dit commando kan dagelijks gebruikt
+worden om het systeem veilig bij te werken. Upgrade zal alle pakketten die
+het niet kon bijwerken vermelden. Gewoonlijk betekent dit dat zij
+afhankelijk zijn van nieuwe pakketten of conflicteren met een ander
+pakket. Men kan <span class="command"><strong>dselect</strong></span> of <code class="literal">apt-get
+install</code> gebruiken om de installatie van deze pakketten af te
+dwingen.
+</p>
+          </dd>
+          <dt>
+            <span class="term">install</span>
+          </dt>
+          <dd>
+            <p>
+Install wordt gebruikt om bij naam genoemde pakketten te installeren. Het
+pakket wordt automatisch opgehaald en geïnstalleerd. Dit kan nuttig zijn als
+u reeds de naam van het te installeren pakket kent en geen GUI wenst te
+gebruiken om het te kiezen. Gelijk welk aantal pakketten kan voor
+installatie opgegeven worden. Ze zullen allemaal opgehaald worden. Install
+zal automatisch proberen om een oplossing te vinden voor de
+vereistenproblemen die zich met de opgegeven pakketten stellen, het zal er
+een samenvatting van weergeven en om bevestiging vragen indien er nog andere
+wijzigingen door te voeren zijn dan de opgegeven argumenten.
+</p>
+          </dd>
+          <dt>
+            <span class="term">dist-upgrade</span>
+          </dt>
+          <dd>
+            <p>
+Dist-upgrade voert een volledige opwaardering uit en is ontworpen om de
+opwaardering tussen verschillende uitgaves van Debian te
+vergemakkelijken. Het maakt gebruik van een gesofisticeerd algoritme om de
+beste combinatie van pakketten te vinden die geïnstalleerd, opgewaardeerd en
+verwijderd moeten worden om op die manier een zo groot mogelijk deel van het
+systeem op het niveau van de meest recente uitgave te krijgen. In sommige
+omstandigheden kan het aangewezen zijn dist-upgrade te gebruiken in plaats
+van zelf tijd te investeren in het manueel oplossen in
+<span class="command"><strong>dselect</strong></span> van vereistenproblemen. Nadat dist-upgrade zijn
+operatie beëindigd heeft, kan men dan <span class="command"><strong>dselect</strong></span> gebruiken
+om eventuele pakketten die achterwege gelaten werden, te installeren.
+</p>
+            <p>
+Het is van belang om van nabij te onderzoeken wat dist-upgrade van plan is
+te doen. Zijn keuzes kunnen soms redelijk verrassend zijn.
+</p>
+          </dd>
+        </dl>
+      </div>
+      <p>
+Er kunnen met <span class="command"><strong>apt-get</strong></span> verschillende commandoregelopties
+gebruikt worden die beschreven worden in de man-pagina
+<span class="citerefentry"><span class="refentrytitle">apt-get</span>(8)</span>.
+De meest bruikbare optie is <code class="literal">-d</code> dat de opgehaalde
+bestanden niet installeert. Indien het systeem een groot aantal pakketten
+moet downloaden en er zou iets fout gegaan zijn, dan zou het onwenselijk
+zijn dat er met hun installatie begonnen wordt. Als de optie
+<code class="literal">-d</code> gebruikt werd, kan men de opgehaalde archieven
+beginnen installeren door gewoon het commando waarmee men ze opgehaald heeft
+opnieuw uit te voeren, maar dan zonder de optie <code class="literal">-d</code>.
+</p>
+      <div class="footnotes">
+        <br/>
+        <hr/>
+        <div id="ftn.idm41" class="footnote">
+          <p><a href="#idm41" class="para"><sup class="para">[1] </sup></a> Indien u van een http proxy-server gebruik maakt, moet u eerst de
+omgevingsvariabele http_proxy instellen; zie sources.list(5) </p>
+        </div>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr/>
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td align="left"><a accesskey="p" href="ch1.html">Terug</a> </td>
+          <td align="center"> </td>
+          <td align="right"> <a accesskey="n" href="ch3.html">Volgende</a></td>
+        </tr>
+        <tr>
+          <td align="left" valign="top">Hoofdstuk 1. Algemeen </td>
+          <td align="center">
+            <a accesskey="h" href="index.html">Begin</a>
+          </td>
+          <td align="right" valign="top"> Hoofdstuk 3. DSelect</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

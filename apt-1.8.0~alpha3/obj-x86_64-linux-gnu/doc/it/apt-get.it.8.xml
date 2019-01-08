@@ -1,0 +1,682 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+  "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % aptent SYSTEM "apt.ent"> %aptent;
+<!ENTITY % aptverbatiment SYSTEM "apt-verbatim.ent"> %aptverbatiment;
+<!ENTITY % aptvendor SYSTEM "apt-vendor.ent"> %aptvendor;
+]>
+
+<refentry>
+
+ <refentryinfo>
+   <!-- The last update date -->
+&apt-author.jgunthorpe;
+   &apt-author.team;
+   &apt-email;
+   &apt-product;
+   
+   <date>2018-10-14T00:00:00Z</date>
+ </refentryinfo>
+ 
+ <refmeta>
+   <refentrytitle>apt-get</refentrytitle>
+   <manvolnum>8</manvolnum>
+   <refmiscinfo class="manual">APT</refmiscinfo>
+ </refmeta>
+ 
+ 
+ <!-- Man page title -->
+<refnamediv>
+    <refname>apt-get</refname>
+    <refpurpose>strumento APT per la gestione dei pacchetti, interfaccia a riga di comando</refpurpose>
+ </refnamediv>
+
+ &synopsis-command-apt-get;
+
+ <refsect1><title>Descrizione</title>
+   <para><command>apt-get</command> è lo strumento a riga di comando per gestire
+pacchetti e può essere considerato il «backend» dell'utente per altri
+strumenti che usano la libreria APT. Esistono diversi «front-end» per
+interfaccia, come &aptitude;, &synaptic; e &wajig;.</para>
+
+   <para>A meno che non venga fornita l'opzione <option>-h</option> o
+<option>--help</option>, deve essere presente uno dei comandi seguenti.</para>
+   
+   <variablelist>
+     <varlistentry><term><option>update</option></term>
+     <listitem><para><literal>update</literal> è usato per sincronizzare nuovamente i file degli
+indici dei pacchetti dalle loro fonti. Gli indici dei pacchetti disponibili
+sono scaricati dalle posizioni specificate in
+<filename>/etc/apt/sources.list</filename>. Per esempio, quando si usa un
+archivio Debian, questo comando recupera e analizza i file
+<filename>Packages.gz</filename>, in modo da rendere disponibili
+informazioni sui pacchetti nuovi e quelli aggiornati. Si dovrebbe sempre
+fare un <literal>update</literal> prima di un <literal>upgrade</literal> o
+<literal>dist-upgrade</literal>. Notare che l'indicatore di avanzamento
+globale non è preciso perché è impossibile conoscere in anticipo la
+dimensione dei file degli indici dei pacchetti.</para></listitem>
+     </varlistentry>
+     
+     <varlistentry><term><option>upgrade</option></term>
+     <listitem><para><literal>upgrade</literal> è usato per installare le versioni più recenti di
+tutti i pacchetti attualmente installati sul sistema, usando le fonti
+elencate in <filename>/etc/apt/sources.list</filename>. I pacchetti
+attualmente installati con nuove versioni disponibili sono recuperati e
+aggiornati; in nessun caso vengono rimossi pacchetti attualmente installati
+oppure recuperati e installati pacchetti che non lo sono già. I pacchetti
+attualmente installati che hanno una nuova versione, ma che non possono
+essere aggiornati senza cambiare lo stato di installazione di un altro
+pacchetto, vengono lasciati alla versione attuale. Deve essere prima
+effettuato un <literal>update</literal> in modo che
+<command>apt-get</command> sappia se sono disponibili nuove versioni dei
+pacchetti.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>dist-upgrade</option></term>
+     <listitem><para><literal>dist-upgrade</literal>, oltre ad effettuare le funzioni di
+<literal>upgrade</literal>, gestisce anche in maniera intelligente le
+modifiche delle dipendenze delle nuove versioni dei pacchetti;
+<command>apt-get</command> ha un sistema «intelligente» di risoluzione dei
+conflitti e cerca di aggiornare i pacchetti più importanti a scapito di
+quelli meno importanti, se necessario. Il comando
+<literal>dist-upgrade</literal> può quindi rimuovere alcuni pacchetti. Il
+file <filename>/etc/apt/sources.list</filename> contiene un elenco di
+posizioni da cui recuperare i file di pacchetto desiderati. Vedere anche
+&apt-preferences; per un meccanismo per scavalcare le impostazioni generali
+per singoli pacchetti.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>dselect-upgrade</option></term>
+     <listitem><para><literal>dselect-upgrade</literal> viene usato insieme a &dselect;, il
+front-end tradizionale per i pacchetti di
+Debian. <literal>dselect-upgrade</literal> segue i cambiamenti fatti da
+&dselect; al campo <literal>Status</literal> dei pacchetti disponibili, ed
+effettua le azioni necessarie per realizzare tale stato (ad esempio la
+rimozione di vecchi pacchetti e l'installazione di nuovi).</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>install</option></term>
+     <listitem>
+	 <para><literal>install</literal> è seguito da uno o più pacchetti da installare o
+aggiornare. Ogni pacchetto è un nome di pacchetto, non un nome di file
+pienamente qualificato (ad esempio, in un sistema Debian, l'argomento
+fornito sarebbe <package>apt-utils</package>, non
+<filename>apt-utils_&apt-product-version;_amd64.deb</filename>). Tutti i
+pacchetti richiesti dai pacchetti specificati per l'installazione saranno
+anch'essi recuperati e installati. Il file
+<filename>/etc/apt/sources.list</filename> viene usato per localizzare i
+pacchetti desiderati. Se viene aggiunto un segno meno alla fine del nome di
+pacchetto (senza spazio), il pacchetto specificato viene rimosso, se è
+installato. Analogamente un segno più può essere usato per specificare un
+pacchetto da installare. Queste ultime funzionalità possono essere usate per
+scavalcare decisioni prese dal sistema di risoluzione dei conflitti di
+apt-get.
+	 </para>
+
+     <para>È possibile selezionare una versione specifica di un pacchetto per
+l'installazione scrivendo dopo il nome del pacchetto un segno di uguale e la
+versione del pacchetto da selezionare. Ciò farà sì che venga localizzata e
+selezionata per l'installazione quella versione. In alternativa può essere
+selezionata una distribuzione specifica scrivendo dopo il nome del pacchetto
+una sbarra («/») e la versione della distribuzione o il nome dell'archivio
+(stable, testing, unstable).</para>
+
+     <para>Entrambi i meccanismi di selezione della versione possono far retrocedere
+pacchetti e devono essere usati con cautela.</para>
+
+	<para>Questa è l'azione da usare anche quando si desiderano aggiornare uno o più
+pacchetti già installati senza aggiornare ogni pacchetto nel sistema. A
+differenza dell'azione «upgrade», che aggiorna alla versione più recente
+tutti i pacchetti installati, «install» installa la versione più recente
+solamente per i pacchetti specificati. Basta fornire il nome dei pacchetti
+che si desiderano aggiornare e, se è disponibile una versione più recente,
+essa (e tutte le sue dipendenze come descritto sopra) verrà scaricata e
+installata.
+	</para>
+
+     <para>Da ultimo, il meccanismo &apt-preferences; permette di creare una politica
+di installazione alternativa per i singoli pacchetti.</para>
+
+     <para>Se nessun pacchetto corrisponde all'espressione specificata e questa
+contiene uno tra «.», «?» o «*», allora viene considerata come
+un'espressione regolare POSIX e viene confrontata con tutti i nomi di
+pacchetto nel database. Ogni corrispondenza viene quindi installata (o
+rimossa). Notare che la corrispondenza avviene con sottostringhe, perciò
+«bass.*» trova corrispondenza con «quanto-bass» e «bassissimo». Se ciò non è
+quello che si desidera, ancorare l'espressione regolare con un carattere «^»
+o «$», oppure creare un'espressione regolare più specifica.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>remove</option></term>
+     <listitem><para><literal>remove</literal> è identico a <literal>install</literal> tranne per
+il fatto che i pacchetti sono rimossi invece che installati. Notare che la
+rimozione di un pacchetto lascia i suoi file di configurazione nel
+sistema. Se viene aggiunto un segno più in fondo al nome del pacchetto
+(senza spazi in mezzo), il pacchetto specificato viene installato invece che
+rimosso.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>purge</option></term>
+     <listitem><para><literal>purge</literal> è identico a <literal>remove</literal> tranne per
+il fatto che i pacchetti sono rimossi ed eliminati completamente (viene
+eliminato anche ogni file di configurazione).</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>source</option></term>
+     <listitem><para><literal>source</literal> fa sì che <command>apt-get</command> scarichi i
+pacchetti sorgente. APT esaminerà i pacchetti disponibili per decidere quali
+pacchetti sorgente scaricare. Poi, se possibile, troverà e scaricherà nella
+directory corrente la versione più recente disponibile di quel pacchetto
+sorgente rispettando il rilascio predefinito, impostato con l'opzione
+<literal>APT::Default-Release</literal>, l'opzione <option>-t</option> o per
+i singoli pacchetti con la sintassi <literal>pacch/rilascio</literal>.</para>
+
+    <para>The arguments are interpreted as binary and source package names.  See the
+<option>--only-source</option> option if you want to change that.</para>
+
+     <para>Il sistema tiene traccia dei pacchetti sorgente in modo separato dai
+pacchetti binari, attraverso righe <literal>deb-src</literal> nel file
+&sources-list;. Ciò significa che sarà necessario aggiungere una riga di
+questo tipo per ciascun repository da cui si desiderano ottenere sorgenti;
+in caso contrario probabilmente si otterrà la versione sorgente sbagliata
+(troppo vecchia o troppo nuova) oppure nessuna versione.</para>
+
+     <para>Se viene specificata l'opzione <option>--compile</option> allora il
+pacchetto verrà compilato in un .deb binario usando
+<command>dpkg-buildpackage</command> per l'architettura così come definita
+dall'opzione <command>--host-architecture</command>. Se viene usata
+l'opzione <option>--download-only</option>, allora il pacchetto sorgente non
+verrà spacchettato.</para>
+
+     <para>Può essere recuperata una specifica versione sorgente facendo seguire al
+nome del sorgente un segno uguale e quindi la versione da scaricare, in modo
+simile al meccanismo usato per i file di pacchetto. Ciò permette la
+corrispondenza esatta con il nome e la versione del pacchetto sorgente,
+abilitando implicitamente l'opzione
+<literal>APT::Get::Only-Source</literal>.</para>
+
+     <para>Notare che i pacchetti sorgente non vengono installati né viene tenuta
+traccia di essi nel database di <command>dpkg</command> come per i pacchetti
+binari; sono semplicemente scaricati nella directory corrente, come archivi
+tar dei sorgenti.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>build-dep</option></term>
+     <listitem><para><literal>build-dep</literal> fa sì che apt-get installi o rimuova pacchetti,
+nel tentativo di soddisfare le dipendenze di compilazione di un pacchetto
+sorgente. In modo predefinito sono soddisfatte le dipendenze per compilare
+il pacchetto in modo nativo. Se lo si desidera, è possibile invece
+specificare un'architettura ospite con l'opzione
+<option>--host-architecture</option>.</para><para>The arguments are interpreted as binary or source package names. See the
+<option>--only-source</option> option if you want to change that.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>check</option></term>
+     <listitem><para><literal>check</literal> è uno strumento diagnostico; aggiorna la cache dei
+pacchetti e controlla la presenza di dipendenze non soddisfatte.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>download</option></term>
+       <listitem><para><literal>download</literal> scarica il pacchetto binario specificato nella
+directory corrente.
+       </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>clean</option></term>
+     <listitem><para><literal>clean</literal> ripulisce il repository locale dei file di
+pacchetto recuperati. Rimuove tutto da
+<filename>&cachedir;/archives/</filename> e
+<filename>&cachedir;/archives/partial/</filename>,  tranne il file di lock.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>autoclean</option> (e l'alias <option>auto-clean</option> a partire da 1.1)</term>
+     <listitem><para>Come <literal>clean</literal>, <literal>autoclean</literal> ripulisce il
+repository locale dei file di pacchetto recuperati. La differenza sta nel
+fatto che rimuove solo i file di pacchetto che non possono più essere
+scaricati e sono per lo più inutili. Questo permette di mantenere una cache
+per un periodo lungo senza che cresca fuori controllo. Se l'opzione di
+configurazione <literal>APT::Clean-Installed</literal> è disabilitata,
+impedisce che vengano eliminati i pacchetti installati.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>autoremove</option> (e l'alias <option>auto-remove</option> a partire da 1.1)</term>
+     <listitem><para><literal>autoremove</literal> viene usato per rimuovere i pacchetti che sono
+stati installati automaticamente per soddisfare delle dipendenze per altri
+pacchetti e che non sono più necessari.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>changelog</option></term>
+	<listitem><para><literal>changelog</literal> cerca di scaricare il changelog di un pacchetto
+e lo visualizza usando <command>sensible-pager</command>. In modo
+predefinito visualizza il changelog per la versione che è
+installata. Tuttavia si possono specificare le stesse opzioni del comando
+<option>install</option>.</para>
+       </listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>indextargets</option></term>
+	<listitem><para>Visualizza in modo predefinito un elenco formattato come deb822 di
+informazioni su tutti i file dei dati (alias target indice) che
+<command>apt-get update</command> scaricherebbe. Permette l'uso di
+un'opzione <option>--format</option> per modificare il formato di output,
+così come accetta righe dell'output predefinito con cui filtrare le voci. Il
+comando è usato principalmente come interfaccia per strumenti esterni che
+lavorano con APT per ottenere informazioni e nomi di file per i file
+scaricati, in modo che possano essere usati anch'essi invece di
+riscaricarli. La documentazione dettagliata non è presentata qui e può
+essere invece trovata nel file &apt-acquire-additional-files; fornito con il
+pacchetto <package>apt-doc</package>.
+	   </para>
+	</listitem>
+     </varlistentry>
+
+
+   </variablelist>
+ </refsect1>
+ 
+ <refsect1><title>opzioni</title>
+   &apt-cmdblurb;
+
+   <variablelist>
+     <varlistentry><term><option>--no-install-recommends</option></term>
+     <listitem><para>Non considerare i pacchetti raccomandati come una dipendenza per
+l'installazione. Voce di configurazione:
+<literal>APT::Install-Recommends</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>--install-suggests</option></term>
+     <listitem><para>Considera i pacchetti suggeriti come una dipendenza per
+l'installazione. Voce di
+configurazione:<literal>APT::Install-Suggests</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>-d</option></term><term><option>--download-only</option></term>
+     <listitem><para>Scarica solamente; i file di pacchetto sono solo recuperati e non
+spacchettati o installati. Voce di configurazione:
+<literal>APT::Get::Download-Only</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>-f</option></term><term><option>--fix-broken</option></term>
+     <listitem><para>Aggiusta; cerca di correggere un sistema che ha dipendenze non
+soddisfatte. Questa opzione, quando usata con install o remove, può omettere
+qualsiasi pacchetto per permettere ad APT di trovare una soluzione
+valida. Se sono specificati dei pacchetti, questi devono risolvere
+completamente il problema. L'opzione è a volte necessaria quando si esegue
+APT per la prima volta; APT stesso non permette l'esistenza di pacchetti con
+dipendenze non soddisfatte in un sistema. È possibile che la struttura di
+dipendenze di un sistema sia corrotta a tal punto da richiedere un
+intervento manuale (il che di solito significa usare <command>dpkg
+--remove</command> per eliminare alcuni dei pacchetti che creano
+problemi). L'uso di questa opzione insieme a <option>-m</option> può in
+alcune situazioni produrre un errore. Voce di configurazione:
+<literal>APT::Get::Fix-Broken</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>-m</option></term><term><option>--ignore-missing</option></term>
+     <term><option>--fix-missing</option></term>
+     <listitem><para>Ignora i pacchetti mancanti; se alcuni pacchetti non possono essere
+recuperati o fallisce il controllo sulla loro integrità dopo il recupero
+(file di pacchetto corrotti), mantiene bloccati tali pacchetti e gestisce il
+risultato. L'uso di questa opzione insieme a <option>-f</option> può
+produrre un errore in alcune situazioni. Se un pacchetto è selezionato per
+l'installazione (particolarmente se è indicato nella riga di comando) e non
+può essere scaricato verrà silenziosamente mantenuto invariato. Voce di
+configurazione: <literal>APT::Get::Fix-Missing</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>--no-download</option></term>
+     <listitem><para>Disabilita lo scaricamento dei pacchetti. È usato al meglio con
+<option>--ignore-missing</option> per forzare APT ad usare solo i .deb che
+ha già scaricato. Voce di configurazione:
+<literal>APT::Get::Download</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>-q</option></term><term><option>--quiet</option></term>
+     <listitem><para>Silenzioso; produce un output adatto alla registrazione, omettendo gli
+indicatori di avanzamento. L'uso di più «q» produce un output più silenzioso
+fino a un massimo di 2. Si può anche usare <option>-q=n</option> per
+impostare il livello di silenziosità a n, scavalcando il file di
+configurazione. Notare che il livello di silenziosità 2 implica
+<option>-y</option>; non si dovrebbe mai usare -qq senza un modificatore che
+non fa azioni come -d, --print-uris o -s, dato che APT potrebbe decidere di
+fare qualcosa di inatteso. Voce di configurazione: <literal>quiet</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>-s</option></term>
+                   <term><option>--simulate</option></term>
+		   <term><option>--just-print</option></term>
+		   <term><option>--dry-run</option></term>
+		   <term><option>--recon</option></term>
+		   <term><option>--no-act</option></term>
+     <listitem><para>Nessuna azione; effettua una simulazione degli eventi che avverrebbero sulla
+base dello stato attuale del sistema, ma non fa nulla per cambiare
+effettivamente il sistema. Il lock viene disabilitato
+(<option>Debug::NoLocking</option>) perciò lo stato del sistema può cambiare
+durante l'esecuzione di <command>apt-get</command>. Le simulazioni possono
+anche essere eseguite da utenti non privilegiati che potrebbero non aver
+accesso in lettura a tutta la configurazione di apt, rendendo perciò
+distorta la simulazione. Per gli utenti diversi da root viene mostrata in
+modo predefinito una notifica che avverte di questo
+(<option>APT::Get::Show-User-Simulation-Note</option>). Voce di
+configurazione: <literal>APT::Get::Simulate</literal>.</para>
+
+     <para>Le esecuzioni simulate stampano una serie di righe, ciascuna delle quali
+rappresenta un'operazione di <command>dpkg</command>: configurazione
+(<literal>Conf</literal>), rimozione (<literal>Remv</literal>) o
+spacchettamento (<literal>Inst</literal>). Le parentesi quadre indicano i
+pacchetti difettosi e le parentesi quadre vuote indicano difetti che non
+hanno conseguenze (rari).</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>-y</option></term><term><option>--yes</option></term>
+                   <term><option>--assume-yes</option></term>
+     <listitem><para>Rispondi automaticamente «sì» ai prompt; assume «sì» come risposta a tutti i
+prompt e viene eseguito in modo non interattivo. Se si verifica una
+situazione non desiderabile, come il cambiamento di un pacchetto bloccato,
+il tentativo di installazione di un pacchetto non autenticato o la rimozione
+di un pacchetto essenziale, allora <literal>apt-get</literal> annullerà
+l'esecuzione. Voce di configurazione:
+<literal>APT::Get::Assume-Yes</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>--assume-no</option></term>
+     <listitem><para>Rispondi automaticamente «no» a tutti i prompt. Voce di configurazione:
+<literal>APT::Get::Assume-No</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>--no-show-upgraded</option></term>
+     <listitem><para>Non stampa un elenco di tutti i pacchetti che devono essere aggiornati. Voce
+di configurazione: <literal>APT::Get::Show-Upgraded</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>-V</option></term><term><option>--verbose-versions</option></term>
+     <listitem><para>Mostra la versione completa dei pacchetti aggiornati e installati. Voce di
+configurazione: <literal>APT::Get::Show-Versions</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>-a</option></term>
+                   <term><option>--host-architecture</option></term>
+     <listitem><para>Questa opzione controlla l'architettura per la quale <command>apt-get source
+--compile</command> compila i pacchetti e come le dipendenze di compilazione
+incrociata sono soddisfatte. In modo predefinito non è impostata, il che
+significa che l'architettura ospite è la stessa dell'architettura di
+compilazione (che è definita da <literal>APT::Architecture</literal>). Voce
+di configurazione: <literal>APT::Get::Host-Architecture</literal>.
+     </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>-P</option></term>
+                   <term><option>--build-profiles</option></term>
+     <listitem><para>Questa opzione controlla i profili di compilazione attivi per i quali
+<command>apt-get source --compile</command> compila un pacchetto sorgente e
+come le dipendenze di compilazione sono soddisfatte. In modo predefinito non
+è attivo alcun profilo di compilazione. Più profili di compilazione possono
+essere attivati contemporaneamente concatenandoli con una virgola. Voce di
+configurazione: <literal>APT::Build-Profiles</literal>.
+     </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>-b</option></term><term><option>--compile</option></term>
+                   <term><option>--build</option></term>
+     <listitem><para>Compila i pacchetti sorgente dopo averli scaricati. Voce di configurazione:
+<literal>APT::Get::Compile</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>--ignore-hold</option></term>
+     <listitem><para>Ignora i blocchi sui pacchetti; ciò fa sì che <command>apt-get</command>
+ignori il blocco posto su un pacchetto. Può essere utile insieme a
+<literal>dist-upgrade</literal> per scavalcare un grande numero di blocchi
+non desiderati. Voce di configurazione: <literal>APT::Ignore-Hold</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>--with-new-pkgs</option></term>
+     <listitem><para>Permette l'installazione di nuovi pacchetti quando usato insieme a
+<literal>upgrade</literal>. Ciò è utile se l'aggiornamento di un pacchetto
+installato richiede l'installazione di nuove dipendenze. Invece di bloccare
+il pacchetto <literal>upgrade</literal> aggiornerà il pacchetto e installerà
+le nuove dipendenze. Notare che <literal>upgrade</literal> con questa
+opzione non rimuoverà mai pacchetti, permetterà solo l'aggiunta di
+nuovi. Voce di configurazione:
+<literal>APT::Get::Upgrade-Allow-New</literal>.
+     </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>--no-upgrade</option></term>
+     <listitem><para>Non aggiornare i pacchetti; quando usato insieme a
+<literal>install</literal>, <literal>no-upgrade</literal> impedisce che i
+pacchetti nella riga di comando vengano aggiornati se sono già
+installati. Voce di configurazione: <literal>APT::Get::Upgrade</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>--only-upgrade</option></term>
+     <listitem><para>Non installare nuovi pacchetti; quando usato insieme a
+<literal>install</literal>, <literal>only-upgrade</literal> installa gli
+aggiornamenti solamente per i pacchetti già installati e ignora le richieste
+di installarne di nuovi. Voce di configurazione:
+<literal>APT::Get::Only-Upgrade</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>--allow-downgrades</option></term>
+     <listitem><para>Questa è un'opzione pericolosa che fa sì che apt, se sta facendo delle
+retrocessioni a versioni precedenti, continui senza chiedere all'utente. Non
+dovrebbe essere usata se non in situazioni molto particolari. Il suo uso può
+potenzialmente distruggere il sistema. Voce di configurazione:
+<literal>APT::Get::allow-downgrades</literal>. Introdotta in APT 1.1.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>--allow-remove-essential</option></term>
+     <listitem><para>Questa è un'opzione pericolosa che fa sì che apt, se sta rimuovendo dei
+pacchetti essenziali, continui senza chiedere all'utente. Non dovrebbe
+essere usata se non in situazioni molto particolari. Il suo uso può
+potenzialmente distruggere il sistema. Voce di configurazione:
+<literal>APT::Get::allow-remove-essential</literal>. Introdotta in APT 1.1.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>--allow-change-held-packages</option></term>
+     <listitem><para>Forza «sì»; questa è un'opzione pericolosa che fa sì che apt, se sta
+modificando i pacchetti bloccati, continui senza chiedere all'utente. Non
+dovrebbe essere usata se non in situazioni molto particolari. Il suo uso può
+potenzialmente distruggere il sistema. Voce di configurazione:
+<literal>APT::Get::allow-change-held-packages</literal>. Introdotta in APT
+1.1.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>--force-yes</option></term>
+     <listitem><para>Force yes; this is a dangerous option that will cause apt to continue
+without prompting if it is doing something potentially harmful. It should
+not be used except in very special situations. Using
+<literal>force-yes</literal> can potentially destroy your system!
+Configuration Item: <literal>APT::Get::force-yes</literal>. This is
+deprecated and replaced by <option>--allow-unauthenticated</option> ,
+<option>--allow-downgrades</option> ,
+<option>--allow-remove-essential</option> ,
+<option>--allow-change-held-packages</option> in 1.1. </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>--print-uris</option></term>
+     <listitem><para>Invece di scaricare i file per l'installazione, stampa i loro URI. Ogni URI
+ha il percorso, il nome del file di destinazione, la dimensione e l'hash MD5
+atteso. Notare che il nome file in cui scrivere non corrisponde sempre al
+nome file sul sito remoto. Questo funziona anche con i comandi
+<literal>source</literal> e <literal>update</literal>. Quando usato con il
+comando <literal>update</literal> l'hash MD5 e la dimensione non sono
+inclusi, e sta all'utente decomprimere qualsiasi file compresso. Voce di
+configurazione: <literal>APT::Get::Print-URIs</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>--purge</option></term>
+     <listitem><para>Usa purge invece di remove per ogni cosa da rimuovere. Verrà visualizzato un
+asterisco («*») vicino ai pacchetti pianificati per l'eliminazione
+completa. <option>remove --purge</option> è equivalente al comando
+<option>purge</option>. Voce di configurazione:
+<literal>APT::Get::Purge</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>--reinstall</option></term>
+     <listitem><para>Reinstalla i pacchetti che sono già installati alla nuova versione. Voce di
+configurazione: <literal>APT::Get::ReInstall</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>--list-cleanup</option></term>
+     <listitem><para>Questa opzione è attivata in modo predefinito; usare
+<literal>--no-list-cleanup</literal> per disabilitarla. Quando è attivata
+<command>apt-get</command> gestisce automaticamente il contenuto di
+<filename>&statedir;/lists</filename> per garantire che i file obsoleti
+siano eliminati. L'unica ragione per disabilitarla è se si cambia di
+frequente la propria lista di fonti. Voce di configurazione:
+<literal>APT::Get::List-Cleanup</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>-t</option></term>
+                   <term><option>--target-release</option></term>
+                   <term><option>--default-release</option></term>
+     <listitem><para>Questa opzione controlla l'input predefinito per il motore delle politiche;
+crea un pin predefinito alla priorità 990 usando la stringa di rilascio
+specificata. Ciò scavalca le impostazioni generali in
+<filename>/etc/apt/preferences</filename>. Questa opzione non ha effetto sui
+pacchetti su cui si usa specificatamente il pinning. In breve, questa
+opzione permette di avere un semplice controllo sulla distribuzione da cui
+verranno recuperati i pacchetti. Alcuni esempi comuni possono essere
+<option>-t '2.1*'</option>, <option>-t unstable</option> o <option>-t
+sid</option>. Voce di configurazione:
+<literal>APT::Default-Release</literal>; vedere anche la pagina di manuale
+di &apt-preferences;.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>--trivial-only</option></term>
+     <listitem><para>
+     Effettua solo le operazioni che sono «banali». Può essere correlato
+logicamente a <option>--assume-yes</option>: mentre
+<option>--assume-yes</option> risponde «sì» a tutti i prompt,
+<option>--trivial-only</option> risponde «no». Voce di configurazione:
+<literal>APT::Get::Trivial-Only</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>--no-remove</option></term>
+     <listitem><para>Se un qualsiasi pacchetto dovrebbe essere rimosso, apt-get immediatamente
+annulla l'operazione senza chiedere. Voce di configurazione:
+<literal>APT::Get::Remove</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>--auto-remove</option></term><term><option>--autoremove</option></term>
+     <listitem><para>Se il comando è <literal>install</literal> oppure <literal>remove</literal>,
+allora questa opzione si comporta come se si eseguisse il comando
+<literal>autoremove</literal>, rimuovendo i pacchetti di dipendenza non
+utilizzati. Voce di configurazione:
+<literal>APT::Get::AutomaticRemove</literal>.
+     </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>--only-source</option></term>
+     <listitem><para>Ha significato solo per i comandi <literal>source</literal> e
+<literal>build-dep</literal>. Indica che i nomi dei sorgenti indicati non
+devono essere mappati usando la tabella dei binari; ciò significa che, se
+viene specificata questa opzione, tali comandi accetteranno solamente nomi
+di pacchetti sorgente come argomento, invece di accettare nomi di pacchetti
+binari e cercare il pacchetto sorgente corrispondente. Voce di
+configurazione: <literal>APT::Get::Only-Source</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>--diff-only</option></term><term><option>--dsc-only</option></term><term><option>--tar-only</option></term>
+     <listitem><para>Scarica solo il file diff, dsc o tar di un archivio sorgente. Voce di
+configurazione: <literal>APT::Get::Diff-Only</literal>,
+<literal>APT::Get::Dsc-Only</literal> e
+<literal>APT::Get::Tar-Only</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>--arch-only</option></term>
+     <listitem><para>Elabora solo le dipendenze di compilazione dipendenti
+dall'architettura. Voce di configurazione:
+<literal>APT::Get::Arch-Only</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>--indep-only</option></term>
+     <listitem><para>Elabora solo le dipendenze di compilazione indipendenti
+dall'architettura. Voce di configurazione:
+<literal>APT::Get::Indep-Only</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>--allow-unauthenticated</option></term>
+     <listitem><para>Ignora il fatto che i pacchetti non possono essere autenticati e non chiede
+all'utente cosa fare. Questo può essere utile quando si lavora con
+repository locali, ma è un enorme rischio per la sicurezza se l'autenticità
+dei dati non viene garantita in altro modo dall'utente stesso. L'uso
+dell'opzione <option>Trusted</option> per le voci in &sources-list; dovrebbe
+solitamente essere preferito rispetto a questa impostazione globale. Voce di
+configurazione: <literal>APT::Get::AllowUnauthenticated</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>--no-allow-insecure-repositories</option></term>
+     <listitem><para>Impedisce al comando update di acquisire dati non verificabili dalle fonti
+configurate. Il comando update di Apt fallirà per i repository senza firme
+crittografiche valide. Vedere anche &apt-secure; per i dettagli sul concetto
+e sulle implicazioni. Voce di configurazione:
+<literal>Acquire::AllowInsecureRepositories</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>--allow-releaseinfo-change</option></term>
+     <listitem><para>Allow the update command to continue downloading data from a repository
+which changed its information of the release contained in the repository
+indicating e.g a new major release.  APT will fail at the update command for
+such repositories until the change is confirmed to ensure the user is
+prepared for the change.  See also &apt-secure; for details on the concept
+and configuration.
+     </para><para>
+     Specialist options
+(<literal>--allow-releaseinfo-change-</literal><replaceable>field</replaceable>)
+exist to allow changes only for certain fields like
+<literal>origin</literal>, <literal>label</literal>,
+<literal>codename</literal>, <literal>suite</literal>,
+<literal>version</literal> and <literal>defaultpin</literal>. See also
+&apt-preferences;.  Configuration Item:
+<literal>Acquire::AllowReleaseInfoChange</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>--show-progress</option></term>
+     <listitem><para>Mostra informazioni sul progresso facili da leggere nella finestra del
+terminale quando i pacchetti sono installati, aggiornati o rimossi. Per una
+versione analizzabile da macchina di questi dati, vedere
+README.progress-reporting nella directory della documentazione di apt. Voce
+di configurazione: <literal>Dpkg::Progress</literal> e
+<literal>Dpkg::Progress-Fancy</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>--with-source</option> <option>&synopsis-param-filename;</option></term>
+     <listitem><para>
+     Aggiunge il file specificato come fonte per metadati. Può essere ripetuto
+per aggiungere più file. Vedere la descrizione di
+<option>--with-source</option> in &apt-cache; per ulteriori dettagli.
+     </para></listitem>
+     </varlistentry>
+
+     &apt-commonoptions;
+     
+   </variablelist>
+ </refsect1>
+
+ <refsect1><title>File</title>
+   <variablelist>
+     &file-sourceslist;
+     &file-aptconf;
+     &file-preferences;
+     &file-cachearchives;
+     &file-statelists;
+   </variablelist>
+ </refsect1>
+
+ <refsect1><title>Vedere anche</title>
+   <para>&apt-cache;, &apt-cdrom;, &dpkg;, &sources-list;, &apt-conf;, &apt-config;,
+&apt-secure;, la guida dell'utente di APT in &guidesdir;, &apt-preferences;,
+l'APT Howto.</para>
+ </refsect1>
+
+ <refsect1><title>Diagnostica</title>
+   <para><command>apt-get</command> restituisce zero in caso di funzionamento normale
+e il valore decimale 100 in caso di errore.</para>
+ </refsect1>
+ &manbugs;
+ <refsect1><title>&translation-title;</title>
+   <para>&translation-holder;</para>
+   <para>&translation-english;</para>
+ </refsect1>
+</refentry>

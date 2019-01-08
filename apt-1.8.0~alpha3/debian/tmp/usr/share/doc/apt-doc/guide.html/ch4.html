@@ -1,0 +1,417 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Chapter 4. The Interface</title>
+    <meta name="generator" content="DocBook XSL Stylesheets V1.79.1"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="home" href="index.html" title="APT User's Guide"/>
+    <link rel="up" href="index.html" title="APT User's Guide"/>
+    <link rel="prev" href="ch3.html" title="Chapter 3. DSelect"/>
+  </head>
+  <body>
+    <div class="navheader">
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Chapter 4. The Interface</th>
+        </tr>
+        <tr>
+          <td align="left"><a accesskey="p" href="ch3.html">Prev</a> </td>
+          <th width="60%" align="center"> </th>
+          <td align="right"> </td>
+        </tr>
+      </table>
+      <hr/>
+    </div>
+    <div class="chapter">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h1 class="title"><a id="ch4"/>Chapter 4. The Interface</h1>
+          </div>
+        </div>
+      </div>
+      <div class="toc">
+        <p>
+          <strong>Table of Contents</strong>
+        </p>
+        <dl class="toc">
+          <dt>
+            <span class="section">
+              <a href="ch4.html#s4.1">4.1. Startup</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="section">
+              <a href="ch4.html#s4.2">4.2. The Status Report</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="section">
+              <a href="ch4.html#s4.3">4.3. The Status Display</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="section">
+              <a href="ch4.html#s4.4">4.4. Dpkg</a>
+            </span>
+          </dt>
+        </dl>
+      </div>
+      <p>
+Both that APT <span class="command"><strong>dselect</strong></span> method and <span class="command"><strong>apt-get</strong></span>
+share the same interface. It is a simple system that generally tells you what
+it will do and then goes and does it. <a href="#ftn.idm107" class="footnote" id="idm107"><sup class="footnote">[2]</sup></a> After
+printing out a summary of what will happen APT then will print out some
+informative status messages so that you can estimate how far along it is and
+how much is left to do.
+</p>
+      <div class="section">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h2 class="title"><a id="s4.1"/>4.1. Startup</h2>
+            </div>
+          </div>
+        </div>
+        <p>
+Before all operations except update, APT performs a number of actions
+to prepare its internal state. It also does some checks of the system's
+state. At any time these operations can be performed by running
+<code class="literal">apt-get check</code>.
+</p>
+        <pre class="screen">
+# apt-get check
+Reading Package Lists... Done
+Building Dependency Tree... Done
+</pre>
+        <p>
+The first thing it does is read all the package files into memory. APT uses a
+caching scheme so this operation will be faster the second time it is run. If
+some of the package files are not found then they will be ignored and a
+warning will be printed when apt-get exits.
+</p>
+        <p>
+The final operation performs a detailed analysis of the system's
+dependencies. It checks every dependency of every installed or unpacked
+package and considers if it is OK. Should this find a problem then a report
+will be printed out and <span class="command"><strong>apt-get</strong></span> will refuse to run.
+</p>
+        <pre class="screen">
+# apt-get check
+Reading Package Lists... Done
+Building Dependency Tree... Done
+You might want to run 'apt --fix-broken install' to correct these.
+Sorry, but the following packages have unmet dependencies:
+  9fonts: Depends: xlib6g but it is not installed
+  uucp: Depends: mailx but it is not installed
+  blast: Depends: xlib6g (&gt;= 3.3-5) but it is not installed
+  adduser: Depends: perl-base but it is not installed
+  aumix: Depends: libgpmg1 but it is not installed
+  debiandoc-sgml: Depends: sgml-base but it is not installed
+  bash-builtins: Depends: bash (&gt;= 2.01) but 2.0-3 is installed
+  cthugha: Depends: svgalibg1 but it is not installed
+           Depends: xlib6g (&gt;= 3.3-5) but it is not installed
+  libreadlineg2: Conflicts:libreadline2 (&lt;&lt; 2.1-2.1)
+</pre>
+        <p>
+In this example the system has many problems, including a serious problem with
+libreadlineg2. For each package that has unmet dependencies a line is printed
+out indicating the package with the problem and the dependencies that are
+unmet. A short explanation of why the package has a dependency problem is also
+included.
+</p>
+        <p>
+There are two ways a system can get into a broken state like this. The
+first is caused by <span class="command"><strong>dpkg</strong></span> missing some subtle relationships
+between packages when performing upgrades. <a href="#ftn.idm124" class="footnote" id="idm124"><sup class="footnote">[3]</sup></a>. The second is if a package installation
+fails during an operation. In this situation a package may have been
+unpacked without its dependents being installed.
+</p>
+        <p>
+The second situation is much less serious than the first because APT places
+certain constraints on the order that packages are installed. In both cases
+supplying the <code class="literal">-f</code> option to <span class="command"><strong>apt-get</strong></span>
+will cause APT to deduce a possible solution to the problem and then
+continue on. The APT <span class="command"><strong>dselect</strong></span> method always supplies
+the <code class="literal">-f</code> option to allow for easy continuation of failed
+maintainer scripts.
+</p>
+        <p>
+However, if the <code class="literal">-f</code> option is used to correct a seriously
+broken system caused by the first case then it is possible that it will either
+fail immediately or the installation sequence will fail. In either case it is
+necessary to manually use dpkg (possibly with forcing options) to correct the
+situation enough to allow APT to proceed.
+</p>
+      </div>
+      <div class="section">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h2 class="title"><a id="s4.2"/>4.2. The Status Report</h2>
+            </div>
+          </div>
+        </div>
+        <p>
+Before proceeding <span class="command"><strong>apt-get</strong></span> will present a report on what will
+happen. Generally the report reflects the type of operation being performed
+but there are several common elements. In all cases the lists reflect the
+final state of things, taking into account the <code class="literal">-f</code> option
+and any other relevant activities to the command being executed.
+</p>
+        <div class="section">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h3 class="title"><a id="s4.2.1"/>4.2.1. The Extra Package list</h3>
+              </div>
+            </div>
+          </div>
+          <pre class="screen">
+The following extra packages will be installed:
+  libdbd-mysql-perl xlib6 zlib1 xzx libreadline2 libdbd-msql-perl
+  mailpgp xdpkg fileutils pinepgp zlib1g xlib6g perl-base
+  bin86 libgdbm1 libgdbmg1 quake-lib gmp2 bcc xbuffy
+  squake pgp-i python-base debmake ldso perl libreadlineg2
+  ssh
+</pre>
+          <p>
+The Extra Package list shows all of the packages that will be installed or
+upgraded in excess of the ones mentioned on the command line. It is only
+generated for an <code class="literal">install</code> command. The listed packages are
+often the result of an Auto Install.
+</p>
+        </div>
+        <div class="section">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h3 class="title"><a id="s4.2.2"/>4.2.2. The Packages to Remove</h3>
+              </div>
+            </div>
+          </div>
+          <pre class="screen">
+The following packages will be REMOVED:
+  xlib6-dev xpat2 tk40-dev xkeycaps xbattle xonix
+  xdaliclock tk40 tk41 xforms0.86 ghostview xloadimage xcolorsel
+  xadmin xboard perl-debug tkined xtetris libreadline2-dev perl-suid
+  nas xpilot xfig
+</pre>
+          <p>
+The Packages to Remove list shows all of the packages that will be removed
+from the system. It can be shown for any of the operations and should be given
+a careful inspection to ensure nothing important is to be taken off. The
+<code class="literal">-f</code> option is especially good at generating packages to
+remove so extreme care should be used in that case. The list may contain
+packages that are going to be removed because they are only partially
+installed, possibly due to an aborted installation.
+</p>
+        </div>
+        <div class="section">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h3 class="title"><a id="s4.2.3"/>4.2.3. The New Packages list</h3>
+              </div>
+            </div>
+          </div>
+          <pre class="screen">
+The following NEW packages will installed:
+  zlib1g xlib6g perl-base libgdbmg1 quake-lib gmp2 pgp-i python-base
+</pre>
+          <p>
+The New Packages list is simply a reminder of what will happen. The packages
+listed are not presently installed in the system but will be when APT is done.
+</p>
+        </div>
+        <div class="section">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h3 class="title"><a id="s4.2.4"/>4.2.4. The Kept Back list</h3>
+              </div>
+            </div>
+          </div>
+          <pre class="screen">
+The following packages have been kept back
+  compface man-db tetex-base msql libpaper svgalib1
+  gs snmp arena lynx xpat2 groff xscreensaver
+</pre>
+          <p>
+Whenever the whole system is being upgraded there is the possibility that new
+versions of packages cannot be installed because they require new things or
+conflict with already installed things. In this case the package will appear
+in the Kept Back list. The best way to convince packages listed there to
+install is with <code class="literal">apt-get install</code> or by using
+<span class="command"><strong>dselect</strong></span> to resolve their problems.
+</p>
+        </div>
+        <div class="section">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h3 class="title"><a id="s4.2.5"/>4.2.5. Held Packages warning</h3>
+              </div>
+            </div>
+          </div>
+          <pre class="screen">
+The following held packages will be changed:
+  cvs
+</pre>
+          <p>
+Sometimes you can ask APT to install a package that is on hold, in such a case
+it prints out a warning that the held package is going to be changed. This
+should only happen during dist-upgrade or install.
+</p>
+        </div>
+        <div class="section">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h3 class="title"><a id="s4.2.6"/>4.2.6. Final summary</h3>
+              </div>
+            </div>
+          </div>
+          <p>
+Finally, APT will print out a summary of all the changes that will occur.
+</p>
+          <pre class="screen">
+206 packages upgraded, 8 newly installed, 23 to remove and 51 not upgraded.
+12 packages not fully installed or removed.
+Need to get 65.7M/66.7M of archives. After unpacking 26.5M will be used.
+</pre>
+          <p>
+The first line of the summary simply is a reduced version of all of the lists
+and includes the number of upgrades - that is packages already installed that
+have new versions available. The second line indicates the number of poorly
+configured packages, possibly the result of an aborted installation. The final
+line shows the space requirements that the installation needs. The first pair
+of numbers refer to the size of the archive files. The first number indicates
+the number of bytes that must be fetched from remote locations and the second
+indicates the total size of all the archives required. The next number
+indicates the size difference between the presently installed packages and the
+newly installed packages. It is roughly equivalent to the space required in
+/usr after everything is done. If a large number of packages are being removed
+then the value may indicate the amount of space that will be freed.
+</p>
+          <p>
+Some other reports can be generated by using the -u option to show packages to
+upgrade, they are similar to the previous examples.
+</p>
+        </div>
+      </div>
+      <div class="section">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h2 class="title"><a id="s4.3"/>4.3. The Status Display</h2>
+            </div>
+          </div>
+        </div>
+        <p>
+During the download of archives and package files APT prints out a series of
+status messages.
+</p>
+        <pre class="screen">
+# apt-get update
+Get:1 http://ftp.de.debian.org/debian-non-US/ stable/non-US/ Packages
+Get:2 http://llug.sep.bnl.gov/debian/ testing/contrib Packages
+Hit http://llug.sep.bnl.gov/debian/ testing/main Packages
+Get:4 http://ftp.de.debian.org/debian-non-US/ unstable/binary-i386/ Packages
+Get:5 http://llug.sep.bnl.gov/debian/ testing/non-free Packages
+11% [5 testing/non-free `Waiting for file' 0/32.1k 0%] 2203b/s 1m52s
+</pre>
+        <p>
+The lines starting with <span class="emphasis"><em>Get</em></span> are printed out when APT
+begins to fetch a file while the last line indicates the progress of the
+download. The first percent value on the progress line indicates the total
+percent done of all files. Unfortunately since the size of the Package files
+is unknown <code class="literal">apt-get update</code> estimates the percent done which
+causes some inaccuracies.
+</p>
+        <p>
+The next section of the status line is repeated once for each download
+thread and indicates the operation being performed and some useful
+information about what is happening. Sometimes this section will simply
+read <span class="emphasis"><em>Forking</em></span> which means the OS is loading the download
+module. The first word after the [ is the fetch number as shown on the
+history lines. The next word is the short form name of the object being
+downloaded. For archives it will contain the name of the package that is
+being fetched.
+</p>
+        <p>
+Inside of the single quote is an informative string indicating the progress of
+the negotiation phase of the download. Typically it progresses from
+<span class="emphasis"><em>Connecting</em></span> to <span class="emphasis"><em>Waiting for file</em></span> to
+<span class="emphasis"><em>Downloading</em></span> or <span class="emphasis"><em>Resuming</em></span>. The final
+value is the number of bytes downloaded from the remote site. Once the
+download begins this is represented as <code class="literal">102/10.2k</code> indicating
+that 102 bytes have been fetched and 10.2 kilobytes is expected. The total
+size is always shown in 4 figure notation to preserve space. After the size
+display is a percent meter for the file itself. The second last element is the
+instantaneous average speed. This values is updated every 5 seconds and
+reflects the rate of data transfer for that period. Finally is shown the
+estimated transfer time. This is updated regularly and reflects the time to
+complete everything at the shown transfer rate.
+</p>
+        <p>
+The status display updates every half second to provide a constant feedback on
+the download progress while the Get lines scroll back whenever a new file is
+started. Since the status display is constantly updated it is unsuitable for
+logging to a file, use the <code class="literal">-q</code> option to remove the status
+display.
+</p>
+      </div>
+      <div class="section">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h2 class="title"><a id="s4.4"/>4.4. Dpkg</h2>
+            </div>
+          </div>
+        </div>
+        <p>
+APT uses <span class="command"><strong>dpkg</strong></span> for installing the archives and will
+switch over to the <span class="command"><strong>dpkg</strong></span> interface once downloading is
+completed. <span class="command"><strong>dpkg</strong></span> will also ask a number of questions as
+it processes the packages and the packages themselves may also ask several
+questions. Before each question there is usually a description of what it
+is asking and the questions are too varied to discuss completely here.
+</p>
+      </div>
+      <div class="footnotes">
+        <br/>
+        <hr/>
+        <div id="ftn.idm107" class="footnote">
+          <p><a href="#idm107" class="para"><sup class="para">[2] </sup></a> The
+<span class="command"><strong>dselect</strong></span> method actually is a set of wrapper scripts to
+<span class="command"><strong>apt-get</strong></span>. The method actually provides more functionality
+than is present in <span class="command"><strong>apt-get</strong></span> alone. </p>
+        </div>
+        <div id="ftn.idm124" class="footnote">
+          <p><a href="#idm124" class="para"><sup class="para">[3] </sup></a> APT however
+considers all known dependencies and attempts to prevent broken
+packages </p>
+        </div>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr/>
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td align="left"><a accesskey="p" href="ch3.html">Prev</a> </td>
+          <td align="center"> </td>
+          <td align="right"> </td>
+        </tr>
+        <tr>
+          <td align="left" valign="top">Chapter 3. DSelect </td>
+          <td align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td align="right" valign="top"> </td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

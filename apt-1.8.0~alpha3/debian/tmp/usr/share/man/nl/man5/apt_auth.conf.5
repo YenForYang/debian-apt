@@ -1,0 +1,202 @@
+'\" t
+.\"     Title: apt_auth.conf
+.\"    Author: APT-team
+.\" Generator: DocBook XSL Stylesheets v1.79.1 <http://docbook.sf.net/>
+.\"      Date: 03\ \&december\ \&2018
+.\"    Manual: APT
+.\"    Source: APT 1.8.0~alpha3
+.\"  Language: Dutch
+.\"
+.TH "APT_AUTH\&.CONF" "5" "03\ \&december\ \&2018" "APT 1.8.0~alpha3" "APT"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+apt_auth.conf \- Login\-configuratiebestand voor APT\-bronnen en \-proxy\*(Aqs
+.SH "OMSCHRIJVING"
+.PP
+Configuratiebestanden van APT, zoals
+\fBsources.list\fR(5)
+of
+\fBapt.conf\fR(5), moeten toegankelijk zijn voor iedereen die apt\-gereedschap gebruikt op het systeem om toegang te hebben tot alle informatie in verband met pakketten, zoals de in een pakketbron beschikbare pakketten\&. Daarentegen mag login\-informatie die nodig is om verbinding te maken met een proxy of om gegevens op te halen van een pakketbron, niet steeds voor iedereen toegankelijk zijn\&. Om die reden kan ze niet ondergebracht worden in een bestand met permissies die iedereen leestoegang geven\&.
+.PP
+The APT auth\&.conf file
+/etc/apt/auth\&.conf, and \&.conf files inside
+/etc/apt/auth\&.conf\&.d
+can be used to store login information in a netrc\-like format with restrictive file permissions\&.
+.SH "NETRC\-ACHTIGE INDELING"
+.PP
+De hier gedefinieerde indeling is vergelijkbaar met de indeling van het
+~/\&.netrc\-bestand dat gebruikt wordt door
+\fBftp\fR(1)
+en vergelijkbare programma\*(Aqs in interactie met servers\&. Het is een eenvoudige trefwoord\-gebaseerde indeling, waarbij de volgende trefwoorden herkend worden\&. Niet\-herkende trefwoorden worden genegeerd\&. Trefwoorden kunnen van elkaar gescheiden worden door spaties, tabs en regeleindes\&.
+.PP
+machine \fIcomputernaam\fR[:\fIpoort\fR][/\fIpad\fR]
+.RS 4
+Een element wordt opgezocht door bij het trefwoord
+\fImachine\fR
+naar de computernaam te zoeken die overeenkomt met die van de URI waarvoor apt inloggegevens nodig heeft\&. Als uitbreiding bij de netrc\-indeling kan ook een poortnummer opgegeven worden\&. Indien geen poortnummer opgegeven werd, geven alle poorten een overeenkomst\&. Net zo is ook het pad facultatief en enkel nodig als op dezelfde server meerdere pakketbronnen aanwezig zijn met verschillende inloggegevens\&. Als bij het trefwoord machine een pad opgegeven werd, is er een overeenkomst als het pad in de URI begint met het bij het trefwoord opgegeven pad\&. Eens er een overeenkomst vastgesteld werd, worden de daaropvolgende trefwoorden verwerkt tot het einde van het bestand bereikt wordt of tot een ander trefwoord
+\fImachine\fR
+gevonden wordt\&.
+.RE
+.PP
+login \fInaam\fR
+.RS 4
+De te gebruiken gebruikersnaam\&.
+.RE
+.PP
+password \fItekenreeks\fR
+.RS 4
+Het te gebruiken wachtwoord\&.
+.RE
+.SH "VOORBEELD"
+.PP
+Voor een gebruiker met als naam
+apt
+en met het wachtwoord
+debian
+inloginformatie verstrekken voor het element
+\fBsources.list\fR(5)
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+deb http://example\&.org/debian stretch main
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+zou rechtstreeks in het element kunnen gedaan worden:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+deb http://apt:debian@example\&.org/debian stretch main
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+Als alternatief zou in het bestand auth\&.conf een element als het volgende gebruikt kunnen worden:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+machine example\&.org
+login apt
+password debian
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+Of anders in \('e\('en enkele regel:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+machine example\&.org login apt password debian
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+Indien u meer moet specificeren, zullen al deze regels ook op het element example van toepassing zijn:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+machine example\&.org/deb login apt password debian
+machine example\&.org/debian login apt password debian
+machine example\&.org/debian/ login apt password debian
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+Daarentegen zijn geen van de volgende regels van toepassing:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+machine example\&.org:80 login apt password debian
+machine example\&.org/deb/ login apt password debian
+machine example\&.org/ubuntu login apt password debian
+machine example\&.orga login apt password debian
+machine example\&.net login apt password debian
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+.SH "NOTEN"
+.PP
+Basale ondersteuning voor deze functionaliteit was aanwezig sinds versie 0\&.7\&.25 maar bleef jarenlang ongedocumenteerd\&. De documentatie werd in versie 1\&.5 toegevoegd met tevens een lichtjes gewijzigde toepassing\&. Voor maximale neerwaartse compatibiliteit zou u meerdere
+machine\-trefwoorden met dezelfde computernaam moeten vermijden, maar indien u er meerdere nodig heeft, moet er bij alle in het trefwoord
+machine
+een pad opgegeven worden\&.
+.SH "BESTANDEN"
+.PP
+/etc/apt/auth\&.conf
+.RS 4
+Inloginformatie voor APT\-bronnen en \-proxy\*(Aqs in a netrc\-achtige indeling\&. Configuratie\-item:
+Dir::Etc::netrc\&.
+.RE
+.PP
+/etc/apt/auth\&.conf\&.d/*\&.conf
+.RS 4
+Login information for APT sources and proxies in a netrc\-like format\&. Configuration Item:
+Dir::Etc::netrcparts\&.
+.RE
+.SH "ZIE OOK"
+.PP
+\fBapt.conf\fR(5)
+\fBsources.list\fR(5)
+.SH "BUGS"
+.PP
+\m[blue]\fBAPT bugpagina\fR\m[]\&\s-2\u[1]\d\s+2\&. Indien u een bug in APT wilt rapporteren, raadpleeg dan
+/usr/share/doc/debian/bug\-reporting\&.txt
+of het
+\fBreportbug\fR(1)
+commando\&.
+.SH "VERTALING"
+.PP
+De Nederlandse vertaling werd in 2015 gemaakt door Frans Spiesschaert
+<Frans\&.Spiesschaert@yucom\&.be>, in samenwerking met het Debian Dutch l10n Team
+<debian\-l10n\-dutch@lists\&.debian\&.org>\&.
+.PP
+Merk op dat de vertaling van dit document nog onvertaalde delen kan bevatten\&. Dit is intentioneel om te vermijden dat inhoud verloren zou gaan door een vertaling die achterop loopt op het origineel\&.
+.SH "AUTEUR"
+.PP
+\fBAPT\-team\fR
+.RS 4
+.RE
+.SH "OPMERKINGEN"
+.IP " 1." 4
+APT bugpagina
+.RS 4
+\%http://bugs.debian.org/src:apt
+.RE

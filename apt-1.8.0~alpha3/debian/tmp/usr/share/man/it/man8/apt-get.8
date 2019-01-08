@@ -1,0 +1,727 @@
+'\" t
+.\"     Title: apt-get
+.\"    Author: Jason Gunthorpe
+.\" Generator: DocBook XSL Stylesheets v1.79.1 <http://docbook.sf.net/>
+.\"      Date: 14\ \&ottobre\ \&2018
+.\"    Manual: APT
+.\"    Source: APT 1.8.0~alpha3
+.\"  Language: Italian
+.\"
+.TH "APT\-GET" "8" "14\ \&ottobre\ \&2018" "APT 1.8.0~alpha3" "APT"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NOME"
+apt-get \- strumento APT per la gestione dei pacchetti, interfaccia a riga di comando
+.SH "SINOSSI"
+.HP \w'\fBapt\-get\fR\ 'u
+\fBapt\-get\fR [\fB\-asqdyfmubV\fR] [\fB\-o=\fR\fB\fIstringa_config\fR\fR] [\fB\-c=\fR\fB\fIfile_config\fR\fR] [\fB\-t=\fR\fB\fIrilascio_obiettivo\fR\fR] [\fB\-a=\fR\fB\fIarchitettura\fR\fR] {update | upgrade | dselect\-upgrade | dist\-upgrade | install\ \fIpacch\fR\ [{=\fInumero_versione_pacch\fR\ |\ /\fIrilascio_obiettivo\fR}]...  | remove\ \fIpacch\fR...  | purge\ \fIpacch\fR...  | source\ \fIpacch\fR\ [{=\fInumero_versione_pacch\fR\ |\ /\fIrilascio_obiettivo\fR}]...  | build\-dep\ \fIpacch\fR\ [{=\fInumero_versione_pacch\fR\ |\ /\fIrilascio_obiettivo\fR}]...  | download\ \fIpacch\fR\ [{=\fInumero_versione_pacch\fR\ |\ /\fIrilascio_obiettivo\fR}]...  | check | clean | autoclean | autoremove | {\-v\ |\ \-\-version} | {\-h\ |\ \-\-help}}
+.SH "DESCRIZIONE"
+.PP
+\fBapt\-get\fR
+\(`e lo strumento a riga di comando per gestire pacchetti e pu\(`o essere considerato il \(Fobackend\(Fc dell\*(Aqutente per altri strumenti che usano la libreria APT\&. Esistono diversi \(Fofront\-end\(Fc per interfaccia, come
+\fBaptitude\fR(8),
+\fBsynaptic\fR(8)
+e
+\fBwajig\fR(1)\&.
+.PP
+A meno che non venga fornita l\*(Aqopzione
+\fB\-h\fR
+o
+\fB\-\-help\fR, deve essere presente uno dei comandi seguenti\&.
+.PP
+\fBupdate\fR
+.RS 4
+update
+\(`e usato per sincronizzare nuovamente i file degli indici dei pacchetti dalle loro fonti\&. Gli indici dei pacchetti disponibili sono scaricati dalle posizioni specificate in
+/etc/apt/sources\&.list\&. Per esempio, quando si usa un archivio Debian, questo comando recupera e analizza i file
+Packages\&.gz, in modo da rendere disponibili informazioni sui pacchetti nuovi e quelli aggiornati\&. Si dovrebbe sempre fare un
+update
+prima di un
+upgrade
+o
+dist\-upgrade\&. Notare che l\*(Aqindicatore di avanzamento globale non \(`e preciso perch\('e \(`e impossibile conoscere in anticipo la dimensione dei file degli indici dei pacchetti\&.
+.RE
+.PP
+\fBupgrade\fR
+.RS 4
+upgrade
+\(`e usato per installare le versioni pi\(`u recenti di tutti i pacchetti attualmente installati sul sistema, usando le fonti elencate in
+/etc/apt/sources\&.list\&. I pacchetti attualmente installati con nuove versioni disponibili sono recuperati e aggiornati; in nessun caso vengono rimossi pacchetti attualmente installati oppure recuperati e installati pacchetti che non lo sono gi\(`a\&. I pacchetti attualmente installati che hanno una nuova versione, ma che non possono essere aggiornati senza cambiare lo stato di installazione di un altro pacchetto, vengono lasciati alla versione attuale\&. Deve essere prima effettuato un
+update
+in modo che
+\fBapt\-get\fR
+sappia se sono disponibili nuove versioni dei pacchetti\&.
+.RE
+.PP
+\fBdist\-upgrade\fR
+.RS 4
+dist\-upgrade, oltre ad effettuare le funzioni di
+upgrade, gestisce anche in maniera intelligente le modifiche delle dipendenze delle nuove versioni dei pacchetti;
+\fBapt\-get\fR
+ha un sistema \(Fointelligente\(Fc di risoluzione dei conflitti e cerca di aggiornare i pacchetti pi\(`u importanti a scapito di quelli meno importanti, se necessario\&. Il comando
+dist\-upgrade
+pu\(`o quindi rimuovere alcuni pacchetti\&. Il file
+/etc/apt/sources\&.list
+contiene un elenco di posizioni da cui recuperare i file di pacchetto desiderati\&. Vedere anche
+\fBapt_preferences\fR(5)
+per un meccanismo per scavalcare le impostazioni generali per singoli pacchetti\&.
+.RE
+.PP
+\fBdselect\-upgrade\fR
+.RS 4
+dselect\-upgrade
+viene usato insieme a
+\fBdselect\fR(1), il front\-end tradizionale per i pacchetti di Debian\&.
+dselect\-upgrade
+segue i cambiamenti fatti da
+\fBdselect\fR(1)
+al campo
+Status
+dei pacchetti disponibili, ed effettua le azioni necessarie per realizzare tale stato (ad esempio la rimozione di vecchi pacchetti e l\*(Aqinstallazione di nuovi)\&.
+.RE
+.PP
+\fBinstall\fR
+.RS 4
+install
+\(`e seguito da uno o pi\(`u pacchetti da installare o aggiornare\&. Ogni pacchetto \(`e un nome di pacchetto, non un nome di file pienamente qualificato (ad esempio, in un sistema Debian, l\*(Aqargomento fornito sarebbe
+apt\-utils, non
+apt\-utils_1\&.8\&.0~alpha3_amd64\&.deb)\&. Tutti i pacchetti richiesti dai pacchetti specificati per l\*(Aqinstallazione saranno anch\*(Aqessi recuperati e installati\&. Il file
+/etc/apt/sources\&.list
+viene usato per localizzare i pacchetti desiderati\&. Se viene aggiunto un segno meno alla fine del nome di pacchetto (senza spazio), il pacchetto specificato viene rimosso, se \(`e installato\&. Analogamente un segno pi\(`u pu\(`o essere usato per specificare un pacchetto da installare\&. Queste ultime funzionalit\(`a possono essere usate per scavalcare decisioni prese dal sistema di risoluzione dei conflitti di apt\-get\&.
+.sp
+\(`E possibile selezionare una versione specifica di un pacchetto per l\*(Aqinstallazione scrivendo dopo il nome del pacchetto un segno di uguale e la versione del pacchetto da selezionare\&. Ci\(`o far\(`a s\(`i che venga localizzata e selezionata per l\*(Aqinstallazione quella versione\&. In alternativa pu\(`o essere selezionata una distribuzione specifica scrivendo dopo il nome del pacchetto una sbarra (\(Fo/\(Fc) e la versione della distribuzione o il nome dell\*(Aqarchivio (stable, testing, unstable)\&.
+.sp
+Entrambi i meccanismi di selezione della versione possono far retrocedere pacchetti e devono essere usati con cautela\&.
+.sp
+Questa \(`e l\*(Aqazione da usare anche quando si desiderano aggiornare uno o pi\(`u pacchetti gi\(`a installati senza aggiornare ogni pacchetto nel sistema\&. A differenza dell\*(Aqazione \(Foupgrade\(Fc, che aggiorna alla versione pi\(`u recente tutti i pacchetti installati, \(Foinstall\(Fc installa la versione pi\(`u recente solamente per i pacchetti specificati\&. Basta fornire il nome dei pacchetti che si desiderano aggiornare e, se \(`e disponibile una versione pi\(`u recente, essa (e tutte le sue dipendenze come descritto sopra) verr\(`a scaricata e installata\&.
+.sp
+Da ultimo, il meccanismo
+\fBapt_preferences\fR(5)
+permette di creare una politica di installazione alternativa per i singoli pacchetti\&.
+.sp
+Se nessun pacchetto corrisponde all\*(Aqespressione specificata e questa contiene uno tra \(Fo\&.\(Fc, \(Fo?\(Fc o \(Fo*\(Fc, allora viene considerata come un\*(Aqespressione regolare POSIX e viene confrontata con tutti i nomi di pacchetto nel database\&. Ogni corrispondenza viene quindi installata (o rimossa)\&. Notare che la corrispondenza avviene con sottostringhe, perci\(`o \(Fobass\&.*\(Fc trova corrispondenza con \(Foquanto\-bass\(Fc e \(Fobassissimo\(Fc\&. Se ci\(`o non \(`e quello che si desidera, ancorare l\*(Aqespressione regolare con un carattere \(Fo^\(Fc o \(Fo$\(Fc, oppure creare un\*(Aqespressione regolare pi\(`u specifica\&.
+.RE
+.PP
+\fBremove\fR
+.RS 4
+remove
+\(`e identico a
+install
+tranne per il fatto che i pacchetti sono rimossi invece che installati\&. Notare che la rimozione di un pacchetto lascia i suoi file di configurazione nel sistema\&. Se viene aggiunto un segno pi\(`u in fondo al nome del pacchetto (senza spazi in mezzo), il pacchetto specificato viene installato invece che rimosso\&.
+.RE
+.PP
+\fBpurge\fR
+.RS 4
+purge
+\(`e identico a
+remove
+tranne per il fatto che i pacchetti sono rimossi ed eliminati completamente (viene eliminato anche ogni file di configurazione)\&.
+.RE
+.PP
+\fBsource\fR
+.RS 4
+source
+fa s\(`i che
+\fBapt\-get\fR
+scarichi i pacchetti sorgente\&. APT esaminer\(`a i pacchetti disponibili per decidere quali pacchetti sorgente scaricare\&. Poi, se possibile, trover\(`a e scaricher\(`a nella directory corrente la versione pi\(`u recente disponibile di quel pacchetto sorgente rispettando il rilascio predefinito, impostato con l\*(Aqopzione
+APT::Default\-Release, l\*(Aqopzione
+\fB\-t\fR
+o per i singoli pacchetti con la sintassi
+pacch/rilascio\&.
+.sp
+The arguments are interpreted as binary and source package names\&. See the
+\fB\-\-only\-source\fR
+option if you want to change that\&.
+.sp
+Il sistema tiene traccia dei pacchetti sorgente in modo separato dai pacchetti binari, attraverso righe
+deb\-src
+nel file
+\fBsources.list\fR(5)\&. Ci\(`o significa che sar\(`a necessario aggiungere una riga di questo tipo per ciascun repository da cui si desiderano ottenere sorgenti; in caso contrario probabilmente si otterr\(`a la versione sorgente sbagliata (troppo vecchia o troppo nuova) oppure nessuna versione\&.
+.sp
+Se viene specificata l\*(Aqopzione
+\fB\-\-compile\fR
+allora il pacchetto verr\(`a compilato in un \&.deb binario usando
+\fBdpkg\-buildpackage\fR
+per l\*(Aqarchitettura cos\(`i come definita dall\*(Aqopzione
+\fB\-\-host\-architecture\fR\&. Se viene usata l\*(Aqopzione
+\fB\-\-download\-only\fR, allora il pacchetto sorgente non verr\(`a spacchettato\&.
+.sp
+Pu\(`o essere recuperata una specifica versione sorgente facendo seguire al nome del sorgente un segno uguale e quindi la versione da scaricare, in modo simile al meccanismo usato per i file di pacchetto\&. Ci\(`o permette la corrispondenza esatta con il nome e la versione del pacchetto sorgente, abilitando implicitamente l\*(Aqopzione
+APT::Get::Only\-Source\&.
+.sp
+Notare che i pacchetti sorgente non vengono installati n\('e viene tenuta traccia di essi nel database di
+\fBdpkg\fR
+come per i pacchetti binari; sono semplicemente scaricati nella directory corrente, come archivi tar dei sorgenti\&.
+.RE
+.PP
+\fBbuild\-dep\fR
+.RS 4
+build\-dep
+fa s\(`i che apt\-get installi o rimuova pacchetti, nel tentativo di soddisfare le dipendenze di compilazione di un pacchetto sorgente\&. In modo predefinito sono soddisfatte le dipendenze per compilare il pacchetto in modo nativo\&. Se lo si desidera, \(`e possibile invece specificare un\*(Aqarchitettura ospite con l\*(Aqopzione
+\fB\-\-host\-architecture\fR\&.
+.sp
+The arguments are interpreted as binary or source package names\&. See the
+\fB\-\-only\-source\fR
+option if you want to change that\&.
+.RE
+.PP
+\fBcheck\fR
+.RS 4
+check
+\(`e uno strumento diagnostico; aggiorna la cache dei pacchetti e controlla la presenza di dipendenze non soddisfatte\&.
+.RE
+.PP
+\fBdownload\fR
+.RS 4
+download
+scarica il pacchetto binario specificato nella directory corrente\&.
+.RE
+.PP
+\fBclean\fR
+.RS 4
+clean
+ripulisce il repository locale dei file di pacchetto recuperati\&. Rimuove tutto da
+/var/cache/apt/archives/
+e
+/var/cache/apt/archives/partial/, tranne il file di lock\&.
+.RE
+.PP
+\fBautoclean\fR (e l\*(Aqalias \fBauto\-clean\fR a partire da 1\&.1)
+.RS 4
+Come
+clean,
+autoclean
+ripulisce il repository locale dei file di pacchetto recuperati\&. La differenza sta nel fatto che rimuove solo i file di pacchetto che non possono pi\(`u essere scaricati e sono per lo pi\(`u inutili\&. Questo permette di mantenere una cache per un periodo lungo senza che cresca fuori controllo\&. Se l\*(Aqopzione di configurazione
+APT::Clean\-Installed
+\(`e disabilitata, impedisce che vengano eliminati i pacchetti installati\&.
+.RE
+.PP
+\fBautoremove\fR (e l\*(Aqalias \fBauto\-remove\fR a partire da 1\&.1)
+.RS 4
+autoremove
+viene usato per rimuovere i pacchetti che sono stati installati automaticamente per soddisfare delle dipendenze per altri pacchetti e che non sono pi\(`u necessari\&.
+.RE
+.PP
+\fBchangelog\fR
+.RS 4
+changelog
+cerca di scaricare il changelog di un pacchetto e lo visualizza usando
+\fBsensible\-pager\fR\&. In modo predefinito visualizza il changelog per la versione che \(`e installata\&. Tuttavia si possono specificare le stesse opzioni del comando
+\fBinstall\fR\&.
+.RE
+.PP
+\fBindextargets\fR
+.RS 4
+Visualizza in modo predefinito un elenco formattato come deb822 di informazioni su tutti i file dei dati (alias target indice) che
+\fBapt\-get update\fR
+scaricherebbe\&. Permette l\*(Aquso di un\*(Aqopzione
+\fB\-\-format\fR
+per modificare il formato di output, cos\(`i come accetta righe dell\*(Aqoutput predefinito con cui filtrare le voci\&. Il comando \(`e usato principalmente come interfaccia per strumenti esterni che lavorano con APT per ottenere informazioni e nomi di file per i file scaricati, in modo che possano essere usati anch\*(Aqessi invece di riscaricarli\&. La documentazione dettagliata non \(`e presentata qui e pu\(`o essere invece trovata nel file
+/usr/share/doc/apt\-doc/acquire\-additional\-files\&.md\&.gz
+fornito con il pacchetto
+apt\-doc\&.
+.RE
+.SH "OPZIONI"
+.PP
+Tutte le opzioni a riga di comando si possono impostare usando il file di configurazione; le descrizioni indicano l\*(Aqopzione da impostare\&. Per le opzioni booleane si pu\(`o scavalcare il file di configurazione usando qualcosa come
+\fB\-f\-\fR,
+\fB\-\-no\-f\fR,
+\fB\-f=no\fR
+o diverse altre varianti\&.
+.PP
+\fB\-\-no\-install\-recommends\fR
+.RS 4
+Non considerare i pacchetti raccomandati come una dipendenza per l\*(Aqinstallazione\&. Voce di configurazione:
+APT::Install\-Recommends\&.
+.RE
+.PP
+\fB\-\-install\-suggests\fR
+.RS 4
+Considera i pacchetti suggeriti come una dipendenza per l\*(Aqinstallazione\&. Voce di configurazione:APT::Install\-Suggests\&.
+.RE
+.PP
+\fB\-d\fR, \fB\-\-download\-only\fR
+.RS 4
+Scarica solamente; i file di pacchetto sono solo recuperati e non spacchettati o installati\&. Voce di configurazione:
+APT::Get::Download\-Only\&.
+.RE
+.PP
+\fB\-f\fR, \fB\-\-fix\-broken\fR
+.RS 4
+Aggiusta; cerca di correggere un sistema che ha dipendenze non soddisfatte\&. Questa opzione, quando usata con install o remove, pu\(`o omettere qualsiasi pacchetto per permettere ad APT di trovare una soluzione valida\&. Se sono specificati dei pacchetti, questi devono risolvere completamente il problema\&. L\*(Aqopzione \(`e a volte necessaria quando si esegue APT per la prima volta; APT stesso non permette l\*(Aqesistenza di pacchetti con dipendenze non soddisfatte in un sistema\&. \(`E possibile che la struttura di dipendenze di un sistema sia corrotta a tal punto da richiedere un intervento manuale (il che di solito significa usare
+\fBdpkg \-\-remove\fR
+per eliminare alcuni dei pacchetti che creano problemi)\&. L\*(Aquso di questa opzione insieme a
+\fB\-m\fR
+pu\(`o in alcune situazioni produrre un errore\&. Voce di configurazione:
+APT::Get::Fix\-Broken\&.
+.RE
+.PP
+\fB\-m\fR, \fB\-\-ignore\-missing\fR, \fB\-\-fix\-missing\fR
+.RS 4
+Ignora i pacchetti mancanti; se alcuni pacchetti non possono essere recuperati o fallisce il controllo sulla loro integrit\(`a dopo il recupero (file di pacchetto corrotti), mantiene bloccati tali pacchetti e gestisce il risultato\&. L\*(Aquso di questa opzione insieme a
+\fB\-f\fR
+pu\(`o produrre un errore in alcune situazioni\&. Se un pacchetto \(`e selezionato per l\*(Aqinstallazione (particolarmente se \(`e indicato nella riga di comando) e non pu\(`o essere scaricato verr\(`a silenziosamente mantenuto invariato\&. Voce di configurazione:
+APT::Get::Fix\-Missing\&.
+.RE
+.PP
+\fB\-\-no\-download\fR
+.RS 4
+Disabilita lo scaricamento dei pacchetti\&. \(`E usato al meglio con
+\fB\-\-ignore\-missing\fR
+per forzare APT ad usare solo i \&.deb che ha gi\(`a scaricato\&. Voce di configurazione:
+APT::Get::Download\&.
+.RE
+.PP
+\fB\-q\fR, \fB\-\-quiet\fR
+.RS 4
+Silenzioso; produce un output adatto alla registrazione, omettendo gli indicatori di avanzamento\&. L\*(Aquso di pi\(`u \(Foq\(Fc produce un output pi\(`u silenzioso fino a un massimo di 2\&. Si pu\(`o anche usare
+\fB\-q=n\fR
+per impostare il livello di silenziosit\(`a a n, scavalcando il file di configurazione\&. Notare che il livello di silenziosit\(`a 2 implica
+\fB\-y\fR; non si dovrebbe mai usare \-qq senza un modificatore che non fa azioni come \-d, \-\-print\-uris o \-s, dato che APT potrebbe decidere di fare qualcosa di inatteso\&. Voce di configurazione:
+quiet\&.
+.RE
+.PP
+\fB\-s\fR, \fB\-\-simulate\fR, \fB\-\-just\-print\fR, \fB\-\-dry\-run\fR, \fB\-\-recon\fR, \fB\-\-no\-act\fR
+.RS 4
+Nessuna azione; effettua una simulazione degli eventi che avverrebbero sulla base dello stato attuale del sistema, ma non fa nulla per cambiare effettivamente il sistema\&. Il lock viene disabilitato (\fBDebug::NoLocking\fR) perci\(`o lo stato del sistema pu\(`o cambiare durante l\*(Aqesecuzione di
+\fBapt\-get\fR\&. Le simulazioni possono anche essere eseguite da utenti non privilegiati che potrebbero non aver accesso in lettura a tutta la configurazione di apt, rendendo perci\(`o distorta la simulazione\&. Per gli utenti diversi da root viene mostrata in modo predefinito una notifica che avverte di questo (\fBAPT::Get::Show\-User\-Simulation\-Note\fR)\&. Voce di configurazione:
+APT::Get::Simulate\&.
+.sp
+Le esecuzioni simulate stampano una serie di righe, ciascuna delle quali rappresenta un\*(Aqoperazione di
+\fBdpkg\fR: configurazione (Conf), rimozione (Remv) o spacchettamento (Inst)\&. Le parentesi quadre indicano i pacchetti difettosi e le parentesi quadre vuote indicano difetti che non hanno conseguenze (rari)\&.
+.RE
+.PP
+\fB\-y\fR, \fB\-\-yes\fR, \fB\-\-assume\-yes\fR
+.RS 4
+Rispondi automaticamente \(Fos\(`i\(Fc ai prompt; assume \(Fos\(`i\(Fc come risposta a tutti i prompt e viene eseguito in modo non interattivo\&. Se si verifica una situazione non desiderabile, come il cambiamento di un pacchetto bloccato, il tentativo di installazione di un pacchetto non autenticato o la rimozione di un pacchetto essenziale, allora
+apt\-get
+annuller\(`a l\*(Aqesecuzione\&. Voce di configurazione:
+APT::Get::Assume\-Yes\&.
+.RE
+.PP
+\fB\-\-assume\-no\fR
+.RS 4
+Rispondi automaticamente \(Fono\(Fc a tutti i prompt\&. Voce di configurazione:
+APT::Get::Assume\-No\&.
+.RE
+.PP
+\fB\-\-no\-show\-upgraded\fR
+.RS 4
+Non stampa un elenco di tutti i pacchetti che devono essere aggiornati\&. Voce di configurazione:
+APT::Get::Show\-Upgraded\&.
+.RE
+.PP
+\fB\-V\fR, \fB\-\-verbose\-versions\fR
+.RS 4
+Mostra la versione completa dei pacchetti aggiornati e installati\&. Voce di configurazione:
+APT::Get::Show\-Versions\&.
+.RE
+.PP
+\fB\-a\fR, \fB\-\-host\-architecture\fR
+.RS 4
+Questa opzione controlla l\*(Aqarchitettura per la quale
+\fBapt\-get source \-\-compile\fR
+compila i pacchetti e come le dipendenze di compilazione incrociata sono soddisfatte\&. In modo predefinito non \(`e impostata, il che significa che l\*(Aqarchitettura ospite \(`e la stessa dell\*(Aqarchitettura di compilazione (che \(`e definita da
+APT::Architecture)\&. Voce di configurazione:
+APT::Get::Host\-Architecture\&.
+.RE
+.PP
+\fB\-P\fR, \fB\-\-build\-profiles\fR
+.RS 4
+Questa opzione controlla i profili di compilazione attivi per i quali
+\fBapt\-get source \-\-compile\fR
+compila un pacchetto sorgente e come le dipendenze di compilazione sono soddisfatte\&. In modo predefinito non \(`e attivo alcun profilo di compilazione\&. Pi\(`u profili di compilazione possono essere attivati contemporaneamente concatenandoli con una virgola\&. Voce di configurazione:
+APT::Build\-Profiles\&.
+.RE
+.PP
+\fB\-b\fR, \fB\-\-compile\fR, \fB\-\-build\fR
+.RS 4
+Compila i pacchetti sorgente dopo averli scaricati\&. Voce di configurazione:
+APT::Get::Compile\&.
+.RE
+.PP
+\fB\-\-ignore\-hold\fR
+.RS 4
+Ignora i blocchi sui pacchetti; ci\(`o fa s\(`i che
+\fBapt\-get\fR
+ignori il blocco posto su un pacchetto\&. Pu\(`o essere utile insieme a
+dist\-upgrade
+per scavalcare un grande numero di blocchi non desiderati\&. Voce di configurazione:
+APT::Ignore\-Hold\&.
+.RE
+.PP
+\fB\-\-with\-new\-pkgs\fR
+.RS 4
+Permette l\*(Aqinstallazione di nuovi pacchetti quando usato insieme a
+upgrade\&. Ci\(`o \(`e utile se l\*(Aqaggiornamento di un pacchetto installato richiede l\*(Aqinstallazione di nuove dipendenze\&. Invece di bloccare il pacchetto
+upgrade
+aggiorner\(`a il pacchetto e installer\(`a le nuove dipendenze\&. Notare che
+upgrade
+con questa opzione non rimuover\(`a mai pacchetti, permetter\(`a solo l\*(Aqaggiunta di nuovi\&. Voce di configurazione:
+APT::Get::Upgrade\-Allow\-New\&.
+.RE
+.PP
+\fB\-\-no\-upgrade\fR
+.RS 4
+Non aggiornare i pacchetti; quando usato insieme a
+install,
+no\-upgrade
+impedisce che i pacchetti nella riga di comando vengano aggiornati se sono gi\(`a installati\&. Voce di configurazione:
+APT::Get::Upgrade\&.
+.RE
+.PP
+\fB\-\-only\-upgrade\fR
+.RS 4
+Non installare nuovi pacchetti; quando usato insieme a
+install,
+only\-upgrade
+installa gli aggiornamenti solamente per i pacchetti gi\(`a installati e ignora le richieste di installarne di nuovi\&. Voce di configurazione:
+APT::Get::Only\-Upgrade\&.
+.RE
+.PP
+\fB\-\-allow\-downgrades\fR
+.RS 4
+Questa \(`e un\*(Aqopzione pericolosa che fa s\(`i che apt, se sta facendo delle retrocessioni a versioni precedenti, continui senza chiedere all\*(Aqutente\&. Non dovrebbe essere usata se non in situazioni molto particolari\&. Il suo uso pu\(`o potenzialmente distruggere il sistema\&. Voce di configurazione:
+APT::Get::allow\-downgrades\&. Introdotta in APT 1\&.1\&.
+.RE
+.PP
+\fB\-\-allow\-remove\-essential\fR
+.RS 4
+Questa \(`e un\*(Aqopzione pericolosa che fa s\(`i che apt, se sta rimuovendo dei pacchetti essenziali, continui senza chiedere all\*(Aqutente\&. Non dovrebbe essere usata se non in situazioni molto particolari\&. Il suo uso pu\(`o potenzialmente distruggere il sistema\&. Voce di configurazione:
+APT::Get::allow\-remove\-essential\&. Introdotta in APT 1\&.1\&.
+.RE
+.PP
+\fB\-\-allow\-change\-held\-packages\fR
+.RS 4
+Forza \(Fos\(`i\(Fc; questa \(`e un\*(Aqopzione pericolosa che fa s\(`i che apt, se sta modificando i pacchetti bloccati, continui senza chiedere all\*(Aqutente\&. Non dovrebbe essere usata se non in situazioni molto particolari\&. Il suo uso pu\(`o potenzialmente distruggere il sistema\&. Voce di configurazione:
+APT::Get::allow\-change\-held\-packages\&. Introdotta in APT 1\&.1\&.
+.RE
+.PP
+\fB\-\-force\-yes\fR
+.RS 4
+Force yes; this is a dangerous option that will cause apt to continue without prompting if it is doing something potentially harmful\&. It should not be used except in very special situations\&. Using
+force\-yes
+can potentially destroy your system! Configuration Item:
+APT::Get::force\-yes\&. This is deprecated and replaced by
+\fB\-\-allow\-unauthenticated\fR
+,
+\fB\-\-allow\-downgrades\fR
+,
+\fB\-\-allow\-remove\-essential\fR
+,
+\fB\-\-allow\-change\-held\-packages\fR
+in 1\&.1\&.
+.RE
+.PP
+\fB\-\-print\-uris\fR
+.RS 4
+Invece di scaricare i file per l\*(Aqinstallazione, stampa i loro URI\&. Ogni URI ha il percorso, il nome del file di destinazione, la dimensione e l\*(Aqhash MD5 atteso\&. Notare che il nome file in cui scrivere non corrisponde sempre al nome file sul sito remoto\&. Questo funziona anche con i comandi
+source
+e
+update\&. Quando usato con il comando
+update
+l\*(Aqhash MD5 e la dimensione non sono inclusi, e sta all\*(Aqutente decomprimere qualsiasi file compresso\&. Voce di configurazione:
+APT::Get::Print\-URIs\&.
+.RE
+.PP
+\fB\-\-purge\fR
+.RS 4
+Usa purge invece di remove per ogni cosa da rimuovere\&. Verr\(`a visualizzato un asterisco (\(Fo*\(Fc) vicino ai pacchetti pianificati per l\*(Aqeliminazione completa\&.
+\fBremove \-\-purge\fR
+\(`e equivalente al comando
+\fBpurge\fR\&. Voce di configurazione:
+APT::Get::Purge\&.
+.RE
+.PP
+\fB\-\-reinstall\fR
+.RS 4
+Reinstalla i pacchetti che sono gi\(`a installati alla nuova versione\&. Voce di configurazione:
+APT::Get::ReInstall\&.
+.RE
+.PP
+\fB\-\-list\-cleanup\fR
+.RS 4
+Questa opzione \(`e attivata in modo predefinito; usare
+\-\-no\-list\-cleanup
+per disabilitarla\&. Quando \(`e attivata
+\fBapt\-get\fR
+gestisce automaticamente il contenuto di
+/var/lib/apt/lists
+per garantire che i file obsoleti siano eliminati\&. L\*(Aqunica ragione per disabilitarla \(`e se si cambia di frequente la propria lista di fonti\&. Voce di configurazione:
+APT::Get::List\-Cleanup\&.
+.RE
+.PP
+\fB\-t\fR, \fB\-\-target\-release\fR, \fB\-\-default\-release\fR
+.RS 4
+Questa opzione controlla l\*(Aqinput predefinito per il motore delle politiche; crea un pin predefinito alla priorit\(`a 990 usando la stringa di rilascio specificata\&. Ci\(`o scavalca le impostazioni generali in
+/etc/apt/preferences\&. Questa opzione non ha effetto sui pacchetti su cui si usa specificatamente il pinning\&. In breve, questa opzione permette di avere un semplice controllo sulla distribuzione da cui verranno recuperati i pacchetti\&. Alcuni esempi comuni possono essere
+\fB\-t \*(Aq2\&.1*\*(Aq\fR,
+\fB\-t unstable\fR
+o
+\fB\-t sid\fR\&. Voce di configurazione:
+APT::Default\-Release; vedere anche la pagina di manuale di
+\fBapt_preferences\fR(5)\&.
+.RE
+.PP
+\fB\-\-trivial\-only\fR
+.RS 4
+Effettua solo le operazioni che sono \(Fobanali\(Fc\&. Pu\(`o essere correlato logicamente a
+\fB\-\-assume\-yes\fR: mentre
+\fB\-\-assume\-yes\fR
+risponde \(Fos\(`i\(Fc a tutti i prompt,
+\fB\-\-trivial\-only\fR
+risponde \(Fono\(Fc\&. Voce di configurazione:
+APT::Get::Trivial\-Only\&.
+.RE
+.PP
+\fB\-\-no\-remove\fR
+.RS 4
+Se un qualsiasi pacchetto dovrebbe essere rimosso, apt\-get immediatamente annulla l\*(Aqoperazione senza chiedere\&. Voce di configurazione:
+APT::Get::Remove\&.
+.RE
+.PP
+\fB\-\-auto\-remove\fR, \fB\-\-autoremove\fR
+.RS 4
+Se il comando \(`e
+install
+oppure
+remove, allora questa opzione si comporta come se si eseguisse il comando
+autoremove, rimuovendo i pacchetti di dipendenza non utilizzati\&. Voce di configurazione:
+APT::Get::AutomaticRemove\&.
+.RE
+.PP
+\fB\-\-only\-source\fR
+.RS 4
+Ha significato solo per i comandi
+source
+e
+build\-dep\&. Indica che i nomi dei sorgenti indicati non devono essere mappati usando la tabella dei binari; ci\(`o significa che, se viene specificata questa opzione, tali comandi accetteranno solamente nomi di pacchetti sorgente come argomento, invece di accettare nomi di pacchetti binari e cercare il pacchetto sorgente corrispondente\&. Voce di configurazione:
+APT::Get::Only\-Source\&.
+.RE
+.PP
+\fB\-\-diff\-only\fR, \fB\-\-dsc\-only\fR, \fB\-\-tar\-only\fR
+.RS 4
+Scarica solo il file diff, dsc o tar di un archivio sorgente\&. Voce di configurazione:
+APT::Get::Diff\-Only,
+APT::Get::Dsc\-Only
+e
+APT::Get::Tar\-Only\&.
+.RE
+.PP
+\fB\-\-arch\-only\fR
+.RS 4
+Elabora solo le dipendenze di compilazione dipendenti dall\*(Aqarchitettura\&. Voce di configurazione:
+APT::Get::Arch\-Only\&.
+.RE
+.PP
+\fB\-\-indep\-only\fR
+.RS 4
+Elabora solo le dipendenze di compilazione indipendenti dall\*(Aqarchitettura\&. Voce di configurazione:
+APT::Get::Indep\-Only\&.
+.RE
+.PP
+\fB\-\-allow\-unauthenticated\fR
+.RS 4
+Ignora il fatto che i pacchetti non possono essere autenticati e non chiede all\*(Aqutente cosa fare\&. Questo pu\(`o essere utile quando si lavora con repository locali, ma \(`e un enorme rischio per la sicurezza se l\*(Aqautenticit\(`a dei dati non viene garantita in altro modo dall\*(Aqutente stesso\&. L\*(Aquso dell\*(Aqopzione
+\fBTrusted\fR
+per le voci in
+\fBsources.list\fR(5)
+dovrebbe solitamente essere preferito rispetto a questa impostazione globale\&. Voce di configurazione:
+APT::Get::AllowUnauthenticated\&.
+.RE
+.PP
+\fB\-\-no\-allow\-insecure\-repositories\fR
+.RS 4
+Impedisce al comando update di acquisire dati non verificabili dalle fonti configurate\&. Il comando update di Apt fallir\(`a per i repository senza firme crittografiche valide\&. Vedere anche
+\fBapt-secure\fR(8)
+per i dettagli sul concetto e sulle implicazioni\&. Voce di configurazione:
+Acquire::AllowInsecureRepositories\&.
+.RE
+.PP
+\fB\-\-allow\-releaseinfo\-change\fR
+.RS 4
+Allow the update command to continue downloading data from a repository which changed its information of the release contained in the repository indicating e\&.g a new major release\&. APT will fail at the update command for such repositories until the change is confirmed to ensure the user is prepared for the change\&. See also
+\fBapt-secure\fR(8)
+for details on the concept and configuration\&.
+.sp
+Specialist options (\-\-allow\-releaseinfo\-change\-\fIfield\fR) exist to allow changes only for certain fields like
+origin,
+label,
+codename,
+suite,
+version
+and
+defaultpin\&. See also
+\fBapt_preferences\fR(5)\&. Configuration Item:
+Acquire::AllowReleaseInfoChange\&.
+.RE
+.PP
+\fB\-\-show\-progress\fR
+.RS 4
+Mostra informazioni sul progresso facili da leggere nella finestra del terminale quando i pacchetti sono installati, aggiornati o rimossi\&. Per una versione analizzabile da macchina di questi dati, vedere README\&.progress\-reporting nella directory della documentazione di apt\&. Voce di configurazione:
+Dpkg::Progress
+e
+Dpkg::Progress\-Fancy\&.
+.RE
+.PP
+\fB\-\-with\-source\fR \fB\fInomefile\fR\fR
+.RS 4
+Aggiunge il file specificato come fonte per metadati\&. Pu\(`o essere ripetuto per aggiungere pi\(`u file\&. Vedere la descrizione di
+\fB\-\-with\-source\fR
+in
+\fBapt-cache\fR(8)
+per ulteriori dettagli\&.
+.RE
+.PP
+\fB\-h\fR, \fB\-\-help\fR
+.RS 4
+Mostra un breve riassunto sull\*(Aquso\&.
+.RE
+.PP
+\fB\-v\fR, \fB\-\-version\fR
+.RS 4
+Mostra la versione del programma\&.
+.RE
+.PP
+\fB\-c\fR, \fB\-\-config\-file\fR
+.RS 4
+File di configurazione; specifica un file di configurazione da usare\&. Il programma legge il file di configurazione predefinito e poi questo file di configurazione\&. Se \(`e necessario modificare le impostazioni di configurazione prima che vengano analizzati i file di configurazione predefiniti, specificare un file con la variabile d\*(Aqambiente
+\fBAPT_CONFIG\fR\&. Vedere
+\fBapt.conf\fR(5)
+per informazioni sulla sintassi\&.
+.RE
+.PP
+\fB\-o\fR, \fB\-\-option\fR
+.RS 4
+Imposta un\*(Aqopzione di configurazione; imposter\(`a una qualunque opzione di configurazione\&. La sintassi \(`e
+\fB\-o Pinco::Pallo=pallo\fR\&.
+\fB\-o\fR
+e
+\fB\-\-option\fR
+si possono usare pi\(`u volte per impostare opzioni diverse\&.
+.RE
+.SH "FILE"
+.PP
+/etc/apt/sources\&.list
+.RS 4
+Posizioni da cui scaricare i pacchetti\&. Voce di configurazione:
+Dir::Etc::SourceList\&.
+.RE
+.PP
+/etc/apt/sources\&.list\&.d/
+.RS 4
+Frammenti di file per le posizioni da cui scaricare i pacchetti\&. Voce di configurazione:
+Dir::Etc::SourceParts\&.
+.RE
+.PP
+/etc/apt/apt\&.conf
+.RS 4
+File di configurazione di APT\&. Voce di configurazione:
+Dir::Etc::Main\&.
+.RE
+.PP
+/etc/apt/apt\&.conf\&.d/
+.RS 4
+Frammenti di file di configurazione di APT\&. Voce di configurazione:
+Dir::Etc::Parts\&.
+.RE
+.PP
+/etc/apt/preferences
+.RS 4
+File di preferenze di versione\&. Qui si specifica il "pinning", ossia una preferenza a prendere determinati pacchetti da una fonte separata o da una diversa versione di una distribuzione\&. Voce di configurazione:
+Dir::Etc::Preferences\&.
+.RE
+.PP
+/etc/apt/preferences\&.d/
+.RS 4
+Frammenti di file per le preferenze di versione\&. Voce di configurazione:
+Dir::Etc::PreferencesParts\&.
+.RE
+.PP
+/var/cache/apt/archives/
+.RS 4
+Area di archiviazione per i file dei pacchetti recuperati\&. Voce di configurazione:
+Dir::Cache::Archives\&.
+.RE
+.PP
+/var/cache/apt/archives/partial/
+.RS 4
+Area di archiviazione per i file dei pacchetti in transito\&. Voce di configurazione:
+Dir::Cache::Archives
+(partial
+verr\(`a implicitamente aggiunto in fondo al nome)
+.RE
+.PP
+/var/lib/apt/lists/
+.RS 4
+Area di archiviazione per le informazioni sullo stato di ciascuna risorsa dei pacchetti specificata in
+\fBsources.list\fR(5)
+Voce di configurazione:
+Dir::State::Lists\&.
+.RE
+.PP
+/var/lib/apt/lists/partial/
+.RS 4
+Area di archiviazione per le informazioni di stato in transito\&. Voce di configurazione:
+Dir::State::Lists
+(partial
+verr\(`a implicitamente aggiunto in fondo al nome)
+.RE
+.SH "VEDERE ANCHE"
+.PP
+\fBapt-cache\fR(8),
+\fBapt-cdrom\fR(8),
+\fBdpkg\fR(1),
+\fBsources.list\fR(5),
+\fBapt.conf\fR(5),
+\fBapt-config\fR(8),
+\fBapt-secure\fR(8), la guida dell\*(Aqutente di APT in /usr/share/doc/apt\-doc/,
+\fBapt_preferences\fR(5), l\*(AqAPT Howto\&.
+.SH "DIAGNOSTICA"
+.PP
+\fBapt\-get\fR
+restituisce zero in caso di funzionamento normale e il valore decimale 100 in caso di errore\&.
+.SH "BUG"
+.PP
+\m[blue]\fBPagina dei bug di APT\fR\m[]\&\s-2\u[1]\d\s+2\&. Se si desidera segnalare un bug in APT, vedere
+/usr/share/doc/debian/bug\-reporting\&.txt
+o il comando
+\fBreportbug\fR(1)\&.
+.SH "TRADUZIONE"
+.PP
+Traduzione in italiano a cura del Team italiano di localizzazione di Debian
+<debian\-l10n\-italian@lists\&.debian\&.org>\&. In particolare hanno contribuito Eugenia Franzoni (2000), Hugh Hartmann (2000\-2012), Gabriele Stilli (2012), Beatrice Torracca (2012, 2014, 2015)\&.
+.PP
+Notare che questa versione tradotta del documento pu\(`o contenere parti non tradotte\&. Ci\(`o \(`e voluto, per evitare di perdere contenuti quando la traduzione non \(`e aggiornata rispetto all\*(Aqoriginale\&.
+.SH "AUTORI"
+.PP
+\fBJason Gunthorpe\fR
+.RS 4
+.RE
+.PP
+\fBTeam APT\fR
+.RS 4
+.RE
+.SH "NOTE"
+.IP " 1." 4
+Pagina dei bug di APT
+.RS 4
+\%http://bugs.debian.org/src:apt
+.RE

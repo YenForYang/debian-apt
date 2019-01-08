@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+  "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % aptent SYSTEM "apt.ent"> %aptent;
+<!ENTITY % aptverbatiment SYSTEM "apt-verbatim.ent"> %aptverbatiment;
+<!ENTITY % aptvendor SYSTEM "apt-vendor.ent"> %aptvendor;
+]>
+
+<refentry>
+
+ <refentryinfo>
+   <!-- The last update date -->
+&apt-author.jgunthorpe;
+   &apt-author.team;
+   &apt-email;
+   &apt-product;
+   
+   <date>2013-11-30T00:00:00Z</date>
+ </refentryinfo>
+ 
+ <refmeta>
+   <refentrytitle>apt-config</refentrytitle>
+   <manvolnum>8</manvolnum>
+   <refmiscinfo class="manual">APT</refmiscinfo>
+ </refmeta>
+ 
+ 
+ <!-- Man page title -->
+<refnamediv>
+    <refname>apt-config</refname>
+    <refpurpose>programma di interrogazione della configurazione di APT</refpurpose>
+ </refnamediv>
+
+ &synopsis-command-apt-config;
+
+ <refsect1><title>Descrizione</title>
+   <para><command>apt-config</command> è un programma interno usato da varie parti
+della suite APT per fornire una configurabilità coerente. Accede al file
+principale di configurazione <filename>/etc/apt/apt.conf</filename> in un
+modo facile da usare da parte di applicazioni che usano script.</para>
+
+   <para>A meno che non venga fornita l'opzione <option>-h</option> o
+<option>--help</option>, deve essere presente uno dei comandi seguenti.
+   </para>
+   
+   <variablelist>
+     <varlistentry><term><option>shell</option></term>
+     <listitem><para>
+     shell viene usato per accedere alle informazioni di configurazione da parte
+di uno script di shell. Riceve coppie di argomenti, il primo dei quali è una
+variabile di shell e il secondo è il valore di configurazione da
+interrogare. Come risultato elenca il comando shell di assegnazione per
+ciascun valore presente. In uno script di shell dovrebbe essere usato in
+modo simile a:
+     </para>
+     
+<informalexample><programlisting>
+OPZIONI="-f"
+RES=`apt-config shell OPZIONI MiaApp::opzioni`
+eval $RES
+</programlisting></informalexample>
+
+     <para>In questo modo la variabile d'ambiente $OPZIONI della shell verrà impostata
+al valore di MiaApp::opzioni con un valore predefinito di
+<option>-f</option>.</para>
+
+     
+     <para>La voce di configurazione può essere seguita da /[fdbi]. f restituisce nomi
+di file, d restituisce directory, b restituisce vero o falso e i restituisce
+un intero. Ogni valore restituito è normalizzato e verificato internamente.</para>
+     </listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>dump</option></term>
+     <listitem><para>
+     Mostra soltanto i contenuti dello spazio di configurazione.</para>
+     </listitem>
+     </varlistentry>
+
+   </variablelist>
+ </refsect1>
+
+ <refsect1><title>opzioni</title>
+   &apt-cmdblurb;
+   
+   <variablelist>
+     <varlistentry>
+      <term><option>--empty</option></term>
+      <listitem><para>Include le opzioni che hanno un valore vuoto. Questo è il comportamento
+predefinito, perciò usare --no-empty per rimuoverle dall'output.</para></listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><option>--format '<replaceable>&percnt;f &#x0022;&percnt;v&#x0022;;&percnt;n</replaceable>'</option></term>
+      <listitem><para>Definisce l'output per ciascuna opzione di configurazione. &percnt;t verrà
+sostituito dal suo nome, &percnt;f dal suo nome gerarchico completo e
+&percnt;v dal suo valore. Usa le lettere maiuscole e i caratteri speciali
+nel valore verranno codificati per assicurare che possano essere usati senza
+problemi in una stringa tra virgolette, come definito nella RFC822. In
+aggiunta &percnt;n verrà sostituito da un ritorno a capo e &percnt;N da una
+tabulazione. Un carattere &percnt; può essere prodotto usando
+&percnt;&percnt;. </para></listitem>
+     </varlistentry>
+
+     &apt-commonoptions;
+     
+   </variablelist>
+ </refsect1>
+
+ <refsect1><title>Vedere anche</title>
+   <para>&apt-conf;
+   </para>
+ </refsect1>
+
+ <refsect1><title>Diagnostica</title>
+   <para><command>apt-config</command> restituisce zero in caso di funzionamento
+normale e il valore decimale 100 in caso di errore.
+   </para>
+ </refsect1>
+
+ &manbugs;
+ 
+ <refsect1><title>&translation-title;</title>
+   <para>&translation-holder;</para>
+   <para>&translation-english;</para>
+ </refsect1>
+</refentry>
+

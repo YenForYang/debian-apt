@@ -1,0 +1,34 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node2" href="$classAPT_1_1Container__iterator__base.xhtml" title="Container_iterator\l_base\&lt; Interface, Master,\l iterator_type, container\l_iterator, container_value \&gt;" alt="" coords="249,253,453,324"/>
+<area shape="rect" id="node3" href="$classAPT_1_1Container__iterator__base.xhtml" title="Container_iterator\l_base\&lt; APT::PackageContainer\lInterface, PackageUniverse,\l PackageUniverse::const_iterator,\l pkgCache::PkgIterator, pkgCache\l::PkgIterator \&gt;" alt="" coords="230,583,473,683"/>
+<area shape="rect" id="node5" href="$classAPT_1_1Container__iterator__base.xhtml" title="Container_iterator\l_base\&lt; Interface, Master,\l Container_const_iterator\l\&lt; Interface, Container, Master\l \&gt;, Container::const_iterator,\l Container::value_type \&gt;" alt="" coords="242,5,461,105"/>
+<area shape="rect" id="node7" href="$classAPT_1_1Container__iterator__base.xhtml" title="Container_iterator\l_base\&lt; Interface, Master,\l Container_const_reverse\l_iterator\&lt; Interface, Container,\l Master \&gt;, Container::const_reverse\l_iterator, Container::value_type \&gt;" alt="" coords="224,129,479,229"/>
+<area shape="rect" id="node9" href="$classAPT_1_1Container__iterator__base.xhtml" title="Container_iterator\l_base\&lt; Interface, Master,\l Container_iterator\&lt; Interface,\l Container, Master \&gt;, Container\l::iterator, Container::value_type \&gt;" alt="" coords="229,349,473,434"/>
+<area shape="rect" id="node11" href="$classAPT_1_1Container__iterator__base.xhtml" title="Container_iterator\l_base\&lt; Interface, Master,\l Container_reverse_iterator\l\&lt; Interface, Container, Master\l \&gt;, Container::reverse_iterator,\l Container::value_type \&gt;" alt="" coords="239,459,463,559"/>
+<area shape="rect" id="node13" href="$classpkgCache_1_1Iterator.xhtml" title="pkgCache::Iterator\l\&lt; Dependency, DepIterator \&gt;" alt="" coords="244,1164,459,1205"/>
+<area shape="rect" id="node15" href="$classpkgCache_1_1Iterator.xhtml" title="pkgCache::Iterator\l\&lt; DescFile, DescFileIterator \&gt;" alt="" coords="243,1229,459,1271"/>
+<area shape="rect" id="node17" href="$classpkgCache_1_1Iterator.xhtml" title="pkgCache::Iterator\l\&lt; Description, DescIterator \&gt;" alt="" coords="244,1295,459,1336"/>
+<area shape="rect" id="node19" href="$classpkgCache_1_1Iterator.xhtml" title="pkgCache::Iterator\l\&lt; Group, GrpIterator \&gt;" alt="" coords="266,1360,437,1401"/>
+<area shape="rect" id="node21" href="$classpkgCache_1_1Iterator.xhtml" title="pkgCache::Iterator\l\&lt; Package, PkgIterator \&gt;" alt="" coords="258,707,445,748"/>
+<area shape="rect" id="node23" href="$classpkgCache_1_1Iterator.xhtml" title="pkgCache::Iterator\l\&lt; PackageFile, PkgFileIterator \&gt;" alt="" coords="236,772,467,813"/>
+<area shape="rect" id="node25" href="$classpkgCache_1_1Iterator.xhtml" title="pkgCache::Iterator\l\&lt; Provides, PrvIterator \&gt;" alt="" coords="259,837,444,879"/>
+<area shape="rect" id="node27" href="$classpkgCache_1_1Iterator.xhtml" title="pkgCache::Iterator\l\&lt; ReleaseFile, RlsFileIterator \&gt;" alt="" coords="240,903,463,944"/>
+<area shape="rect" id="node29" href="$classpkgCache_1_1Iterator.xhtml" title="pkgCache::Iterator\l\&lt; VerFile, VerFileIterator \&gt;" alt="" coords="254,968,449,1009"/>
+<area shape="rect" id="node31" href="$classpkgCache_1_1Iterator.xhtml" title="pkgCache::Iterator\l\&lt; Version, VerIterator \&gt;" alt="" coords="263,1033,440,1075"/>
+<area shape="rect" id="node33" href="$classpkgCache_1_1Iterator.xhtml" title="pkgCache::Iterator\l\&lt; Str, Itr \&gt;" alt="" coords="280,1099,423,1140"/>
+<area shape="rect" id="node4" href="$classAPT_1_1PackageUniverse_1_1const__iterator.xhtml" title="PackageUniverse::const\l_iterator" alt="" coords="536,612,713,653"/>
+<area shape="rect" id="node6" href="$classAPT_1_1Container__const__iterator.xhtml" title="Container_const_iterator\l\&lt; Interface, Container,\l Master \&gt;" alt="" coords="533,27,716,83"/>
+<area shape="rect" id="node8" href="$classAPT_1_1Container__const__reverse__iterator.xhtml" title="Container_const_reverse\l_iterator\&lt; Interface,\l Container, Master \&gt;" alt="" coords="533,151,716,207"/>
+<area shape="rect" id="node10" href="$classAPT_1_1Container__iterator.xhtml" title="Container_iterator\l\&lt; Interface, Container,\l Master \&gt;" alt="" coords="539,363,710,419"/>
+<area shape="rect" id="node12" href="$classAPT_1_1Container__reverse__iterator.xhtml" title="Container_reverse_iterator\l\&lt; Interface, Container,\l Master \&gt;" alt="" coords="527,481,723,537"/>
+<area shape="rect" id="node14" href="$classpkgCache_1_1DepIterator.xhtml" title="pkgCache::DepIterator" alt="" coords="541,1171,709,1198"/>
+<area shape="rect" id="node16" href="$classpkgCache_1_1DescFileIterator.xhtml" title="pkgCache::DescFileIterator" alt="" coords="527,1237,723,1263"/>
+<area shape="rect" id="node18" href="$classpkgCache_1_1DescIterator.xhtml" title="pkgCache::DescIterator" alt="" coords="537,1302,712,1329"/>
+<area shape="rect" id="node20" href="$classpkgCache_1_1GrpIterator.xhtml" title="pkgCache::GrpIterator" alt="" coords="542,1367,707,1394"/>
+<area shape="rect" id="node22" href="$classpkgCache_1_1PkgIterator.xhtml" title="pkgCache::PkgIterator" alt="" coords="541,714,708,741"/>
+<area shape="rect" id="node24" href="$classpkgCache_1_1PkgFileIterator.xhtml" title="pkgCache::PkgFileIterator" alt="" coords="531,779,719,806"/>
+<area shape="rect" id="node26" href="$classpkgCache_1_1PrvIterator.xhtml" title="pkgCache::PrvIterator" alt="" coords="543,845,706,871"/>
+<area shape="rect" id="node28" href="$classpkgCache_1_1RlsFileIterator.xhtml" title="pkgCache::RlsFileIterator" alt="" coords="533,910,717,937"/>
+<area shape="rect" id="node30" href="$classpkgCache_1_1VerFileIterator.xhtml" title="pkgCache::VerFileIterator" alt="" coords="532,975,717,1002"/>
+<area shape="rect" id="node32" href="$classpkgCache_1_1VerIterator.xhtml" title="pkgCache::VerIterator" alt="" coords="543,1041,706,1067"/>
+</map>

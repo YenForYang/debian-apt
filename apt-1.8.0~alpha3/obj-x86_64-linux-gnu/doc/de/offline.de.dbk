@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+  "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % aptent SYSTEM "apt.ent"> %aptent;
+<!ENTITY % aptverbatiment SYSTEM "apt-verbatim.ent"> %aptverbatiment;
+<!ENTITY % aptvendor SYSTEM "apt-vendor.ent"> %aptvendor;
+]>
+
+<book lang="de">
+
+<title>APT offline verwenden</title>
+
+<bookinfo>
+
+<authorgroup>
+  <author>
+    <personname>Jason Gunthorpe</personname><email>jgg@debian.org</email>
+  </author>
+</authorgroup>
+
+<releaseinfo>Version &apt-product-version;</releaseinfo>
+
+<abstract>
+<para>
+Dieses Dokument beschreibt, wie APT in einer Umgebung ohne Netzwerk,
+speziell einem »Turnschuhnetzwerk«, an die Durchführung von Upgrades
+herangeht.
+</para>
+</abstract>
+
+<copyright><year>1999</year><holder>Jason Gunthorpe</holder></copyright>
+
+<legalnotice>
+<title>Lizenzhinweis</title>
+<para>
+»APT« und dieses Dokument sind freie Software. Sie können sie unter den
+Bedingungen der GNU General Public License, wie sie von der Free Software
+Foundation veröffentlicht wird; entweder Version 2 der Lizenz oder
+(optional) jeder neueren Version weitergeben und/oder verändern.
+</para>
+<para>
+Siehe für weitere Details auf Debian-Systemen die Datei
+/usr/share/common-licenses/GPL, die die vollständige Lizenz enthält.
+</para>
+</legalnotice>
+
+</bookinfo>
+
+<chapter id="ch1"><title>Einleitung</title>
+
+<section id="s1.1"><title>Übersicht</title>
+<para>
+Normalerweise benötigt APT direkten Zugang zu einem Debian-Archiv, entweder
+von einem lokalen Medium oder über ein Netz. Eine andere häufige
+Beanstandung ist, dass eine Debian-Maschine an einer langsamen Anbindung,
+wie einem Modem, hängt und eine andere Maschine eine sehr schnelle
+Verbindung hat, sie jedoch physisch fern sind.
+</para>
+<para>
+Die Lösung dazu besteht darin, große Wechselmedien, wie eine Zip-Platte oder
+eine SuperDisk zu benutzen. Diese Platten sind nicht groß genug, um ein
+ganzes Debian-Archiv zu speichern, können aber leicht eine Untermenge
+aufnehmen, die für die meisten Benutzer groß genug ist. Die Idee besteht
+darin, APT zu benutzen, um eine Liste benötigter Pakete zu generieren und
+diese dann mit einer anderen Maschine mit guter Verbindung auf die Platte
+herunterzuladen. Es ist sogar möglich, eine andere Debian-Maschine mit APT
+oder ein komplett unterschiedliches Betriebssystem und ein Download-Werkzeug
+wie Wget zu benutzen. Nennen wir die Maschine, die die Pakete herunterlädt
+<emphasis>ferner Rechner</emphasis> und die mit der schlechten oder
+fehlenden Verbindung <emphasis>Zielrechner</emphasis>.
+</para>
+<para>
+Dies wird durch kreatives Manipulieren der APT-Konfigurationsdatei
+erreicht. Die wesentliche Voraussetzung besteht darin, APT mitzuteilen, dass
+es für seine Archivdateien auf einer Platte nachsieht. Beachten Sie, dass
+diese Platte mit einem Dateisystem formatiert sein sollte, das mit langen
+Dateinamen umgehen kann, so wie ext2, fat32 oder vfat.
+</para>
+</section>
+
+</chapter>
+
+<chapter id="ch2"><title>APT auf beiden Maschinen benutzen</title>
+
+<section id="s2.1"><title>Übersicht</title>
+<para>
+Ein verfügbares APT auf beiden Maschinen stellt die einfachste Konfiguration
+dar. Die Grundidee besteht darin, eine Kopie der Statusdatei auf der Platte
+abzulegen und die Maschine in der Ferne zu benutzen, um die neusten
+Paketdateien herunterzuladen und zu entscheiden, welche Pakete
+heruntergeladen werden. Die Plattenverzeichnisstruktur sollte so aussehen:
+</para>
+<screen>
+  /Platte/
+    Archive/
+       partial/
+    lists/
+       partial/
+    status
+    sources.list
+    apt.conf
+</screen>
+</section>
+
+<section id="s2.2"><title>Die Konfigurationsdatei</title>
+<para>
+Die Konfigurationsdatei sollte APT mitteilen, dass es seine Dateien auf der
+Platte speichert und obendrein die Konfigurationsdateien auf der Platte
+benutzt. Die »sources.list« sollte genau die Sites enthalten, die Sie auf
+der fernen Maschine benutzen möchten und die Statusdatei sollte eine Kopie
+von <emphasis>/var/lib/dpkg/status</emphasis> vom
+<emphasis>Zielrechner</emphasis> sein. Bitte beachten Sie, falls Sie lokale
+Archive benutzen, dass Sie »copy«-URIs benutzen müssen. Die Syntax
+entspricht der von »file«-URIs.
+</para>
+<para>
+<emphasis>apt.conf</emphasis> muss die nötigen Informationen enthalten,
+damit APT die Platte benutzt:
+</para>
+<screen>
+ APT
+ {
+   /* Dies ist nicht nötig, falls die beiden Maschinen die gleiche
+      Architektur haben. Es teilt dem fernen APT mit, welche Architektur die
+      Zielmaschine hat */
+   Architecture "i386";
+
+   Get::Download-Only "true";
+ };
+
+ Dir
+ {
+   /* Die Platte für Statusinformationen benutzen und die Statusdatei von der
+      Vorgabe /var/lib/dpkg umleiten */
+   State "/disc/";
+   State::status "status";
+
+   // Programmzwischenspeicher werden lokal gespeichert
+   Cache::archives "/disc/archives/";
+   Cache "/tmp/";
+
+   // Ort der Quellenliste.
+   Etc "/disc/";
+ };
+</screen>
+<para>
+Weitere Details finden sich in der apt.conf-Handbuchseite und der
+Musterkonfigurationsdatei in
+<emphasis>/usr/share/doc/apt/examples/apt.conf</emphasis>.
+</para>
+<para>
+Das Erste, was auf der Zielmaschine getan werden muss, ist das Einhängen der
+Platte und das Kopieren von <emphasis>/var/lib/dpkg/status</emphasis>
+dorthin. Sie werden außerdem die in der Übersicht umrissenen Verzeichnisse
+<emphasis>archives/partial/</emphasis> und
+<emphasis>lists/partial/</emphasis> erstellen müssen. Dann bringen Sie die
+Platte zu der fernen Maschine und konfigurieren Sie die
+»sources.list«. Führen Sie das folgende auf der fernen Maschine aus:
+</para>
+<screen>
+ # export APT_CONFIG="/disc/apt.conf"
+ # apt-get update
+ [ APT lädt die Paketdateien herunter ]
+ # apt-get dist-upgrade
+ [ APT lädt all die Pakete herunter, die die Zielmaschine benötigt, um ein
+   Upgrade durchzuführen ]
+</screen>
+<para>
+Der Befehl »dist-upgrade« kann durch alle anderen Standard-APT-Befehle
+ersetzt werden, insbesondere »dselect-upgrade«. Sie können sogar eine
+APT-Oberfläche, wie <emphasis>dselect</emphasis>, benutzen. Jedoch stellt
+dies ein Problem dar, Ihre Auswahl zurück an den lokalen Rechner zu
+kommunizieren.
+</para>
+<para>
+Nun enthält die Platte alle Indexdateien und Archive, die nötig sind, um ein
+Upgrade der Zielmaschine durchzuführen. Bringen Sie die Platte zurück und
+starten Sie:
+</para>
+<screen>
+  # export APT_CONFIG="/Platte/apt.conf"
+  # apt-get check
+  [ APT erstellt eine lokale Kopie der Zwischenspeicherdateien ]
+  # apt-get --no-d -o dir::state::status=/var/lib/dpkg/status dist-upgrade
+  [ Oder irgendeinen anderen APT-Befehl ]
+</screen>
+<para>
+Es ist für ordentliches Funktionieren notwendig, die Statusdatei erneut als
+die lokale anzugeben. Dies ist sehr wichtig!
+</para>
+<para>
+Wenn Sie Dselect benutzen, können Sie die sehr riskante Aktion durchführen,
+disc/status auf /var/lib/dpkg/status zu kopieren, so dass die von Ihnen auf
+der fernen Maschine gemachte Auswahl aktualisiert wird. Es wird in höchstem
+Maße empfohlen, dass Leute nur auf der lokalen Maschine Auswahlen treffen –
+aber dies könnte manchmal unmöglich sein. Kopieren Sie die Statusdatei
+NICHT, falls Dpkg oder APT in der Zwischenzeit benutzt wurden!
+</para>
+</section>
+
+</chapter>
+
+<chapter id="ch3"><title>APT und Wget benutzen</title>
+
+<section id="s3.1"><title>Übersicht</title>
+<para>
+<emphasis>wget</emphasis> ist ein beliebtes und portierbares
+Herunterladewerkzeug, das auf nahezu jeder Maschine laufen kann. Anders als
+die Methode oben wird hierfür benötigt, dass die Debian-Maschine bereits
+eine Liste verfügbarer Pakete hat.
+</para>
+<para>
+Die Grundidee besteht darin, eine Platte zu erzeugen, die nur die
+heruntergeladenen Archivdateien von der fernen Site enthält. Dies wird durch
+Benutzen der Option »--print-uris« von Apt-get und dem anschließenden
+Erstellen eines Wget-Skripts getan, das dann die Pakete tatsächlich
+herunterlädt.
+</para>
+</section>
+
+<section id="s3.2"><title>Betrieb</title>
+<para>
+Anders als bei der vorherigen Technik werden keine speziellen
+Konfigurationsdateien benötigt. Es werden lediglich die Standard-APT-Befehle
+benutzt, um die Dateiliste zu erstellen.
+</para>
+<screen>
+ # apt-get dist-upgrade 
+ [ Antworten Sie »nein« auf gestellte Fragen; stellen Sie sicher, dass Sie
+ mit den Aktionen zufrieden sind ]
+ # apt-get -qq --print-uris dist-upgrade &gt; uris
+ # awk '{print "wget -O " $2 " " $1}' &lt; uris &gt; /Platte/wget-script
+</screen>
+<para>
+Es könnte auch jeder andere Befehl neben »dist-upgrade« hier benutzt werden,
+einschließlich »upgrade«.
+</para>
+<para>
+Die Datei /Platte/wget-script wird nun eine Liste der Wget-Befehle
+enthalten, um die erforderlichen Archive herunterzuladen. Dieses Skript
+sollte mit dem aktuellen Verzeichnis als Platteneinhängepunkt ausgeführt
+werden, so dass die Ausgabe auf die Platte gespeichert wird.
+</para>
+<para>
+Die Maschine in der Ferne würde etwas wie das folgende tun
+</para>
+<screen>
+  # cd /Platte
+  # sh -x ./wget-script
+  [ warten … ]
+</screen>
+<para>
+Sobald die Archive heruntergeladen und die Platte zur Debian-Maschine
+zurückgekehrt ist, kann die Installation durch Benutzung von 
+</para>
+<screen>
+  # apt-get -o dir::cache::archives="/Platte/" dist-upgrade
+</screen>
+<para>
+fortfahren, wodurch die bereits auf der Platte heruntergeladenen Archive
+benutzt werden.
+</para>
+</section>
+
+</chapter>
+
+</book>

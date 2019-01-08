@@ -1,0 +1,139 @@
+'\" t
+.\"     Title: apt-transport-https
+.\"    Author: APT-team
+.\" Generator: DocBook XSL Stylesheets v1.79.1 <http://docbook.sf.net/>
+.\"      Date: 11\ \&mei\ \&2018
+.\"    Manual: APT
+.\"    Source: APT 1.8.0~alpha3
+.\"  Language: Dutch
+.\"
+.TH "APT\-TRANSPORT\-HTTP" "1" "11\ \&mei\ \&2018" "APT 1.8.0~alpha3" "APT"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+apt-transport-https \- Transportmethode van APT voor het downloaden via het HTTP Secure protocol (HTTPS)
+.SH "OMSCHRIJVING"
+.PP
+Deze transportmethode van APT laat toe om pakketbronnen te gebruiken die benaderd worden via het HTTP Secure protocol (HTTPS), ook wel aangeduid als HTTP over TLS\&. Ze is standaard beschikbaar sinds apt 1\&.5 en voordien in het pakket
+apt\-transport\-https\&. Merk op dat een transportmethode nooit rechtstreeks door een gebruiker aangesproken wordt, maar door APT\-gereedschap gebruikt wordt op basis van de gebruikersconfiguratie\&.
+.PP
+HTTP zelf is een niet\-versleuteld transportprotocol (vergelijk
+\fBapt-transport-http\fR(1)), dat zoals de toegevoegde S aangeeft, ingepakt wordt in een versleutelde laag, die bekend staat als Transport Layer Security (TLS), om te voorzien in versleuteling van punt naar punt\&. Een voldoende onderlegde aanvaller kan nog steeds de communicatiepartners gadeslaan en een grondige analyse van de versleutelde communicatie kan nog steeds belangrijke details aan het licht brengen\&. Een overzicht van beschikbare alternatieve transportmethodes wordt gegeven in
+\fBsources.list\fR(5)\&.
+.SH "OPTIES"
+.PP
+Het HTTPS\-protocol is gebaseerd op het HTTP\-protocol, en dus zijn alle opties die ondersteund worden door
+\fBapt-transport-http\fR(1)
+ook beschikbaar via
+Acquire::https\&. Ze hebben standaard dezelfde waarden als vermeld bij
+Acquire::http\&. Deze man\-pagina documenteert enkel de opties die
+\fIspecifiek zijn voor https\fR\&.
+.SS "Servergeloofsbrieven"
+.PP
+Standaard worden alle door het systeem vertrouwde certificaten (zie het pakket
+ca\-certificates) gebruikt om het certificaat van de server te verifi\(:eren\&. Een alternatieve certificaatautoriteit (CA) kan geconfigureerd worden met de optie
+Acquire::https::CAInfo
+en zijn computerspecifieke optie
+Acquire::https::CAInfo::\fIcomputer\fR\&. De optie CAInfo specificeert een bestand dat bestaat uit CA\-certificaten (in PEM\-indeling), die samengevoegd worden om de keten te vormen die APT moet gebruiken voor het verifi\(:eren van het pad vanaf het door uzelf ondertekend basiscertificaat\&. Indien de externe server tijdens de uitwisseling de hele keten verstrekt, dan moet het bestand enkel het basiscertificaat bevatten\&. Anders is de hele keten vereist\&. Indien u ondersteuning moet voorzien voor verschillende autoriteiten, bestaat de enige mogelijkheid erin alles samen te voegen\&.
+.PP
+Er kan een aangepaste lijst van herroepen certificaten (certificate revocation list \- CRL) geconfigureerd worden met de opties
+Acquire::https::CRLFile
+en
+Acquire::https::CRLFile::\fIcomputer\fR\&. Zoals bij de vorige optie moet een bestand opgegeven worden in PEM\-indeling\&.
+.SS "Beveiliging uitschakelen"
+.PP
+Als tijdens het proces van serverauthenticatie de verificatie van het certificaat om een af andere reden (vervallen, herroepen, persoon in het midden, enz\&.) mislukt, mislukt het tot stand brengen van de verbinding\&. Dit is duidelijk wat u in alle gevallen wenst en wat voorzien wordt in de standaardwaarde (true) van de optie
+Acquire::https::Verify\-Peer
+en diens computerspecifieke variant\&. Indien u
+\fIprecies\fR
+weet wat u doet, kunt u door deze optie op "false" in te stellen, de wederzijdse verificatie van certificaten overslaan en ervoor zorgen dat de uitwisseling succesvol is\&. Nogmaals: deze optie is enkel bedoeld met het oog op foutopsporing en het uitvoeren van testen, aangezien ze alle beveiliging wegneemt die door het gebruik van HTTPS geboden wordt\&.
+.PP
+Op dezelfde manier kan de optie
+Acquire::https::Verify\-Host
+en zijn computerspecifieke variant gebruikt worden om een beveiligingsfunctie te deactiveren: het door de server geleverde certificaat bevat de identiteit van de server en die moet overeenkomen met de DNS\-naam die gebruikt wordt om hem te benaderen\&. Zoals gevraagd wordt door RFC 2818 wordt de naam van de spiegelserver standaard getoetst aan de identiteit die in het certificaat gevonden wordt\&. Dit standaardgedrag is veilig en moet niet gewijzigd worden, maar indien u weet dat de server die u gebruikt, een DNS\-naam heeft die niet overeenkomst met de identiteit in diens certificaat, kunt u de optie instellen op "false", hetgeen zal voorkomen dat de vergelijking uitgevoerd wordt\&.
+.SS "Cli\(:entauthenticatie"
+.PP
+Behalve de geboden ondersteuning voor authenticatie via een wachtwoord (zie
+\fBapt_auth.conf\fR(5)), ondersteunt HTTPS ook authenticatie op basis van cli\(:entcertificaten via
+Acquire::https::SSLCert
+en
+Acquire::https::SSLKey\&. Deze moeten respectievelijk ingesteld worden op de bestandsnaam van het X\&.509 cli\(:entcertificaat en de ermee verbonden (niet\-versleutelde) private sleutel, beide in PEM\-indeling\&. In de praktijk wordt de computerspecifieke variant van beide opties ten zeerste aanbevolen\&.
+.SH "VOORBEELDEN"
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+Acquire::https {
+	Proxy::example\&.org "DIRECT";
+	Proxy "socks5h://apt:pass@127\&.0\&.0\&.1:9050";
+	Proxy\-Auto\-Detect "/usr/local/bin/apt\-https\-proxy\-auto\-detect";
+	No\-Cache "true";
+	Max\-Age "3600";
+	No\-Store "true";
+	Timeout "10";
+	Dl\-Limit "42";
+	Pipeline\-Depth "0";
+	AllowRedirect "false";
+	User\-Agent "Mijn APT\-HTTPS";
+	SendAccept "false";
+
+	CAInfo "/pad/naar/ca/certs\&.pem";
+	CRLFile "/pad/naar/all/crl\&.pem";
+	Verify\-Peer "true";
+	Verify\-Host::defecte\&.example\&.org "false";
+	SSLCert::example\&.org "/pad/naar/cli\(:ent/cert\&.pem";
+	SSLKey::example\&.org "/pad/naar/cli\(:ent/key\&.pem"
+};
+.fi
+.if n \{\
+.RE
+.\}
+.SH "ZIE OOK"
+.PP
+\fBapt-transport-http\fR(1)
+\fBapt.conf\fR(5)
+\fBapt_auth.conf\fR(5)
+\fBsources.list\fR(5)
+.SH "BUGS"
+.PP
+\m[blue]\fBAPT bugpagina\fR\m[]\&\s-2\u[1]\d\s+2\&. Indien u een bug in APT wilt rapporteren, raadpleeg dan
+/usr/share/doc/debian/bug\-reporting\&.txt
+of het
+\fBreportbug\fR(1)
+commando\&.
+.SH "VERTALING"
+.PP
+De Nederlandse vertaling werd in 2015 gemaakt door Frans Spiesschaert
+<Frans\&.Spiesschaert@yucom\&.be>, in samenwerking met het Debian Dutch l10n Team
+<debian\-l10n\-dutch@lists\&.debian\&.org>\&.
+.PP
+Merk op dat de vertaling van dit document nog onvertaalde delen kan bevatten\&. Dit is intentioneel om te vermijden dat inhoud verloren zou gaan door een vertaling die achterop loopt op het origineel\&.
+.SH "AUTEUR"
+.PP
+\fBAPT\-team\fR
+.RS 4
+.RE
+.SH "OPMERKINGEN"
+.IP " 1." 4
+APT bugpagina
+.RS 4
+\%http://bugs.debian.org/src:apt
+.RE

@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+  "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % aptent SYSTEM "apt.ent"> %aptent;
+<!ENTITY % aptverbatiment SYSTEM "apt-verbatim.ent"> %aptverbatiment;
+<!ENTITY % aptvendor SYSTEM "apt-vendor.ent"> %aptvendor;
+]>
+
+<refentry>
+
+ <refentryinfo>
+   <!-- The last update date -->
+&apt-author.moconnor;
+   &apt-author.team;
+   &apt-email;
+   &apt-product;
+   
+   <date>2015-09-25T00:00:00Z</date>
+ </refentryinfo>
+ 
+ <refmeta>
+   <refentrytitle>apt-mark</refentrytitle>
+   <manvolnum>8</manvolnum>
+   <refmiscinfo class="manual">APT</refmiscinfo>
+ </refmeta>
+ 
+ 
+ <!-- Man page title -->
+<refnamediv>
+    <refname>apt-mark</refname>
+    <refpurpose>zeigt, setzt und hebt verschiedene Einstellungen für ein Paket auf.</refpurpose>
+ </refnamediv>
+
+ &synopsis-command-apt-mark;
+
+ <refsect1><title>Beschreibung</title>
+    <para><command>apt-mark</command> kann als einheitliche Oberfläche zum Setzen
+verschiedener Einstellungen eines Pakets benutzt werden, wie das Markieren
+eines Pakets als automatisch/manuell installiert oder um
+<command>dpkg</command>-Auswahlen wie »hold« (halten), »install«
+(installieren), »deinstall« (entfernen) oder »purge« (vollständig entfernen)
+zu ändern, die z.B. von <command>apt-get dselect-upgrade</command> oder
+<command>aptitude</command> berücksichtigt werden.
+   </para>
+   </refsect1><refsect1><title>Automatisch und manuell installierte Pakete</title>
+   <para>
+     Wenn Sie erbitten, dass ein Paket installiert werden soll und im Ergebnis
+weitere Pakete installiert werden, um die Abhängigkeiten zu erfüllen, werden
+diese Abhängigkeiten als automatisch installiert markiert, während das
+Paket, das Sie explizit installiert haben, stattdessen als manuell
+installiert markiert wird. Sobald kein manuell installiertes Paket mehr von
+einem automatisch installierten Paket abhängt. wird es als nicht mehr
+benötigt angesehen und z.B. <command>apt-get</command> oder
+<command>aptitude</command> werden vorschlagen, es zu entfernen.
+   </para>
+   <variablelist>
+     <varlistentry><term><option>auto</option></term>
+	 <listitem><para><literal>auto</literal> wird benutzt, um ein Paket als automatisch
+installiert zu markieren, was veranlasst, dass das Paket entfernt wird, wenn
+keine manuell installierten Pakete von ihm abhängen.
+       </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>manual</option></term>
+	 <listitem><para><literal>manual</literal> wird benutzt, um ein Paket als manuell installiert
+zu markieren, was verhindert, dass das Paket automatisch entfernt wird, wenn
+kein anderes Paket von ihm abhängt.
+       </para></listitem>
+     </varlistentry>
+
+       <varlistentry><term><option>showauto</option></term>
+	 <listitem><para><literal>showauto</literal> wird benutzt, um eine Liste automatisch
+installierter Pakete – mit einem Paket in jeder neuen Zeile –
+auszugeben. Wenn kein Paket angegeben ist, werden alle automatisch
+installierten Pakete aufgelistet. Falls Pakete angegeben sind, werden nur
+diejenigen angezeigt, die automatisch installiert wurden.
+       </para></listitem>
+     </varlistentry>
+
+       <varlistentry><term><option>showmanual</option></term>
+	 <listitem><para><literal>showmanual</literal> kann auf die gleiche Weise wie
+<literal>showauto</literal> benutzt werden, mit der Änderung, dass es
+stattdessen eine Liste manuell installierter Pakete ausgibt.
+       </para></listitem>
+     </varlistentry>
+   </variablelist>
+
+   <refsect2><title>Optionen</title>
+     <variablelist>
+       <varlistentry>
+	 <term><option>-f=&synopsis-param-filename;</option></term>
+	 <term><option>--file=&synopsis-param-filename;</option></term>
+	 <listitem><para>
+	   schreibt/liest Paketstatus von dem Dateinamen, der mit dem Parameter
+&synopsis-param-filename;, anstatt vom Standardort, der
+<filename>extended_status</filename> im von Konfigurationselement
+<literal>Dir::State</literal> definierten Verzeichnis, angegeben ist.
+	 </para></listitem>
+       </varlistentry>
+     </variablelist>
+   </refsect2>
+
+ </refsect1><refsect1><title>Änderungen für ein Paket verhindern</title>
+   <variablelist>
+     <varlistentry><term><option>hold</option></term>
+	 <listitem><para><literal>hold</literal> wird benutzt, um ein Paket als zurückgehalten zu
+markieren. Dadurch wird verhindert, dass das Paket automatisch installiert,
+entfernt oder ein Upgrade davon durchgeführt wird.
+       </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>unhold</option></term>
+	 <listitem><para><literal>unhold</literal> wird benutzt, um ein vorher gesetztes »hold« auf
+ein Paket aufzuheben, um alle Aktionen wieder zu erlauben.
+       </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>showhold</option></term>
+	 <listitem><para><literal>showhold</literal> wird benutzt, um eine Liste auf »hold« gesetzter
+Pakete auf die gleiche Art wie für andere Anzeigebefehle auszugeben.
+       </para></listitem>
+     </varlistentry>
+   </variablelist>
+ </refsect1><refsect1><title>Pakete zum Installieren, Entfernen und vollständigen Entfernen einplanen</title>
+ <para>
+    Einige Oberflächen wie <command>apt-get dselect-upgrade</command> können
+benutzt werden, um vorher geplante Änderungen am Installationsstatus von
+Paketen anzuwenden. Solche Änderungen können mit dem Befehlen
+<option>install</option>, <option>remove</option> (auch als
+<option>deinstall</option> bekannt) und <option>purge</option> geplant
+werden. Pakete mit einer bestimmten Auswahl können mit
+<option>showinstall</option>, <option>showremove</option> beziehungsweise
+<option>showpurge</option> angezeigt werden. Weitere Informationen über
+diese sogenannten Dpkg-Auswahlen finden Sie in &dpkg;.
+ </para>
+ </refsect1>
+
+ <refsect1><title>Optionen</title>
+   <variablelist>
+     &apt-commonoptions;
+   </variablelist>
+ </refsect1>
+
+ <refsect1><title>Dateien</title>
+   <variablelist>
+	&file-extended_states;
+   </variablelist>
+ </refsect1>
+
+ <refsect1><title>Siehe auch</title>
+    <para><phrase>&apt-get;,&aptitude;,&apt-conf;</phrase></para>
+ </refsect1>
+
+ <refsect1><title>Diagnose</title>
+   <para><command>apt-mark</command> gibt bei normalen Aktionen Null zurück, bei
+Fehlern nicht Null.</para>
+ </refsect1>
+
+ &manbugs;
+ 
+ <refsect1><title>&translation-title;</title>
+   <para>&translation-holder;</para>
+   <para>&translation-english;</para>
+ </refsect1>
+</refentry>

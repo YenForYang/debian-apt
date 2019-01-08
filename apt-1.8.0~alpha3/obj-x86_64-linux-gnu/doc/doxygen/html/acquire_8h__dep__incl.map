@@ -1,0 +1,11 @@
+<map id="apt&#45;pkg/acquire.h" name="apt&#45;pkg/acquire.h">
+<area shape="rect" id="node2" href="$acquire-item_8h.xhtml" title="apt&#45;pkg/acquire&#45;item.h" alt="" coords="5,80,176,107"/>
+<area shape="rect" id="node3" href="$acquire-worker_8h.xhtml" title="apt&#45;pkg/acquire&#45;worker.h" alt="" coords="201,80,386,107"/>
+<area shape="rect" id="node4" href="$algorithms_8h_source.xhtml" title="apt&#45;pkg/algorithms.h" alt="" coords="345,379,503,405"/>
+<area shape="rect" id="node5" href="$cachefile_8h_source.xhtml" title="apt&#45;pkg/cachefile.h" alt="" coords="468,80,615,107"/>
+<area shape="rect" id="node6" href="$cacheset_8h.xhtml" title="apt&#45;pkg/cacheset.h" alt="" coords="475,155,621,181"/>
+<area shape="rect" id="node7" href="$edsp_8h.xhtml" title="apt&#45;pkg/edsp.h" alt="" coords="489,229,607,256"/>
+<area shape="rect" id="node10" href="$statechanges_8h_source.xhtml" title="apt&#45;pkg/statechanges.h" alt="" coords="631,229,806,256"/>
+<area shape="rect" id="node8" href="$packagemanager_8h_source.xhtml" title="apt&#45;pkg/packagemanager.h" alt="" coords="461,304,661,331"/>
+<area shape="rect" id="node9" href="$dpkgpm_8h_source.xhtml" title="apt&#45;pkg/deb/dpkgpm.h" alt="" coords="527,379,697,405"/>
+</map>

@@ -1,0 +1,22 @@
+<map id="pkgAcqMetaIndex" name="pkgAcqMetaIndex">
+<area shape="rect" id="node20" href="$classpkgAcqMetaClearSig.xhtml" title="An item responsible for downloading clearsigned metaindexes {{{. " alt="" coords="1576,409,1732,436"/>
+<area shape="rect" id="node2" href="$classpkgAcqMetaBase.xhtml" title="the manager of a transaction " alt="" coords="2547,511,2681,537"/>
+<area shape="rect" id="node3" href="$classpkgAcqTransactionItem.xhtml" title="baseclass for the indexes files to manage them all together " alt="" coords="1915,499,2089,525"/>
+<area shape="rect" id="node4" href="$classpkgAcquire_1_1Item.xhtml" title="Represents the process by which a pkgAcquire object should retrieve a file or a collection of files..." alt="" coords="553,1015,605,1041"/>
+<area shape="rect" id="node10" href="$structpkgAcquire_1_1ItemDesc.xhtml" title="Represents a single download source from which an item should be downloaded. " alt="" coords="928,1183,1012,1209"/>
+<area shape="rect" id="node5" href="$classWeakPointable.xhtml" title="WeakPointable" alt="" coords="213,1244,332,1271"/>
+<area shape="rect" id="node13" href="$classpkgAcquire_1_1Worker.xhtml" title="A fetch subprocess. " alt="" coords="1968,961,2036,988"/>
+<area shape="rect" id="node6" href="$classpkgAcquire.xhtml" title="The core download scheduler. {{{. " alt="" coords="1271,907,1366,933"/>
+<area shape="rect" id="node8" href="$classpkgAcquire_1_1Queue.xhtml" title="A single download queue in a pkgAcquire object. {{{. " alt="" coords="1622,863,1686,889"/>
+<area shape="rect" id="node9" href="$structpkgAcquire_1_1Queue_1_1QItem.xhtml" title="A single item placed in this queue. " alt="" coords="2289,1007,2351,1033"/>
+<area shape="rect" id="node11" title="STL class. " alt="" coords="243,615,302,641"/>
+<area shape="rect" id="node14" href="$structpkgAcquire_1_1MethodConfig.xhtml" title="Information about the properties of a single acquire method. {{{. " alt="" coords="915,944,1025,971"/>
+<area shape="rect" id="node18" href="$classIndexTarget.xhtml" title="Information about an index file. " alt="" coords="921,432,1019,459"/>
+<area shape="rect" id="node21" href="$classmetaIndex.xhtml" title="metaIndex" alt="" coords="1273,280,1365,307"/>
+<area shape="rect" id="node23" href="$structmetaIndex_1_1checkSum.xhtml" title="checkSum" alt="" coords="535,201,624,228"/>
+<area shape="rect" id="node12" title="STL class. " alt="" coords="5,615,164,641"/>
+<area shape="rect" id="node15" href="$classpkgAcquire_1_1MethodConfig_1_1Private.xhtml" title="Private" alt="" coords="545,936,613,963"/>
+<area shape="rect" id="node16" href="$classpkgAcquireStatus.xhtml" title="A monitor object for downloads controlled by the pkgAcquire class. {{{. " alt="" coords="902,804,1038,831"/>
+<area shape="rect" id="node24" href="$classHashStringList.xhtml" title="HashStringList" alt="" coords="215,175,331,201"/>
+<area shape="rect" id="node26" href="$classpkgIndexFile.xhtml" title="pkgIndexFile" alt="" coords="527,315,631,341"/>
+</map>

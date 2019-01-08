@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+  "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % aptent SYSTEM "apt.ent"> %aptent;
+<!ENTITY % aptverbatiment SYSTEM "apt-verbatim.ent"> %aptverbatiment;
+<!ENTITY % aptvendor SYSTEM "apt-vendor.ent"> %aptvendor;
+]>
+
+<refentry>
+
+ <refentryinfo>
+   <!-- The last update date -->
+&apt-author.team;
+   &apt-email;
+   &apt-product;
+   
+   <date>2015-10-20T00:00:00Z</date>
+ </refentryinfo>
+ 
+ <refmeta>
+   <refentrytitle>apt</refentrytitle>
+   <manvolnum>8</manvolnum>
+   <refmiscinfo class="manual">APT</refmiscinfo>
+ </refmeta>
+ 
+ 
+ <!-- Man page title -->
+<refnamediv>
+    <refname>apt</refname>
+    <refpurpose>コマンドラインインターフェイス</refpurpose>
+ </refnamediv>
+
+ &synopsis-command-apt;
+
+ <refsect1><title>説明</title>
+   <para><command>apt</command>
+は、パッケージ管理システム用の高レベルのコマンドラインインターフェースを提供します。エンドユーザインターフェースとして設計されています。また
+&apt-get; や &apt-cache; のような専用の APT
+ツールと比べて、デフォルトでインタラクティブな使用に適したいくつかのオプションが有効になっています。
+   </para><para>
+   <command>apt</command> 自身と同じように、man
+ページはエンドユーザインターフェースとして意図されています。さらに、一部のオプションや詳細の豊富さで読者を圧倒することを避けるため、複数の場所で部分的に情報を複製しないよう、最も使用されるコマンドとオプションを言及するように意図されています。
+   </para>
+
+   <variablelist>
+     <varlistentry><term><option>update</option> (&apt-get;)</term>
+     <listitem><para><option>update</option>
+は、設定されたすべての取得元からパッケージ情報をダウンロードするために使用されます。ほかのコマンドは、このデータを操作します。例えば、パッケージのアップグレードを実行したり、中を検索したり、インストール可能なすべてのパッケージに関する詳細情報を表示します。
+     </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>upgrade</option> (&apt-get;)</term>
+     <listitem><para><option>upgrade</option> は、&sources-list;
+で設定された取得元からシステムに現在インストール済みのすべてのパッケージで利用可能なアップグレードをインストールするために使用されます。依存関係を満たすために必要な場合は新しいパッケージがインストールされますが、既存のパッケージが削除されることはありません。パッケージのアップグレードにインストール済みパッケージの削除が必要な場合、そのパッケージのアップグレードは行われません。
+     </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>full-upgrade</option> (&apt-get;)</term>
+     <listitem><para><literal>full-upgrade</literal>
+はアップグレードの機能を実行しますが、システム全体をアップグレードするために必要とされる場合には、現在インストール済みのパッケージを削除することができます。
+     </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>install</option>, <option>remove</option>, <option>purge</option> (&apt-get;)</term>
+     <listitem><para>&regex;、&glob; または 完全な一致で指定された 1
+つ以上のパッケージに対して要求された処理を実行します。要求された処理は、特定のパッケージに対してパッケージ名にプラス (+)
+を追加してパッケージのインストールを、マイナス (-) を追加してパッケージの削除を上書きすることができます。
+     </para><para>
+	   パッケージ名にイコール (=)
+とパッケージのバージョンを続けることで、選択したバージョンのパッケージをインストールすることができます。代わりに、パッケージ名にスラッシュ (/)
+およびコード名 (&debian-stable-codename;、&debian-testing-codename;、sid …) またはスイート名
+(stable、testing、unstable)
+を続けることで、特定のリリースのバージョンをインストールすることができます。また、必要な場合には、パッケージの依存関係を満たすリリースからバージョンを選択します。
+     </para><para>
+	   パッケージの削除はパッケージの全データを削除しますが、削除の事故に備えて、通常は隠れている小さな (修正された)
+ユーザ設定ファイルを残します。問題が発生したときは、誤って削除したパッケージのインストール要求を発行すると、以前のようにその機能を復元します。一方、<command>purge</command>
+を呼び出すことで、すでに削除したパッケージの残されたデータを削除することができます。これはあなたのホームディレクトリに保存しているデータや設定には影響を与えないことに注意してください。
+     </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>autoremove</option> (&apt-get;)</term>
+     <listitem><para>
+	   <literal>autoremove</literal>
+は、ほかのパッケージの依存関係を満たすために自動的にインストールされた後に、依存関係の変更あるいは必要としていたパッケージが削除されたことでもう必要なくなったパッケージの削除に使用することができます。
+     </para><para>
+	   別のパッケージの依存関係のため一度インストールされたなどで増えたアプリケーションがリストに含まれていないことを確認する必要があります。&apt-mark;
+を使って、手動でパッケージをインストール済にマークすることができます。<command>install</command>
+経由で明示的にインストールしたパッケージは、自動削除のために提案されることはありません。
+     </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>search</option> (&apt-cache;)</term>
+     <listitem><para><option>search</option> は、利用可能なパッケージのリストを指定した &regex;
+条件で検索してマッチした結果を表示するために使用することができます。これは、例えば特定の機能をもつパッケージを探している場合に有用です。特定のファイルを含むパッケージを探しているのなら、&apt-file;
+を試してください。
+     </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>show</option> (&apt-cache;)</term>
+     <listitem><para>指定されたパッケージに関する情報を表示します。依存関係、インストールおよびダウンロードサイズ、パッケージが入手可能な取得元、パッケージの内容の説明などを含みます。例えば
+&apt; にパッケージの削除をさせる前や、インストールする新しいパッケージを検索するときに、この情報を見て参考にすることができます。
+     </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>list</option> (作業中)</term>
+     <listitem><para><option>list</option>
+は、一定の基準を満たすパッケージのリストを表示することができるという点で、<command>dpkg-query --list</command>
+に似ています。インストール済 (<option>--installed</option>)、アップグレード可能
+(<option>--upgradeable</option>) または利用可能なすべてのバージョン
+(<option>--all-versions</option>) の一覧オプションでも、パッケージ名をマッチさせる &glob;
+パターンをサポートしています。
+     </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>edit-sources</option> (作業中)</term>
+     <listitem><para><literal>edit-sources</literal> は、お好みのテキストエディタで &sources-list;
+ファイルを編集することができます。また、基本的な健全性チェックを提供します。
+     </para></listitem>
+     </varlistentry>
+
+
+   </variablelist>
+ </refsect1>
+
+ <refsect1><title>スクリプトの使い方およびほかの APT ツールとの違い</title>
+  <para>
+   &apt;
+コマンドラインはエンドユーザ向けツールとして設計されています。動作はバージョン間で変更される可能性があります。後方互換性を損なうことのないようには努めますが、変更がインタラクティブな使用に有益と思われる場合には、その保証はありません。
+  </para><para>
+   &apt; のすべての機能は、&apt-get; や &apt-cache; など専用の APT ツールで利用可能です。&apt;
+は、単にいくつかのオプションのデフォルト値を変更します (&apt-conf;
+の特にバイナリ範囲を参照)。可能な限り下位互換性を保つように、スクリプトでは (潜在的に有効になっているいくつかの追加オプションをつけて)
+コマンドを使うべきです。
+   </para>
+ </refsect1>
+
+ <refsect1><title>関連項目</title>
+   <para>&apt-get;、&apt-cache;、&sources-list;、&apt-conf;、&apt-config;、&guidesdir; にある
+APT ユーザガイド、&apt-preferences;、APT Howto.</para>
+ </refsect1>
+
+ <refsect1><title>診断メッセージ</title>
+   <para><command>apt</command> は正常終了時に 0 を返します。エラー時には十進の 100 を返します。</para>
+ </refsect1>
+ &manbugs;
+ <refsect1><title>&translation-title;</title>
+   <para>&translation-holder;</para>
+   <para>&translation-english;</para>
+ </refsect1>
+</refentry>

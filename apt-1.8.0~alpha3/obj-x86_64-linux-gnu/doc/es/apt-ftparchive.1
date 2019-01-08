@@ -1,0 +1,675 @@
+'\" t
+.\"     Title: apt-ftparchive
+.\"    Author: Jason Gunthorpe
+.\" Generator: DocBook XSL Stylesheets v1.79.1 <http://docbook.sf.net/>
+.\"      Date: 11\ \&Noviembre\ \&2016
+.\"    Manual: APT
+.\"    Source: APT 1.8.0~alpha3
+.\"  Language: Spanish
+.\"
+.TH "APT\-FTPARCHIVE" "1" "11\ \&Noviembre\ \&2016" "APT 1.8.0~alpha3" "APT"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NOMBRE"
+apt-ftparchive \- Herramienta para generar ficheros de \('indice
+.SH "SINOPSIS"
+.HP \w'\fBapt\-ftparchive\fR\ 'u
+\fBapt\-ftparchive\fR [\fB\-dsq\fR] [\fB\-\-md5\fR] [\fB\-\-delink\fR] [\fB\-\-readonly\fR] [\fB\-\-contents\fR] [\fB\-\-arch\ \fR\fB\fIarchitecture\fR\fR] [\fB\-o=\fR\fB\fIconfig_string\fR\fR] [\fB\-c=\fR\fB\fIconfig_file\fR\fR] {packages\ \fIpath\fR...\ [\fIoverride\-file\fR\ [\fIpathprefix\fR]]  | sources\ \fIpath\fR...\ [\fIoverride\-file\fR\ [\fIpathprefix\fR]]  | contents\ \fIpath\fR  | release\ \fIpath\fR  | generate\ \fIconfig_file\fR\ \fIsection\fR...  | clean\ \fIconfig_file\fR  | {\-v\ |\ \-\-version} | {\-h\ |\ \-\-help}}
+.SH "DESCRIPCI\('ON"
+.PP
+\fBapt\-ftparchive\fR
+es la herramienta de la l\('inea de \('ordenes que genera los ficheros de \('indice que APT utiliza para acceder a la fuente de la distribuci\('on\&. Los ficheros de \('indice se deber\('ian generar en el sitio de origen basado en el contenido de ese sitio\&.
+.PP
+\fBapt\-ftparchive\fR
+es un superconjunto del programa
+\fBdpkg-scanpackages\fR(1), e incorpora su funcionalidad al completo mediante la orden
+packages\&. Tambi\('en contiene un generador de contenidos de fichero,
+contents, y un modo elaborado para realizar un \(Foscript\(Fc para el proceso de generaci\('on de un archivo completo\&.
+.PP
+Internamente,
+\fBapt\-ftparchive\fR
+puede hacer uso de bases de datos binarias para almacenar los contenidos de un fichero \(Fo\&.deb\(Fc y no depender de ning\('un programa externo como
+\fBgzip\fR(1)\&. Cuando se realiza una generaci\('on completa, autom\('aticamente realiza comprobaciones de cambios en los ficheros y genera los ficheros de salida comprimidos deseados\&.
+.PP
+A menos que se use la opci\('on
+\fB\-h\fR
+o
+\fB\-\-help\fR, una de las siguientes \('ordenes debe estar presente\&.
+.PP
+\fBpackages\fR
+.RS 4
+La orden \(Fopackages\(Fc genera un fichero de paquete a partir de un directorio\&. Busca recursivamente ficheros \(Fo\&.deb\(Fc en el directorio proporcionado, generando un registro de paquete en la salida est\('andar para cada uno\&. Esta orden es casi un equivalente de
+\fBdpkg-scanpackages\fR(1)\&.
+.sp
+La opci\('on
+\fB\-\-db\fR
+se puede usar para especificar una base de datos binaria para la cach\('e (registro de paquetes)\&.
+.RE
+.PP
+\fBsources\fR
+.RS 4
+La orden
+sources
+genera un fichero de \('indice de fuentes a partir de un directorio\&. Toma el directorio proporcionado y busca en \('el recursivamente ficheros \(Fo\&.dsc\(Fc, generando un registro de fuente en la salida est\('andar para cada uno\&. Esta orden es casi un equivalente de
+\fBdpkg-scansources\fR(1)\&.
+.sp
+Si se define un fichero alternativo, se buscar\('a un fichero de fuentes alternativo con la extensi\('on \(Fo\&.src\(Fc\&. Puede usar la opci\('on \-\-source\-override para cambiar el fichero de fuentes alternativo que se usar\('a\&.
+.RE
+.PP
+\fBcontents\fR
+.RS 4
+La orden
+contents
+genera un fichero de contenidos a partir de un directorio\&. Toma el directorio proporcionado y busca en \('el recursivamente ficheros \(Fo\&.deb\(Fc, lee la lista de ficheros para cada uno, los ordena y muestra en la salida est\('andar la lista de ficheros que coinciden con los paquetes\&. Los directorios no se muestran por la salida est\('andar\&. Si varios paquetes tienen el mismo fichero, entonces cada paquete se separar\('a por una coma en la salida\&.
+.sp
+La opci\('on
+\fB\-\-db\fR
+se puede usar para especificar una base de datos binaria para la cach\('e (registro de paquetes)\&.
+.RE
+.PP
+\fBrelease\fR
+.RS 4
+The
+release
+command generates a Release file from a directory tree\&. It recursively searches the given directory for uncompressed and compressed
+Packages,
+Sources,
+Contents,
+Components
+and
+icons
+files as well as
+Release,
+Index
+and
+md5sum\&.txt
+files by default (APT::FTPArchive::Release::Default\-Patterns)\&. Additional filename patterns can be added by listing them in
+APT::FTPArchive::Release::Patterns\&. It then writes to stdout a
+Release
+file containing (by default) an MD5, SHA1, SHA256 and SHA512 digest for each file\&.
+.sp
+Los valores para los campos de metadatos adicionales en el fichero \(FoRelease\(Fc se toman de las variables correspondientes en
+APT::FTPArchive::Release, por ejemplo
+APT::FTPArchive::Release::Origin\&. Los campos permitidos son:
+Origin,
+Label,
+Suite,
+Version,
+Codename,
+Date,
+NotAutomatic,
+ButAutomaticUpgrades,
+Acquire\-By\-Hash,
+Valid\-Until,
+Signed\-By,
+Architectures,
+Components
+y
+Description\&.
+.RE
+.PP
+\fBgenerate\fR
+.RS 4
+La orden
+generate
+se ha dise\(~nado para ejecutarse desde un script de cron y genera los \('indices de acuerdo a lo proporcionado en el fichero de configuraci\('on\&. El lenguaje de configuraci\('on proporciona una forma flexible de definir qu\('e ficheros de \('indice se generar\('an a partir de qu\('e directorios, as\('i como proporcionar una forma sencilla de mantener la configuraci\('on necesaria\&.
+.RE
+.PP
+\fBclean\fR
+.RS 4
+La orden
+clean
+ordena las bases de datos que usa el fichero de configuraci\('on proporcionado, eliminando los registros que no son necesarios\&.
+.RE
+.SH "LA CONFIGURACI\('ON DE \(FoGENERATE\(Fc"
+.PP
+La orden
+generate
+usa un fichero de configuraci\('on para describir los ficheros que se generar\('an\&. Sigue el t\('ipico formato de configuraci\('on de ISC presente en las herramientas de ISC como bind 8 y dhcpd\&.
+\fBapt.conf\fR(5)
+contiene una descripci\('on de la sintaxis\&. Tenga en cuenta que la configuraci\('on de \(Fogenerate\(Fc se analiza por secci\('on, pero
+\fBapt.conf\fR(5)
+se analiza por \('arbol\&. Esto s\('olo afecta a c\('omo se maneja el \('ambito de la etiqueta\&.
+.PP
+La configuraci\('on de \(Fogenerate\(Fc tiene cuatro secciones diferentes, descritas a continuaci\('on\&.
+.SS "Secci\('on Dir"
+.PP
+La secci\('on
+Dir
+define los directorios est\('andar necesarios para ubicar los ficheros necesarios durante el proceso de generaci\('on\&. A estos directorios se les a\(~naden ciertas rutas relativas definidas en secciones posteriores para producir una ruta absoluta\&.
+.PP
+\fBArchiveDir\fR
+.RS 4
+Define la ra\('iz del archivo FTP; en una configuraci\('on est\('andar de Debian \('este es el directorio que contiene el
+ls\-LR
+y los nodos \(Fodist\(Fc\&.
+.RE
+.PP
+\fBOverrideDir\fR
+.RS 4
+Define la ubicaci\('on de los ficheros alternativos\&.
+.RE
+.PP
+\fBCacheDir\fR
+.RS 4
+Define la ubicaci\('on de los ficheros almacenados\&.
+.RE
+.PP
+\fBFileListDir\fR
+.RS 4
+Define la ubicaci\('on de los ficheros del listado de ficheros, si se usa posteriormente el valor
+FileList\&.
+.RE
+.SS "Secci\('on Default"
+.PP
+La secci\('on
+Default
+define los valores predeterminados, y los ajustes que controlan la operaci\('on del generador\&. Otras secciones pueden sobrescribir estos valores predeterminados con un valor de la secci\('on\&.
+.PP
+\fBPackages::Compress\fR
+.RS 4
+Sets the default compression schemes to use for the package index files\&. It is a string that contains a space separated list of at least one of the compressors configured via the
+\fBAPT::Compressor\fR
+configuration scope\&. The default for all compression schemes is \*(Aq\&. gzip\*(Aq\&.
+.RE
+.PP
+\fBPackages::Extensions\fR
+.RS 4
+Define la lista predeterminada de extensiones de fichero que son ficheros de paquete\&. El valor predeterminado es \(Fo\&.deb\(Fc\&.
+.RE
+.PP
+\fBSources::Compress\fR
+.RS 4
+Esta opci\('on es similar a
+Packages::Compress
+excepto que controla la compresi\('on para los ficheros \(FoSources\(Fc\&.
+.RE
+.PP
+\fBSources::Extensions\fR
+.RS 4
+Define la lista predeterminada de las extensiones de fichero que son ficheros de fuentes\&. El valor predeterminado es \(Fo\&.dsc\(Fc\&.
+.RE
+.PP
+\fBContents::Compress\fR
+.RS 4
+Esta opci\('on es similar a
+Packages::Compress
+excepto que controla la compresi\('on para los ficheros \(FoContents\(Fc\&.
+.RE
+.PP
+\fBTranslation::Compress\fR
+.RS 4
+Esta opci\('on es similar a
+Packages::Compress
+excepto que controla la compresi\('on para el fichero maestro Translation\-en\&.
+.RE
+.PP
+\fBDeLinkLimit\fR
+.RS 4
+Define el n\('umero de kilobytes a desenlazar (y reemplazar con enlaces duros) por ejecuci\('on\&. Se usa junto al valor
+External\-Links
+de cada secci\('on\&.
+.RE
+.PP
+\fBFileMode\fR
+.RS 4
+Define el modo de todos los ficheros de \('indice creados\&. El valor predeterminado es 0644\&. Todos los ficheros de \('indice se ajustan a este modo sin tener en cuenta la m\('ascara de usuario (\(Foumask\(Fc)\&.
+.RE
+.PP
+\fBLongDescription\fR
+.RS 4
+Define si se incluyen descripciones largas en el fichero
+Packages, o si se separan en un fichero
+Translation\-en
+maestro\&.
+.RE
+.SS "Secci\('on TreeDefault"
+.PP
+Define los valores predeterminados de las secciones
+Tree\&. Todas estas variables son variables de sustituci\('on y reemplazan las cadenas $(DIST), $(SECTION) y $(ARCH) con sus valores respectivos\&.
+.PP
+\fBMaxContentsChange\fR
+.RS 4
+Define el n\('umero de kilobytes de los ficheros de contenido que se generan cada d\('ia\&. Los ficheros de contenido est\('an en una cola \(Foround\-robin\(Fc, de modo que durante varios d\('ias todos se regenerar\('an\&.
+.RE
+.PP
+\fBContentsAge\fR
+.RS 4
+Controla el n\('umero de d\('ias en los que se permite comprobar un fichero de contenido sin cambios\&. Si este l\('imite caduca, el tiempo de modificaci\('on (mtime) del fichero de contenido se actualiza\&. Este caso puede aparecer si un fichero de paquete cambia de forma que no resulte en un fichero de contenido nuevo (por ejemplo, una edici\('on alternativa)\&. Se permite la retenci\('on con la esperanza de que se instalen nuevos \(Fo\&.deb\(Fc, lo cual precisa un fichero nuevo de todos modos\&. El valor predeterminado es diez, las unidades usadas son d\('ias\&.
+.RE
+.PP
+\fBDirectory\fR
+.RS 4
+Define la ra\('iz del directorio \(Fo\&.deb\(Fc\&. El valor predeterminado es
+$(DIST)/$(SECTION)/binary\-$(ARCH)/
+.RE
+.PP
+\fBSrcDirectory\fR
+.RS 4
+Define la ra\('iz del directorio de los paquetes de fuentes\&. El valor predeterminado es
+$(DIST)/$(SECTION)/source/
+.RE
+.PP
+\fBPackages\fR
+.RS 4
+Define el fichero \(FoPackages\(Fc de salida\&. El valor predeterminado es
+$(DIST)/$(SECTION)/binary\-$(ARCH)/Packages
+.RE
+.PP
+\fBSources\fR
+.RS 4
+Define el fichero \(FoSources\(Fc de salida\&. El valor predeterminado es
+$(DIST)/$(SECTION)/source/Sources
+.RE
+.PP
+\fBTranslation\fR
+.RS 4
+Define el fichero maestro \(FoTranslation\-en\(Fc que contiene las descripciones largas en el caso de que no se incluyan en el fichero \(FoPackages\(Fc\&. El valor predeterminado es
+$(DIST)/$(SECTION)/i18n/Translation\-en
+.RE
+.PP
+\fBInternalPrefix\fR
+.RS 4
+Define el prefijo de la ruta que hace que un enlace simb\('olico se considere un enlace interno en lugar de un enlace externo\&. El valor predeterminado es
+$(DIST)/$(SECTION)/
+.RE
+.PP
+\fBContents\fR
+.RS 4
+Define el fichero \(FoContents\(Fc de salida\&. El valor predeterminado es
+$(DIST)/Contents\-$(ARCH)\&. Si este valor provoca que varios ficheros \(FoPackages\(Fc se relacionen con un \('unico fichero \(FoContents\(Fc (el comportamiento predeterminado),
+\fBapt\-ftparchive\fR
+integrar\('a autom\('aticamente esos ficheros de paquete\&.
+.RE
+.PP
+\fBContents::Header\fR
+.RS 4
+Define el fichero de cabecera a a\(~nadir al fichero \(FoContents\(Fc de salida\&.
+.RE
+.PP
+\fBBinCacheDB\fR
+.RS 4
+Define la base de datos binaria de la cach\('e para usar en esta secci\('on\&. Varias secciones pueden compartir la misma base de datos\&.
+.RE
+.PP
+\fBFileList\fR
+.RS 4
+Define que
+\fBapt\-ftparchive\fR
+deber\('ia leer la lista de ficheros del fichero proporcionado en lugar de explorar recursivamente el \('arbol de directorios\&. A los nombres de los ficheros relativos se les a\(~nade como prefijo el directorio del archivo\&.
+.RE
+.PP
+\fBSourceFileList\fR
+.RS 4
+Define que
+\fBapt\-ftparchive\fR
+deber\('ia leer la lista de ficheros del fichero proporcionado en lugar de explorar recursivamente el \('arbol de directorio\&. A los nombres de los ficheros relativos se les a\(~nade como prefijo el directorio del archivo\&. S\('olo se usa cuando se procesan \('indices de fuentes\&.
+.RE
+.SS "Secci\('on Tree"
+.PP
+La secci\('on
+Tree
+define un \('arbol de un archivo de paquetes Debian est\('andar que consiste en un directorio base, varias secciones en ese directorio base y finalmente varias arquitecturas en cada secci\('on\&. La ruta exacta usada se define en la variable de sustituci\('on
+Directory\&.
+.PP
+La secci\('on
+Tree
+toma un \('ambito de una etiqueta que define la variable
+$(DIST)
+y la ra\('iz del \('arbol (a la ruta se le a\(~nade el prefijo
+ArchiveDir)\&. Normalmente esto es un valor como
+dists/stretch\&.
+.PP
+Todos los valores definidos en la secci\('on
+TreeDefault
+se pueden utilizar en la secci\('on
+Tree, as\('i como tres nuevas variables\&.
+.PP
+Cuando se procesa una secci\('on
+Tree
+\fBapt\-ftparchive\fR
+realiza una operaci\('on similar a la siguiente:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+for i in Sections do 
+   for j in Architectures do
+      Generar con DIST=scope SECTION=i ARCH=j
+     
+.fi
+.if n \{\
+.RE
+.\}
+
+.PP
+\fBSections\fR
+.RS 4
+Es una lista de secciones separadas por espacios que aparecen bajo la distribuci\('on; habitualmente, es similar a
+main contrib non\-free\&.
+.RE
+.PP
+\fBArchitectures\fR
+.RS 4
+This is a space separated list of all the architectures that appear under search section\&. The special architecture \*(Aqsource\*(Aq is used to indicate that this tree has a source archive\&. The architecture \*(Aqall\*(Aq signals that architecture specific files like
+Packages
+should not include information about architecture
+all
+packages in all files as they will be available in a dedicated file\&.
+.RE
+.PP
+\fBLongDescription\fR
+.RS 4
+Define si se incluyen descripciones largas en el fichero
+Packages, o si se separan en un fichero
+Translation\-en
+maestro\&.
+.RE
+.PP
+\fBBinOverride\fR
+.RS 4
+Define el fichero binario alternativo\&. \('Este contiene la informaci\('on sobre la secci\('on, la prioridad y la direcci\('on del mantenedor\&.
+.RE
+.PP
+\fBSrcOverride\fR
+.RS 4
+Define el fichero de fuentes alternativo\&. \('Este contiene la informaci\('on sobre la secci\('on\&.
+.RE
+.PP
+\fBExtraOverride\fR
+.RS 4
+Define el fichero binario alternativo adicional\&.
+.RE
+.PP
+\fBSrcExtraOverride\fR
+.RS 4
+Define el fichero de fuentes alternativo adicional\&.
+.RE
+.SS "Secci\('on BinDirectory"
+.PP
+La secci\('on
+bindirectory
+define un directorio binario sin ning\('un tipo de estructura especial\&. El \('ambito de la etiqueta define la ubicaci\('on del directorio binario, la configuraci\('on es similar a la secci\('on
+Tree
+sin sustituir las variables o la configuraci\('on de
+SectionArchitecture\&.
+.PP
+\fBPackages\fR
+.RS 4
+Define el fichero \(FoPackages\(Fc de salida\&.
+.RE
+.PP
+\fBSources\fR
+.RS 4
+Define el fichero \(FoSources\(Fc de salida\&. Es necesario al menos un fichero
+Packages
+o
+Sources\&.
+.RE
+.PP
+\fBContents\fR
+.RS 4
+Define el fichero \(FoContents\(Fc de salida (opcional)
+.RE
+.PP
+\fBBinOverride\fR
+.RS 4
+Define el fichero binario alternativo\&.
+.RE
+.PP
+\fBSrcOverride\fR
+.RS 4
+Define el fichero de fuentes alternativo\&.
+.RE
+.PP
+\fBExtraOverride\fR
+.RS 4
+Define el fichero binario alternativo adicional\&.
+.RE
+.PP
+\fBSrcExtraOverride\fR
+.RS 4
+Define el fichero de fuentes alternativo adicional\&.
+.RE
+.PP
+\fBBinCacheDB\fR
+.RS 4
+Define la base de datos de la cach\('e\&.
+.RE
+.PP
+\fBPathPrefix\fR
+.RS 4
+A\(~nade una ruta a todas las rutas de salida\&.
+.RE
+.PP
+\fBFileList\fR, \fBSourceFileList\fR
+.RS 4
+Define el fichero de la lista de ficheros\&.
+.RE
+.SH "EL FICHERO BINARIO ALTERNATIVO"
+.PP
+El fichero binario alternativo es totalmente compatible con
+\fBdpkg-scanpackages\fR(1)\&. Contiene cuatro campos separados por espacios\&. El primero es el nombre del paquete, el segundo la prioridad asignada el paquete, el tercero es la secci\('on a la que se fuerza el paquete y el \('ultimo es el campo de permutaci\('on del mantenedor\&.
+.PP
+La forma general del campo del mantenedor es:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+antigua [// antigua\-n]* => nueva
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+o simplemente
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+nueva
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+La primera forma permite una lista separada por barras dobles de las direcciones de correo electr\('onico antiguas a definir\&. Si se encuentra cualquier de ellas \(Fonueva\(Fc se sustituye por el campo del mantenedor\&. La segunda forma sustituye de forma incondicional el campo del mantenedor\&.
+.SH "EL FICHERO DE FUENTES ALTERNATIVO"
+.PP
+El fichero de fuentes alternativo es totalmente compatible con
+\fBdpkg-scansources\fR(1)\&. Contiene dos campos separados por espacios\&. El primero es el nombre del paquete fuente, el segundo es la secci\('on a la que se asignar\('a\&.
+.SH "EL FICHERO ALTERNATIVO ADICIONAL"
+.PP
+El fichero alternativo adicional permite a\(~nadir o reemplazar en la salida cualquier etiqueta arbitraria\&. Tiene tres columnas, la primera es el paquete, la segunda es la etiqueta y el resto de la l\('inea es el nuevo valor\&.
+.SH "OPCIONES"
+.PP
+Todas las opciones de la l\('inea de \('ordenes se pueden definir mediante el fichero de configuraci\('on, las descripciones indican la opci\('on de la configuraci\('on a definir\&. Para opciones de tipo \(Foboolean\(Fc puede invalidar el fichero de configuraci\('on utilizando algo como
+\fB\-f\-\fR,\fB\-\-no\-f\fR,
+\fB\-f=no\fR
+u otras muchas variaciones\&.
+.PP
+\fB\-\-md5\fR, \fB\-\-sha1\fR, \fB\-\-sha256\fR, \fB\-\-sha512\fR
+.RS 4
+Genera la suma de control dada\&. Por omisi\('on, estas opciones est\('an activas\&. Si se desactivan, los ficheros de \('indice generados no contendr\('an los campos de suma de control donde sea posibl\&. Opciones de configuraci\('on:
+APT::FTPArchive::\fIChecksum\fR
+y
+APT::FTPArchive::\fIIndex\fR::\fIChecksum\fR
+donde
+\fIIndex\fR
+puede ser
+Packages,
+Sources
+o
+Release, y
+\fIChecksum\fR
+puede ser
+MD5,
+SHA1,
+SHA256
+o
+SHA512\&.
+.RE
+.PP
+\fB\-d\fR, \fB\-\-db\fR
+.RS 4
+Utiliza una base de datos binaria para la cach\('e\&. \('Esto no afecta a la orden \(Fogenerate\(Fc\&. Opci\('on de configuraci\('on:
+APT::FTPArchive::DB\&.
+.RE
+.PP
+\fB\-q\fR, \fB\-\-quiet\fR
+.RS 4
+Silencioso, produce una salida adecuada para su almacenamiento, omitiendo los indicadores de progreso\&. M\('as letras \(Foq\(Fc producen una salida m\('as silenciosa, hasta un m\('aximo de dos letras\&. Adem\('as, es posible usar
+\fB\-q=#\fR
+para ajustar el nivel de silencio, ignorando el fichero de configuraci\('on\&. Opci\('on de configuraci\('on:
+quiet\&.
+.RE
+.PP
+\fB\-\-delink\fR
+.RS 4
+Realiza el desenlazado\&. Esta opci\('on activa el desenlazado de los ficheros si se usa la opci\('on
+External\-Links\&. Esta activa de forma predeterminada y se puede desactivar mediante
+\fB\-\-no\-delink\fR\&. Opci\('on de configuraci\('on:
+APT::FTPArchive::DeLinkAct\&.
+.RE
+.PP
+\fB\-\-contents\fR
+.RS 4
+Realiza la generaci\('on de \(Focontents\(Fc\&. Cuando se usa esta opci\('on y los \('indices de los paquetes se est\('an generando con una base de datos de la cach\('e, el listado de los ficheros se extraer\('a tambi\('en y se almacenar\('a en la base de datos para su uso posterior\&. Cuando se usa la orden \(Fogenerate\(Fc esta opci\('on tambi\('en permite la creaci\('on de cualquier fichero \(FoContents\(Fc\&. Esta activa de forma predeterminada\&. Opci\('on de configuraci\('on:
+APT::FTPArchive::Contents\&.
+.RE
+.PP
+\fB\-s\fR, \fB\-\-source\-override\fR
+.RS 4
+Selecciona el fichero de fuentes alternativo a usar con la orden
+sources\&. Opci\('on de configuraci\('on:
+APT::FTPArchive::SourceOverride\&.
+.RE
+.PP
+\fB\-\-readonly\fR
+.RS 4
+Define los permisos de las bases de datos de la cach\('e como s\('olo lectura\&. Opci\('on de configuraci\('on:
+APT::FTPArchive::ReadOnlyDB\&.
+.RE
+.PP
+\fB\-a\fR, \fB\-\-arch\fR
+.RS 4
+Hace que las \('ordenes
+packages
+y
+contents
+s\('olo acepten aquellos paquetes que coinciden con
+*_arch\&.deb
+o
+*_all\&.deb, en lugar de todos los ficheros de paquete en la ruta dada\&. Elemento de configuraci\('on:
+APT::FTPArchive::Architecture\&.
+.RE
+.PP
+\fBAPT::FTPArchive::AlwaysStat\fR
+.RS 4
+\fBapt-ftparchive\fR(1)
+almacena tantos metadatos como sea posible en una base de datos de almacenamiento\&. Si los paquetes se recompilan o publican otra vez con la misma versi\('on aparecer\('an problemas ya que se usar\('an los metadatos almacenados y ahora obsoletos tales como el tama\(~no o la suma de control\&. Esta situaci\('on se evitar\('a si se activa esta opci\('on ya que se comprobar\('a si el fichero ha cambiado\&. Tenga en cuenta que esta opci\('on est\('a definida como \(Fofalse\(Fc por omisi\('on, ya que no se recomienda subir varias versiones o compilaciones de un paquete con el mismo n\('umero de versi\('on, as\('i que en teor\('ia nadie deber\('ia tener problemas y por ello todas estas comprobaciones adicionales son innecesarias\&.
+.RE
+.PP
+\fBAPT::FTPArchive::LongDescription\fR
+.RS 4
+De forma predeterminada esta opci\('on de configuraci\('on se define como \(Fotrue\(Fc y s\('olo se deber\('ia definir como \(Fofalse\(Fc si el archivo de paquetes generado con
+\fBapt-ftparchive\fR(1)
+tambi\('en proporciona ficheros
+Translation\&. Tenga en cuenta que el fichero maestro
+Translation\-en
+s\('olo se puede crear con la orden \(Fogenerate\(Fc\&.
+.RE
+.PP
+\fB\-h\fR, \fB\-\-help\fR
+.RS 4
+Muestra un mensaje corto sobre el uso\&.
+.RE
+.PP
+\fB\-v\fR, \fB\-\-version\fR
+.RS 4
+Muestra la versi\('on del programa\&.
+.RE
+.PP
+\fB\-c\fR, \fB\-\-config\-file\fR
+.RS 4
+Fichero de configuraci\('on: Especifica el fichero de configuraci\('on a usar\&. El programa leer\('a el fichero de configuraci\('on predeterminado y, despu\('es, este fichero de configuraci\('on\&. Si necesita que ciertas opciones de configuraci\('on se definan antes que el an\('alisis de los de los ficheros de configuraci\('on predeterminados, defina un fichero con la variable de entorno
+\fBAPT_CONFIG\fR\&. Consulte
+\fBapt.conf\fR(5)
+para informaci\('on sobre la sintaxis\&.
+.RE
+.PP
+\fB\-o\fR, \fB\-\-option\fR
+.RS 4
+Define una opci\('on de configuraci\('on: Esto definir\('a una opci\('on arbitraria de configuraci\('on\&. La sintaxis es
+\fB\-o Algo::Cosa=cosa\fR\&.
+\fB\-o\fR
+y
+\fB\-\-option\fR
+se pueden usar varias veces para definir diferentes opciones\&.
+.RE
+.SH "EJEMPLOS"
+.PP
+Para crear un fichero \(FoPackages\(Fc comprimido para un directorio que contenga paquetes binarios (\(Fo\&.deb\(Fc):
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+\fBapt\-ftparchive\fR packages \fIdirectorio\fR | \fBgzip\fR > Packages\&.gz
+.fi
+.if n \{\
+.RE
+.\}
+.SH "V\('EASE TAMBI\('EN"
+.PP
+\fBapt.conf\fR(5)
+.SH "DIAGN\('OSTICOS"
+.PP
+\fBapt\-ftparchive\fR
+devuelve cero si no hay ning\('un error, y el valor 100 en caso de error\&.
+.SH "BUGS"
+.PP
+\m[blue]\fBP\('agina de errores de APT\fR\m[]\&\s-2\u[1]\d\s+2\&. Si quiere informar de un error en APT, consulte
+/usr/share/doc/debian/bug\-reporting\&.txt
+o use la orden
+\fBreportbug\fR(1)\&.
+.SH "TRADUCCI\('ON"
+.PP
+La traducci\('on al espa\(~nol la realizaron Ismael Fanlo, Carlos Mestre, Rudy Godoy, Gustavo Saldumbide, Javier Fern\('andez\-Sanguino y Rub\('en Porras Campo entre los a\(~nos 2003 y 2004\&. La traducci\('on fue actualizada por Francisco Javier Cuadrado y Omar Campagne Polaino entre los a\(~nos 2009 y 2012 \&.
+.PP
+Tenga en cuenta que este documento puede contener secciones sin traducir\&. Esto es intencionado para evitar perder contenido cuando la traducci\('on no est\('a actualizada con respecto al documento original\&.
+.SH "AUTORES"
+.PP
+\fBJason Gunthorpe\fR
+.RS 4
+.RE
+.PP
+\fBEquipo de APT\fR
+.RS 4
+.RE
+.SH "NOTAS"
+.IP " 1." 4
+P\('agina de errores de APT
+.RS 4
+\%http://bugs.debian.org/src:apt
+.RE

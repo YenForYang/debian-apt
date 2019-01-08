@@ -1,0 +1,1357 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+  "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % aptent SYSTEM "apt.ent"> %aptent;
+<!ENTITY % aptverbatiment SYSTEM "apt-verbatim.ent"> %aptverbatiment;
+<!ENTITY % aptvendor SYSTEM "apt-vendor.ent"> %aptvendor;
+]>
+
+<refentry>
+
+ <refentryinfo>
+   &apt-author.jgunthorpe;
+   &apt-author.team;
+   <author>
+     &apt-name.dburrows;
+     <contrib>Documentazione iniziale di Debug::*.</contrib>
+     <email>dburrows@debian.org</email>
+   </author>
+   <!-- The last update date -->
+&apt-email;
+   &apt-product;
+   
+   <date>2018-12-10T00:00:00Z</date>
+ </refentryinfo>
+ 
+ <refmeta>
+   <refentrytitle>apt.conf</refentrytitle>
+   <manvolnum>5</manvolnum>
+   <refmiscinfo class="manual">APT</refmiscinfo>
+ </refmeta>
+ 
+ 
+ <!-- Man page title -->
+<refnamediv>
+    <refname>apt.conf</refname>
+    <refpurpose>file di configurazione di APT</refpurpose>
+ </refnamediv>
+
+ <refsect1><title>Descrizione</title>
+   <para><filename>/etc/apt/apt.conf</filename> è il file di configurazione
+principale condiviso da tutti gli strumenti nella suite APT, anche se non è
+affatto l'unico posto in cui possono essere impostate opzioni. La suite
+condivide anche un analizzatore comune della riga di comando per fornire un
+ambiente uniforme.</para>
+
+   <orderedlist>
+      <para>Quando uno strumento APT viene avviato, legge i file di configurazione nel
+seguente ordine:</para>
+      <listitem><para>il file specificato dalla variabile d'ambiente <envar>APT_CONFIG</envar> (se
+presente)</para></listitem>
+      <listitem><para>tutti i file in <literal>Dir::Etc::Parts</literal>, in ordine alfanumerico
+crescente, se il loro nome file non ha estensione o ha
+«<literal>conf</literal>» come estensione, e contiene solamente caratteri
+alfanumerici, trattini (-), caratteri di sottolineatura (_) e punti
+(.). Altrimenti, APT visualizza un messaggio che informa che un file è stato
+ignorato, a meno che il file non corrisponda ad un modello nell'elenco di
+configurazione <literal>Dir::Ignore-Files-Silently</literal> nel qual caso
+verrà ignorato silenziosamente.</para></listitem>
+      <listitem><para>il file di configurazione principale specificato da
+<literal>Dir::Etc::main</literal></para></listitem>
+      <listitem><para>tutte le opzioni impostate nel sottoalbero di configurazione specifico dei
+binari sono spostate nella radice dell'albero.</para></listitem>
+      <listitem><para>le opzioni nella riga di comando sono applicate per scavalcare le direttive
+di configurazione o per caricare ulteriori file di configurazione.</para></listitem>
+   </orderedlist>
+   </refsect1>
+   <refsect1><title>Sintassi</title>
+   <para>Il file di configurazione ha un'organizzazione ad albero con le opzioni
+riunite in gruppi funzionali. Un'opzione viene specificata con una notazione
+a due punti (:); per esempio <literal>APT::Get::Assume-Yes</literal> è
+un'opzione per lo strumento Get all'interno del gruppo dello strumento
+APT. Le opzioni non ereditano dai gruppi genitori.</para> 
+
+   <para>Sintatticamente il linguaggio di configurazione è basato sul modello di
+quello usato dagli strumenti ISC come bind e dhcp. Le righe che iniziano con
+<literal>//</literal> vengono trattate come commenti (ignorate), così come
+tutto il testo racchiuso tra <literal>/*</literal> e <literal>*/</literal>,
+proprio come i commenti C/C++. Ogni riga ha la forma
+<literal>APT::Get::Assume-Yes "true";</literal>. Le virgolette e il punto e
+virgola finale sono obbligatori. I valori non possono includere barre
+inverse (\) o ulteriori virgolette. I nomi delle opzioni sono costituiti da
+caratteri alfanumerici e dai caratteri «/-:._+». Un nuovo ambito può essere
+aperto con parentesi graffe come in:</para>
+
+<informalexample><programlisting>   
+APT {
+  Get {
+    Assume-Yes "true";
+    Fix-Broken "true";
+  };
+};
+</programlisting></informalexample>
+
+   <para>con le nuove righe posizionate in modo da renderle più leggibili. Si possono
+creare elenchi aprendo un ambito e includendo una singola stringa racchiusa
+tra virgolette e seguita da un punto e virgola. Possono essere incluse più
+voci, separate da un punto e virgola.</para>
+
+<informalexample><programlisting>   
+DPkg::Pre-Install-Pkgs {"/usr/sbin/dpkg-preconfigure --apt";};
+</programlisting></informalexample>
+
+   <para>In generale i file di configurazione d'esempio &configureindex; sono una
+buona guida su come debba essere un file di configurazione.</para>
+
+   <para>I nomi delle voci di configurazione sono insensibili all'uso di maiuscole e
+minuscole, perciò nell'esempio precedente si sarebbe potuto usare
+<literal>dpkg::pre-install-pkgs</literal>.</para>
+
+   <para>I nomi delle voci di configurazione sono opzionali se viene definito un
+elenco come si può vedere nell'esempio
+<literal>DPkg::Pre-Install-Pkgs</literal> precedente. Se non si specifica un
+nome, una nuova voce aggiunge semplicemente una nuova opzione all'elenco. Se
+si specifica un nome, si può sovrascrivere l'opzione come per ogni altra,
+assegnandole un nuovo valore.</para>
+
+   <para>Sono definiti due comandi speciali: <literal>#include</literal> (che è
+deprecato e non supportato da implementazioni alternative) e
+<literal>#clear</literal>. <literal>#include</literal> include il file
+indicato a meno che il suo nome non termini con un carattere «/», nel qual
+caso viene inclusa l'intera directory. <literal>#clear</literal> viene usato
+per eliminare una parte dell'albero di configurazione. L'elemento
+specificato e tutti i suoi discendenti vengono eliminati. (Notare che anche
+queste righe devono terminare con un punto e virgola.)</para>
+
+   <para>
+   Il comando <literal>#clear</literal> è l'unico modo di cancellare un elenco
+o un intero ambito. Riaprire un ambito (o usare la sintassi descritta più
+sotto aggiungendo alla fine <literal>::</literal>) <emphasis>non</emphasis>
+sovrascrive le voci precedentemente scritte. Le opzioni possono essere
+sovrascritte solamente assegnandovi un nuovo valore; gli elenchi e gli
+ambiti non possono essere sovrascritti, solo cancellati.
+   </para>
+
+   <para>Tutti gli strumenti APT accettano un'opzione -o che permette di specificare
+una direttiva di configurazione arbitraria nella riga di comando. La
+sintassi è un nome completo di opzione (per esempio
+<literal>APT::Get::Assume-Yes</literal>) seguito da un segno di uguaglianza
+e quindi il nuovo valore dell'opzione. Per aggiungere un nuovo elemento ad
+un elenco, aggiungere <literal>::</literal> alla fine del nome
+dell'elenco. (Come si può immaginare, la sintassi per gli ambiti non può
+essere usata nella riga di comando.)</para>
+
+   <para>
+   Notare che aggiungere voci in coda ad un elenco usando <literal>::</literal>
+funziona solamente con un elemento per riga, e che non si dovrebbe usarlo
+insieme alla sintassi per gli ambiti (che aggiunge implicitamente
+<literal>::</literal>). L'uso di entrambe le sintassi insieme fa apparire un
+bug che sfortunatamente alcuni utenti utilizzano: un'opzione con l'insolito
+nome «<literal>::</literal>» che funziona come una qualsiasi altra opzione
+con nome. Ciò introduce molti problemi; innanzitutto gli utenti che scrivono
+più righe con questa sintassi <emphasis>sbagliata</emphasis> nella speranza
+di aggiungere voci ad un elenco ottengono il risultato opposto, dato che
+viene usata solo l'ultima assegnazione per questa opzione
+«<literal>::</literal>». Le versioni future di APT causeranno errori e
+smetteranno di funzionare se incontrano questo uso scorretto, perciò è bene
+correggere tali dichiarazioni ora, quando APT ancora non si lamenta
+esplicitamente.
+   </para>
+ </refsect1>
+
+ <refsect1><title>Il gruppo APT</title>
+   <para>Questo gruppo di opzioni controlla il comportamento generale di APT, oltre a
+contenere le opzioni per tutti gli strumenti.</para>
+
+   <variablelist>
+     <varlistentry><term><option>Architecture</option></term>
+     <listitem><para>Architettura di sistema; imposta l'architettura da usare quando si
+recuperano i file e si analizzano gli elenchi dei pacchetti. Il valore
+predefinito interno è l'architettura per la quale apt è stato compilato.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>Architectures</option></term>
+     <listitem><para>
+     Tutte le architetture supportate dal sistema. Ad esempio, le CPU che
+implementano l'insieme di istruzioni <literal>amd64</literal> (chiamato
+anche <literal>x86-64</literal>) sono anche in grado di eseguire binari
+compilati per l'insieme di istruzioni <literal>i386</literal>
+(<literal>x86</literal>). Questo elenco viene usato quando si recuperano i
+file e si analizzano gli elenchi dei pacchetti. Il valore iniziale
+predefinito è sempre l'architettura nativa del sistema
+(<literal>APT::Architecture</literal>), e le altre architetture vengono
+aggiunte all'elenco predefinito quando sono registrate con <command>dpkg
+--add-architecture</command>.
+     </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>Compressor</option></term>
+     <listitem><para>
+     Questo ambito definisce quali formati di compressione sono gestiti, come
+possono essere effettuate la compressione e la decompressione se il supporto
+per il formato non è incorporato direttamente in apt e un valoro di costo
+che indica quanto costoso è comprimere qualcosa in questo formato. Come
+esempio, la seguente sezione di configurazione permette ad apt di scaricare
+e decomprimere, oltre a creare e archiviare, file con l'estensione a basso
+costo <literal>.reversed</literal> che passerà al comando
+<command>rev</command> senza parametri aggiuntivi per la compressione e la
+decompressione nella riga di comando:</para>
+<informalexample><programlisting>
+APT::Compressor::rev {
+	Name "rev";
+	Extension ".reversed";
+	Binary "rev";
+	CompressArg {};
+	UncompressArg {};
+	Cost "10";
+};
+</programlisting></informalexample>
+     </listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>Build-Profiles</option></term>
+     <listitem><para>
+     Elenco dei profili di compilazione abilitati per la risoluzione delle
+dipendenze di compilazione, senza il prefisso dello spazio dei nomi
+«<literal>profile.</literal>». In modo predefinito questa lista è
+vuota. <envar>DEB_BUILD_PROFILES</envar>, come usata da &dpkg-buildpackage;
+ha la precedenza sulla notazione della lista.
+     </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>Default-Release</option></term>
+     <listitem><para>Il rilascio predefinito da cui installare i pacchetti se è disponibile più
+di una versione. Contiene il nome del rilascio, il nome in codice o la
+versione del rilascio. Esempi: «stable», «testing», «unstable»,
+«&debian-stable-codename;», «&debian-testing-codename;», «4.0»,
+«5.0*». Vedere anche &apt-preferences;.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>Ignore-Hold</option></term>
+     <listitem><para>Ignora i pacchetti bloccati; questa opzione globale fa sì che il risolutore
+di problemi ignori i pacchetti bloccati nel suo processo decisionale.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>Clean-Installed</option></term>
+     <listitem><para>Attiva in modo predefinito. Quando attiva, la funzionalità autoclean rimuove
+dalla cache ogni pacchetto che non può più essere scaricato. Se disattivata,
+allora sono esclusi dalla rimozione anche i pacchetti che sono installati;
+fare attenzione però al fatto che APT non fornisce alcun mezzo diretto per
+reinstallarli.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>Immediate-Configure</option></term>
+     <listitem><para>
+     Attiva in modo predefinito, il che fa sì che APT installi i pacchetti
+essenziali e importanti non appena è possibile durante un'installazione o
+aggiornamento, per limitare l'effetto di una chiamata a &dpkg; che non ha
+successo. Se questa opzione è disattivata, APT tratta un pacchetto
+importante nello stesso modo di un pacchetto extra: tra lo spacchettamento
+del pacchetto A e la sua configurazione possono esserci molte altre chiamate
+di spacchettamento o configurazione per altri pacchetti non correlati B, C,
+ecc. Se queste causano il fallimento della chiamata a &dpkg; (ad esempio
+perché lo script del manutentore di B genera un errore), ciò ha come
+risultato un sistema in cui il pacchetto A è spacchettato ma non
+configurato; perciò non è più garantito il funzionamento di ogni pacchetto
+che dipende da A, dato che la dipendenza da A non è più soddisfatta.
+     </para><para>
+     Il contrassegno di configurazione immediata viene applicato anche nel caso
+potenzialmente problematico di dipendenze circolari, dato che una dipendenza
+con il contrassegno di immediato è equivalente ad una pre-dipendenza. In
+teoria ciò permette ad APT di riconoscere una situazione in cui non è in
+grado di effettuare la configurazione immediata, di terminare annullando e
+di suggerire all'utente che l'opzione dovrebbe essere temporaneamente
+disattivata per permettere la continuazione dell'operazione. Notare come sia
+stata usata l'espressione «in teoria»: in realtà questo problema si è
+verificato molto di rado, in versioni non stabili di distribuzione, ed è
+stato causato da dipendenze sbagliate del pacchetto interessato o da un
+sistema che era già in uno stato erroneo; perciò non si dovrebbe disattivare
+alla cieca questa opzione, dato che lo scenario descritto sopra non è
+l'unico problema che può aiutare a prevenire.
+     </para><para>
+     Prima di eseguire una grossa operazione come <literal>dist-upgrade</literal>
+con questa opzione disattivata, si dovrebbe provare a usare esplicitamente
+<literal>install</literal> sul pacchetto che APT non è stato in grado di
+configurare immediatamente; assicurarsi però di segnalare il problema alla
+propria distribuzione e al Team di APT usando il collegamento per i bug
+indicato in seguito, in modo che possano lavorare a migliorare o correggere
+il processo di aggiornamento.
+     </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>Force-LoopBreak</option></term>
+     <listitem><para>
+     Non attivare mai questa opzione a meno di non sapere
+<emphasis>veramente</emphasis> ciò che si sta facendo. Permette ad APT di
+rimuovere temporaneamente un pacchetto essenziale per rompere un ciclo
+Conflicts/Conflicts o Conflicts/Pre-Depends tra due pacchetti
+essenziali. <emphasis>Un tale ciclo non dovrebbe mai esistere ed è un bug
+grave</emphasis>. Questa opzione funziona se i pacchetti essenziali non sono
+<command>tar</command>, <command>gzip</command>, <command>libc</command>,
+<command>dpkg</command>, <command>dash</command> o qualsiasi altro da cui
+dipendono tali pacchetti.
+     </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>Cache-Start</option></term><term><option>Cache-Grow</option></term><term><option>Cache-Limit</option></term>
+     <listitem><para>APT, a partire dalla versione 0.7.26, usa un file cache ridimensionabile
+mappato in memoria per memorizzare le informazioni
+disponibili. <literal>Cache-Start</literal> funziona da indicatore della
+dimensione che la cache raggiungerà ed è perciò la quantità di memoria che
+APT richiederà all'avvio. Il valore predefinito è 20971520 byte (~20
+MB). Notare che questa quantità di spazio deve essere disponibile per APT,
+altrimenti probabilmente terminerà con un fallimento in modo molto poco
+grazioso; perciò per i dispositivi con memoria limitata questo valore
+dovrebbe essere abbassato, mentre nei sistemi con molte fonti configurate
+dovrebbe essere aumentato. <literal>Cache-Grow</literal> definisce di quanto
+verrà aumentata la dimensione della cache in byte, se lo spazio definito da
+<literal>Cache-Start</literal> non è sufficiente; il valore predefinito è
+1048576 (~1 MB). Questo valore verrà applicato più volte, fino a che la
+cache non è grande abbastanza per memorizzare tutte le informazioni o la
+dimensione della cache raggiunge il valore
+<literal>Cache-Limit</literal>. Il valore predefinito di
+<literal>Cache-Limit</literal> è 0 che indica nessun limite. Se
+<literal>Cache-Grow</literal> viene impostato a 0 la crescita automatica
+della cache è disabilitata.
+     </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>Build-Essential</option></term>
+     <listitem><para>Definisce quali pacchetti sono considerati dipendenze di compilazione
+essenziali.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>Get</option></term>
+     <listitem><para>La sottosezione Get controlla lo strumento &apt-get;; vedere la sua
+documentazione per maggiori informazioni su queste opzioni.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>Cache</option></term>
+     <listitem><para>La sottosezione Cache controlla lo strumento &apt-cache;; vedere la sua
+documentazione per maggiori informazioni su queste opzioni.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>CDROM</option></term>
+     <listitem><para>La sottosezione CDROM controlla lo strumento &apt-cdrom;; vedere la sua
+documentazione per maggiori informazioni su queste opzioni.</para></listitem>
+     </varlistentry>
+   </variablelist>
+ </refsect1>
+
+ <refsect1><title>Il gruppo Acquire</title>
+   <para>Il gruppo di opzioni <literal>Acquire</literal> controlla lo scaricamento
+dei pacchetti così come i vari «metodi di acquisizione» responsabili per lo
+scaricamento stesso (vedere anche &sources-list;).</para>
+
+   <variablelist>
+     <varlistentry><term><option>Check-Date</option></term>
+	 <listitem><para>
+	 Security related option defaulting to true, enabling time-related
+checks. Disabling it means that the machine's time cannot be trusted, and
+APT will hence disable all time-related checks, such as
+<option>Check-Valid-Until</option> and verifying that the Date field of a
+release file is not in the future.
+	 </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>Max-FutureTime</option></term>
+	 <listitem><para>Maximum time (in seconds) before its creation (as indicated by the
+<literal>Date</literal> header) that the <filename>Release</filename> file
+should be considered valid.  The default value is <literal>10</literal>.
+Archive specific settings can be made by appending the label of the archive
+to the option name. Preferably, the same can be achieved for specific
+&sources-list; entries by using the <option>Date-Max-Future</option> option
+there.
+	 </para></listitem>
+     </varlistentry>
+     <varlistentry><term><option>Check-Valid-Until</option></term>
+     <listitem><para>
+     Opzione relativa alla sicurezza attiva in modo predefinito, poiché dare una
+data di scadenza alla convalida di un file Release evita attacchi ripetuti
+nel corso del tempo e può anche, per esempio, aiutare gli utenti a
+identificare i mirror che non sono più aggiornati, ma la funzionalità
+dipende dall'esattezza dell'orologio sul sistema dell'utente. I manutentori
+degli archivi sono incoraggiati a creare file Release con l'intestazione
+<literal>Valid-Until</literal>, ma se non lo fanno o se si desidera un
+valore più restrittivo può essere utilizzata l'opzione
+<literal>Max-ValidTime</literal> seguente. Per disabiitare il controllo in
+modo selettivo dovrebbe essere preferita l'opzione
+<option>Check-Valid-Until</option> delle voci in &sources-list;, invece di
+usare questa configurazione globale.
+     </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>Max-ValidTime</option></term>
+	 <listitem><para>Tempo massimo (in secondi) dalla sua creazione (come indicata
+dall'intestazione <literal>Date</literal>) per il quale il file
+<filename>Release</filename> deve essere considerato valido. Se il file
+Release stesso include un'intestazione <literal>Valid-Until</literal>, viene
+usata come data di scadenza quella più corta. Il valore predefinito è
+<literal>0</literal> che sta per «valido per sempre». Possono essere fatte
+impostazioni specifiche per ciascun archivio aggiungendo l'etichetta
+dell'archivio in fondo al nome dell'opzione. È preferibile ottenere la
+stessa cosa per voci specifiche in &sources-list; usando lì l'opzione
+<option>Valid-Until-Max</option>.
+	 </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>Min-ValidTime</option></term>
+	 <listitem><para>Tempo minimo (in secondi) dalla sua creazione (come indicata
+dall'intestazione <literal>Date</literal>) per il quale il file
+<filename>Release</filename> deve essere considerato valido. Utilizzare
+questa opzione se si deve usare un mirror (locale), aggiornato raramente, di
+un archivio aggiornato più spesso che ha un'intestazione
+<literal>Valid-Until</literal>, invece di disabilitare completamente il
+controllo della data di scadenza. Possono essere fatte impostazioni
+specifiche per ciascun archivio aggiungendo l'etichetta dell'archivio in
+fondo al nome dell'opzione. È preferibile ottenere la stessa cosa per voci
+specifiche in &sources-list; usando lì l'opzione
+<option>Valid-Until-Min</option>.
+	 </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>AllowTLS</option></term>
+     <listitem><para>
+     Allow use of the internal TLS support in the http method. If set to false,
+this completely disables support for TLS in apt's own methods (excluding the
+curl-based https method). No TLS-related functions will be called anymore.
+     </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>PDiffs</option></term>
+	 <listitem><para>Cerca di scaricare le differenze chiamate <literal>PDiff</literal> per gli
+indici (come i file <filename>Packages</filename>), invece di scaricare
+interamente i nuovi. Attiva in modo predefinito. È preferibile fare questa
+impostazione per file indice o voci specifiche in &sources-list; usando lì
+l'opzione <option>PDiffs</option>.</para>
+	 <para>Sono disponibili anche due sotto-opzioni per limitare l'uso dei PDiff:
+<literal>FileLimit</literal> può essere usata per specificare un numero
+massimo di file PDiff che devono essere scaricati per aggiornare un
+file. <literal>SizeLimit</literal>, invece, è la percentuale massima della
+dimensione di tutte le patch in rapporto alla dimensione del file finale
+considerato. Se uno di questi limiti viene superato, viene scaricato il file
+completo invece delle patch.
+	 </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>By-Hash</option></term>
+	 <listitem><para>Cerca di scaricare gli indici usando un URI costruito a partire da una somma
+hash del file atteso invece che scaricato attraverso un nome di file stable
+ben noto. Attiva in modo predefinito, ma disabilitata in modo predefinito se
+la fonte non indica il supporto per essa. Il suo uso può essere forzato con
+il valore speciale «force». È preferibile impostarla per file indice o voci
+specifiche in &sources-list; usando lì l'opzione <option>By-Hash</option>.
+	 </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>Queue-Mode</option></term>
+     <listitem><para>Modalità di coda; <literal>Queue-Mode</literal> può essere
+<literal>host</literal> o <literal>access</literal>, che determinano come
+APT mette in parallelo le connessioni in uscita. <literal>host</literal>
+significa che viene aperta una connessione per ogni host bersaglio,
+<literal>access</literal> significa che viene aperta una connessione per
+ogni tipo di URI.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>Retries</option></term>
+     <listitem><para>Numero di tentativi successivi da effettuare. Se è diverso da zero, APT
+riproverà per il numero di volte specificato a scaricare i file con cui non
+ha avuto successo.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>Source-Symlinks</option></term>
+     <listitem><para>Usa i collegamenti simbolici per gli archivi sorgente. Se impostata a vero,
+allora per gli archivi sorgente verranno creati, quando possibile, dei
+collegamenti simbolici invece di fare una copia. Il valore predefinito è
+vero.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>http</option> <option>https</option></term>
+     <listitem><para>The options in these scopes configure APTs acquire transports for the
+protocols HTTP and HTTPS and are documented in the &apt-transport-http; and
+&apt-transport-https; manpages respectively.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>ftp</option></term>
+     <listitem><para>
+     <literal>ftp::Proxy</literal> imposta il proxy predefinito da usare per gli
+URI FTP. È nella forma standard
+<literal>ftp://[[utente][:password]@]host[:porta]/</literal>. Si possono
+anche specificare proxy per ciascun host usando la forma
+<literal>ftp::Proxy::&lt;host&gt;</literal> con la speciale parola chiave
+<literal>DIRECT</literal> che indica di non usare proxy. Se nessuna delle
+opzioni precedenti è impostata, viene usata la variabile d'ambiente
+<envar>ftp_proxy</envar>. Per usare un proxy FTP è necessario impostare lo
+script <literal>ftp::ProxyLogin</literal> nel file di configurazione. Questa
+voce specifica i comandi da inviare per dire al server proxy a cosa
+connettersi. Vedere &configureindex; per un esempio di come utilizzarla. Le
+variabili di sostituzione che rappresentano i corrispondenti componenti
+dell'URI sono <literal>$(PROXY_USER)</literal>,
+<literal>$(PROXY_PASS)</literal>, <literal>$(SITE_USER)</literal>,
+<literal>$(SITE_PASS)</literal>, <literal>$(SITE)</literal> e
+<literal>$(SITE_PORT)</literal>.</para>
+
+     <para>L'opzione <literal>timeout</literal> imposta il tempo di timeout usato dal
+metodo; questo valore si applica sia al timeout per la connessione sia a
+quello per i dati.</para>
+
+     <para>Sono fornite diverse impostazioni per controllare la modalità
+passiva. Generalmente è sicuro lasciare attiva la modalità passiva; funziona
+in quasi tutti gli ambienti. Tuttavia in alcune situazioni è necessario
+disabilitare la modalità passiva e usare invece la modalità per porta
+FTP. Ciò può essere fatto globalmente o, per connessioni che passano
+attraverso un proxy, per uno specifico host (vedere il file di
+configurazione d'esempio).</para>
+
+     <para>È possibile usare FTP attraverso un proxy via HTTP impostando la variabile
+d'ambiente <envar>ftp_proxy</envar> ad un URL HTTP; per la sintassi vedere
+la spiegazione del metodo http più sopra. Non è possibile impostare questa
+opzione nel file di configurazione e l'uso di FTP via HTTP non è raccomando
+a causa della sua bassa efficienza.</para>
+
+     <para>L'impostazione <literal>ForceExtended</literal> controlla l'uso dei comandi
+<literal>EPSV</literal> e <literal>EPRT</literal> della RFC 2428. Il valore
+predefinito è falso, il che significa che questi comandi sono usati
+solamente se la connessione di controllo è IPv6. Impostare questo valore a
+vero forza il loro uso anche su connessioni IPv4. Notare che la maggior
+parte dei server FTP non supporta la RFC 2428.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>cdrom</option></term>
+     <listitem><para>
+     Per URI che usano il metodo <literal>cdrom</literal>, l'unica opzione
+configurabile è il punto di mount, <literal>cdrom::Mount</literal>, che deve
+essere il punto di mount dell'unità CD-ROM (o DVD o quello che è), come
+specificato in <filename>/etc/fstab</filename>. È possibile fornire comandi
+alternativi per il montaggio e lo smontaggio se il proprio punto di mount
+non può essere elencato in fstab. La sintassi prevede di mettere
+<literallayout>/cdrom/::Mount "pippo";</literallayout> all'interno del blocco
+<literal>cdrom</literal>. È importante che sia presente la barra in fondo. I
+comandi per lo smontaggio possono essere specificati usando UMount.
+     </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>gpgv</option></term>
+     <listitem><para>
+     Per gli URI GPGV l'unica opzione configurabile è
+<literal>gpgv::Options</literal>, che passa parametri aggiuntivi a gpgv.
+     </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>CompressionTypes</option></term>
+     <listitem><para>Elenco di tipi di compressione che sono capiti dai metodi di acquisizione. I
+file come <filename>Packages</filename> possono essere disponibili in vari
+formati di compressione. In modo predefinito i metodi di acquisizione
+possono decomprimere e ricomprimere molti formati comuni come
+<command>xz</command> e <command>gzip</command>; con questa impostazione si
+possono ottenere informazioni sui formati supportati, si può modificarli
+oltre ad aggiungere il supporto per altri formati (vedere anche
+<option>APT::Compressor</option>). La sintassi è: <synopsis>Acquire::CompressionTypes::<replaceable>EstensioneFile</replaceable> "<replaceable>NomeMetodo</replaceable>";</synopsis>
+     </para><para>Inoltre si può usare il sottogruppo <literal>Order</literal> per definire in
+quale ordine il sistema di acquisizione cerca di scaricare i file
+compressi. Il sistema tenta con il primo tipo di compressione e in caso di
+errore passa al successivo nell'elenco perciò, per preferire un tipo
+rispetto ad un altro, basta mettere il tipo preferito per primo; i tipi che
+non sono già presenti vengono aggiunti in modo implicito alla fine
+dell'elenco, perciò si può usare, ad esempio, <synopsis>Acquire::CompressionTypes::Order:: "gz";</synopsis> per preferire i file compressi con <command>gzip</command> a tutti
+gli altri formati di compressione. Se si volesse preferire
+<command>xz</command> rispetto a <command>gzip</command> e
+<command>bzip2</command>, l'impostazione di configurazione sarebbe:
+<synopsis>Acquire::CompressionTypes::Order { "xz"; "gz"; };</synopsis> Non è necessario aggiungere
+esplicitamente <literal>bz2</literal> all'elenco, dato che verrà aggiunto
+automaticamente.</para>
+     <para>Notare che
+<literal>Dir::Bin::<replaceable>NomeMetodo</replaceable></literal> viene
+controllata al momento dell'esecuzione. Se questa opzione è stata impostata
+e il supporto per il formato non è incluso direttamente in apt, il metodo
+verrà usato solo se questo file è esistente; ad esempio, per il metodo
+<literal>bzip2</literal> l'impostazione (interna) è: <literallayout>Dir::Bin::bzip2 "/bin/bzip2";</literallayout> Notare anche che le voci nell'elenco
+specificate nella riga di comando vengono aggiunte alla fine dell'elenco
+specificato nei file di configurazione, ma prima delle voci predefinite. In
+questo caso, per preferire un tipo rispetto a quelli specificati nei file di
+configurazione si può impostare l'opzione direttamente, non nello stile per
+elenco. Ciò non sovrascrive l'elenco definito; aggiunge solamente il tipo
+indicato all'inizio dell'elenco.</para>
+     <para>Il tipo speciale <literal>uncompressed</literal> può essere usato per dare
+la precedenza ai file non compressi, ma è bene notare che la maggior parte
+degli archivi non fornisce file non compressi, perciò questo è utilizzabile
+soprattutto per i mirror locali.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>GzipIndexes</option></term>
+	 <listitem><para>
+	 Quando si scaricano indici compressi con <literal>gzip</literal> (Packages,
+Sources o Translations), li mantiene localmente compressi con gzip invece di
+spacchettarli. Questo fa risparmiare parecchio spazio su disco a spese di un
+maggiore uso della CPU quando si creano le cache locali dei pacchetti. In
+modo predefinito è disabilitato.
+	 </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>Languages</option></term>
+     <listitem><para>La sottosezione Languages controlla quali file
+<filename>Translation</filename> sono scaricati e in quale ordine APT cerca
+di visualizzare le traduzioni delle descrizioni. APT cerca di visualizzare
+la prima descrizione disponibile nella lingua elencata per prima. Le lingue
+possono essere definite con i loro codici brevi o lunghi. Notare che non
+tutti gli archivi forniscono i file <filename>Translation</filename> per
+tutte le lingue; i codici di lingua lunghi sono particolarmente rari.</para>
+     <para>L'elenco predefinito include «environment» ed
+«en». «<literal>environment</literal>» ha un significato speciale in questo
+contesto: viene sostituito al momento dell'esecuzione dai codici di lingua
+estratti dalla variabile d'ambiente <literal>LC_MESSAGES</literal>. Assicura
+anche che questi codici non vengano inclusi due volte nell'elenco. Se
+<literal>LC_MESSAGES</literal> è impostata a «C», viene usato solamente il
+file <filename>Translation-en</filename> (se disponibile). Per forzare APT a
+non usare alcun file Translation, usare l'impostazione
+<literal>Acquire::Languages=none</literal>. "<literal>none</literal>" è un
+altro codice con significato speciale che interrompe la ricerca di un file
+<filename>Translation</filename> adatto. Questo dice ad APT di scaricare
+anche queste traduzioni, senza usarle realmente a meno che l'ambiente non
+specifichi le lingue. Perciò il seguente esempio di configurazione avrà come
+risultato l'ordine «en, it» in una localizzazione inglese o «it, en» in una
+italiana. Notare che «fr» viene scaricato, ma non usato, a meno che APT non
+venga usato in una localizzazione francese (dove l'ordine sarebbe «fr, it,
+en»). <programlisting>Acquire::Languages { "environment"; "it"; "en"; "none"; "fr"; };</programlisting></para>
+     <para>Notare che per prevenire problemi risultanti dall'uso di APT in ambienti
+differenti (ad esempio da parte di utenti o programmi diversi), tutti i file
+Translation che si trovano in <filename>/var/lib/apt/lists/</filename>
+vengono aggiunti alla fine dell'elenco (dopo un "<literal>none</literal>"
+implicito).</para>
+     </listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>ForceIPv4</option></term>
+	 <listitem><para>
+         Durante gli scaricamenti, forza l'uso del solo protocollo IPv4.
+	 </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>ForceIPv6</option></term>
+	 <listitem><para>
+         Durante gli scaricamenti, forza l'uso del solo protocollo IPv6.
+	 </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>MaxReleaseFileSize</option></term>
+	 <listitem><para>
+           La dimensione massima per i file Release/Release.gpg/InRelease. Il valore
+predefinito è 10 MB.
+	 </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>EnableSrvRecords</option></term>
+	 <listitem><para>
+           Questa opzione controlla se apt usa il record del server DNS SRV come
+specificato nella RFC 2782 per selezionare un server alternativo a cui
+connettersi. In modo predefinito è impostata a vero («true»).
+	 </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>AllowInsecureRepositories</option></term>
+	 <listitem><para>
+	   Permette alle operazioni di aggiornamento di caricare file dei dati da
+repository senza sufficienti informazioni di sicurezza. Il valore
+predefinito è «<literal>false</literal>». Il concetto, le implicazioni e le
+alternative sono spiegati in dettaglio in &apt-secure;.
+	 </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>AllowWeakRepositories</option></term>
+	 <listitem><para>
+	   Permette alle operazioni di aggiornamento di caricare file dei dati da
+repository che forniscono informazioni di sicurezza che sono però
+considerate non abbastanza robuste dal punto di vista crittografico. Il
+valore predefinito è «<literal>false</literal>». Il concetto, le
+implicazioni e le alternative sono spiegati in dettaglio in &apt-secure;.
+	 </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>AllowDowngradeToInsecureRepositories</option></term>
+	 <listitem><para>
+	   Permette che un repository che era in precedenza firmato con gpg diventi non
+firmato durante un'operazione di aggiornamento. Quando non c'è una firma
+valida per un repository precedentemente fidato, apt rifiuta
+l'aggiornamento. Questa opzione può essere usata per scavalcare questa
+protezione. Non dovrebbe mai venire abilitata. Il valore predefinito è
+«<literal>false</literal>. Il concetto, le implicazioni e le alternative
+sono spiegati in dettaglio in &apt-secure;.
+	 </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>Changelogs::URI</option> ambito</term>
+	<listitem><para>
+	  L'acquisizione di changelog è possibile solamente se è noto un URI da cui
+ottenerli. Il file Release indica questa informazione preferibilmente in un
+campo «Changelogs». Se questo non è disponibile, viene usato il campo
+Label/Origin del file Release per controllare se esiste un'opzione
+<literal>Acquire::Changelogs::URI::Label::<replaceable>ETICHETTA</replaceable></literal>
+o
+<literal>Acquire::Changelogs::URI::Origin::<replaceable>ORIGINE</replaceable></literal>
+e, se è così, viene preso questo valore. Il valore nel file Release può
+essere scavalcato con
+<literal>Acquire::Changelogs::URI::Override::Label::<replaceable>ETICHETTA</replaceable></literal>
+or
+<literal>Acquire::Changelogs::URI::Override::Origin::<replaceable>ORIGINE</replaceable></literal>.
+Il valore deve essere un URI normale verso un file di testo, tranne per il
+fatto che dati specifici di pacchetto sono sostituito con il segnaposto
+<literal>@CHANGEPATH@</literal>. Il valore per esso è: 1. se il pacchetto è
+da una componente (es. <literal>main</literal>) è la prima parte, altrimenti
+viene omesso; 2. la prima lettera del nome del pacchetto sorgente, tranne
+per i pacchetti sorgente con nome che inizia con «<literal>lib</literal>»,
+nel qual caso saranno le prime quattro lettere; 3. il nome completo del
+pacchetto sorgente; 4. il nome completo di nuovo e 5. la versione
+sorgente. La prima (se presente), la seconda, la terza e la quarta parte
+sono separate da una sbarra («<literal>/</literal>») e tra la quarta e la
+quinta parte c'è un trattino basso («<literal>_</literal>»). Per questa
+opzione è disponibile il valore speciale «<literal>no</literal>» che indica
+che questa fonte non può essere usata per acquisire file changelog. In
+questo caso viene provata un'altra fonte, se disponibile.
+	</para></listitem>
+    </varlistentry>
+
+   </variablelist>
+ </refsect1>
+
+ <refsect1><title>Configurazione specifica per binari</title>
+    <para>Specialmente con l'introduzione del binario <command>apt</command> può
+essere utile impostare determinate opzioni solamente per uno specifico
+binario, dato che anche opzioni che sembrerebbero avere effetto solo su un
+determinato binario come <option>APT::Get::Show-Versions</option>, hanno
+effetto su <command>apt-get</command> così come su <command>apt</command>.
+    </para>
+    <para>L'impostazione di un'opzione per un solo binario specifico può essere
+ottenuta solamente impostando l'opzione all'interno di un ambito
+<option>Binary::<replaceable>binario-specifico</replaceable></option>. Ad
+esempio impostare l'opzione <option>APT::Get::Show-Versions</option>
+solamente per <command>apt</command> può essere fatto impostando invece
+<option>Binary::apt::APT::Get::Show-Versions</option>.</para>
+    <para>Notare che, come visto nella sezione DESCRIZIONE più in alto, non si possono
+impostare opzioni specifiche per un binario dalla riga di comando né nei
+file di configurazione caricati tramite la riga di comando</para>
+ </refsect1>
+
+ <refsect1><title>Directory</title>
+
+   <para>La sezione <literal>Dir::State</literal> contiene directory che sono
+relative a informazioni di stato locali. <literal>lists</literal> è la
+directory in cui mettere gli elenchi scaricati dei pacchetti e
+<literal>status</literal> è il nome del file di stato di
+&dpkg;. <literal>preferences</literal> è il nome del file
+<filename>preferences</filename> di APT. <literal>Dir::State</literal>
+contiene la directory predefinita da anteporre a tutte le sottovoci che non
+iniziano con <filename>/</filename> o <filename>./</filename>.</para>
+
+   <para><literal>Dir::Cache</literal> contiene le posizioni relative alle
+informazioni della cache locale, come le due cache dei pacchetti
+<literal>srcpkgcache</literal> e <literal>pkgcache</literal>, così come la
+posizione in cui mettere gli archivi scaricati:
+<literal>Dir::Cache::archives</literal>. La generazione delle cache può
+essere disattivata impostando <literal>pkgcache</literal> o
+<literal>srcpkgcache</literal> a <literal>""</literal>. Questo rallenta
+l'avvio ma fa risparmiare spazio su disco. È probabilmente preferibile
+disattivare pkgcache piuttosto che srcpkgcache. Come per
+<literal>Dir::State</literal>, la directory predefinita è contenuta in
+<literal>Dir::Cache</literal></para>
+
+   <para><literal>Dir::Etc</literal> contiene la posizione dei file di
+configurazione; <literal>sourcelist</literal> fornisce la posizione di
+sourcelist e <literal>main</literal> è il file di configurazione predefinito
+(l'impostazione non ha effetto, a meno che non venga fatta dal file di
+configurazione specificato da <envar>APT_CONFIG</envar>).</para>
+
+   <para>L'impostazione <literal>Dir::Parts</literal> legge dalla directory
+specificata tutti i frammenti di configurazione in ordine lessicale. Al
+termine viene caricato il file di configurazione principale.</para>
+
+   <para><literal>Dir::Bin</literal> punta ai programmi binari;
+<literal>Dir::Bin::Methods</literal> specifica la posizione dei gestori dei
+metodi e <literal>gzip</literal>, <literal>bzip2</literal>,
+<literal>lzma</literal>, <literal>dpkg</literal>, <literal>apt-get</literal>
+<literal>dpkg-source</literal> <literal>dpkg-buildpackage</literal> e
+<literal>apt-cache</literal> specificano la posizione dei rispettivi
+programmi.</para>
+
+   <para>
+     La voce di configurazione <literal>RootDir</literal> ha un significato
+speciale. Se impostata, tutti i percorsi saranno relativi a
+<literal>RootDir</literal>, <emphasis>anche i percorsi che sono specificati
+in modo assoluto</emphasis>. Perciò, ad esempio, se
+<literal>RootDir</literal> è impostata a <filename>/tmp/staging</filename> e
+<literal>Dir::State::status</literal> è impostata a
+<filename>/var/lib/dpkg/status</filename>, allora il file di stato verrà
+cercato in <filename>/tmp/staging/var/lib/dpkg/status</filename>. Se si
+desidera un prefisso solo per i percorsi relativi, impostare invece
+<literal>Dir</literal>.
+   </para>
+
+   <para>
+      La lista <literal>Ignore-Files-Silently</literal> può essere usata per
+specificare quali file debbano essere ignorati in modo silenzioso da APT
+mentre analizza i file nelle directory con i frammenti. In modo predefinito
+un file il cui nome termina con <literal>.disabled</literal>,
+<literal>~</literal>, <literal>.bak</literal> o
+<literal>.dpkg-[a-z]+</literal> viene ignorato in modo silenzioso. Come si
+vede nell'ultimo valore predefinito questi modelli possono usare una
+sintassi con espressioni regolari.
+   </para>
+ </refsect1>
+ 
+ <refsect1><title>APT in DSelect</title>
+   <para>   
+   Quando APT viene usato come metodo per &dselect; svariate direttive di
+configurazione controllano il comportamento predefinito; queste sono nella
+sezione <literal>DSelect</literal>.</para>
+   
+   <variablelist>
+     <varlistentry><term><option>Clean</option></term>
+     <listitem><para>Modalità di pulizia della cache; i valori permessi sono
+<literal>always</literal>, <literal>prompt</literal>,
+<literal>auto</literal>, <literal>pre-auto</literal> e
+<literal>never</literal>. <literal>always</literal> e
+<literal>prompt</literal> rimuovono tutti i pacchetti dalla cache dopo ogni
+aggiornamento; <literal>prompt</literal> (il valore predefinito) lo fa in
+modo condizionato. <literal>auto</literal> rimuove solo quei pacchetti che
+non sono più scaricabili (ad esempio perché sostituiti da una nuova
+versione). <literal>pre-auto</literal> effettua questa azione prima di
+scaricare i nuovi pacchetti.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>options</option></term>
+     <listitem><para>Il contenuto di questa variabile è passato come opzioni per la riga di
+comando ad &apt-get;, quando questo viene eseguito per la fase di
+installazione.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>Updateoptions</option></term>
+     <listitem><para>Il contenuto di questa variabile è passato come opzioni per la riga di
+comando ad &apt-get;, quando questo viene eseguito per la fase di
+aggiornamento.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>PromptAfterUpdate</option></term>
+     <listitem><para>Se impostato a vero l'operazione [A]ggiorna di &dselect; chiederà sempre
+conferma prima di continuare. Il comportamento predefinito è di chiedere
+solo in caso di errore.</para></listitem>
+     </varlistentry>
+   </variablelist>
+ </refsect1>
+ 
+ <refsect1><title>Come APT invoca &dpkg;</title>
+   <para>Diverse direttive di configurazione controllano il modo in cui APT invoca
+&dpkg;; sono nella sezione <literal>DPkg</literal>.</para>
+
+   <variablelist>
+     <varlistentry><term><option>options</option></term>
+     <listitem><para>Questa è una lista di opzioni da passare a &dpkg;. Le opzioni devono essere
+specificate usando la notazione per le liste e ogni voce nella lista viene
+passata a &dpkg; come un singolo argomento.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>Path</option></term>
+     <listitem><para>This is a string that defines the <envar>PATH</envar> environment variable
+used when running dpkg. It may be set to any valid value of that environment
+variable; or the empty string, in which case the variable is not changed.</para></listitem>
+     </varlistentry>
+     
+     <varlistentry><term><option>Pre-Invoke</option></term><term><option>Post-Invoke</option></term>
+     <listitem><para>Questa è una lista di comandi di shell da eseguire prima/dopo l'invocazione
+di &dpkg;. Come <literal>options</literal> deve essere specificata con la
+notazione per le liste. I comandi sono invocati in ordine usando
+<filename>/bin/sh</filename>; se qualcuno dei comandi fallisce APT terminerà
+annullando.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>Pre-Install-Pkgs</option></term>
+     <listitem><para>Questa è una lista di comandi di shell da eseguire prima di invocare
+&dpkg;. Come <literal>options</literal> deve essere specificata con la
+notazione per le liste. I comandi sono invocati in ordine usando
+<filename>/bin/sh</filename>; se qualcuno dei comandi fallisce APT terminerà
+annullando. APT passa i nomi di file di tutti i file .deb che sta per
+installare ai comandi, uno per riga sul descrittore di file richiesto,
+usando in modo predefinito lo standard input.</para>
+
+     <para>La versione 2 di questo protocollo invia più informazioni attraverso il
+descrittore di file richiesto: una riga con il testo <literal>VERSION
+2</literal>, lo spazio di configurazione di APT e un elenco di azioni di
+pacchetto con nome file e informazioni sulle versioni.</para>
+
+     <para>Ogni riga con una direttiva di configurazione ha la forma
+<literal>chiave=valore</literal>. I caratteri speciali (segno di uguale, a
+capo, caratteri non stampabili, virgolette e segno di percentuale in
+<literal>chiave</literal> e a capo, caratteri non stampabili e segno di
+percentuale in <literal>valore</literal>) sono codificati con %-valore. Le
+liste sono rappresentate da più righe <literal>chiave::=valore</literal> con
+la stessa chiave. La sezione di configurazione termina con una riga vuota.</para>
+
+     <para>Le righe delle azioni di pacchetto sono costituite nella Versione 2 da
+cinque campi: nome di pacchetto (senza qualifica dell'architettura anche se
+foreign), vecchia versione, direzione del cambiamento di versione (&lt; per
+gli aggiornamenti, &gt; per le retrocessioni a versioni precedenti, = per
+nessun cambiamento), nuova versione, azione. I campi di versione sono «-»
+per nessuna versione (per esempio quando si installa un pacchetto per la
+prima volta; la mancanza di versione viene trattata come precedente a
+qualsiasi versione, perciò è un aggiornamento indicato come <literal>- &lt;
+1.23.4</literal>). Il campo dell'azione è «**CONFIGURE**» se il pacchetto
+viene configurato, «**REMOVE**» se viene rimosso o il nome di un file .deb
+se viene spacchettato.</para>
+
+     <para>Nella Versione 3 ogni campo di versione viene seguito dall'architettura di
+questa versione, che è «-» se non c'è versione, e da un campo che mostra il
+tipo MultiArch «same», «foreign», «allowed» o «none». Notare che «none» è un
+nome di tipo non corretto che viene mantenuto per questioni di compatibilità
+e dovrebbe essere letto come «no» e gli utenti sono incoraggiati a
+supportarli entrambi.</para>
+
+     <para>La versione del protocollo da usare per il comando
+<literal><replaceable>cmd</replaceable></literal> può essere scelta
+impostando in modo appropriato
+<literal>DPkg::Tools::options::<replaceable>cmd</replaceable>::Version</literal>,
+il cui valore predefinito è la versione 1. Se APT non supporta la versione
+richiesta invierà invece l'informazione nella versione più alta per cui ha
+il supporto.
+     </para>
+
+     <para>Il descrittore di file da usare per inviare le informazioni può essere
+richiesto con
+<literal>DPkg::Tools::options::<replaceable>cmd</replaceable>::InfoFD</literal>
+che è in modo predefinito <literal>0</literal> per lo standard input ed è
+disponibile a partire dalla versione 0.9.11. Il supporto per l'opzione può
+essere controllato guardando la variabile d'ambiente
+<envar>APT_HOOK_INFO_FD</envar> che contiene il numero del descrittore di
+file usato per conferma.</para>
+     </listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>Run-Directory</option></term>
+     <listitem><para>APT cambia la directory attuale in questa prima di invocare &dpkg;; il
+valore predefinito è <filename>/</filename>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>Build-options</option></term>
+     <listitem><para>Queste opzioni sono passate a &dpkg-buildpackage; quando vengono compilati i
+pacchetti; il valore predefinito disabilita la firma e produce tutti i
+binari.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>DPkg::ConfigurePending</option></term>
+     <listitem><para>Se questa opzione è impostata, APT invoca <command>dpkg --configure
+--pending</command> per lasciare che &dpkg; gestisca tutte le configurazioni
+e i trigger necessari. Questa opzione è attivata in modo predefinito, ma
+potrebbe essere utile disattivarla se si desidera eseguire APT più volte di
+seguito, ad esempio in un installatore. In uno scenario simile si può
+disattivare questa opzione in tutte le esecuzioni tranne l'ultima.</para></listitem>
+     </varlistentry>
+   </variablelist>
+ </refsect1>
+
+ <refsect1>
+   <title>Opzioni Periodic e Archives</title>
+   <para>I gruppi di opzioni <literal>APT::Periodic</literal> e
+<literal>APT::Archives</literal> configurano il comportamento degli
+aggiornamenti periodici di apt, ciò viene fatto attraverso lo script
+<literal>/etc/cron.daily/apt</literal>. Per una breve documentazione di
+queste opzioni, vedere all'inizio dello script.
+   </para>
+ </refsect1>
+
+ <refsect1>
+   <title>Opzioni di debug</title>
+   <para>
+     Se si abilitano le opzioni nella sezione <literal>Debug::</literal> verranno
+inviate delle informazioni di debug nel flusso dello standard error del
+programma usando le librerie <literal>apt</literal>, o verranno abilitate
+speciali modalità del programma che sono principalmente utili per far il
+debug del comportamento di <literal>apt</literal>. La maggior parte di
+queste opzioni non è interessante per l'utente normale, ma alcune potrebbero
+esserlo:
+
+     <itemizedlist>
+       <listitem>
+	 <para>
+	   <literal>Debug::pkgProblemResolver</literal> abilita l'output relativo alle
+decisioni prese da <literal>dist-upgrade, upgrade, install, remove,
+purge</literal>.
+	 </para>
+       </listitem>
+
+       <listitem>
+	 <para>
+	   <literal>Debug::NoLocking</literal> disabilita tutti i lock sui file. Può
+essere usato per eseguire alcune operazioni (ad esempio <literal>apt-get -s
+install</literal>) come utente non root.
+	 </para>
+       </listitem>
+
+       <listitem>
+	 <para>
+	   <literal>Debug::pkgDPkgPM</literal> stampa l'effettiva riga di comando ogni
+volta che <literal>apt</literal> invoca &dpkg;.
+	 </para>
+       </listitem>
+
+       <listitem>
+	 <para>
+	   <!-- TODO: provide a
+	   motivating example, except I haven't a clue why you'd want
+	   to do this. -->
+<literal>Debug::IdentCdrom</literal> disabilita l'inclusione di dati statfs
+negli ID dei CD-ROM.  
+	 </para>
+       </listitem>
+     </itemizedlist>
+   </para>
+
+   <para>
+     Segue un elenco completo delle opzioni di debug per apt.
+   </para>
+
+   <variablelist>
+     <varlistentry>
+       <term><option>Debug::Acquire::cdrom</option></term>
+
+       <listitem>
+	 <para>
+	   Stampa informazioni relative all'accesso a fonti
+<literal>cdrom://</literal>.
+	 </para>
+       </listitem>
+     </varlistentry>
+
+     <varlistentry>
+       <term><option>Debug::Acquire::ftp</option></term>
+
+       <listitem>
+	 <para>
+	   Stampa informazioni relative allo scaricamento dei pacchetti usando FTP.
+	 </para>
+       </listitem>
+     </varlistentry>
+
+     <varlistentry>
+       <term><option>Debug::Acquire::http</option></term>
+
+       <listitem>
+	 <para>
+	   Stampa informazioni relative allo scaricamento dei pacchetti usando HTTP.
+	 </para>
+       </listitem>
+     </varlistentry>
+
+     <varlistentry>
+       <term><option>Debug::Acquire::https</option></term>
+
+       <listitem>
+	 <para>
+	   Stampa informazioni relative allo scaricamento dei pacchetti usando HTTPS.
+	 </para>
+       </listitem>
+     </varlistentry>
+
+     <varlistentry>
+       <term><option>Debug::Acquire::gpgv</option></term>
+
+       <listitem>
+	 <para>
+	   Stampa informazioni relative alla verifica delle firme di cifratura fatta
+usando <literal>gpg</literal>.
+	 </para>
+       </listitem>
+     </varlistentry>
+
+     <varlistentry>
+       <term><option>Debug::aptcdrom</option></term>
+
+       <listitem>
+	 <para>
+	   Produce in output informazioni sul processo di accesso a raccolte di
+pacchetti memorizzati su CD-ROM.
+	 </para>
+       </listitem>
+     </varlistentry>
+
+     <varlistentry>
+       <term><option>Debug::BuildDeps</option></term>
+       <listitem>
+	 <para>
+	   Descrive il processo di risoluzione delle dipendenze di compilazione in
+&apt-get;.
+	 </para>
+       </listitem>
+     </varlistentry>
+
+     <varlistentry>
+       <term><option>Debug::Hashes</option></term>
+       <listitem>
+	 <para>
+	   Produce in output ogni hash crittografico che viene generato dalle librerie
+<literal>apt</literal>.
+	 </para>
+       </listitem>
+     </varlistentry>
+
+     <varlistentry>
+       <term><option>Debug::IdentCDROM</option></term>
+       <listitem>
+	 <para>
+	   Quando viene generato l'ID per un CD-ROM, non include informazioni da
+<literal>statfs</literal>, cioè il numero di blocchi usati e liberi sul file
+system del CD-ROM.
+	 </para>
+       </listitem>
+     </varlistentry>
+
+     <varlistentry>
+       <term><option>Debug::NoLocking</option></term>
+       <listitem>
+	 <para>
+	   Disabilita tutti i lock sui file. Per esempio permette di eseguire due
+istanze di <quote><literal>apt-get update</literal></quote>
+contemporaneamente.
+	 </para>
+       </listitem>
+     </varlistentry>
+
+     <varlistentry>
+       <term><option>Debug::pkgAcquire</option></term>
+
+       <listitem>
+	 <para>
+	   Registra nel log quando vengono aggiunte o rimosse voci dalla coda globale
+degli scaricamenti.
+	 </para>
+       </listitem>
+     </varlistentry>
+
+     <varlistentry>
+       <term><option>Debug::pkgAcquire::Auth</option></term>
+       <listitem>
+	 <para>
+	   Produce in output messaggi di stato ed errori relativi alla verifica dei
+codici di controllo e delle firme di cifratura dei file scaricati.
+	 </para>
+       </listitem>
+     </varlistentry>
+
+     <varlistentry>
+       <term><option>Debug::pkgAcquire::Diffs</option></term>
+       <listitem>
+	 <para>
+	   Produce in output informazioni sullo scaricamento e l'applicazione dei diff
+per gli elenchi degli indici dei pacchetti, e gli errori relativi a tali
+diff.
+	 </para>
+       </listitem>
+     </varlistentry>
+
+     <varlistentry>
+       <term><option>Debug::pkgAcquire::RRed</option></term>
+
+       <listitem>
+	 <para>
+	   Produce in output informazioni relative all'applicazione di patch agli
+elenchi dei pacchetti di apt quando vengono scaricati i diff per gli indici
+invece degli indici completi.
+	 </para>
+       </listitem>
+     </varlistentry>
+
+     <varlistentry>
+       <term><option>Debug::pkgAcquire::Worker</option></term>
+
+       <listitem>
+	 <para>
+	   Registra nel log tutte le interazioni con i sottoprocessi che effettuano
+realmente gli scaricamenti.
+	 </para>
+       </listitem>
+     </varlistentry>
+
+     <varlistentry>
+       <term><option>Debug::pkgAutoRemove</option></term>
+
+       <listitem>
+	 <para>
+	   Registra nel log gli eventi relativi allo stato di automaticamente
+installato dei pacchetti e alla rimozione dei pacchetti non utilizzati.
+	 </para>
+       </listitem>
+     </varlistentry>
+
+     <varlistentry>
+       <term><option>Debug::pkgDepCache::AutoInstall</option></term>
+       <listitem>
+	 <para>
+	   Genera messaggi di debug che descrivono quali pacchetti vengono
+automaticamente installati per risolvere delle dipendenze. Corrisponde al
+passo iniziale di installazione automatica effettuato, ad esempio, in
+<literal>apt-get install</literal> e non all'intero risolutore di dipendenze
+di <literal>apt</literal>; per quello vedere
+<literal>Debug::pkgProblemResolver</literal>.
+	 </para>
+       </listitem>
+     </varlistentry>
+
+     <varlistentry>
+       <term><option>Debug::pkgDepCache::Marker</option></term>
+       <listitem>
+        <para>
+           Genera messaggi di debug che descrivono quali pacchetto vengono
+contrassegnati per essere mantenuti/installati/rimossi mentre il
+ProblemResolver fa il suo lavoro. Ogni aggiunta o rimozione può causare
+azioni aggiuntive che vengono mostrate con un rientro di due spazi in più
+sotto alla voce originale. Il formato per ogni riga è
+<literal>MarkKeep</literal>, <literal>MarkDelete</literal> o
+<literal>MarkInstall</literal> seguito da <literal>nome-pacchetto &lt;a.b.c
+-&gt; d.e.f | x.y.z&gt; (sezione)</literal> dove <literal>a.b.c</literal> è
+l'attuale versione del pacchetto, <literal>d.e.f</literal> è la versione
+presa in considerazione per l'installazione e <literal>x.y.z</literal> è una
+versione più recente, ma non considerata per l'installazione (a causa di un
+punteggio di pin più basso). Gli ultimi due possono essere omessi se non
+esistono o se sono uguali alla versione
+installata. <literal>sezione</literal> è il nome della sezione in cui
+compare il pacchetto.
+        </para>
+       </listitem>
+     </varlistentry>
+
+     <varlistentry>
+       <term><option>Debug::pkgDPkgPM</option></term>
+       <listitem>
+	 <para>
+	   Quando invoca &dpkg;, produce in output l'esatta riga di comando usata, con
+gli argomenti separati da un singolo carattere di spazio.
+	 </para>
+       </listitem>
+     </varlistentry>
+
+     <varlistentry>
+       <term><option>Debug::pkgDPkgProgressReporting</option></term>
+       <listitem>
+	 <para>
+	   Produce in output tutti i dati ricevuti da &dpkg; sul descrittore del file
+di stato ed ogni errore incontrato durante la sua analisi.
+	 </para>
+       </listitem>
+     </varlistentry>
+
+     <varlistentry>
+       <term><option>Debug::pkgOrderList</option></term>
+
+       <listitem>
+	 <para>
+	   Genera un trace dell'algoritmo che decide l'ordine in cui
+<literal>apt</literal> deve passare i pacchetti a &dpkg;.
+	 </para>
+       </listitem>
+     </varlistentry>
+
+     <varlistentry>
+       <term><option>Debug::pkgPackageManager</option></term>
+
+       <listitem>
+	 <para>
+	   Produce in output messaggi di stato che indicano i passi effettuati
+nell'invocazione di &dpkg;.
+	 </para>
+       </listitem>
+     </varlistentry>
+
+     <varlistentry>
+       <term><option>Debug::pkgPolicy</option></term>
+
+       <listitem>
+	 <para>
+	   Produce in output la priorità di ogni elenco di pacchetti all'avvio.
+	 </para>
+       </listitem>
+     </varlistentry>
+
+     <varlistentry>
+       <term><option>Debug::pkgProblemResolver</option></term>
+
+       <listitem>
+	 <para>
+	   Traccia l'esecuzione del risolutore di dipendenze (questo ha effetto solo
+per ciò che accade quando viene incontrato un problema complesso di
+dipendenze).
+	 </para>
+       </listitem>
+     </varlistentry>
+
+     <varlistentry>
+       <term><option>Debug::pkgProblemResolver::ShowScores</option></term>
+       <listitem>
+        <para>
+          Visualizza un elenco di tutti i pacchetti installati con il loro punteggio
+calcolato che è usato dal pkgProblemResolver. La descrizione dei pacchetti è
+la stessa descritta in <literal>Debug::pkgDepCache::Marker</literal>
+        </para>
+       </listitem>
+     </varlistentry>
+
+     <varlistentry>
+       <term><option>Debug::sourceList</option></term>
+
+       <listitem>
+	 <para>
+	   Stampa informazioni sui fornitori lette da
+<filename>/etc/apt/vendors.list</filename>.
+	 </para>
+       </listitem>
+     </varlistentry>
+
+     <varlistentry>
+       <term><option>Debug::RunScripts</option></term>
+       <listitem>
+        <para>
+          Visualizza i comandi esterni che sono richiamati dagli hook di apt. Ciò
+include ad esempio le opzioni di configurazione
+<literal>DPkg::{Pre,Post}-Invoke</literal> o
+<literal>APT::Update::{Pre,Post}-Invoke</literal>.
+        </para>
+       </listitem>
+     </varlistentry>
+
+
+
+   <!-- 2009/07/11 Currently used nowhere. The corresponding code
+is commented.
+     <varlistentry>
+
+       <term><literal>Debug::Vendor</literal></term>
+
+       <listitem>
+	 <para>
+	   Print information about each vendor.
+	 </para>
+       </listitem>
+     </varlistentry>
+-->
+</variablelist>
+ </refsect1>
+ 
+ <refsect1><title>Esempi</title>
+   <para>&configureindex; è un file di configurazione che mostra valori d'esempio per
+tutte le opzioni possibili.</para>
+ </refsect1>
+ 
+ <refsect1><title>File</title>
+   <variablelist>
+      &file-aptconf;
+   </variablelist>
+ </refsect1>
+ 
+ <refsect1><title>Vedere anche</title>
+   <para><!-- ? reading apt.conf -->
+&apt-cache;, &apt-config;, &apt-preferences;.</para>
+ </refsect1>
+
+ &manbugs;
+ 
+ <refsect1><title>&translation-title;</title>
+   <para>&translation-holder;</para>
+   <para>&translation-english;</para>
+ </refsect1>
+</refentry>
+

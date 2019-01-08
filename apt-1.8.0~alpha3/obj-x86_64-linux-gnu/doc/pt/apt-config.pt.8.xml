@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+  "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % aptent SYSTEM "apt.ent"> %aptent;
+<!ENTITY % aptverbatiment SYSTEM "apt-verbatim.ent"> %aptverbatiment;
+<!ENTITY % aptvendor SYSTEM "apt-vendor.ent"> %aptvendor;
+]>
+
+<refentry>
+
+ <refentryinfo>
+   <!-- The last update date -->
+&apt-author.jgunthorpe;
+   &apt-author.team;
+   &apt-email;
+   &apt-product;
+   
+   <date>2013-11-30T00:00:00Z</date>
+ </refentryinfo>
+ 
+ <refmeta>
+   <refentrytitle>apt-config</refentrytitle>
+   <manvolnum>8</manvolnum>
+   <refmiscinfo class="manual">APT</refmiscinfo>
+ </refmeta>
+ 
+ 
+ <!-- Man page title -->
+<refnamediv>
+    <refname>apt-config</refname>
+    <refpurpose>Programa de Consulta de Configuração do APT</refpurpose>
+ </refnamediv>
+
+ &synopsis-command-apt-config;
+
+ <refsect1><title>Descrição</title>
+   <para><command>apt-config</command> é um programa interno usado por várias partes
+da suite APT para fornecer uma configurabilidade consistente. Acede ao
+ficheiro de configuração principal <filename>/etc/apt/apt.conf</filename> de
+um modo que é fácil de usar para aplicações em script.</para>
+
+   <para>A menos que a opção <option>-h</option>, ou <option>--help</option> seja
+fornecida, um dos comandos abaixo têm que estar presentes.
+   </para>
+   
+   <variablelist>
+     <varlistentry><term><option>shell</option></term>
+     <listitem><para>
+     shell é usado para aceder à informação de configuração a partir de um script
+shell. É fornecido pares de argumentos, sendo o primeiro uma variável de
+shell e o segundo o valor de configuração a consultar. Como resultado cria
+uma lista de comandos atribuídos a shell para cada valor presente. Num
+script shell deverá ser usado como se segue:
+     </para>
+     
+<informalexample><programlisting>
+OPTS="-f"
+RES=`apt-config shell OPTS MyApp::options`
+eval $RES
+</programlisting></informalexample>
+
+     <para>Isto irá definir a variável de ambiente shell $OPTS ao valor de
+MyApp::options com uma predefinição de <option>-f</option>.</para>
+
+     
+     <para>O item de configuração pode ser pós-fixado com um /[fdbi]. f devolve nomes
+de ficheiros, d devolve directórios, b devolve verdadeiro ou falso e i
+devolve um número inteiro. Cada um dos valores devolvidos é normalizado e
+verificado internamente.</para>
+     </listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>dump</option></term>
+     <listitem><para>
+     Apenas mostra o conteúdo do espaço de configuração.</para>
+     </listitem>
+     </varlistentry>
+
+   </variablelist>
+ </refsect1>
+
+ <refsect1><title>opções</title>
+   &apt-cmdblurb;
+   
+   <variablelist>
+     <varlistentry>
+      <term><option>--empty</option></term>
+      <listitem><para>Inclui opções que têm um valor vazio. Isto é a predefinição, então use
+--no-empty para removê-las dos resultados.</para></listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><option>--format '<replaceable>&percnt;f &#x0022;&percnt;v&#x0022;;&percnt;n</replaceable>'</option></term>
+      <listitem><para>Define a saída de cada opção de configuração. &percnt;t irá ser substituído
+com o seu nome individual, &percnt;f com o seu nome hierárquico e &percnt;v
+com o seu valor. O uso de letras maiúsculas e caracteres especiais no valor
+será codificado para assegurar que pode, por exemplo, ser usado em segurança
+numa string citada como definido por RFC822. Adicionalmente &percnt;n será
+substituído por uma nova linha, e &percnt;N por um separador. Um &percnt;
+pode ser escrito ao usar &percnt;&percnt;.</para></listitem>
+     </varlistentry>
+
+     &apt-commonoptions;
+     
+   </variablelist>
+ </refsect1>
+
+ <refsect1><title>Veja também</title>
+   <para>&apt-conf;
+   </para>
+ </refsect1>
+
+ <refsect1><title>Diagnóstico</title>
+   <para><command>apt-config</command> devolve zero em operação normal, 100 decimal
+em erro.
+   </para>
+ </refsect1>
+
+ &manbugs;
+ 
+ <refsect1><title>&translation-title;</title>
+   <para>&translation-holder;</para>
+   <para>&translation-english;</para>
+ </refsect1>
+</refentry>
+

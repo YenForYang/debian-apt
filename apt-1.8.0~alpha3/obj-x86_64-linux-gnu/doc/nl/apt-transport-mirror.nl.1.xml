@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+  "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % aptent SYSTEM "apt.ent"> %aptent;
+<!ENTITY % aptverbatiment SYSTEM "apt-verbatim.ent"> %aptverbatiment;
+<!ENTITY % aptvendor SYSTEM "apt-vendor.ent"> %aptvendor;
+]>
+
+<refentry>
+
+ <refentryinfo>
+   <!-- The last update date -->
+&apt-author.team;
+   &apt-email;
+   &apt-product;
+   
+   <date>2017-12-09T00:00:00Z</date>
+ </refentryinfo>
+
+ <refmeta>
+   <refentrytitle>apt-transport-mirror</refentrytitle>
+   <manvolnum>1</manvolnum>
+   <refmiscinfo class="manual">APT</refmiscinfo>
+ </refmeta>
+
+ 
+ <!-- Man page title -->
+<refnamediv>
+    <refname>apt-transport-mirror</refname>
+    <refpurpose>Transportmethode van APT voor een meer geautomatiseerde siegelserverselectie</refpurpose>
+ </refnamediv>
+
+<refsect1><title>Omschrijving</title>
+<para>Deze transportmethode van APT past zelf geen protocol toe om lokale of
+externe pakketbronnen te benaderen, maar haalt een spiegelserverlijst op en
+leidt alle verzoeken om naar de spiegelserver(s) die uit de lijst uitgekozen
+wordt/worden. Deze wordt/worden benaderd via overige transportmethodes,
+zoals &apt-transport-http;. De basale functionaliteit hiervan was reeds
+beschikbaar vanaf apt 0.7.24, maar bleef ongedocumenteerd tot apt 1.6,
+waarin een volledige herwerking van de transportmethode en de erdoor
+ondersteunde functies plaats vond. Merk op dat een transportmethode nooit
+rechtstreeks door een gebruiker aangesproken wordt, maar door
+APT-gereedschap gebruikt wordt op basis van de gebruikersconfiguratie.</para>
+<para>Indien het verkrijgen van een bestand via een spiegelserver mislukt, zorgt
+de methode ervoor dat automatisch een andere mogelijke spiegelserver uit de
+lijst geprobeerd wordt, totdat ofwel het bestand opgehaald is of er in de
+lijst geen spiegelservers meer overblijven. Op die manier wordt op een
+transparante manier omgegaan met storingen bij servers en vergelijkbare
+problemen.</para>
+<para>De implicaties van de methode voor de beveiliging zijn afhankelijk van de
+gemaakte keuzes inzake beveiliging voor de transportmethode die gebruikt
+wordt om de lijst met spiegelservers op te halen en de transportmethodes die
+betrokken zijn bij het benaderen van de gekozen spiegelserver(s) door de
+transportmethode.</para>
+</refsect1>
+
+<refsect1><title>Opties</title>
+<para>Voor deze transportmethode bestaan momenteel geen configuratieopties. De
+selectie van de spiegelserver hangt volledig af van de spiegelservers die in
+de spiegelserverlijst aangeboden worden en de bestanden die APT moet
+verkrijgen.</para>
+
+<refsect2><title>Indeling van de spiegelserverlijst</title>
+<para>Een spiegelserverlijst bestaat uit één of meer regels met een URI van een
+spiegelserver. Lege regels en regels die beginnen met een hekje
+(<literal>#</literal>) worden genegeerd. Een URI begint steeds meet een
+URI-methode die de transportmethode vaststelt die voor die spiegelserver
+gebruikt wordt. Indien de URI bijvoorbeeld met <literal>http:</literal>
+begint, is de bevoegde transportmethode &apt-transport-http;, welke
+specifieke eisen kan stellen aan de indeling van het resterende deel van de
+URI.</para>
+<para>Metadata over een spiegelserver kunnen op dezelfde regel opgegeven worden,
+gescheiden van de URI met een tab. Verschillende metadata-elementen kunnen
+onderling gescheiden worden door tabs of spaties. (Dit is een
+gespecialiseerde functionaliteit die enkel beschikbaar is in apt >=
+1.6. Eerdere versies van apt zullen er niet in slagen spiegelserverlijsten
+met deze functionaliteit te ontleden.)</para>
+<para>Vanaf apt 1.6 wordt ook het gebruik van gecomprimeerde spiegelserverlijsten
+ondersteund. Merk op dat de bestandsnaam van de spiegelserverlijst moet
+aangeven welk compressiealgoritme gebruikt wordt. Er gebeurt geen
+autodetectie op basis van de inhoud van het bestand.</para>
+</refsect2>
+
+<refsect2><title>Spiegelserverselectie op basis van metadata</title>
+<para>Zoals aangegeven bij de indeling, kunnen metadata toegevoegd worden aan een
+spiegelserver om te voorkomen dat een spiegelserver geselecteerd zou worden
+voor het bekomen van een bestand dat niet overeenkomt met deze
+metadata. Daardoor kan de spiegelserverlijst bijvoorbeeld partiële
+spiegelservers bevatten die enkel bepaalde architecturen bedienen en zal APT
+automatisch een andere spiegelserver kiezen voor bestanden die voor een niet
+vermelde architectuur bedoeld zijn. Worden ondersteund: beperkingen op het
+gebied van architectuur (<literal>arch</literal>), de codenaam van de
+release (<literal>codename</literal>), de component van de pakketbron waarin
+het bestand zich bevindt (<literal>component</literal>), de taal waarvoor
+het bestand moet dienen (<literal>lang</literal>), de suitenaam van de
+release (<literal>suite</literal>) en het bestandstype
+(<literal>type</literal>).</para>
+</refsect2>
+
+<refsect2><title>Volgorde waarin het teruggevallen op spiegelservers gebeurt</title>
+<para>Indien voor een spiegelserver geen volgorde opgegeven is via de
+metadatasleutel <literal>priority</literal>, is de volgorde waarin
+spiegelservers gecontacteerd worden toevallig. Indien een bepaalde groep
+spiegelservers eerst uitgeprobeerd moet worden vooraleer eventuele andere
+groepen aangesproken worden, kan expliciet een prioriteit ingesteld
+worden. De spiegelservers met het laagste getal worden eerst
+uitgeprobeerd. Spiegelservers waarvoor geen uitdrukkelijke prioriteit
+ingesteld werd, hebben standaard het hoogst mogelijke getal en worden
+daardoor laatst uitgeprobeerd. De keuze tussen spiegelservers met dezelfde
+prioriteit gebeurt opnieuw op basis van toeval.</para>
+</refsect2>
+
+<refsect2><title>Toegestane transportmethodes in een spiegelserverlijst</title>
+<para>De beschikbaarheid en de keuzemogelijkheden van transportmethodes in een
+spiegelserverlijst wordt beperkt door hoe de APT-cliënt de
+spiegelserverlijst benadert. Indien een lokale transportmethode, zoals
+<literal>file</literal> of <literal>copy</literal> gebruikt wordt, kan de
+spiegelserverlijst ook lokale bronnen bevatten, terwijl een
+spiegelserverlijst die benaderd wordt via <literal>http</literal> dat niet
+kan. Bovendien kan een spiegelserverlijst niet zelf een spiegelserverlijst
+bevatten of geen andere transportmethodewikkels (zoals
+<package>apt-transport-tor</package>). Zie de documentatie bij deze
+transportmethodes over hoe u ze met de spiegelservermethode kunt gebruiken.</para>
+<para>Merk op dat versies van apt voorafgaand aan 1.6 geen enkele andere
+transportmethode dan <literal>http</literal> ondersteunen.</para>
+</refsect2>
+</refsect1>
+
+<refsect1><title>Voorbeelden</title>
+<refsect2><title>Basaal voorbeeld</title>
+<para>Een basaal voorbeeld van een spiegelserverlijst die door alle versies van
+apt met een spiegelservermethode (>= 0.7.24) ondersteund wordt, waarbij de
+cliënt om het even welke van de drie spiegelservers zal kiezen:</para>
+<literallayout>
+http://ftp.de.debian.org/debian/
+http://ftp.us.debian.org/debian/
+http://deb.debian.org/debian/
+</literallayout>
+<para>In de veronderstelling dat een bestand met deze inhoud op uw computer
+opgeslagen werd als <filename>/etc/apt/mirrorlist.txt</filename>, kan het op
+de volgende manier gebruikt worden in &sources-list; (sinds apt 1.6):</para>
+<literallayout>
+deb mirror+file:/etc/apt/mirrorlist.txt &debian-stable-codename; main
+</literallayout>
+<para>Alle versies van de spiegelservermethode ondersteunen een spiegelserverlijst
+die via HTTP benaderd kan worden. In de veronderstelling dat het beschikbaar
+is op <literal>http://apt.example.org/mirror.lst</literal>, kan het element
+uit de bovenstaande sources.list ook als volgt geschreven worden:</para>
+<literallayout>
+deb mirror://apt.example.org/mirror.lst &debian-stable-codename; main
+</literallayout>
+<para>Merk op dat met het oog op uniformiteit vanaf apt 1.6 het gebruik van
+<literal>mirror+http</literal> de voorkeur zou moeten genieten boven
+<literal>mirror</literal>. De functionaliteit blijft dezelfde.</para>
+</refsect2>
+<refsect2><title>Voorbeeld van een met metadata verrijkte spiegelserverselectie</title>
+<para>Zoals bij de definiëring van de indeling uitgelegd werd, ondersteunen
+versies van apt voorafgaand aan 1.6 dit niet. Ze zullen dus de
+spiegelserverlijst niet kunnen ontleden. De voorbeeldspiegelserverlijst is
+met opzet gecompliceerd gemaakt om een aantal aspecten van het
+selectieproces te illustreren. Er wordt uitgegaan van de volgende
+opstelling: de eerste spiegelserver is een lokale spiegelserver die via de
+methode file kan benaderd worden, maar mogelijk is deze onvolledig. De
+tweede spiegelserver heeft een zeer goede verbinding, maar het is een
+gedeeltelijke spiegelserver in die zin dat hij enkel bestanden bevat bedoeld
+voor de architecturen <literal>amd64</literal> en <literal>all</literal>. De
+overige spiegelservers zijn doorsneespiegelservers die enkel gecontacteerd
+moeten worden als de voorgaande niet werken.
+</para>
+<literallayout>
+file:/srv/local/debian/mirror/	priority:1 type:index
+http://partial.example.org/mirror/	priority:2 arch:amd64 arch:all type:deb
+http://ftp.us.debian.org/debian/	type:deb
+http://ftp.de.debian.org/debian/	type:deb
+https://deb.debian.org/debian/
+</literallayout>
+<para>In deze opstelling met deze spiegelserverlijst, zal de eerste spiegelserver
+gebruikt worden om alle indexbestanden te downloaden, in de veronderstelling
+dat de spiegelserverlijst zelf benaderd wordt via een lokale
+transportmethode zoals <literal>file</literal>. Indien dit niet het geval
+is, of indien de spiegelserver om een andere reden niet bereikbaar is, of
+indien hij het gevraagde bestand niet ter beschikking heeft, zal een andere
+spiegelserver gebruikt worden om het bestand te bekomen, en die zal gekozen
+worden op basis van het type bestand: een indexbestand zal door de laatste
+server uit de lijst aangeleverd worden, terwijl een pakket voor de
+architectuur <literal>amd64</literal> aangeleverd wordt door de tweede en
+die voor bijv. de architectuur <literal>i386</literal> door een van de drie
+laatste.</para>
+
+</refsect2>
+</refsect1>
+
+ &manbugs;
+
+ <refsect1><title>&translation-title;</title>
+   <para>&translation-holder;</para>
+   <para>&translation-english;</para>
+ </refsect1>
+</refentry>

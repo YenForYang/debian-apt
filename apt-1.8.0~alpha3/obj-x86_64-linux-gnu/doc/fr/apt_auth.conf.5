@@ -1,0 +1,204 @@
+'\" t
+.\"     Title: apt_auth.conf
+.\"    Author: \('Equipe de d\('eveloppement d\*(AqAPT
+.\" Generator: DocBook XSL Stylesheets v1.79.1 <http://docbook.sf.net/>
+.\"      Date: 03\ \&d\('ecembre\ \&2018
+.\"    Manual: APT
+.\"    Source: APT 1.8.0~alpha3
+.\"  Language: French
+.\"
+.TH "APT_AUTH\&.CONF" "5" "03\ \&d\('ecembre\ \&2018" "APT 1.8.0~alpha3" "APT"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NOM"
+apt_auth.conf \- Fichier de configuration de connexion pour les sources et les mandataires d\*(AqAPT
+.SH "DESCRIPTION"
+.PP
+Les fichiers de configuration d\*(AqAPT tels que
+\fBsources.list\fR(5)
+ou
+\fBapt.conf\fR(5)
+doivent pouvoir \(^etre accessibles \(`a tous ceux qui utilisent les outils d\*(AqAPT sur le syst\(`eme pour acc\('eder \(`a toutes les informations relatives aux paquets telles que les paquets disponibles dans un d\('ep\(^ot\&. Les informations de connexion n\('ecessaires pour se connecter \(`a un mandataire ou pour t\('el\('echarger des donn\('ees \(`a partir d\*(Aqun d\('ep\(^ot, d\*(Aqun autre c\(^ot\('e, ne devraient pas toujours \(^etre accessibles \(`a tous et ne peuvent donc pas \(^etre mises dans un fichier dot\('e de droits de lecture universels\&.
+.PP
+The APT auth\&.conf file
+/etc/apt/auth\&.conf, and \&.conf files inside
+/etc/apt/auth\&.conf\&.d
+can be used to store login information in a netrc\-like format with restrictive file permissions\&.
+.SH "FORMAT DE TYPE NETRC"
+.PP
+Le format d\('efini ici est analogue au format du fichier
+~/\&.netrc
+utilis\('e par
+\fBftp\fR(1)
+et des programmes similaires interagissant avec des serveurs\&. C\*(Aqest un format simple bas\('e sur les jetons qui reconna\(^it les jetons suivants\ \&; les jetons inconnus seront ignor\('es\&. Les jetons peuvent \(^etre s\('epar\('es par des espaces, des tabulations ou des changements de ligne\&.
+.PP
+machine \fInom d\*(Aqh\(^ote\fR[:\fIport\fR][/\fIchemin\fR]
+.RS 4
+Les entr\('ees sont trouv\('ees en recherchant le jeton de
+\fImachine\fR
+correspondant au nom d\*(Aqh\(^ote de l\*(AqURI qui fournit les informations de connexion dont APT a besoin\&. Comme extension du format netrc, un num\('ero de port peut \(^etre d\('efini\&. Si ce n\*(Aqest pas le cas, le jeton est valide pour tous les ports\&. De la m\(^eme mani\(`ere, le chemin est facultatif et seulement n\('ecessaire et utile si plusieurs d\('ep\(^ots, avec des informations de connexion diff\('erentes, sont h\('eberg\('ees sur le m\(^eme serveur\&. Un jeton de machine avec un chemin correspond si le chemin dans l\*(AqURI d\('ebute par le chemin donn\('e dans le jeton\&. Une fois qu\*(Aqune correspondance est \('etablie, les jetons suivants sont trait\('es, s\*(Aqarr\(^etant lorsque la fin du fichier est atteinte ou qu\*(Aqun autre jeton de
+\fImachine\fR
+est rencontr\('e\&.
+.RE
+.PP
+login \fInom\fR
+.RS 4
+L\*(Aqidentifiant \(`a utiliser
+.RE
+.PP
+password \fIcha\(^ine\fR
+.RS 4
+Le mot de passe \(`a utiliser\&.
+.RE
+.SH "EXEMPLE"
+.PP
+La fourniture d\*(Aqinformations de connexion pour un utilisateur nomm\('e
+apt
+avec le mot de passe
+debian
+pour l\*(Aqentr\('ee de
+\fBsources.list\fR(5)
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+deb http://example\&.org/debian stretch main
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+peut se faire directement dans l\*(Aqentr\('ee\ \&:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+deb http://apt:debian@example\&.org/debian stretch main
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+Autrement, une entr\('ee dans le fichier auth\&.conf telle que la suivante peut \(^etre utilis\('ee\ \&:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+machine example\&.org
+login apt
+password debian
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+Ou enfin, en une seule ligne\ \&:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+machine example\&.org login apt password debian
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+\&. Si vous avez besoin d\*(Aq\(^etre plus pr\('ecis, tout le contenu de ces lignes s\*(Aqappliquera \('egalement \(`a l\*(Aqentr\('ee d\*(Aqexemple\ \&:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+machine example\&.org/deb login apt password debian
+machine example\&.org/debian login apt password debian
+machine example\&.org/debian/ login apt password debian
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+En revanche, aucune des lignes suivantes ne s\*(Aqapplique\ \&:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+machine example\&.org:80 login apt password debian
+machine example\&.org/deb/ login apt password debian
+machine example\&.org/ubuntu login apt password debian
+machine example\&.orga login apt password debian
+machine example\&.net login apt password debian
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+.SH "REMARQUE"
+.PP
+Une prise en charge basique de cette fonctionnalit\('e est pr\('esente depuis la version\ \&0\&.7\&.25, mais n\*(Aq\('etait pas document\('ee depuis des ann\('ees\&. La documentation a \('et\('e ajout\('ee dans la version\ \&1\&.5, modifiant aussi l\('eg\(`erement l\*(Aqimpl\('ementation\&. Pour une compatibilit\('e ascendante maximale, vous devriez \('eviter d\*(Aqavoir plusieurs jetons de
+machine
+avec le m\(^eme nom d\*(Aqh\(^ote, mais si vous devez en avoir plusieurs, il faudrait qu\*(Aqun chemin soit pr\('ecis\('e dans le jeton de
+machine\&.
+.SH "FICHIERS"
+.PP
+/etc/apt/auth\&.conf
+.RS 4
+Informations de connexion pour les sources et les mandataires d\*(AqAPT dans un format de type netrc\&. \('El\('ement de configuration\ \&:
+Dir::Etc::netrc\&.
+.RE
+.PP
+/etc/apt/auth\&.conf\&.d/*\&.conf
+.RS 4
+Login information for APT sources and proxies in a netrc\-like format\&. Configuration Item:
+Dir::Etc::netrcparts\&.
+.RE
+.SH "VOIR AUSSI"
+.PP
+\fBapt.conf\fR(5)
+\fBsources.list\fR(5)
+.SH "BOGUES"
+.PP
+\m[blue]\fBPage des bogues d\*(AqAPT\fR\m[]\&\s-2\u[1]\d\s+2\&. Si vous souhaitez signaler un bogue \(`a propos d\*(AqAPT, veuillez lire
+/usr/share/doc/debian/bug\-reporting\&.txt
+ou utiliser la commande
+\fBreportbug\fR(1)\&.
+.SH "TRADUCTEURS"
+.PP
+J\('er\(^ome Marant, Philippe Batailler, Christian Perrier
+<bubulle@debian\&.org>
+(2000, 2005, 2009, 2010), \('Equipe de traduction francophone de Debian
+<debian\-l10n\-french@lists\&.debian\&.org>
+.PP
+Veuillez noter que cette traduction peut contenir des parties non traduites\&. Cela est volontaire, pour \('eviter de perdre du contenu quand la traduction est l\('eg\(`erement en retard sur le contenu d\*(Aqorigine\&.
+.SH "AUTEUR"
+.PP
+\fB\('Equipe de d\('eveloppement d\*(AqAPT\fR
+.RS 4
+.RE
+.SH "NOTES"
+.IP " 1." 4
+Page des bogues d'APT
+.RS 4
+\%http://bugs.debian.org/src:apt
+.RE

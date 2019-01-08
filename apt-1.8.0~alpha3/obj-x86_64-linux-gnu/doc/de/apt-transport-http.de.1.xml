@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+  "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % aptent SYSTEM "apt.ent"> %aptent;
+<!ENTITY % aptverbatiment SYSTEM "apt-verbatim.ent"> %aptverbatiment;
+<!ENTITY % aptvendor SYSTEM "apt-vendor.ent"> %aptvendor;
+]>
+
+<refentry>
+
+ <refentryinfo>
+   <!-- The last update date -->
+&apt-author.team;
+   &apt-email;
+   &apt-product;
+   
+   <date>2018-05-11T00:00:00Z</date>
+ </refentryinfo>
+
+ <refmeta>
+   <refentrytitle>apt-transport-http</refentrytitle>
+   <manvolnum>1</manvolnum>
+   <refmiscinfo class="manual">APT</refmiscinfo>
+ </refmeta>
+
+ 
+ <!-- Man page title -->
+<refnamediv>
+    <refname>apt-transport-http</refname>
+    <refpurpose>APT-Transportmethode zum Herunterladen über das Hypertext Transfer Protocol
+(HTTP)</refpurpose>
+ </refnamediv>
+
+<refsect1><title>Beschreibung</title>
+<para>Diese APT-Transportmethode erlaubt die Verwendung von Depots, auf die über
+das Hypertext Transfer Protocol (HTTP) zugegriffen wird. Es ist
+standardmäßig verfügbar und wahrscheinlich das meistverwendete aller
+Transporte. Beachten Sie, dass eine Transportmethode niemals direkt durch
+einen Benutzer aufgerufen wird, sondern von APT-Werkzeugen basierend auf der
+Konfiguration des Benutzers.</para>
+<para>HTTP ist ein unverschlüsseltes Transportprotokoll. Das bedeutet, dass die
+ganze Kommunikation mit einem fernen Server (oder Proxy) durch einen
+Angreifer mit ausreichenden Fähigkeiten beobachtet werden kann, der
+landläufig als »Mann in der Mitte« (MITM) bezeichnet wird. Ein derartiger
+Angreifer kann die Kommunikation jedoch <emphasis>nicht</emphasis> ändern,
+um die Sicherheit Ihres System zu kompromittieren, da APTs
+Datensicherheitsmodell unabhängig von der gewählten Transportmethode
+ist. Einzelheiten werden in &apt-secure; erklärt. Einen Überblick über
+verfügbare Transportmethoden gibt es in &sources-list;.</para>
+</refsect1>
+
+<refsect1><title>Optionen</title>
+<para>Verschiedene Optionen können in einer &apt-conf;-Datei gesetzt werden, um
+sein Verhalten zu ändern. Dies reicht von einer Proxy-Konfiguration bis hin
+zu einer Behelfslösung für spezielle Serverbeschränkungen.</para>
+
+<refsect2><title>Proxy-Konfiguration</title>
+<para>Die Umgebungsvariable <envar>http_proxy</envar> wird zur systemweiten
+Konfiguration unterstützt. APT-spezifische Proxys können mittels der Option
+<literal>Acquire::http::Proxy</literal> konfiguriert werden. Proxys, die nur
+für bestimmte Rechner benutzt werden, können über
+<literal>Acquire::http::Proxy::<replaceable>Rechner</replaceable></literal>
+angegeben werden. Eine granularere Steuerung kann über die nachfolgend
+genauer beschriebene Proxy-Autoerkennung erreicht werden. Alle diese
+Optionen verwenden das URI-Format
+<literal><replaceable>Schema</replaceable>://[[<replaceable>Benutzer</replaceable>][:<replaceable>Passwort</replaceable>]@]<replaceable>Rechner</replaceable>[:<replaceable>Port</replaceable>]/</literal>.
+Untersützte URI-Schemen sind <literal>socks5h</literal> (SOCKS5 mit ferner
+DNS-Auflösung), <literal>http</literal> und
+<literal>https</literal>. Authentifizierungseinzelheiten können über
+&apt-authconf; bereitgestellt werden, statt sie direkt in den URI
+einzufügen.</para>
+<para>Die unterschiedlichen APT-Konfigurationsoptionen unterstützen den Sonderwert
+<literal>DIRECT</literal>, der bedeutet, dass kein Proxy benutzt werden
+soll. Außerdem wird die Umgebungsvariable <envar>no_proxy</envar> für
+denselben Zweck unterstützt.</para>
+<para>Desweiteren werden drei Einstellungen zur Steuerung des Zwischenspeichers
+mit HTTP/1.1-konformen Proxy-Zwischenspeichern bereitgestellt:
+<literal>Acquire::http::No-Cache</literal> teilt dem Proxy mit, dass er
+unter keinen Umständen seine zwischengespeicherten Antworten benutzen soll,
+<literal>Acquire::http::Max-Age</literal> setzt das maximal erlaubte Alter
+einer Indexdatei im Zwischenspeicher des Proxys (in
+Sekunden). <literal>Acquire::http::No-Store</literal> gibt an, dass der
+Proxy die angefragten Archivdateien nicht in seinem Zwischenspeicher ablegen
+soll. Das kann verwandt werden, um zu verhindern, dass der Proxy seinen
+Zwischenspeicher mit (großen) .deb-Dateien verunreinigt.</para>
+</refsect2>
+
+<refsect2><title>Automatische Proxy-Konfiguration</title>
+<para><literal>Acquire::http::Proxy-Auto-Detect</literal> kann benutzt werden, um
+einen externen Befehl zum Auffinden des HTTP-Proxys anzugeben, der benutzt
+werden soll. Der erste und einzige Parameter ist ein URI, der den Rechner
+bezeichnet, der kontaktiert werden soll, um eine rechnerspezifische
+Konfiguration zu ermöglichen. APT erwartet dass der Befehl als Ausgabe auf
+der Standardausgabe den Proxy als einzelne Zeile im vorher angegebenen
+URI-Format oder das Wort <literal>DIRECT</literal> ausgibt, falls kein Proxy
+benutzt werden soll. Fehlt die Ausgabe, zeigt dies an, dass die allgemeinen
+Proxy-Einstellungen benutzt werden sollen.</para>
+<para>Beachten Sie, dass die automatische Erkennung nicht für einen Rechner
+benutzt wird, falls bereits eine rechnerspezifische Proxy-Konfiguration per
+<literal>Acquire::http::Proxy::<replaceable>Rechner</replaceable></literal>
+gesetzt wurde.</para>
+<para>Beispielimplementierungen finden Sie in den Paketen &squid-deb-proxy-client;
+und &auto-apt-proxy;.</para>
+<para>Diese Option hat Vorrang vor dem veralteten Optionsnamen
+<literal>Acquire::http::ProxyAutoDetect</literal>.</para>
+</refsect2>
+
+<refsect2><title>Verbindungskonfiguration</title>
+<para>Die Option <literal>Acquire::http::Timeout</literal> stellt den Zeitnehmer,
+der von der Methode benutzt wird. Dieser Wert wird auf die Verbindungs-
+sowie die Datenzeitüberschreitungen angewendet.</para>
+<para>Die benutzte Bandbreite kann durch
+<literal>Acquire::http::Dl-Limit</literal> eingeschränkt werden, was
+Ganzzahlwerte in Kilobyte pro Sekunde akzeptiert. Der Vorgabewert ist 0, was
+die Beschränkung ausschaltet und versucht, sämtliche verfügbare Bandbreite
+zu benutzen. Beachten Sie, dass diese Optionen implizit das Herunterladen
+von mehreren Servern zur gleichen Zeit deaktiviert.</para>
+<para>Die Einstellung <literal>Acquire::http::Pipeline-Depth</literal> kann
+verwandt werden, um HTTP-Pipelining zu aktivieren (RFC 2616 Abschnitt
+8.1.2.2), was z.B. bei Verbindungen mit hoher Latenz vorteilhaft sein
+kann. Sie gibt an, wie viele Anfragen in eine Leitung gesandt werden. APT
+versucht, zur Laufzeit Webserver und Proxys aufzuspüren, die sich falsch
+verhalten und eine Behelfslösung zu finden. Falls Sie jedoch wissen, dass
+sich Ihrer nicht konform zur HTTP/1.1-Spezifikation verhält, kann das
+Weiterleiten durch Setzen des Wertes auf 0 deaktiviert werden. Standardmäßig
+ist es mit dem Wert 10 aktiviert.</para>
+<para><literal>Acquire::http::AllowRedirect</literal> steuert, ob APT Umleitungen
+folgen wird, was standardmäßig aktiviert ist.</para>
+<para><literal>Acquire::http::User-Agent</literal> kann benutzt werden, um einen
+anderen User-Agent für die HTTP-Download-Methode zu setzten, da einige
+Proxys den Clients nur dann Zugriff gewähren, wenn der Client einen
+bekannten Kennzeichner verwendet.</para>
+<para><literal>Acquire::http::SendAccept</literal> ist standardmäßig aktiviert und
+sendet für Abfragen ohne Dateinamenserweiterungen ein <literal>Accept:
+text/*</literal>-Kopfzeilenfeld an den Server, um zu verhindern, dass der
+Server versucht, Inhalt auszuhandeln.</para>
+</refsect2>
+</refsect1>
+
+<refsect1><title>Beispiele</title>
+<literallayout>
+Acquire::http {
+	Proxy::example.org "DIRECT";
+	Proxy "socks5h://apt:pass@127.0.0.1:9050";
+	Proxy-Auto-Detect "/usr/local/bin/apt-http-proxy-auto-detect";
+	No-Cache "true";
+	Max-Age "3600";
+	No-Store "true";
+	Timeout "10";
+	Dl-Limit "42";
+	Pipeline-Depth "0";
+	AllowRedirect "false";
+	User-Agent "My APT-HTTP";
+	SendAccept "false";
+};
+</literallayout>
+</refsect1>
+
+<refsect1>
+<title>Siehe auch</title>
+<para>&apt-conf; &apt-authconf; &sources-list;
+</para>
+</refsect1>
+
+ &manbugs;
+
+ <refsect1><title>&translation-title;</title>
+   <para>&translation-holder;</para>
+   <para>&translation-english;</para>
+ </refsect1>
+</refentry>

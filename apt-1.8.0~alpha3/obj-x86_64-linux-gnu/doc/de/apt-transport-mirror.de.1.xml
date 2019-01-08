@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+  "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % aptent SYSTEM "apt.ent"> %aptent;
+<!ENTITY % aptverbatiment SYSTEM "apt-verbatim.ent"> %aptverbatiment;
+<!ENTITY % aptvendor SYSTEM "apt-vendor.ent"> %aptvendor;
+]>
+
+<refentry>
+
+ <refentryinfo>
+   <!-- The last update date -->
+&apt-author.team;
+   &apt-email;
+   &apt-product;
+   
+   <date>2017-12-09T00:00:00Z</date>
+ </refentryinfo>
+
+ <refmeta>
+   <refentrytitle>apt-transport-mirror</refentrytitle>
+   <manvolnum>1</manvolnum>
+   <refmiscinfo class="manual">APT</refmiscinfo>
+ </refmeta>
+
+ 
+ <!-- Man page title -->
+<refnamediv>
+    <refname>apt-transport-mirror</refname>
+    <refpurpose>APT-Transportmethode für stärker automatisierte Spiegelserverauswahl</refpurpose>
+ </refnamediv>
+
+<refsect1><title>Beschreibung</title>
+<para>Diese APT-Transportmethode implementiert kein Protokoll, um auf lokale oder
+ferne Depots selbst zuzugreifen, beschafft jedoch eine Spiegelserverliste
+und leitet alle Anfragen an den/die Spiegel, der/die aus der Liste
+herausgegriffen wurde(n). Der Zugriff erfolgt über andere
+Transportprotokolle wie &apt-transport-http;. Die Grundfunktionalität ist
+seit APT 0.7.24 verfügbar, war jedoch bis APT 1.6 nicht dokumentiert. APT
+1.6 enthält eine komplette Neuentwicklung der Transportmethode und der
+unterstützten Funktionalitäten. Beachten Sie, dass eine Transportmethode
+niemals durch einen Benutzer direkt aufgerufen wird, jedoch von
+APT-Werkzeugen basierend auf der Konfiguration des Benutzers.</para>
+<para>Falls das Beschaffen einer Datei mittels eines Spiegelservers fehlschlägt,
+stellt die Methode sicher, dass automatisch ein anderer möglicher
+Spiegelserver der Liste ausprobiert wird, entweder bis die Datei geholt
+wurde oder bis kein Spiegelserver auf der Liste mehr übrig ist. Damit werden
+transparent Serverausfallzeiten und ähnliche Probleme gehandhabt.</para>
+<para>Die Konsequenzen für die Sicherheit aufgrund der Transportmethode basieren
+auf Sicherheitserwägungen, die mit der Transportmethode verbunden sind, die
+zum Holen der Spiegelserverliste verwendet wird, und welche
+Transportmethoden beim Zugriff auf den/die ausgewählten Spiegelserver durch
+die Transportmethode beteiligt sind.</para>
+</refsect1>
+
+<refsect1><title>Optionen</title>
+<para>Diese Transportmethode hat derzeit keine Konfigurationsoptionen. Die Auswahl
+des Spiegelservers basiert ganz auf den angebotenene Spiegelservern auf der
+Spiegelserverliste und den Dateien, die APT holen möchte.</para>
+
+<refsect2><title>Spiegelserverlistenformat</title>
+<para>Eine Spiegelserverliste enthält mindestens eine Zeile. Jede Zeile gibt einen
+URI für einen Spiegelserver an. Leere Zeilen und die, die mit einem
+Rautezeichen (<literal>#</literal>) beginnen, werden ignoriert. Ein URI
+beginnt immer mit einem URI-Schema, das angibt, welche Transportmethode für
+diesen Spiegelserver benutzt wird. Falls der URI beispielsweise mit
+<literal>http:</literal> anfängt, ist die zuständige Transportmethode
+&apt-transport-http;, was spezielle Anforderungen an das Format des
+verbleibenden Teils des URI stellen kann.</para>
+<para>Metadaten über einen Spiegelserver können in derselben Zeile angegeben
+werden, vom URI durch einen Tabulator getrennt. Mehrere Elemente der
+Metadaten können ihrerseits durch Leerzeichen oder Tabulatoren getrennt
+werden. (Dies ist eine fortschrittliche Funktionalität, die erst seit APT
+1.6 verfügbar ist. Ältere APT-Versionen scheitern bei der Auswertung von
+Spiegelserverlisten, die diese Funktionalität verwenden.)</para>
+<para>Seit APT 1.6 wird auch die Verwendung komprimierter Spiegelserverlisten
+unterstützt. Beachten Sie, dass der Dateiname der Spiegelserverliste den
+verwendeten Komprimierungsalgorithmus angeben muss; es wird keine
+automatische Bestimmung anhand des Dateiinhalts durchgeführt.</para>
+</refsect2>
+
+<refsect2><title>Spiegelserverauswahl anhand von Metadaten</title>
+<para>Wie im Format angegeben, können an einen Spiegelserver zusätzliche Metadaten
+angehängt werden, um zu verhindern, dass ein Spiegelserver ausgewählt wird,
+um eine Datei zu beschaffen, die diesen Metadaten nicht entspricht. Auf
+diese Weise kann die Spiegelserverliste z.B. Teilspiegelserver enthalten,
+die nur bestimmte Architekturen bereitstellen, und APT wird für Dateien, die
+eine nicht aufgeführte Architektur benötigen, automatisch einen anderen
+Spiegelserver auswählen. Unterstützt werden Beschränkungen für die
+Architektur (<literal>arch</literal>), den Codenamen der Veröffentlichung
+(<literal>codename</literal>), Bestandteil des Depots, in dem sich die Datei
+befindet (<literal>component</literal>), die zur Datei passende Sprache
+(<literal>lang</literal>), Suite-Name der Veröffentlichung
+(<literal>suite</literal>) und Typ der Datei (<literal>type</literal>).</para>
+</refsect2>
+
+<refsect2><title>Reihenfolge der Ersatzspiegel</title>
+<para>Falls für einen Spiegel keine Priorität über den Metadatenschlüssel
+<literal>priority</literal> angegeben wurde, ist die Reihenfolge, in der die
+Spiegelserver ausgewählt werden, zufällig. Falls eine bestimmte
+Zusammenstellung von Spiegelservern zuerst vor anderen Zusammenstellungen
+ausprobiert werden soll, kann die Priorität explizit gesetzt werden. Die
+Spiegelserver mit der niedrigsten Nummer werden zuerst
+ausprobiert. Spiegelserver, die keine explizit gesetzte Priorität haben,
+werden standardmäßig auf die höchstmögliche Nummer gesetzt und daher zuletzt
+ausprobiert. Die Auswahl zwischen Spiegelservern mit derselben Priorität
+erfolgt wiederum zufällig.</para>
+</refsect2>
+
+<refsect2><title>Erlaubte Transportmethoden in einer Spiegelserverliste</title>
+<para>Die Verfügbarkeit und Auswahl von Transportmethoden in einer
+Spiegelserverliste wird durch die Zugriffsart von APT auf die
+Spiegelserverliste beschränkt. Falls eine lokale Transportmethode wie
+<literal>file</literal> oder <literal>copy</literal> benutzt wird, kann die
+Spiegelserverliste auch lokale Ressourcen enthalten, während eine
+Spiegelserverliste, auf die per <literal>http</literal> zugegriffen wird,
+dies nicht kann. Eine Spiegelserverliste kann nicht zusätzlich eine weitere
+Spiegelserverliste oder andere verpackte Transportmethoden (wie
+<package>apt-transport-tor</package>) enthalten. Sie finden in der
+Dokumentation dieser Transportmethoden, wie sie mit der Spiegelservermethode
+benutzt werden.</para>
+<para>Beachten Sie, dass APT-Versionen vor 1.6 keine andere Transportmethode als
+<literal>http</literal> unterstützten.</para>
+</refsect2>
+</refsect1>
+
+<refsect1><title>Beispiele</title>
+<refsect2><title>Einfaches Beispiel</title>
+<para>Eine einfache Beispielspiegelserverliste, die von allen APT-Versionen mit
+einer Spiegelservermethode (>= 0.7.24) unterstützt wird, in der der Client
+einen von drei Spiegelservern aussuchen kann:</para>
+<literallayout>
+http://ftp.de.debian.org/debian/
+http://ftp.us.debian.org/debian/
+http://deb.debian.org/debian/
+</literallayout>
+<para>Angenommen, eine Datei mit diesem Inhalt wäre als
+<filename>/etc/apt/mirrorlist.txt</filename> auf Ihrem Rechner
+gespeichert. Sie kann (seit APT 1.6) wie folgt in &sources-list; benutzt
+werden:</para>
+<literallayout>
+deb mirror+file:/etc/apt/mirrorlist.txt &debian-stable-codename; main
+</literallayout>
+<para>Alle Versionen der Spiegelservermethode unterstützen eine
+Spiegelserverliste, auf die mittels HTTP zugegriffen werden kann. Wird davon
+ausgegangen, dass sie unter
+<literal>http://apt.example.org/mirror.lst</literal> verfügbar ist, kann
+obiger Sources.list-Eintrag kann stattdessen auch wie folgt geschrieben
+werden:</para>
+<literallayout>
+deb mirror://apt.example.org/mirror.lst &debian-stable-codename; main
+</literallayout>
+<para>Beachten Sie, das seit APT 1.6 die Verwendung von
+<literal>mirror+http</literal> der Einheitlichkeit wegen
+<literal>mirror</literal> vorgezogen werden sollte. Die Funktionalität ist
+dieselbe.</para>
+</refsect2>
+<refsect2><title>Beispiel mit verbesserter Spiegelserverauswahl anhand von Metadaten</title>
+<para>Wie in der Formatdefinition erklärt, unterstützen dies APT-Versionen vor 1.6
+nicht und das Auswerten der Spiegelserverliste wird scheitern. Die
+Beispielspiegelserverliste ist absichtlich komplex, um einige Aspekte der
+Auswahl zu zeigen. Die folgende Einstellung wird angenommen: Der erste
+Spiegelserver ist ein lokaler Spiegelserver, auf den mit der File-Methode
+zugegriffen wird, aber möglicherweise unvollständig. Der zweite
+Spiegelserver hat eine gute Verbindung, ist aber ein Teilspiegelserver in
+sofern, dass er nur Dateien der Architekturen <literal>amd64</literal> und
+<literal>all</literal> enthält. Die verbleibenden Spiegelserver sind
+Durchschnittsserver, die nur kontaktiert werden sollen, wenn die vorherigen
+nicht funktionieren.
+</para>
+<literallayout>
+file:/srv/local/debian/mirror/	priority:1 type:index
+http://partial.example.org/mirror/	priority:2 arch:amd64 arch:all type:deb
+http://ftp.us.debian.org/debian/	type:deb
+http://ftp.de.debian.org/debian/	type:deb
+https://deb.debian.org/debian/
+</literallayout>
+<para>In dieser Einstellung mit dieser Spiegelserverliste wird der erste
+Spiegelserver benutzt, um alle Indexdateien herunterzuladen, unter der
+Annahme, dass auf die Spiegelserverliste selbst über eine lokale
+Transportmethode wie <literal>file</literal> zugegriffen wird. Falls dies
+nicht so ist, auf den Spiegelserver aus einem anderen Grund nicht
+zugegriffen werden kann oder er die angeforderte Datei nicht enthält, wird
+ein anderer Spiegelserver benutzt, um die Datei zu beschaffen, was vom Typ
+der Datei abhängt: Eine Indexdatei wird durch den letzten Spiegelserver auf
+der Liste bereitgestellt, während ein Paket der Architektur
+<literal>amd64</literal> durch den zweiten und z.B. der Architektur
+<literal>i386</literal> durch einen der letzten drei.</para>
+
+</refsect2>
+</refsect1>
+
+ &manbugs;
+
+ <refsect1><title>&translation-title;</title>
+   <para>&translation-holder;</para>
+   <para>&translation-english;</para>
+ </refsect1>
+</refentry>

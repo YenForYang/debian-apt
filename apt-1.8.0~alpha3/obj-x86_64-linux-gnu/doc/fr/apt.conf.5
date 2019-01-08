@@ -1,0 +1,1213 @@
+'\" t
+.\"     Title: apt.conf
+.\"    Author: Jason Gunthorpe
+.\" Generator: DocBook XSL Stylesheets v1.79.1 <http://docbook.sf.net/>
+.\"      Date: 10\ \&d\('ecembre\ \&2018
+.\"    Manual: APT
+.\"    Source: APT 1.8.0~alpha3
+.\"  Language: French
+.\"
+.TH "APT\&.CONF" "5" "10\ \&d\('ecembre\ \&2018" "APT 1.8.0~alpha3" "APT"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NOM"
+apt.conf \- Fichier de configuration pour APT
+.SH "DESCRIPTION"
+.PP
+Le fichier
+apt\&.conf
+est le fichier de configuration principal du l\*(Aqensemble de programmes APT, mais n\*(Aqest de loin pas le seul endroit o\(`u des choix d\*(Aqoptions peuvent \(^etre effectu\('es\&. L\*(Aqensemble des outils partagent leur analyse de la ligne de commande, ce qui permet de garantir un environnement d\*(Aqutilisation uniforme\&.
+.PP
+Lorsqu\*(Aqun programme de l\*(Aqensemble APT est utilis\('e, il lit le fichier de configuration dans l\*(Aqordre suivant\ \&:
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 1.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  1." 4.2
+.\}
+fichier indiqu\('e par la variable d\*(Aqenvironnement
+\fBAPT_CONFIG\fR
+si elle existe
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 2.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  2." 4.2
+.\}
+tous les fichiers de
+Dir::Etc::Parts
+dans l\*(Aqordre alphanum\('erique ascendant qui ont soit l\*(Aqextension "conf", soit aucune extension et qui ne contiennent que des caract\(`eres alphanum\('eriques, des tirets (\-), des caract\(`eres de soulignement (_) et des points (\&.), les autres fichiers \('etant ignor\('es\&. Dans le cas contraire, APT affichera un avertissement indiquant qu\*(Aqil a ignor\('e un fichier si celui\-ci ne correspond par \(`a un motif d\('efini dans
+Dir::Ignore\-Files\-Silently
+(les fichiers correspondant \(`a cette variable de configuration \('etant, eux, ignor\('es silencieusemennt)\&.
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 3.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  3." 4.2
+.\}
+le fichier de configuration d\('efini par
+Dir::Etc::Main
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 4.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  4." 4.2
+.\}
+toutes les options d\('efinie dans le sous\-arbre binaire de configuration sp\('ecifique sont d\('eplac\('ees \(`a la racine de l\*(Aqarbre\&.
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 5.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  5." 4.2
+.\}
+les options de ligne de commande sont appliqu\('ees pour remplacer les directives de configuration ou pour charger d\*(Aqautres fichiers de configuration\&.
+.RE
+.SH "SYNTAXE"
+.PP
+Le fichier de configuration est construit comme un arbre d\*(Aqoptions organis\('ees en groupes fonctionnels\&. On se sert du double deux points (\(Fo\ \&::\ \&\(Fc) pour indiquer une option\ \&; par exemple,
+APT::Get::Assume\-Yes
+est une option pour le groupe d\*(Aqoutils APT, destin\('ee \(`a l\*(Aqoutil Get\&. Il n\*(Aqy a pas d\*(Aqh\('eritage des options des groupes parents\&.
+.PP
+Syntaxiquement, le langage de configuration est con\(,cu sur le m\(^eme mod\(`ele que les langages utilis\('es par des outils ISC tels que bind et dhcp\&. Une ligne qui commence par
+//
+est trait\('ee comme un commentaire et ignor\('ee, de m\(^eme que les sections de texte plac\('ees entre
+/*
+et
+*/, tout comme les commentaires C/C++\&. Chaque ligne est de la forme\ \&:
+APT::Get::Assume\-Yes "true";\&. Les guillemets et le point\-virgule final sont obligatoire\&. La valeur doit tenir sur une seule ligne et il n\*(Aqexiste pas de fusion de cha\(^ines\&. Elle ne doit pas comporter de guillemets et de barre oblique invers\('ee\&. Le nom d\*(Aqune option peut contenir des caract\(`eres alphanum\('eriques et \(Fo\ \&/\-:\&._+\ \&\(Fc\&. On peut d\('eclarer un nouveau champ d\*(Aqaction avec des accolades, comme suit\ \&:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+   
+APT {
+  Get {
+    Assume\-Yes "true";
+    Fix\-Broken "true";
+  };
+};
+.fi
+.if n \{\
+.RE
+.\}
+.PP
+avec des retours \(`a la ligne pour faciliter la lecture\&. On peut cr\('eer une liste en ouvrant un champ d\*(Aqaction et en y ins\('erant une cha\(^ine entre guillemets suivie d\*(Aqun point virgule\&. Des entr\('ees multiples peuvent \(^etre incluses, s\('epar\('ees par des points\-virgules\&.
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+   
+DPkg::Pre\-Install\-Pkgs {"/usr/sbin/dpkg\-preconfigure \-\-apt";};
+.fi
+.if n \{\
+.RE
+.\}
+.PP
+Les mod\(`eles
+/usr/share/doc/apt/examples/configure\-index\&.gz
+montrent \(`a quoi devrait ressembler le fichier de configuration\&.
+.PP
+Les identifiants des options de configuration ne sont pas sensibles \(`a la casse\&. Dans l\*(Aqexemple pr\('ec\('edent, on pourrait donc aussi bien utiliser
+dpkg::pre\-install\-pkgs\&.
+.PP
+Les noms des \('el\('ements de configuration sont optionnels si une liste est d\('efinie, comme cela peut se voir avec l\*(Aqexemple
+DPkg::Pre\-Install\-Pkgs
+pr\('ec\('edent\&. Si vous n\*(Aqindiquez pas de nom, une nouvelle entr\('ee ajoutera une nouvelle option \(`a la liste\&. Dans le cas contraire, l\*(Aqoption correspondante peut \(^etre remplac\('ee, comme toute autre option, en lui r\('eaffectant une valeur\&.
+.PP
+Deux \('el\('ements sp\('eciaux sont autoris\('es\ \&:
+#include
+(qui est obsol\(`ete et n\*(Aqest plus g\('er\('e par des impl\('ementations alternatives) et
+#clear\&.
+#include
+inclut le fichier donn\('e en param\(`etre, \(`a moins que le nom ne se termine par une barre oblique auquel cas le r\('epertoire entier est inclus\&.
+#clear
+sert \(`a effacer une partie de l\*(Aqarbre de configuration\&. L\*(Aq\('el\('ement d\('esign\('e et tout ses descendants sont supprim\('es\&. Veuillez noter que ces lignes doivent \('egalement se terminer avec un point\-virgule\&.
+.PP
+La commande
+#clear
+est la seule fa\(,con de supprimer une liste ou un champ d\*(Aqaction (\(Fo\ \&scope\ \&\(Fc)\&. La r\('eouverture d\*(Aqun scope ou le style \(Fo\ \&::\ \&\(Fc d\('ecrit plus loin ne remplaceront
+\fIpas\fR
+les entr\('ees \('ecrites pr\('ec\('edemment\&. Les options ne peuvent \(^etre remplac\('ees qu\*(Aqen leur affectant une nouvelle valeur\&. Les listes et les champs d\*(Aqaction ne peuvent \(^etre remplac\('es mais seulement effac\('es\&.
+.PP
+Tous les outils d\*(AqAPT poss\(`edent une option
+\fB\-o\fR
+qui permet de sp\('ecifier une configuration quelconque depuis la ligne de commande\&. La syntaxe consiste en un nom complet d\*(Aqoption (par exemple
+APT::Get::Assume\-Yes) suivi par un signe \('egal, puis par la nouvelle valeur de l\*(Aqoption\&. On peut compl\('eter une liste en ajoutant un
+::
+final au nom de la liste\&. Comme on peut s\*(Aqen douter, la syntaxe de champ d\*(Aqaction (\(Fo\ \&scope\ \&\(Fc) ne peut pas \(^etre indiqu\('ee \(`a la ligne de commande\&.
+.PP
+Veuillez noter que vous ne pouvez utiliser
+::
+que pour ajouter un \('el\('ement par ligne \(`a la liste et que cela ne devrait pas \(^etre utilis\('e en combinaison avec la syntaxe de champ d\*(Aqaction (\(Fo\ \&scope\ \&\(Fc) qui inclut implicitement
+::\&. L\*(Aqutilisation simultan\('ee des deux syntaxes d\('eclenchera un bogue dont certains utilisateurs se servent comme d\*(Aqune fonctionnalit\('e\ \&: une option avec le nom inhabituel \(Fo\ \&::\ \&\(Fc se comportera comme toute autre option nomm\('ee\&. Cela risque d\*(Aqavoir de nombreux probl\(`emes comme cons\('equence, par exemple si un utilisateur \('ecrit plusieurs lignes avec cette syntaxe
+\fIerron\('ee\fR
+afin de faire un ajout \(`a la liste, l\*(Aqeffet obtenu sera inverse puisque seule la derni\(`ere valeur pour l\*(Aqoption \(Fo\ \&::\ \&\(Fc sera utilis\('ee\&. Les futures versions d\*(AqAPT retourneront une erreur et l\*(Aqex\('ecution sera interrompue si cette utilisation incorrecte est rencontr\('ee\&. Il est donc conseill\('e de corriger ces d\('efauts tant qu\*(AqAPT ne s\*(Aqen plaint pas explicitement\&.
+.SH "LE GROUPE APT"
+.PP
+Ce groupe d\*(Aqoptions contr\(^ole le comportement global d\*(AqAPT et contient \('egalement des options communes \(`a tous les outils\&.
+.PP
+\fBArchitecture\fR
+.RS 4
+L\*(Aqarchitecture du syst\(`eme\ \&; cette option positionne l\*(Aqarchitecture \(`a utiliser pour r\('ecup\('erer des fichiers et analyser des listes de paquets\&. La valeur interne par d\('efaut est l\*(Aqarchitecture pour laquelle APT a \('et\('e compil\('e\&.
+.RE
+.PP
+\fBArchitectures\fR
+.RS 4
+Toutes les architectures g\('er\('ees par le syst\(`eme\&. Par exemple, les processeurs qui mettent en \(oeuvre le jeu d\*(Aqinstructions
+amd64
+(aussi appel\('e
+x86\-64) peuvent ex\('ecuter des binaires compil\('es pour le jeu d\*(Aqinstructionsi386
+(x86)\&. Cette liste est utilis\('e pour r\('ecup\('erer des fichiers et analyser les listes de paquets\&. La valeur par d\('efaut initiale est toujours celle de l\*(Aqarchitecture native du syst\(`eme (APT::Architecture) et les autres architectures sont ajout\('ees \(`a la liste par d\('efaut lorsqu\*(Aqelles sont enregistr\('ees avec
+\fBdpkg \-\-add\-architecture\fR\&.
+.RE
+.PP
+\fBCompressor\fR
+.RS 4
+Ce champ d\*(Aqaction (\(Fo\ \&scope\ \&\(Fc) d\('efinit quels formats de compression sont g\('er\('es, comment la compression et la d\('ecompression peuvent \(^etre r\('ealis\('ees si ce format n\*(Aqest pas pris en charge directement dans APT et une indication du co\(^ut d\*(Aqune compression dans ce format\&. Dans cet exemple, le paragraphe suivant de la configuration permettra \(`a APT de t\('el\('echarger, d\('ecompresser, cr\('eer et stocker des fichiers avec l\*(Aqextension de fichier \(`a bas co\(^ut
+\&.reversed
+qu\*(Aqil passera \(`a la commande
+\fBrev\fR
+sans param\(`etre suppl\('ementaire en ligne de commande pour la compression et la d\('ecompression\ \&:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+APT::Compressor::rev {
+	Name "rev";
+	Extension "\&.reversed";
+	Binary "rev";
+	CompressArg {};
+	UncompressArg {};
+	Cost "10";
+};
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.PP
+\fBBuild\-Profiles\fR
+.RS 4
+Liste de tous les profils de construction activ\('es pour la r\('esolution de d\('ependances de construction, sans le pr\('efixe de l\*(Aqespace de nommage du "profile\&."\&. Par d\('efaut, cette liste est vide\&. La variable
+\fBDEB_BUILD_PROFILES\fR
+comme l\*(Aqutilise
+\fBdpkg-buildpackage\fR(1)
+annule la notation de liste\&.
+.RE
+.PP
+\fBDefault\-Release\fR
+.RS 4
+Indique la distribution \(`a utiliser par d\('efaut lors de l\*(Aqinstallation d\*(Aqun paquet si plusieurs versions sont disponibles\&. La valeur peut \(^etre un nom de distribution ou un num\('ero de version\&. Exemples\ \&: \(Fo\ \&stable\ \&\(Fc, \(Fo\ \&testing\ \&\(Fc, \(Fo\ \&stretch\ \&\(Fc, \(Fo\ \&buster\ \&\(Fc, \(Fo\ \&4\&.0\ \&\(Fc, \(Fo\ \&5\&.0*\ \&\(Fc\&. Voir aussi
+\fBapt_preferences\fR(5)\&.
+.RE
+.PP
+\fBIgnore\-Hold\fR
+.RS 4
+Ignore les paquets \(Fo\ \&gel\('es\ \&\(Fc\ \&; cette option globale indique au syst\(`eme de r\('esolution de ne pas tenir compte des paquets \(Fo\ \&gel\('es\ \&\(Fc dans sa prise de d\('ecision\&.
+.RE
+.PP
+\fBClean\-Installed\fR
+.RS 4
+Avec cette option qui est activ\('ee par d\('efaut, la fonctionnalit\('e \(Fo\ \&autoclean\ \&\(Fc supprime du cache tout paquet qui ne peut plus \(^etre r\('ecup\('er\('e\&. Quand cette option est d\('esactiv\('ee, les paquets qui sont install\('es localement sont aussi exclus du nettoyage \- mais notez que APT ne fournit aucun moyen direct pour les r\('einstaller\&.
+.RE
+.PP
+\fBImmediate\-Configure\fR
+.RS 4
+La valeur par d\('efaut est \(Fo\ \&on\ \&\(Fc ce qui a pour cons\('equence qu\*(AqAPT installera les paquets essentiels et importants d\(`es que possible pendant les op\('erations d\*(Aqinstallation ou de mise \(`a jour, afin de limiter les cons\('equences d\*(Aqun \('echec de
+\fBdpkg\fR(1)\&. Si cette option est d\('esactiv\('ee, APT traitera les paquets importants comme les paquets de priorit\('e \(Fo\ \&extra\ \&\(Fc\ \&:\ \&entre la d\('ecompaction du paquet A et sa configuration, de nombreuses op\('erations de d\('ecompaction ou de configuration peuvent prendre place pour des paquets B ou C qui n\*(Aqont rien \(`a voir\&. Si ces op\('erations provoquent un \('echec de
+\fBdpkg\fR(1)
+(par exemple si les scripts du responsable du paquet B provoquent une erreur), le r\('esultat est que le paquet A est d\('ecompact\('e mais non configur\('e\&. En cons\('equence, les paquets qui en d\('ependent pourraient ne plus fonctionner puisque leurs d\('ependances ne sont pas satisfaites\&.
+.sp
+Le marqueur de configuration imm\('ediate est \('egalement utilis\('e dans le cas potentiellement d\('elicat de d\('ependances circulaires, car une d\('ependance avec le marqueur \(Fo\ \&immediate\ \&\(Fc est \('equivalent \(`a une pr\('e\-d\('ependance\&. Cela permet en th\('eorie \(`a APT de reconna\(^itre le cas o\(`u il ne peut effectuer de configuration imm\('ediate et de s\*(Aqinterrompre pour sugg\('erer de d\('esactiver temporairement l\*(Aqoption pour permettre aux op\('erations de s\*(Aqeffectuer\&. Veuillez noter l\*(Aqutilisation du terme \(Fo\ \&en th\('eorie\ \&\(Fc\ \&:\ \&en r\('ealit\('e, ce probl\(`eme est rarement rencontr\('e, dans des versions non stables de distributions, et \('etait caus\('e par des d\('ependances incorrectes ou par un syst\(`eme d\('ej\(`a dans un \('etat instable\&. Vous ne devriez donc pas d\('esactiver cette option sans savoir ce que vous faites car le sc\('enario ci\-dessus n\*(Aqest le seul qu\*(Aqelle permet d\*(Aq\('eviter\&.
+.sp
+Avant qu\*(Aqune op\('eration importante comme
+dist\-upgrade
+ne soit ex\('ecut\('ee avec cette option d\('esactiv\('ee, vous devriez essayer d\*(Aqinstaller (install) explicitement le paquet qu\*(AqAPT ne peut pas configurer imm\('ediatement\&. Ne manquez toutefois pas de signaler le probl\(`eme dans votre distribution et \(`a l\*(Aq\('equipe de maintenance d\*(AqAPT avec le lien de syst\(`eme de gestion de bogues ci\-dessous, afin qu\*(Aqils puissent am\('eliorer ou corriger les processus de mise \(`a jour\&.
+.RE
+.PP
+\fBForce\-LoopBreak\fR
+.RS 4
+Ne jamais activer cette option \(`a moins que vous ne sachiez
+\fIr\('eellement\fR
+ce que vous faites\&. Elle autorise APT \(`a supprimer temporairement un paquet essentiel pour mettre fin \(`a une boucle Conflicts / Conflicts ou Conflicts / Pre\-Depends entre deux paquets essentiels\&.
+\fIUne telle boucle ne devrait jamais se produire\ \&: c\*(Aqest un bogue tr\(`es important\fR\&. Cette option fonctionne si les paquets essentiels ne sont pas
+\fBtar\fR,
+\fBgzip\fR,
+\fBlibc\fR,
+\fBdpkg\fR,
+\fBdash\fR
+ou tous les paquets dont ces paquets d\('ependent\&.
+.RE
+.PP
+\fBCache\-Start\fR, \fBCache\-Grow\fR, \fBCache\-Limit\fR
+.RS 4
+\(`A partir de la version 0\&.7\&.26, APT utilise un fichier de cache de taille variable index\('e en m\('emoire (\(Fo\ \&resizable memory mapped cache file\ \&\(Fc) pour conserver les informations du fichier \(Fo\ \&available\ \&\(Fc\&.
+Cache\-Start
+d\('efinit la taille minimale de ce cache et par cons\('equent la quantit\('e de m\('emoire qu\*(AqAPT utilisera d\(`es son lancement\&. La valeur par d\('efaut est de 20971520 octets (environ 20\ \&Mo)\&. Il est indispensable que l\*(Aqensemble de cette m\('emoire soit disponible, sinon APT ne pourra se lancer\&. Il peut donc \(^etre n\('ecessaire de diminuer cette valeur sur des syst\(`emes disposant de peu de m\('emoire\&. Au contraire, pour des syst\(`emes qui utilisent de nombreuses sources de paquet, il peut \(^etre n\('ecessaire de l\*(Aqaugmenter\&. La valeur de
+Cache\-Grow
+d\('efinit, en octets, la quantit\('e de m\('emoire suppl\('ementaire qui peut \(^etre allou\('ee au cache si la valeur d\('efinie par
+Cache\-Start
+est insuffisante\&. La valeur par d\('efaut de
+Cache\-Grow
+est de 1048576 octets (environ 1\ \&Mo)\&. Cette augmentation se fera tant que la taille du cache sera insuffisante pour contenir toutes les informations n\('ecessaires ou qu\*(Aqelle atteint la valeur limite d\('efinie par
+Cache\-Limit\&. La valeur par d\('efaut de
+Cache\-Limit
+est nulle (il n\*(Aqexiste donc pas de limite \(`a la taille maximale du cache)\&. Si
+Cache\-Grow
+est \('egal \(`a 0, l\*(Aqaugmentation automatique de la taille du cache est d\('esactiv\('ee\&.
+.RE
+.PP
+\fBBuild\-Essential\fR
+.RS 4
+Cette option d\('efinit les paquets qui sont consid\('er\('es comme faisant partie des d\('ependances essentielles pour la construction de paquets\&.
+.RE
+.PP
+\fBGet\fR
+.RS 4
+La sous\-section
+Get
+contr\(^ole l\*(Aqoutil
+\fBapt-get\fR(8), veuillez consulter sa documentation pour avoir plus d\*(Aqinformations sur les options en question\&.
+.RE
+.PP
+\fBCache\fR
+.RS 4
+La sous\-section
+Cache
+contr\(^ole l\*(Aqoutil
+\fBapt-cache\fR(8), veuillez consulter sa documentation pour avoir plus d\*(Aqinformations sur les options en question\&.
+.RE
+.PP
+\fBCDROM\fR
+.RS 4
+La sous\-section
+CDROM
+contr\(^ole l\*(Aqoutil
+\fBapt-cdrom\fR(8), veuillez consulter sa documentation pour avoir plus d\*(Aqinformations sur les options en question\&.
+.RE
+.SH "LE GROUPE ACQUIRE"
+.PP
+Le groupe d\*(Aqoptions
+Acquire
+contr\(^ole le t\('el\('echargement des paquets ainsi que les diff\('erentes \(Fo\ \&m\('ethodes d\*(Aqacquisition\ \&\(Fc qui effectuent ce t\('el\('echargement (voir aussi
+\fBsources.list\fR(5))\&.
+.PP
+\fBCheck\-Date\fR
+.RS 4
+Les options relatives \(`a la s\('ecurit\('e sont positionn\('ees par d\('efaut \(`a \(Fo\ \&true\ \&\(Fc,permettant des v\('erifications relatives \(`a l\*(Aqheure\&. Leur d\('esactivation signifie qu\*(Aqon ne peut pas faire confiance \(`a l\*(Aqheure de la machine, et APT de ce fait d\('esactivera toutes les v\('erifications de ce type, telles que
+\fBCheck\-Valid\-Until\fR
+et la v\('erification que le champ Date d\*(Aqun fichier Release n\*(Aqest pas dans le futur\&.
+.RE
+.PP
+\fBMax\-FutureTime\fR
+.RS 4
+Dur\('ee maximale (en secondes) pendant laquelle un fichier Release est consid\('er\('e comme valable, \(`a partir du moment de sa cr\('eation (tel que cela est indiqu\('e dans l\*(Aqen\-t\(^ete
+Date)\&. La valeur par d\('efaut est
+10\&. Un r\('eglage sp\('ecifique pour une archive donn\('ee peut \(^etre d\('efini en ajoutant l\*(Aq\('etiquette de l\*(Aqarchive au nom de l\*(Aqoption\&. De pr\('ef\('erence, le m\(^eme r\('esultat peut \(^etre obtenu pour des entr\('ees particuli\(`eres de
+\fBsources.list\fR(5)
+en utilisant ici l\*(Aqoption
+\fBDate\-Max\-Future\fR\&.
+.RE
+.PP
+\fBCheck\-Valid\-Until\fR
+.RS 4
+L\*(Aqactivation de l\*(Aqoption de s\('ecurit\('e qui permet de mettre une limite temporelle de validit\('e au fichier Release permet d\*(Aq\('eviter des attaques de type \(Fo\ \&replay\ \&\(Fc et permet d\*(Aq\('eviter d\*(Aqutiliser des miroirs qui ne sont plus \(`a jour\&. Cependant, cette fonctionnalit\('e a besoin que l\*(Aqhorloge du syst\(`eme soit \(`a jour\&. Les gestionnaires d\*(Aqarchives devraient cr\('eer des fichiers Release comportant l\*(Aqen\-t\(^ete
+Valid\-Until\&. Cependant, si cet en\-t\(^ete est absent, ou si une valeur plus stricte est d\('esir\('ee, la valeur du param\(`etre
+Max\-ValidTime
+est alors utilis\('ee\&. L\*(Aqoption
+\fBCheck\-Valid\-Until\fR
+des entr\('ees de
+\fBsources.list\fR(5)
+devrait \(^etre pr\('ef\('er\('ee pour d\('esactiver s\('electivement la v\('erification plut\(^ot que d\*(Aqutiliser ce remplacement global\&.
+.RE
+.PP
+\fBMax\-ValidTime\fR
+.RS 4
+Dur\('ee maximale (en secondes) pendant laquelle un fichier Release est consid\('er\('e comme valable, \(`a partir du moment de sa cr\('eation (tel que cela est indiqu\('e dans l\*(Aqen\-t\(^ete
+Date)\&. Si ce fichier lui\-m\(^eme comporte un en\-t\(^ete
+Valid\-Until
+la plus ancienne des deux dates est utilis\('ee comme date d\*(Aqexpiration\&. La valeur par d\('efaut (0) signifie \(Fo\ \&valable \('eternellement\ \&\(Fc\&. Un r\('eglage sp\('ecifique pour une archive donn\('ee peut \(^etre d\('efini en ajoutant l\*(Aq\('etiquette de l\*(Aqarchive au nom de l\*(Aqoption\&. De pr\('ef\('erence, le m\(^eme r\('esultat peut \(^etre obtenu pour des entr\('ees particuli\(`eres de
+\fBsources.list\fR(5)
+en utilisant ici l\*(Aqoption
+\fBValid\-Until\-Max\fR\&.
+.RE
+.PP
+\fBMin\-ValidTime\fR
+.RS 4
+Dur\('ee minimale (en secondes) pendant laquelle un fichier Release est consid\('er\('e comme valable, \(`a partir du moment de sa cr\('eation (tel que cela est indiqu\('e dans l\*(Aqen\-t\(^ete
+Date)\&. Il est conseill\('e d\*(Aqutiliser ce r\('eglage si vous utilisez un miroir mis \(`a jour ponctuellement (par exemple un miroir local) d\*(Aqune archive mise \(`a jour plus fr\('equemment avec un en\-t\(^ete
+Valid\-Until
+plut\(^ot que de d\('esactiver compl\(`etement le contr\(^ole des dates d\*(Aqexpiration\&. Un r\('eglage sp\('ecifique pour une archive donn\('ee peut \(^etre d\('efini en ajoutant l\*(Aq\('etiquette de l\*(Aqarchive au nom de l\*(Aqoption\&. De pr\('ef\('erence, le m\(^eme r\('esultat peut \(^etre obtenu pour des entr\('ees particuli\(`eres de
+\fBsources.list\fR(5)
+en utilisant ici l\*(Aqoption
+\fBValid\-Until\-Min\fR\&.
+.RE
+.PP
+\fBAllowTLS\fR
+.RS 4
+Permet l\*(Aqutilisation de la prise en charge interne de TLS dans la m\('ethode http\&. Si la valeur de l\*(Aqoption est \(Fo\ \&false\ \&\(Fc, cela d\('esactive totalement la prise en charge de TLS dans les m\('ethodes propres d\*(AqApt (\(`a l\*(Aqexclusion de la m\('ethode https bas\('ee sur curl)\&. Plus aucune des fonctions li\('ees \(`a TLS ne peut \(^etre appel\('ee\&.
+.RE
+.PP
+\fBPDiffs\fR
+.RS 4
+Essayer de t\('el\('echarger les fichiers diff\('erentiels appel\('es
+PDiffs
+pour les index (par exemple les fichiers
+Packages), plut\(^ot que de les t\('el\('echarger enti\(`erement\&. Par d\('efaut \(`a \(Fo\ \&true\ \&\(Fc\&. De pr\('ef\('erence, cela peut \(^etre d\('efini pour des entr\('ees particuli\(`eres de
+\fBsources.list\fR(5)
+ou des fichiers d\*(Aqindex en utilisant ici l\*(Aqoption
+\fBPDiffs\fR\&.
+.sp
+Deux sous\-options permettant de limiter l\*(Aqutilisation de fichiers \(Fo\ \&pdiff\ \&\(Fc sont \('egalement disponibles\&.
+FileLimit
+permet d\*(Aqindiquer le nombre maximal de fichiers de diff\('erences peuvent \(^etre t\('el\('echarg\('es pour modifier un fichier\&.
+SizeLimit
+permet par ailleurs de limiter la taille combin\('ee des fichiers de diff\('erences r\('ecup\('er\('es \(`a un certain pourcentage du fichier \(`a modifier\&. Si une de ces limites est d\('epass\('ee, le fichier complet est t\('el\('echarg\('e au lieu de t\('el\('echarger les fichiers de diff\('erences\&.
+.RE
+.PP
+\fBBy\-Hash\fR
+.RS 4
+Essayer de t\('el\('echarger les index avec un URI construit \(`a partir de la somme de hachage du fichier attendu plut\(^ot que de les t\('el\('echarger \(`a partir d\*(Aqun nom de fichier stable bien connu\&. Par d\('efaut \(`a \(Fo\ \&true\ \&\(Fc, mais automatiquement d\('esactiv\('e si la source n\*(Aqindique pas sa prise en charge\&. Son utilisation peut \(^etre forc\('ee avec la valeur sp\('eciale \(Fo\ \&force\ \&\(Fc\&. De pr\('ef\('erence, cela peut \(^etre d\('efini pour des entr\('ees particuli\(`eres de
+\fBsources.list\fR(5)
+ou des fichiers d\*(Aqindex en utilisant ici l\*(Aqoption
+\fBBy\-Hash\fR\&.
+.RE
+.PP
+\fBQueue\-Mode\fR
+.RS 4
+Mode de file d\*(Aqattente\ \&;
+Queue\-Mode
+peut prendre les valeurs
+host
+ou
+access, ce qui d\('etermine comment APT parall\('elise les connexions sortantes\&.
+Host
+signifie qu\*(Aqune connexion par cible sera initi\('ee, tandis que
+access
+signifie qu\*(Aqune connexion par type d\*(AqURI sera initi\('ee\&.
+.RE
+.PP
+\fBRetries\fR
+.RS 4
+Nombre d\*(Aqessais \(`a effectuer\&. Si ce nombre n\*(Aqest pas nul, APT essaie de r\('ecup\('erer, le nombre donn\('e de fois, les fichiers dont la r\('ecup\('eration a \('echou\('e\&.
+.RE
+.PP
+\fBSource\-Symlinks\fR
+.RS 4
+Utilise des liens symboliques pour les archives de sources\&. Positionn\('ee \(`a \(Fo\ \&true\ \&\(Fc, cette option cr\('ee si possible des liens symboliques vers les archives de sources au lieu de les copier\&. Par d\('efaut \(`a \(Fo\ \&true\ \&\(Fc\&.
+.RE
+.PP
+\fBhttp\fR \fBhttps\fR
+.RS 4
+Les options dans ces champs d\*(Aqaction configurent les transports d\*(Aqacquisition d\*(AqAPT pour les protocoles HTTP et HTTPS et sont document\('ees dans les pages de manuel
+\fBapt-transport-http\fR(1)
+et
+\fBapt-transport-https\fR(1)
+respectivement\&.
+.RE
+.PP
+\fBftp\fR
+.RS 4
+ftp::Proxy
+est le mandataire (proxy) FTP \(`a utiliser par d\('efaut pour les URI FTP\&. Il se pr\('esente sous la forme standard\ \&:
+ftp://[[user][:pass]@]host[:port]/\&. On peut sp\('ecifier un mandataire particulier par h\(^ote distant en utilisant la syntaxe\ \&:
+ftp::Proxy::<h\(^ote>\&. Le mot\-cl\('e sp\('ecial
+DIRECT
+indique alors de n\*(Aqutiliser aucun mandataire pour l\*(Aqh\(^ote\&. Si aucun des param\(`etres pr\('ec\('edents n\*(Aqest d\('efinis, la variable d\*(Aqenvironnement
+\fBftp_proxy\fR
+annule et replace toutes les options de mandataire FTP\&. Pour utiliser un mandataire FTP, vous devrez renseigner l\*(Aqentr\('ee
+ftp::ProxyLogin
+dans le fichier de configuration\&. Cette entr\('ee sp\('ecifie les commandes \(`a envoyer au mandataire pour lui pr\('eciser \(`a quoi il doit se connecter\&. Voyez
+/usr/share/doc/apt/examples/configure\-index\&.gz
+pour savoir comment faire\&. Les variables de substitution qui repr\('esentent le composant d\*(AqURI correspondant sont\ \&:
+$(PROXY_USER),
+$(PROXY_PASS),
+$(SITE_USER),
+$(SITE_PASS),
+$(SITE)
+et
+$(SITE_PORT)\&.
+.sp
+L\*(Aqoption
+timeout
+positionne le compteur d\*(Aqexpiration du d\('elai (timeout) utilis\('e par la m\('ethode\&. Cela s\*(Aqapplique aussi bien \(`a la connexion qu\*(Aqaux donn\('ees\&.
+.sp
+Plusieurs options de configuration sont fournies pour contr\(^oler le mode passif\&. Il est g\('en\('eralement plus s\(^ur d\*(Aqactiver le mode passif et cela marche dans presque tous les environnements\&. Cependant, certaines situations n\('ecessitent que le mode passif soit d\('esactiv\('e et que le mode \(Fo\ \&port\ \&\(Fc de ftp soit utilis\('e \(`a la place\&. On peut le faire globalement, pour des connexions qui passent par un mandataire ou pour une machine sp\('ecifique (examinez le mod\(`ele de fichier de configuration)\&.
+.sp
+Il est possible de faire transiter le trafic FTP par un mandataire HTTP en positionnant la variable d\*(Aqenvironnement
+\fBftp_proxy\fR
+\(`a une URL HTTP \-\- consultez la m\('ethode http ci\-dessus pour la syntaxe\&. On ne peut pas le faire dans le fichier de configuration et il n\*(Aqest de toute fa\(,con pas recommand\('e d\*(Aqutiliser FTP au travers de HTTP en raison de la faible efficacit\('e de cette m\('ethode\&.
+.sp
+L\*(Aqoption
+ForceExtended
+contr\(^ole l\*(Aqutilisation des commandes li\('ees \(`a la RFC 2428,
+EPSV
+et
+EPRT\&. Par d\('efaut, elle vaut \(Fo\ \&false\ \&\(Fc ce qui signifie que ces commandes ne sont utilis\('ees que pour une connexion de type IPv6\&. Quand elle vaut \(Fo\ \&true\ \&\(Fc, on les utilise m\(^eme si la connexion est de type IPv4\&. La plupart des serveurs FTP ne suivent pas la RFC 2428\&.
+.RE
+.PP
+\fBcdrom\fR
+.RS 4
+La seule option de configuration pour les URI qui utilisent la m\('ethode
+cdrom
+est le point de montage\ \&:
+cdrom::Mount\ \&; il doit repr\('esenter le point de montage du lecteur de CD\-ROM (ou DVD, etc\&.) indiqu\('e dans
+/etc/fstab\&. D\*(Aqautres commandes de montage et de d\('emontage peuvent \(^etre fournies quand le point de montage ne peut \(^etre list\('e dans le fichier
+/etc/fstab\&. Syntaxiquement, il faut placer
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+/cdrom/::Mount "foo";
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+dans le bloc
+cdrom\&. La barre oblique finale est importante\&. Les commandes de d\('emontage peuvent \(^etre sp\('ecifi\('ees en utilisant
+UMount\&.
+.RE
+.PP
+\fBgpgv\fR
+.RS 4
+La seule option pour les URI GPGV est
+gpgv::Options, qui permet de passer des param\(`etres \(`a gpgv
+.RE
+.PP
+\fBCompressionTypes\fR
+.RS 4
+Cette option indique la liste des types de compression comprises par les m\('ethodes d\*(Aqacquisition\&. Des fichiers comme
+Packages
+peuvent \(^etre disponibles dans divers formats de compression\&. Par d\('efaut, les m\('ethodes d\*(Aqacquisition d\('ecompressent et recompressent dans beaucoup de formats courants les fichiers compress\('es comme avec
+\fBxz\fR
+et
+\fBgzip\fR\ \&; ce champ d\*(Aqaction permet de rechercher les formats pris en charge ou de les modifier, et l\*(Aqajout de prise en charge de formats suppl\('ementaires est aussi possible (voir aussi
+\fBAPT::Compressor\fR)\&. La syntaxe \(`a utiliser est\ \&:\ \&
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+Acquire::CompressionTypes::\fIExtensionFichier\fR "\fINomMethode\fR";
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+Le sous\-groupe
+Order
+peut \(^etre \('egalement utilis\('e pour d\('efinir l\*(Aqordre dans lequel le syst\(`eme d\*(Aqacquisition tentera de t\('el\('echarger les fichiers compress\('es\&. Le premier syst\(`eme mentionn\('e sera essay\('e en premier, puis le suivant en cas d\*(Aq\('echec\&. Ainsi, pour privil\('egier un format par rapport \(`a un autre, il suffit de le placer en premier dans cette liste\&. Les types qui ne sont pas d\('ej\(`a indiqu\('es seront ajout\('es implicitement \(`a la fin de la liste\&. Ainsi, par exemple,
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+Acquire::CompressionTypes::Order:: "gz";
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+peut \(^etre utilis\('e pour pr\('ef\('erer les fichiers compress\('es avec
+\fBgzip\fR
+par rapport \(`a tous les autres formats de compression\&. Si l\*(Aqobjectif est d\*(Aqutiliser
+\fBxz\fR
+en priorit\('e par rapport \(`a
+\fBgzip\fR
+et
+\fBbzip2\fR, ce r\('eglage doit ressembler \(`a
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+Acquire::CompressionTypes::Order { "xz"; "gz"; };
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+\&. Il est inutile d\*(Aqajouter explicitement
+bz2
+\(`a liste car il sera ajout\('e automatiquement\&.
+.sp
+Veuillez noter que
+Dir::Bin::\fINomMethode\fR
+sera contr\(^ol\('e \(`a l\*(Aqex\('ecution\ \&: si cette option est utilis\('ee et que la prise en charge de ce format n\*(Aqest pas construite dans APT, la m\('ethode ne sera utilis\('ee que si ce fichier existe\&. Ainsi, pour la m\('ethode
+bzip2, le r\('eglage (utilis\('e en interne) est
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+Dir::Bin::bzip2 "/bin/bzip2";
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+\&. Veuillez \('egalement noter que les \('el\('ements de liste indiqu\('es \(`a la ligne de commande seront ajout\('es \(`a la fin de la liste indiqu\('ee dans les fichiers de configuration, mais avant les valeurs par d\('efaut\&. Dans ce cas, pour \('etablir une pr\('ef\('erence par rapport aux types mentionn\('es dans les fichiers de configuration, il est possible de placer l\*(Aqoption directement, pas sous forme de liste\&. Cela ne remplacera pas la liste par d\('efaut mais elle sera simplement pr\('efix\('ee avec l\*(Aqoption en question\&.
+.sp
+Le type sp\('ecial
+uncompressed
+peut servir \(`a donner la pr\('ef\('erence aux fichiers non compress\('es\&. Veuillez noter que la plupart des archives ne fournissent pas de fichiers non compress\('es, donc ce r\('eglage est surtout destin\('e aux miroirs locaux\&.
+.RE
+.PP
+\fBGzipIndexes\fR
+.RS 4
+Lorsque des index compress\('es par gzip doivent \(^etre utilis\('es (pour les fichiers Packages, Sources, Translations), ceux\-ci seront compress\('es avec gzip au lieu d\*(Aq\(^etre laiss\('es d\('ecompress\('es\&. Cela peut permettre de gagner beaucoup d\*(Aqespace disque au prix d\*(Aqune utilisation plus importante du processeur lorsque les caches locaux sont cr\('e\('es\&. Valeur par d\('efaut\ \&:\ \&Faux (\(Fo\ \&False\ \&\(Fc)\&.
+.RE
+.PP
+\fBLanguages\fR
+.RS 4
+La sous\-section \(Fo\ \&Languages\ \&\(Fc contr\(^ole quels fichiers
+Translation
+sont t\('el\('echarg\('es et dans quel ordre APT les utilisera pour afficher les traductions de descriptions\&. APT recherchera d\*(Aqabord la premi\(`ere traduction disponible pour le champ Description dans la langue choisie en premier\&. Les langues peuvent \(^etre indiqu\('ees par leur code long ou court\&. Veuillez noter que tous les d\('ep\(^ots ne fournissent pas les fichiers
+Translation
+pour toutes les langues, les codes longs de langues \('etant particuli\(`erement rares\&.
+.sp
+La liste par d\('efaut contient \(Fo\ \&environment\ \&\(Fc et \(Fo\ \&en\ \&\(Fc\&. La valeur \(Fo\ \&environment\ \&\(Fc a une signification sp\('eciale\ \&: elle sera remplac\('ee, \(`a l\*(Aqex\('ecution, par les codes de langues utilis\('es dans la variable d\*(Aqenvironnement
+LC_MESSAGES\&. Les codes utilis\('es en double ne seront pas inclus deux fois dans la liste\&. Si
+LC_MESSAGES
+contient \(Fo\ \&C\ \&\(Fc, seul le fichier
+Translation\-en
+sera utilis\('e, s\*(Aqil est disponible\&. Pour forcer APT \(`a n\*(Aqutiliser aucun fichier de traduction, il est n\('ecessaire d\*(Aqutiliser le r\('eglage
+Acquire::Languages=none\&. La valeur \(Fo\ \&none\ \&\(Fc a une signification sp\('eciale et indique de ne rechercher aucun fichier
+Translation\&. Cela indique \(`a APT de t\('el\('echarger ces traductions, sans n\('ecessairement les utiliser sauf si la variable d\*(Aqenvironnement indique ces langues\&. Ainsi, dans l\*(Aqexemple qui suit, l\*(Aqordre utilis\('e sera \(Fo\ \&en, fr\ \&\(Fc si dans un environnement configur\('e pour l\*(Aqanglais et \(Fo\ \&fr, en\ \&\(Fc pour un environnement configur\('e en fran\(,cais\&. Les fichiers pour l\*(Aqallemand seront \('egalement t\('el\('echarg\('es mais ne sont utilis\('es que dans un environnement configur\('e pour l\*(Aqallemand\&. Dans ce dernier cas, l\*(Aqordre est alors \(Fo\ \&de, fr, en\ \&\(Fc\&.
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+Acquire::Languages { "environment"; "fr"; "en"; "none"; "de"; };
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+Note\ \&: afin d\*(Aq\('eviter des probl\(`emes lorsqu\*(AqAPT est ex\('ecut\('e dans diff\('erents environnements (p\&.\ \&ex\&. par diff\('erents utilisateurs ou diff\('erents programmes), tous les fichiers \(Fo\ \&Translation\ \&\(Fcqui sont trouv\('es dans
+/var/lib/apt/lists/
+seront ajout\('es \(`a la fin de la liste (apr\(`es un \(Fo\ \&none\ \&\(Fc implicite)\&.
+.RE
+.PP
+\fBForceIPv4\fR
+.RS 4
+Utilisation impos\('ee du protocole IPv4 lors des t\('el\('echargements\&.
+.RE
+.PP
+\fBForceIPv6\fR
+.RS 4
+Utilisation impos\('ee du protocole IPv6 lors des t\('el\('echargements\&.
+.RE
+.PP
+\fBMaxReleaseFileSize\fR
+.RS 4
+La taille maximale des fichiers Release/Release\&.gpg/InRelease\&. La taille par d\('efaut est 10\ \&Mo\&.
+.RE
+.PP
+\fBEnableSrvRecords\fR
+.RS 4
+Cette option v\('erifie si APT utilisera l\*(Aqentr\('ee de serveur DNS SRV telle que d\('efinie dans la RFC\ \&2782 pour choisir un serveur alternatif auquel se connecter\&. La valeur par d\('efaut est \(Fo\ \&true\ \&\(Fc\&.
+.RE
+.PP
+\fBAllowInsecureRepositories\fR
+.RS 4
+Autoriser les op\('erations de mise \(`a jour \(`a charger des fichiers de donn\('ees \(`a partir de d\('ep\(^ots sans informations de s\('ecurit\('e suffisantes\&. La valeur par d\('efaut est \(Fo\ \&false\ \&\(Fc\&. Le concept, les implications ainsi que les alternatives sont d\('etaill\('es dans
+\fBapt-secure\fR(8)\&.
+.RE
+.PP
+\fBAllowWeakRepositories\fR
+.RS 4
+Autoriser les op\('erations de mise \(`a jour \(`a charger des fichiers de donn\('ees \(`a partir de d\('ep\(^ots qui fournissent des informations de s\('ecurit\('e, mais qui ne sont plus consid\('er\('es comme suffisamment robustes sur le plan de la cryptographie\&. La valeur par d\('efaut est \(Fo\ \&false\ \&\(Fc\&. Le concept, les implications ainsi que les alternatives sont d\('etaill\('es dans
+\fBapt-secure\fR(8)\&.
+.RE
+.PP
+\fBAllowDowngradeToInsecureRepositories\fR
+.RS 4
+Permettre qu\*(Aqun d\('ep\(^ot qui \('etait auparavant sign\('e par pgp devienne non sign\('e durant l\*(Aqop\('eration de la mise \(`a jour\&. Quand il n\*(Aqy a pas de signature valable pour un ancien d\('ep\(^ot de confiance, APT refusera la mise \(`a jour\&. Cette option peut \(^etre utilis\('ee pour contourner cette protection\&. Vous ne souhaiterez presque certainement jamais activer cette option\&. La valeur pas d\('efaut est \(Fo\ \&false\ \&\(Fc\&. Le concept, les implications ainsi que les alternatives sont d\('etaill\('es dans
+\fBapt-secure\fR(8)\&.
+.RE
+.PP
+\fBChangelogs::URI\fR champ d\*(Aqaction
+.RS 4
+La r\('ecup\('eration des journaux des modifications n\*(Aqest possible que si l\*(AqURI o\(`u les t\('el\('echarger est connu\&. De pr\('ef\('erence, le fichier Release l\*(Aqindique dans un champ \(Fo\ \&Changelogs\ \&\(Fc\&. S\*(Aqil n\*(Aqest pas disponible, les champs Label ou Origine du fichier Release sont utilis\('es pour v\('erifier si les options
+Acquire::Changelogs::URI::Label::\fILABEL\fR
+ou
+Acquire::Changelogs::URI::Origin::\fIORIGINE\fR
+existent, et si c\*(Aqest le cas, cette valeur est prise\&. La valeur dans le fichier Release peut \(^etre contourn\('ee par
+Acquire::Changelogs::URI::Override::Label::\fILABEL\fR
+ou
+Acquire::Changelogs::URI::Override::Origin::\fIORIGINE\fR\&. La valeur devrait \(^etre un URI normal vers un fichier texte, \(`a l\*(Aqexception que les donn\('ees sp\('ecifiques du paquet sont remplac\('ees par le param\(`etre
+@CHANGEPATH@\&. Sa valeur est la suivante\ \&: 1\&. si le paquet provient d\*(Aqun composant (par exemple
+main) il constitue la premi\(`ere partie, sinon elle est omise\ \&; 2\&. est la premi\(`ere lettre du nom du paquet source, sauf si le nom du paquet source commence par
+lib
+auquel cas les quatre premi\(`eres lettres seront utilis\('ees\ \&; 3\&. le nom complet du paquet source\ \&; 4\&. le nom complet une fois de plus\ \&; 5\&. la version de la source\&. Les quatres premi\(`eres parties (ou trois si le composant est absent) sont s\('epar\('ees par des barres obliques (\(Fo\ \&/\ \&\(Fc), et les deux derni\(`eres sont s\('epar\('ees par un caract\(`ere de soulignement (\(Fo\ \&_\ \&\(Fc)\&. La valeur sp\('eciale \(Fo\ \&no\ \&\(Fc est disponible pour indiquer que cette source ne peut \(^etre utilis\('ee pour r\('ecup\('erer les fichiers changelog\&. Dans ce cas, une autre source sera essay\('ee\&.
+.RE
+.SH "CONFIGURATION SP\('ECIFIQUE D\*(AQEX\('ECUTABLE"
+.PP
+Particuli\(`erement avec l\*(Aqintroduction de l\*(Aqex\('ecutable
+\fBapt\fR
+il peut \(^etre utile de configurer certaines options seulement pour un ex\('ecutable particulier dans la mesure ou m\(^eme des options qui semblent affecter seulement certains binaires telles que
+\fBAPT::Get::Show\-Versions\fR
+affectent
+\fBapt\-get\fR
+autant qu\*(Aq\fBapt\fR\&.
+.PP
+La configuration d\*(Aqune option pour un ex\('ecutable particulier peut \(^etre r\('ealis\('ee en r\('eglant l\*(Aqoption dans le champ d\*(Aqaction
+\fBBinary::\fR\fB\fIex\('ecutable\-sp\('ecifique\fR\fR\&. Affecter l\*(Aqoption
+\fBAPT::Get::Show\-Versions\fR
+\(`a
+\fBapt\fR
+seulement peut \(^etre fait, par exemple en configurant plut\(^ot
+\fBBinary::apt::APT::Get::Show\-Versions\fR\&.
+.PP
+Veuillez noter que comme cela est indiqu\('e dans la section DESCRIPTION plus haut, il n\*(Aqest pas possible de configurer les options sp\('ecifiques aux ex\('ecutables en ligne de commande ni dans des fichiers de configuration charg\('es par la ligne de commande\&.
+.SH "LES R\('EPERTOIRES"
+.PP
+Les r\('epertoires de la section
+Dir::State
+concernent le syst\(`eme local\&.
+lists
+est le r\('epertoire o\(`u placer les listes de paquets t\('el\('echarg\('es et
+status
+est le nom du fichier d\*(Aq\('etat de
+\fBdpkg\fR(1)\&.
+preferences
+concerne APT\ \&: c\*(Aqest le nom du fichier
+preferences\&.
+Dir::State
+contient le r\('epertoire par d\('efaut pr\('efix\('e \(`a tous les sous\-\('el\('ements, quand ceux\-ci ne commencent pas par
+/
+ou
+\&./\&.
+.PP
+Dir::Cache
+contient les emplacements qui renseignent sur le cache local\ \&: par exemple, les deux caches de paquets
+srcpkgcache
+et
+pkgcache, ainsi que l\*(Aqendroit o\(`u sont plac\('ees les archives t\('el\('echarg\('ees,
+Dir::Cache::archives\&. On peut emp\(^echer la cr\('eation des caches en positionnant
+pkgcache
+ou
+srcpkgcache
+\(`a la valeur
+""\&. Cela ralentit le d\('emarrage mais \('economise de l\*(Aqespace disque\&. Il vaut mieux se passer du cache
+pkgcache
+plut\(^ot que se passer du cache
+srcpkgcache\&. Comme pour
+Dir::State, le r\('epertoire par d\('efaut est contenu dans
+Dir::Cache\&.
+.PP
+Dir::Etc
+contient l\*(Aqemplacement des fichiers de configuration,
+sourcelist
+indique l\*(Aqemplacement de la liste de sources et
+main
+est le fichier de configuration par d\('efaut (le modifier n\*(Aqa aucun effet, \(`a moins qu\*(Aqon ne le modifie avec le fichier de configuration indiqu\('e par la variable
+\fBAPT_CONFIG\fR)\&.
+.PP
+Dir::Parts
+lit, par ordre d\*(Aqentr\('ee, tous les fragments de configuration dans le r\('epertoire indiqu\('e\&. Ensuite, le fichier principal de configuration est charg\('e\&.
+.PP
+Les programmes binaires sont point\('es par
+Dir::Bin\&. L\*(Aqemplacement des gestionnaires de m\('ethodes est indiqu\('e par
+Dir::Bin::Methods\ \&;
+gzip,
+bzip2,
+lzma,
+dpkg,
+apt\-get,
+dpkg\-source,
+dpkg\-buildpackage
+et
+apt\-cache
+indiquent l\*(Aqemplacement des programmes correspondants\&.
+.PP
+L\*(Aqoption de configuration
+RootDir
+a une signification particuli\(`ere\&. Lorsqu\*(Aqelle est d\('efinie, tous les chemins sont consid\('er\('es relativement \(`a
+RootDir,
+\fIm\(^eme les chemins sp\('ecifi\('es de mani\(`ere absolue\fR\&. Ainsi par exemple si
+RootDir
+est d\('efini comme
+/tmp/staging, et que chemin du fichier d\*(Aq\('etat
+Dir::State::status
+est d\('eclar\('e comme
+/var/lib/dpkg/status
+alors ce fichier sera cherch\('e dans
+/tmp/staging/var/lib/dpkg/status\&. Si vous souhaitez seulement pr\('efixer des chemins relatifs, d\('efinissez plut\(^ot
+Dir\&.
+.PP
+La liste
+Ignore\-Files\-Silently
+permet d\*(Aqindiquer quels sont les fichiers qu\*(AqAPT peut ignorer sans avertissement dans les r\('epertoires contenant des fragments de configuration\&. Par d\('efaut, les fichiers qui se terminent par
+\&.disabled,
+~,
+\&.bak
+ou
+\&.dpkg\-[a\-z]+
+sont ignor\('es\&. Comme cela est visible dans le dernier \('el\('ement de cette liste, il est possible d\*(Aqutiliser la syntaxe des expressions rationnelles\&.
+.SH "APT ET DSELECT"
+.PP
+Quand APT est utilis\('e comme une m\('ethode de
+\fBdselect\fR(1), plusieurs directives contr\(^olent le comportement par d\('efaut\&. On les trouve dans la section
+DSelect\&.
+.PP
+\fBClean\fR
+.RS 4
+Mode de nettoyage du cache\ \&; cette variable peut prendre l\*(Aqune des valeurs suivantes\ \&: \(Fo\ \&always\ \&\(Fc, \(Fo\ \&prompt\ \&\(Fc, \(Fo\ \&auto\ \&\(Fc, \(Fo\ \&pre\-auto\ \&\(Fc et \(Fo\ \&never\ \&\(Fc\&. \(Fo\ \&always\ \&\(Fc et \(Fo\ \&prompt\ \&\(Fc suppriment tous les paquets du cache apr\(`es la mise \(`a niveau\ \&; \(Fo\ \&prompt\ \&\(Fc (valeur par d\('efaut) les supprime apr\(`es une demande et \(Fo\ \&auto\ \&\(Fc ne supprime que les archives qui ne peuvent plus \(^etre t\('el\('echarg\('ees (remplac\('ees, par exemple, par une nouvelle version)\&. \(Fo\ \&pre\-auto\ \&\(Fc les supprime avant de r\('ecup\('erer de nouveaux paquets\&.
+.RE
+.PP
+\fBoptions\fR
+.RS 4
+Le contenu de cette variable est pass\('e comme options de ligne de commande \(`a
+\fBapt-get\fR(8)
+lors de la phase d\*(Aqinstallation\&.
+.RE
+.PP
+\fBUpdateoptions\fR
+.RS 4
+Le contenu de cette variable est pass\('e comme options de ligne de commande \(`a
+\fBapt-get\fR(8)
+lors de la phase de mise \(`a jour\&.
+.RE
+.PP
+\fBPromptAfterUpdate\fR
+.RS 4
+Si cette option est \(Fo\ \&true\ \&\(Fc, l\*(Aqop\('eration [U]pdate de
+\fBdselect\fR(1)
+interroge toujours l\*(Aqutilisateur avant de continuer\&. Par d\('efaut, ce n\*(Aqest qu\*(Aqen cas d\*(Aqerreur que l\*(Aqon propose \(`a l\*(Aqutilisateur d\*(Aqintervenir\&.
+.RE
+.SH "M\('ETHODE D\*(AQAPPEL DE DPKG(1) PAR APT"
+.PP
+Plusieurs directives de configuration contr\(^olent la mani\(`ere dont APT invoque
+\fBdpkg\fR(1)\ \&: elles figurent dans la section
+DPkg\&.
+.PP
+\fBoptions\fR
+.RS 4
+Il s\*(Aqagit d\*(Aqune liste d\*(Aqoptions \(`a passer \(`a
+\fBdpkg\fR(1)\&. Les options doivent \(^etre d\('eclar\('ees en utilisant la notation de liste et chaque \('el\('ement de la liste est pass\('e comme un seul param\(`etre \(`a
+\fBdpkg\fR(1)\&.
+.RE
+.PP
+\fBPath\fR
+.RS 4
+This is a string that defines the
+\fBPATH\fR
+environment variable used when running dpkg\&. It may be set to any valid value of that environment variable; or the empty string, in which case the variable is not changed\&.
+.RE
+.PP
+\fBPre\-Invoke\fR, \fBPost\-Invoke\fR
+.RS 4
+Il s\*(Aqagit d\*(Aqune liste de commandes shell \(`a ex\('ecuter avant ou apr\(`es l\*(Aqappel de
+\fBdpkg\fR(1)\&. Tout comme pour
+Options, on doit utiliser la notation de liste\&. Les commandes sont appel\('ees dans l\*(Aqordre, en utilisant
+/bin/sh\ \&: APT s\*(Aqarr\(^ete d\(`es que l\*(Aqune d\*(Aqelles \('echoue\&.
+.RE
+.PP
+\fBPre\-Install\-Pkgs\fR
+.RS 4
+Il s\*(Aqagit d\*(Aqune liste de commandes shell \(`a ex\('ecuter avant d\*(Aqappeler
+\fBdpkg\fR(1)\&. Tout comme pour
+Options, on doit utiliser la notation de liste\&. Les commandes sont appel\('ees dans l\*(Aqordre, en utilisant
+/bin/sh\ \&: APT s\*(Aqarr\(^ete d\(`es que l\*(Aqune d\*(Aqelles \('echoue\&. APT transmet aux commandes les noms de tous les fichiers \&.deb qu\*(Aqil va installer, \(`a raison d\*(Aqun par ligne sur le descripteur de fichier demand\('e, par d\('efaut sur l\*(Aqentr\('ee standard\&.
+.sp
+La version\ \&2 de ce protocole envoie plus d\*(Aqinformations \(`a travers le descripteur du fichier requis\ \&: une ligne avec le texte
+VERSION 2, l\*(Aqespace de configuration d\*(AqAPT et une liste d\*(Aqactions de paquet avec le nom de fichier et l\*(Aqinformation de version\&.
+.sp
+Chaque ligne de directive de configuration a la forme
+cl\('e=valeur\&. Les caract\(`eres sp\('eciaux (signes \('egal, fin de ligne, caract\(`eres non imprimables, guillemets et signe pourcentage dans
+cl\('e
+et fin de ligne, caract\(`eres non imprimables et signe pourcentage dans
+valeur) sont %\-encod\('es (encodage URL)\&. Les listes sont repr\('esent\('es par des lignes
+cl\('e::=valeur
+multiples avec la m\(^eme cl\('e\&. Les sections de la configuration se terminent par une ligne vide\&.
+.sp
+Les lignes d\*(Aqaction de paquet consistent en cinq champs dans la version\ \&2\ \&: le nom du paquet (sans qualification d\*(Aqarchitecture, m\(^eme si c\*(Aqest une architecture suppl\('ementaire \(en\ \&\(Fo\ \&foreign\ \&\(Fc), la version ancienne, la direction du changement de version (< pour les mises \(`a niveau, > pour les retours en arri\(`ere, = pour pas de modification), la nouvelle version, l\*(Aqaction\&. Les champs versions sont \(Fo\ \&\-\ \&\(Fc pour pas de version du tout (par exemple lors de la premi\(`ere installation d\*(Aqun paquet\ \&; pas de version est trait\('e comme ant\('erieur \(`a n\*(Aqimporte quelle version r\('eelle, ainsi c\*(Aqest une mise \(`a jour, indiqu\('ee comme
+\- < 1\&.23\&.4)\&. Le champ action est \(Fo\ \&**CONFIGURE**\ \&\(Fc si le paquet est en cours de configuration, \(Fo\ \&**REMOVE**\ \&\(Fc s\*(Aqil est en cours de suppression, ou bien le nom d\*(Aqun fichier \&.deb s\*(Aqil est en cours de d\('epaquetage\&.
+.sp
+Dans la Version\ \&3, apr\(`es chaque champ version, se trouve l\(cqarchitecture de cette version qui est \(Fo\ \&\-\ \&\(Fc s\*(Aqil n\*(Aqy a pas de version, puis un champ montrant le type MultiArch \(Fo\ \&same\ \&\(Fc, \(Fo\ \&foreign\ \&\(Fc, \(Fo\ \&allowed\ \&\(Fc ou \(Fo\ \&none\ \&\(Fc\&. Veuillez noter que \(Fo\ \&none\ \&\(Fc est un nom de type incorrect qui est juste conserv\('e pour des raisons de compatibilit\('e, il devrait \(^etre lu comme \(Fo\ \&no\ \&\(Fc et les utilisateurs sont encourag\('es \(`a prendre en charge les deux\&.
+.sp
+La version du protocole qu\*(Aqil faut utiliser pour la commande
+\fIcmd\fR
+peut \(^etre choisie en r\('eglant
+DPkg::Tools::options::\fIcmd\fR::Version
+en cons\('equence, la version par d\('efaut \('etant la premi\(`ere\&. Si APT ne g\(`ere pas la version demand\('ee, il enverra les informations dans la version la plus haute qu\*(Aqil g\(`ere\&.
+.sp
+Le descripteur de fichier \(`a utiliser pour l\*(Aqenvoi des informations peut \(^etre demand\('e avec l\*(Aqoption
+DPkg::Tools::options::\fIcmd\fR::InfoFD
+qui est par d\('efaut
+0
+comme entr\('ee standard\ \&; l\*(Aqoption est disponible depuis la version\ \&0\&.9\&.11\&. La prise en charge de l\*(Aqoption peut \(^etre d\('etect\('ee en regardant la variable d\*(Aqenvironnement
+\fBAPT_HOOK_INFO_FD\fR
+qui contient comme confirmation le num\('ero du descripteur de fichier utilis\('e\&.
+.RE
+.PP
+\fBRun\-Directory\fR
+.RS 4
+APT se place dans ce r\('epertoire avant d\*(Aqappeler
+\fBdpkg\fR(1)\ \&; par d\('efaut, c\*(Aqest le r\('epertoire
+/\&.
+.RE
+.PP
+\fBBuild\-options\fR
+.RS 4
+Ces options sont pass\('ees \(`a
+\fBdpkg-buildpackage\fR(1)
+lors de la compilation des paquets\ \&; par d\('efaut la signature est d\('esactiv\('ee et tous les binaires sont cr\('e\('es\&.
+.RE
+.PP
+\fBDPkg::ConfigurePending\fR
+.RS 4
+Si cette option est choisie, APT lancera
+\fBdpkg \-\-configure \-\-pending\fR
+pour laisser
+\fBdpkg\fR(1)
+g\('erer les configurations de paquets et les actions diff\('er\('ees\&. Cette option est automatiquement activ\('ee\&. Il peut par contre \(^etre utile de la d\('esactiver pour lancer APT plusieurs fois successives, par exemple quand il est utilis\('e depuis un outil d\*(Aqinstallation\&. Dans ce cas, seul le dernier de tous les appels successifs peut conserver l\*(Aqoption active\&.
+.RE
+.SH "OPTIONS \(Fo\ \&PERIODIC\ \&\(Fc ET \(Fo\ \&ARCHIVE\ \&\(Fc"
+.PP
+Les groupes d\*(Aqoptions
+APT::Periodic
+et
+APT::Archive
+configurent les comportements p\('eriodiques r\('ealis\('es par le script
+/usr/lib/apt/apt\&.systemd\&.daily, lanc\('e quotidiennement\&.
+.SH "LES OPTIONS DE D\('EBOGAGE"
+.PP
+Les options de la section
+Debug::
+servent soit \(`a provoquer l\*(Aqaffichage d\*(Aqinformations de d\('ebogage sur la sortie d\*(Aqerreur standard du programme qui utilise les biblioth\(`eques APT, soit \(`a activer des modes de fonctionnement sp\('eciaux qui sont principalement utiles pour d\('eboguer le comportement de
+APT\&. La plupart de ces options n\*(Aqont pas d\*(Aqint\('er\(^et pour un utilisateur normal, mais certaines peuvent tout de m\(^eme \(^etre utiles\ \&:
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Debug::pkgProblemResolver
+affiche d\*(Aqint\('eressantes informations sur les d\('ecisions prises par les commandes
+dist\-upgrade, upgrade, install, remove et purge\&.
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Debug::NoLocking
+d\('esactive le verrouillage de fichier de mani\(`ere \(`a ce qu\*(AqAPT puisse effectuer quelques op\('erations (telles que
+apt\-get \-s install) sans avoir les privil\(`eges du superutilisateur\&.
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Debug::pkgDPkgPM
+affiche la ligne de commande \(`a chaque appel de
+\fBdpkg\fR(1)\&.
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+
+Debug::IdentCdrom
+d\('esactive l\*(Aqinclusion de donn\('ees de type statfs dans les identifiants de CD\&.
+.RE
+.PP
+Liste compl\(`ete des options de d\('ebogage de APT\ \&:
+.PP
+\fBDebug::Acquire::cdrom\fR
+.RS 4
+Affiche les informations concernant les sources de type
+cdrom://
+.RE
+.PP
+\fBDebug::Acquire::ftp\fR
+.RS 4
+Affiche les informations concernant le t\('el\('echargement de paquets par FTP\&.
+.RE
+.PP
+\fBDebug::Acquire::http\fR
+.RS 4
+Affiche les informations concernant le t\('el\('echargement de paquets par HTTP\&.
+.RE
+.PP
+\fBDebug::Acquire::https\fR
+.RS 4
+Print information related to downloading packages using HTTPS\&.
+.RE
+.PP
+\fBDebug::Acquire::gpgv\fR
+.RS 4
+Affiche les informations relatives \(`a la v\('erification de signatures cryptographiques avec
+gpg\&.
+.RE
+.PP
+\fBDebug::aptcdrom\fR
+.RS 4
+Affiche des informations concernant l\*(Aqacc\(`es aux collections de paquets stock\('ees sur CD\&.
+.RE
+.PP
+\fBDebug::BuildDeps\fR
+.RS 4
+D\('ecrit le processus de r\('esolution des d\('ependances pour la construction de paquets source (\ \&\(Fo\ \&build\-dependencies\ \&\(Fc\ \&) par
+\fBapt-get\fR(8)\&.
+.RE
+.PP
+\fBDebug::Hashes\fR
+.RS 4
+Affiche toutes les cl\('es de hachage cryptographiques cr\('e\('ees par les librairies d\*(Aqapt\&.
+.RE
+.PP
+\fBDebug::IdentCDROM\fR
+.RS 4
+D\('esactive l\*(Aqinclusion des donn\('ees de type
+statfs
+pour la g\('en\('eration des identifiants de CD, c\*(Aqest\-\(`a\-dire le nombre de blocs libres et utilis\('es sur le syst\(`eme de fichier du CD\&.
+.RE
+.PP
+\fBDebug::NoLocking\fR
+.RS 4
+D\('esactive le verrouillage de fichiers\&. Cela permet par exemple de lancer deux instances de
+\(Fo\ \&apt\-get update\ \&\(Fc
+en m\(^eme temps\&.
+.RE
+.PP
+\fBDebug::pkgAcquire\fR
+.RS 4
+Trace les ajouts et suppressions d\*(Aq\('el\('ements de la queue globale de t\('el\('echargement\&.
+.RE
+.PP
+\fBDebug::pkgAcquire::Auth\fR
+.RS 4
+Affiche les d\('etails de la v\('erification des sommes de contr\(^ole et des signatures cryptographiques des fichiers t\('el\('echarg\('es, ainsi que les erreurs \('eventuelles\&.
+.RE
+.PP
+\fBDebug::pkgAcquire::Diffs\fR
+.RS 4
+Affiche les informations de t\('el\('echargement et de prise en compte des fichiers diff\('erentiels des indexes de paquets, ainsi que les erreurs \('eventuelles\&.
+.RE
+.PP
+\fBDebug::pkgAcquire::RRed\fR
+.RS 4
+Affiche les d\('etails de l\*(Aqapplication des fichiers de diff\('erences aux listes de paquets d\*(AqAPT quand ces fichiers de diff\('erences sont t\('el\('echarg\('es \(`a la place des fichiers complets\&.
+.RE
+.PP
+\fBDebug::pkgAcquire::Worker\fR
+.RS 4
+Affiche toutes les interactions avec les processus enfants qui se chargent effectivement des t\('el\('echargements\&.
+.RE
+.PP
+\fBDebug::pkgAutoRemove\fR
+.RS 4
+Affiche les changements concernant le marquage des paquets comme install\('es automatiquement, et la suppression des paquets inutiles\&.
+.RE
+.PP
+\fBDebug::pkgDepCache::AutoInstall\fR
+.RS 4
+Cr\('ee les informations de d\('ebogage d\('ecrivant quels paquets sont install\('es automatiquement pour satisfaire les d\('ependances\&. Cela concerne la passe initiale d\*(Aqinstallation automatique effectu\('ee par exemple par
+apt\-get install
+et pas le syst\(`eme de r\('esolution de d\('ependances complet de APT\ \&; voir
+Debug::pkgProblemResolver
+pour ce dernier\&.
+.RE
+.PP
+\fBDebug::pkgDepCache::Marker\fR
+.RS 4
+Cr\('ee les informations de d\('ebogage d\('ecrivant quels paquets sont gard\('es/install\('es/supprim\('es pendant le travail de l\*(Aqoutil de r\('esolution de probl\(`emes\&. Chaque ajout ou suppression peut impliquer des actions suppl\('ementaires\ \&;\ \&elles sont alors indiqu\('ees avec une indentation de deux espaces de plus que l\*(Aqaction qui les a d\('eclench\('ees\&. Le format de chaque ligne est
+MarkKeep,
+MarkDelete
+ou
+MarkInstall
+suivi de
+nom\-paquet <a\&.b\&.c \-> d\&.e\&.f | x\&.y\&.z> (section)
+o\(`u
+a\&.b\&.c
+est la version actuelle du paquet,
+d\&.e\&.f
+la version devant \(^etre install\('ee et
+x\&.y\&.z
+une version plus r\('ecente qui n\*(Aqest pas pr\('evue pour \(^etre install\('ee (\(`a cause d\*(Aqun score plus faible)\&. Ces deux derniers \('el\('ements peuvent ne pas \(^etre mentionn\('es s\*(Aqils ne sont pas pertinents o\(`u lorsque ils sont identiques \(`a la version install\('ee\&.
+section
+est le nom de la section o\(`u figure le paquet\&.automatiquement pour satisfaire les d\('ependances\&. Cela concerne la passe initiale d\*(Aqinstallation automatique effectu\('ee par exemple par
+apt\-get install
+et pas le syst\(`eme de r\('esolution de d\('ependances complet de APT\ \&; voir
+Debug::pkgProblemResolver
+pour ce dernier\&.
+.RE
+.PP
+\fBDebug::pkgDPkgPM\fR
+.RS 4
+Affiche la commande exacte d\*(Aqinvocation de
+\fBdpkg\fR(1)
+\(`a chaque appel\ \&; les param\(`etres sont s\('epar\('es par des espaces\&.
+.RE
+.PP
+\fBDebug::pkgDPkgProgressReporting\fR
+.RS 4
+Affiche l\*(Aqensemble des informations re\(,cues de
+\fBdpkg\fR(1)
+par l\*(Aqinterm\('ediaire du descripteur de fichier d\*(Aq\('etat, et les \('eventuelles erreurs d\*(Aqanalyse de ce fichier\&.
+.RE
+.PP
+\fBDebug::pkgOrderList\fR
+.RS 4
+Affiche les \('etapes de l\*(Aqalgorithme utilis\('e pour choisir l\*(Aqordre dans lequel
+apt
+passe les paquets \(`a
+\fBdpkg\fR(1)\&.
+.RE
+.PP
+\fBDebug::pkgPackageManager\fR
+.RS 4
+Affiche le d\('etail des op\('erations li\('ees \(`a l\*(Aqinvocation de
+\fBdpkg\fR(1)\&.
+.RE
+.PP
+\fBDebug::pkgPolicy\fR
+.RS 4
+Affiche, au lancement, la priorit\('e de chaque liste de paquets\&.
+.RE
+.PP
+\fBDebug::pkgProblemResolver\fR
+.RS 4
+Affiche la trace d\*(Aqex\('ecution du syst\(`eme de r\('esolution de d\('ependances (ne concerne que les cas o\(`u un probl\(`eme de d\('ependances complexe se pr\('esente)\&.
+.RE
+.PP
+\fBDebug::pkgProblemResolver::ShowScores\fR
+.RS 4
+Affiche la liste de tous les paquets install\('es avec leur score calcul\('e par l\*(Aqoutil de r\('esolution de probl\(`emes\&. La description du paquet est celle qui est d\('ecrite dans
+Debug::pkgDepCache::Marker\&.
+.RE
+.PP
+\fBDebug::sourceList\fR
+.RS 4
+Affiche les fournisseurs d\('eclar\('es dans le fichier
+/etc/apt/vendors\&.list\&.
+.RE
+.PP
+\fBDebug::RunScripts\fR
+.RS 4
+Affiche les commandes externes qui sont appel\('es par le point d\*(Aqentr\('ee apt\&. Cela inclut par exemple les options de configuration
+DPkg::{Pre,Post}\-Invoke
+ou
+APT::Update::{Pre,Post}\-Invoke\&.
+.RE
+.SH "EXEMPLES"
+.PP
+Le fichier
+/usr/share/doc/apt/examples/configure\-index\&.gz
+contient un mod\(`ele de fichier montrant des exemples pour toutes les options existantes\&.
+.SH "FICHIERS"
+.PP
+/etc/apt/apt\&.conf
+.RS 4
+Fichier de configuration d\*(AqAPT\&. \('El\('ement de configuration\ \&:
+Dir::Etc::Main\&.
+.RE
+.PP
+/etc/apt/apt\&.conf\&.d/
+.RS 4
+Fragments du fichier de configuration d\*(AqAPT\&. \('El\('ement de configuration\ \&:
+Dir::Etc::Parts\&.
+.RE
+.SH "VOIR AUSSI"
+.PP
+
+\fBapt-cache\fR(8),
+\fBapt-config\fR(8),
+\fBapt_preferences\fR(5)\&.
+.SH "BOGUES"
+.PP
+\m[blue]\fBPage des bogues d\*(AqAPT\fR\m[]\&\s-2\u[1]\d\s+2\&. Si vous souhaitez signaler un bogue \(`a propos d\*(AqAPT, veuillez lire
+/usr/share/doc/debian/bug\-reporting\&.txt
+ou utiliser la commande
+\fBreportbug\fR(1)\&.
+.SH "TRADUCTEURS"
+.PP
+J\('er\(^ome Marant, Philippe Batailler, Christian Perrier
+<bubulle@debian\&.org>
+(2000, 2005, 2009, 2010), \('Equipe de traduction francophone de Debian
+<debian\-l10n\-french@lists\&.debian\&.org>
+.PP
+Veuillez noter que cette traduction peut contenir des parties non traduites\&. Cela est volontaire, pour \('eviter de perdre du contenu quand la traduction est l\('eg\(`erement en retard sur le contenu d\*(Aqorigine\&.
+.SH "AUTEURS"
+.PP
+\fBJason Gunthorpe\fR
+.RS 4
+.RE
+.PP
+\fB\('Equipe de d\('eveloppement d\*(AqAPT\fR
+.RS 4
+.RE
+.PP
+\fBDaniel Burrows\fR <\&dburrows@debian\&.org\&>
+.RS 4
+Documentation initiale de Debug::*\&.
+.RE
+.SH "NOTES"
+.IP " 1." 4
+Page des bogues d'APT
+.RS 4
+\%http://bugs.debian.org/src:apt
+.RE

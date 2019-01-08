@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>第3章 DSelect</title>
+    <meta name="generator" content="DocBook XSL Stylesheets V1.79.1"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="home" href="index.html" title="APT ユーザガイド"/>
+    <link rel="up" href="index.html" title="APT ユーザガイド"/>
+    <link rel="prev" href="ch2.html" title="第2章 apt-get"/>
+    <link rel="next" href="ch4.html" title="第4章 インターフェース"/>
+  </head>
+  <body>
+    <div class="navheader">
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">第3章 DSelect</th>
+        </tr>
+        <tr>
+          <td align="left"><a accesskey="p" href="ch2.html">戻る</a> </td>
+          <th width="60%" align="center"> </th>
+          <td align="right"> <a accesskey="n" href="ch4.html">次へ</a></td>
+        </tr>
+      </table>
+      <hr/>
+    </div>
+    <div class="chapter">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h1 class="title"><a id="ch3"/>第3章 DSelect</h1>
+          </div>
+        </div>
+      </div>
+      <p>
+APT の <span class="command"><strong>dselect</strong></span> メソッドは <span class="command"><strong>dselect</strong></span> パッケージ選択
+GUI を使った完全な APT システムを提供します。インストールや削除するパッケージの選択には <span class="command"><strong>dselect</strong></span>
+を使い、実際のインストールは APT が行います。
+</p>
+      <p>
+APT メソッドを有効にするには、<span class="command"><strong>dselect</strong></span> でアクセス(a) を選択し、それから APT
+メソッドを選択する必要があります。そうするとアーカイブの取得先の場所となる<span class="emphasis"><em>ソース</em></span>群を聞かれます。これにはリモートのインターネットサイトやローカルの
+Debian ミラー、CD-ROM を指定できます。各ソースで Debian アーカイブ全体のうちの一部を提供でき、APT
+は自動的に組み合わせてパッケージ群一式を構成します。CD-ROM
+がある場合はまずそれを指定し、それからミラーを指定するのが良い方法で、そうすることで最新のバグ修正にアクセスできるようになります。APT
+はインターネットからダウンロードする前に CD-ROM にあるパッケージを自動的に利用します。
+</p>
+      <pre class="screen">
+   ディストリビューションソース位置一覧の準備
+
+ Debian ディストリビューションの基底 URL を指定してください。
+ 認識できるアクセス方法: http file
+
+ 例:
+      file:/mnt/debian,
+      ftp://ftp.debian.org/debian,
+      http://ftp.de.debian.org/debian,
+
+
+ URL [http://llug.sep.bnl.gov/debian]:
+</pre>
+      <p>
+<span class="emphasis"><em>ソース</em></span>の準備は基礎となる Debian アーカイブの質問から始まり、デフォルトは HTTP
+ミラーとなっています。その次は取得するディストリビューションを質問します。
+</p>
+      <pre class="screen">
+ 取得するディストリビューションのタグやパッケージファイルへのパスを
+ / で終える形式で指定してください。ディストリビューションのタグには
+ 以下のようなものがあります: stable unstable testing non-US
+
+ ディストリビューション [stable]:
+</pre>
+      <p>
+ディストリビューションはアーカイブ中の Debian バージョンを参照し、<span class="emphasis"><em>stable</em></span>
+は最新のリリース版を、<span class="emphasis"><em>unstable</em></span>
+は開発版を参照します。<span class="emphasis"><em>non-US</em></span>
+は一部のミラーでのみ利用可能で、合衆国からの輸出ができない暗号化技術その他のものを収録するパッケージを参照します。ただしこういったパッケージの合衆国への輸入は合法です。
+</p>
+      <pre class="screen">
+ 取得するコンポーネントを指定してください
+ コンポーネントには以下のようなものがあります: main contrib non-free
+
+ コンポーネント [main contrib non-free]:
+</pre>
+      <p>
+コンポーネント一覧は取得するサブディストリビューションの一覧を参照します。このディストリビューションはソフトウェアのライセンスを基にして分けられています。main
+にあるのは DFSG フリーのパッケージですが contrib や non-free
+には利用目的や配布形態に様々な制限を課せられているものが収録されています。
+</p>
+      <p>
+ソースはいくらでも追加できます。準備スクリプトは必要なソースを全て指定するまで聞き続けます。
+</p>
+      <p>
+<span class="command"><strong>dselect</strong></span> を使う前にメニューから更新(u)を選択して利用可能なパッケージ一覧を更新する必要があります。これは
+<code class="literal">apt-get update</code> の上位集合で、取得した情報を <span class="command"><strong>dselect</strong></span>
+から利用できるようにします。以前に <code class="literal">apt-get update</code>
+を実行していても更新(u)を実行する必要があります。
+</p>
+      <p>
+その後は選択(s)を使って選択し、導入(i)を使ってインストールします。APT
+メソッドを使っている場合は設定(c)や削除(r)コマンドに意味はなく、導入(i)コマンドがその両方を実行します。
+</p>
+      <p>
+デフォルトで APT はインストールに成功したパッケージ (.deb) ファイルを自動的に削除します。この挙動を変更するには
+/etc/apt/apt.conf 中に <code class="literal">Dselect::clean "prompt";</code> と記述します。
+</p>
+    </div>
+    <div class="navfooter">
+      <hr/>
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td align="left"><a accesskey="p" href="ch2.html">戻る</a> </td>
+          <td align="center"> </td>
+          <td align="right"> <a accesskey="n" href="ch4.html">次へ</a></td>
+        </tr>
+        <tr>
+          <td align="left" valign="top">第2章 apt-get </td>
+          <td align="center">
+            <a accesskey="h" href="index.html">ホーム</a>
+          </td>
+          <td align="right" valign="top"> 第4章 インターフェース</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

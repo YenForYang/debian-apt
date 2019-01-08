@@ -1,0 +1,702 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+  "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % aptent SYSTEM "apt.ent"> %aptent;
+<!ENTITY % aptverbatiment SYSTEM "apt-verbatim.ent"> %aptverbatiment;
+<!ENTITY % aptvendor SYSTEM "apt-vendor.ent"> %aptvendor;
+]>
+
+<refentry>
+
+ <refentryinfo>
+   <!-- The last update date -->
+&apt-author.jgunthorpe;
+   &apt-author.team;
+   &apt-email;
+   &apt-product;
+   
+   <date>2018-10-14T00:00:00Z</date>
+ </refentryinfo>
+ 
+ <refmeta>
+   <refentrytitle>apt-get</refentrytitle>
+   <manvolnum>8</manvolnum>
+   <refmiscinfo class="manual">APT</refmiscinfo>
+ </refmeta>
+ 
+ 
+ <!-- Man page title -->
+<refnamediv>
+    <refname>apt-get</refname>
+    <refpurpose>APT gereedschap voor het behandelen van pakketten -- commandoregelinterface</refpurpose>
+ </refnamediv>
+
+ &synopsis-command-apt-get;
+
+ <refsect1><title>Omschrijving</title>
+   <para><command>apt-get</command> is het gereedschap voor de commandoregel voor het
+behandelen van pakketten. Het kan door de gebruiker beschouwd worden als
+zijn "backend" (het basisinstrument) voor andere gereedschappen die gebruik
+maken van de bibliotheek van APT. Er bestaan verschillende "front-end"
+interfaces, zoals &aptitude;, &synaptic; en &wajig;.</para>
+
+   <para>Tenzij de optie <option>-h</option>, of <option>--help</option> opgegeven
+werd, moet een van de onderstaande commando's gebruikt worden.</para>
+   
+   <variablelist>
+     <varlistentry><term><option>update</option></term>
+     <listitem><para><literal>update</literal> wordt gebruikt om de indexbestanden van
+beschikbare pakketten terug te synchroniseren met hun pakketbronnen. De
+indexen worden opgehaald van de locatie(s) die in
+<filename>/etc/apt/sources.list</filename> opgegeven werden. Indien
+bijvoorbeeld een Debian-archief gebruikt wordt, zal dit commando de
+bestanden <filename>Packages.gz</filename> ophalen en doorzoeken zodat de
+informatie over nieuwe en bijgewerkte pakketten beschikbaar wordt. Een
+<literal>update</literal> moet altijd uitgevoerd worden voor een
+<literal>upgrade</literal> of een <literal>dist-upgrade</literal>. U moet er
+rekening mee houden dat de globale voortgangsindicator niet betrouwbaar is,
+aangezien de grootte van de pakketbestanden vooraf niet gekend is.</para></listitem>
+     </varlistentry>
+     
+     <varlistentry><term><option>upgrade</option></term>
+     <listitem><para><literal>upgrade</literal> wordt gebruikt om vanaf de pakketbronnen die in
+het bestand <filename>/etc/apt/sources.list</filename> vermeld worden, de
+recentste versies te installeren van alle pakketten die momenteel op het
+systeem geïnstalleerd zijn. Pakketten waarvan een recentere versie
+beschikbaar is, worden opgehaald en bijgewerkt. Onder geen beding worden
+pakketten die momenteel geïnstalleerd zijn, verwijderd of worden pakketten
+die nog niet geïnstalleerd zijn, opgehaald en geïnstalleerd. Recentere
+versies van pakketten die momenteel geïnstalleerd zijn en die niet
+bijgewerkt kunnen worden zonder de installatiestatus van een ander pakket te
+wijzigen, zullen op hun huidige versie behouden blijven. Vooraf moet een
+<literal>update</literal> uitgevoerd worden, zodat
+<command>apt-get</command> weet dat er nieuwere versies van pakketten
+beschikbaar zijn.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>dist-upgrade</option></term>
+     <listitem><para><literal>dist-upgrade</literal> vervult niet enkel de functie van
+<literal>upgrade</literal>, maar handelt bovendien op een intelligente
+manier vereisten af die bij de nieuwere pakketversies veranderd
+zijn. <command>apt-get</command> beschikt over een "slim" systeem van
+conflictoplossing en zal proberen om de belangrijkste pakketten op te
+waarderen, eventueel, mocht dat nodig blijken, ten koste van minder
+belangrijke. Het kan daarom gebeuren dat het commando
+<literal>dist-upgrade</literal> sommige pakketten verwijdert. Het bestand
+<filename>/etc/apt/sources.list</filename> bevat een lijst met locaties
+waarvandaan de gewenste pakketten opgehaald kunnen worden. Zie ook
+&apt-preferences; voor een mechanisme dat toelaat om voor individuele
+pakketten de algemene instellingen te overschrijven.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>dselect-upgrade</option></term>
+     <listitem><para><literal>dselect-upgrade</literal> wordt gebruikt in combinatie met
+&dselect;, het traditionele front-end van Debian voor
+pakketbeheer. <literal>dselect-upgrade</literal> volgt de veranderingen op
+die &dselect; aanbrengt in het <literal>Status</literal>-veld van de
+beschikbare pakketten en voert de acties uit die nodig zijn om die status
+waar te maken (bijvoorbeeld het verwijderen van oude en het installeren van
+nieuwe pakketten).</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>install</option></term>
+     <listitem>
+	 <para><literal>install</literal> wordt gevolgd door een of meer pakketten die men
+wenst te installeren of op te waarderen. Elk pakket wordt aangeduid met de
+pakketnaam, niet met zijn volledige unieke bestandsnaam (in een Debian
+systeem bijvoorbeeld zal <package>apt-utils</package> het argument zijn dat
+opgegeven wordt en niet
+<filename>apt-utils_&apt-product-version;_amd64.deb</filename>). Alle
+pakketten die door het/de opgegeven te installeren pakket(ten) vereist
+worden, zullen eveneens opgehaald en geïnstalleerd worden. Het bestand
+<filename>/etc/apt/sources.list</filename> wordt gebruikt om de gewenste
+pakketten te vinden. Indien aan het eind van een pakketnaam een koppelteken
+(zonder spatie ertussenin) geplaatst wordt, zal het opgegeven pakket
+verwijderd worden indien het geïnstalleerd is. Net zo kan een plus-teken
+gebruikt worden om op te geven dat een pakket geïnstalleerd moet
+worden. Deze laatstgenoemde werkwijzen kunnen gebruikt worden om
+beslissingen te overschrijven die door het conflictoplossingssysteem van
+apt-get genomen worden.
+	 </para>
+
+     <para>Een specifieke versie van een pakket kiezen voor installatie kan door de
+pakketnaam te laten volgen door een gelijkheidsteken en de te selecteren
+versie van het pakket. Dit zorgt ervoor dat die versie wordt opgezocht en
+voor installatie geselecteerd wordt. Eveneens kan een specifieke distributie
+geselecteerd worden door de pakketnaam te laten volgen door een slash en de
+versie van de distributie of de archiefnaam ervan (stable, testing,
+unstable).</para>
+
+     <para>Beide versieselectiemechanismes kunnen pakketten degraderen en moeten met
+zorg gebruikt worden.</para>
+
+	<para>Dit is ook de aangewezen werkwijze indien u een of meer reeds geïnstalleerde
+pakketten wilt opwaarderen zonder alle op het systeem aanwezige pakketten op
+te waarderen. In tegenstelling tot het commando "upgrade", dat de recentste
+versie installeert van alle op het systeem aanwezige pakketten, zal
+"install" enkel de recentste versie installeren van het/de opgegeven
+pakket(ten). Geef gewoon de naam op van het/de pakket(ten) dat/die u wenst
+op te waarderen en, indien er een recentere versie beschikbaar is, zal die
+(samen met zijn vereisten, zoals hiervoor uitgelegd werd) gedownload en
+geïnstalleerd worden.
+	</para>
+
+     <para>Tot slot stelt het mechanisme &apt-preferences; u in staat om voor
+individuele pakketten een ander installatiebeleid te creëren.</para>
+
+     <para>Indien geen enkel pakket overeenkomt met de opgegeven expressie en de
+expressie een '.', '?' of '*' bevat, dan wordt aangenomen dat het om een
+POSIX reguliere expressie gaat en wordt die toegepast op alle pakketnamen
+uit de database. Elke overeenkomst wordt dan geïnstalleerd (of
+verwijderd). Merk op dat het zoeken naar een overeenkomst gebeurt per
+deeltekenreeks, zodat 'lo.*' zowel met 'how-lo' als met 'lowest' een
+overeenkomst oplevert. Indien dit niet wenselijk is, veranker de reguliere
+expressie dan met behulp van het teken '^' of '$' of maak de reguliere
+expressie specifieker.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>remove</option></term>
+     <listitem><para><literal>remove</literal> is identiek aan <literal>install</literal> behalve
+dat pakketten ermee verwijderd in plaats van geïnstalleerd worden. Merk op
+dat het verwijderen van een pakket de configuratiebestanden ervan op het
+systeem laat staan. Indien een plus-teken aan de pakketnaam toegevoegd wordt
+(zonder spatie ertussenin), zal het opgegeven pakket geïnstalleerd in plaats
+van verwijderd worden.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>purge</option></term>
+     <listitem><para><literal>purge</literal> is identiek aan <literal>remove</literal> behalve
+dat pakketten verwijderd en gewist worden (ook eventuele
+configuratiebestanden worden verwijderd).</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>source</option></term>
+     <listitem><para><literal>source</literal> doet <command>apt-get</command> bronpakketten
+ophalen. APT zal de beschikbare pakketten doorzoeken om uit te maken welk
+bronpakket opgehaald moet worden. Het zal de meest recente beschikbare
+versie van dat bronpakket opzoeken, ophalen en in de huidige map
+plaatsen. Het respecteert daarbij waar mogelijk de standaarduitgave,
+ingesteld met de optie <literal>APT::Default-Release</literal>, de optie
+<option>-t</option> of opgegeven per pakket via de syntaxis
+<literal>pkg/release</literal>.</para>
+
+    <para>The arguments are interpreted as binary and source package names.  See the
+<option>--only-source</option> option if you want to change that.</para>
+
+     <para>De opvolging van bronpakketten gebeurt afzonderlijk, los van de binaire
+pakketten, via <literal>deb-src</literal>-regels in het bestand
+&sources-list;. Dit betekent dat u een dergelijke regel moet toevoegen per
+pakketbron waarvan u bronpakketten wilt ophalen. Anders zult u wellicht de
+verkeerde versie (te oud/te recent) van het bronpakket krijgen of helemaal
+geen.</para>
+
+     <para>Indien de optie <option>--compile</option> opgegeven werd, zal het pakket
+tot een binair .deb-bestand gecompileerd worden met behulp van de opdracht
+<command>dpkg-buildpackage</command> en dit voor de architectuur die met de
+optie <command>--host-architecture</command> opgegeven werd. Als de optie
+<option>--download-only</option> opgegeven werd, zal het bronpakket niet
+uitgepakt worden.</para>
+
+     <para>Een specifieke versie van de broncode kunt u ophalen door de naam van het
+bronpakket te laten volgen door een gelijkheidsteken en de op te halen
+versie. Dit mechanisme is gelijkaardig aan datgene wat voor pakketbestanden
+gebruikt wordt. Dit maakt het mogelijk een exacte overeenkomst met de naam
+en het versienummer van het bronpakket te gebruiken, wat neerkomt op het
+impliciet aanzetten van de optie <literal>APT::Get::Only-Source</literal>.</para>
+
+     <para>Merk op dat in tegenstelling tot binaire pakketten, bronpakketten niet
+opgenomen en opgevolgd worden in de database van <command>dpkg</command>. Ze
+worden gewoon opgehaald en in de huidige map geplaatst, zoals tar-archieven
+van broncode.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>build-dep</option></term>
+     <listitem><para><literal>build-dep</literal> doet apt-get pakketten installeren/verwijderen
+i een poging om te voldoen aan de vereisten voor het bouwen van een
+bronpakket. Standaard wordt voldaan aan de vereisten voor het bouwen van het
+pakket voor de architectuur van het systeem. In de plaats daarvan kan
+desgewenst een architectuur gespecificeerd worden met de optie
+<option>--host-architecture</option>.</para><para>The arguments are interpreted as binary or source package names. See the
+<option>--only-source</option> option if you want to change that.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>check</option></term>
+     <listitem><para><literal>check</literal> is een diagnostisch gereedschap; het werkt de
+pakketcache bij en controleert op defecte vereisten.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>download</option></term>
+       <listitem><para><literal>download</literal> zal het opgegeven binaire pakket ophalen en in
+de huidige map plaatsen.
+       </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>clean</option></term>
+     <listitem><para><literal>clean</literal> ruimt de lokale opslagplaats voor opgehaalde
+pakketbestanden op. Op het vergrendelingsbestand na ruimt het in
+<filename>&cachedir;/archives/</filename> en
+<filename>&cachedir;/archives/partial/</filename> alles op.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>autoclean</option> (en de <option>auto-clean</option> alias sinds 1.1)</term>
+     <listitem><para>Net als <literal>clean</literal> ruimt <literal>autoclean</literal> de
+lokale opslagplaats voor opgehaalde pakketbestanden op. Het verschil is dat
+het enkel pakketbestanden opruimt die niet langer opgehaald kunnen worden en
+goeddeels waardeloos zijn. Dit laat toe om gedurende een lange tijd een
+cache bij te houden zonder dat die onbeheersbaar wordt. Door het uitzetten
+van de configuratieoptie <literal>APT::Clean-Installed</literal> kan het
+opruimen van pakketbestanden van geïnstalleerde pakketten verhinderd worden.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>autoremove</option> (en de <option>auto-remove</option> alias sinds 1.1)</term>
+     <listitem><para><literal>autoremove</literal> wordt gebruikt om pakketten te verwijderen die
+automatisch geïnstalleerd werden om te voldoen aan de vereisten van andere
+pakketten en nu niet langer nodig zijn.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>changelog</option></term>
+	<listitem><para><literal>changelog</literal> tracht het changelog-bestand (logbestand met
+veranderingen) van een pakket op te halen en geeft dit weer via het commando
+<command>sensible-pager</command>. Standaard wordt het logbestand met
+wijzigingen weergegeven voor de geïnstalleerde versie. U kunt evenwel
+dezelfde opties opgeven als bij het commando <option>install</option>.</para>
+       </listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>indextargets</option></term>
+	<listitem><para>Geeft standaard een volgens deb822 ingedeelde lijst weer met informatie over
+alle gegevensbestanden (ook soms indexbestanden of indexdoelen genoemd) die
+<command>apt-get update</command> zou downloaden. Ondersteunt de optie
+<option>--format</option> voor het aanpassen van de indeling van de uitvoer
+en accepteert ook regels uit de standaarduitvoer om er de gegevens mee te
+filteren. Het commando wordt hoofdzakelijk gebruikt als een interface voor
+extern gereedschap dat APT gebruikt om informatie te verkrijgen evenals de
+namen van opgehaalde bestanden, zodat ook dat gereedschap er gebruik van kan
+maken in plaats van ze ook zelf weer op te halen. Meer gedetailleerde
+documentatie wordt hier niet gegeven, maar is daarentegen wel te vinden in
+het bestand &apt-acquire-additional-files; dat te vinden is in het pakket
+<package>apt-doc</package>.
+	   </para>
+	</listitem>
+     </varlistentry>
+
+
+   </variablelist>
+ </refsect1>
+ 
+ <refsect1><title>opties</title>
+   &apt-cmdblurb;
+
+   <variablelist>
+     <varlistentry><term><option>--no-install-recommends</option></term>
+     <listitem><para>Aanbevolen pakketten niet als te installeren vereisten
+beschouwen. Configuratie-item: <literal>APT::Install-Recommends</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>--install-suggests</option></term>
+     <listitem><para>Voorgestelde pakketten als te installeren vereisten
+beschouwen. Configuratie-item: <literal>APT::Install-Suggests</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>-d</option></term><term><option>--download-only</option></term>
+     <listitem><para>Enkel downloaden; pakketbestanden worden enkel opgehaald, niet uitgepakt of
+geïnstalleerd. Configuratie-item:
+<literal>APT::Get::Download-Only</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>-f</option></term><term><option>--fix-broken</option></term>
+     <listitem><para>Herstellen; proberen een systeem met defecte vereisten te repareren. Als
+deze optie gebruikt wordt samen met install/remove, kan ze elk pakket
+overslaan om APT toe te laten tot een aannemelijke oplossing te
+komen. Indien pakketten opgegeven worden, moeten die het probleem volledig
+repareren. Soms is deze optie nodig wanneer APT voor de eerste keer
+uitgevoerd wordt. APT zelf laat niet toe dat op een systeem defecte
+pakketvereisten voorkomen. Het is mogelijk dat de vereistenstructuur van een
+systeem dermate defect is dat een manuele interventie noodzakelijk is
+(hetgeen meestal betekent dat <command>dpkg --remove</command> moet gebruikt
+worden om sommige problematische pakketten uit de weg te ruimen). Het
+gebruik van deze optie samen met <option>-m</option> kan in sommige
+omstandigheden een fout opleveren. Configuratie-item:
+<literal>APT::Get::Fix-Broken</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>-m</option></term><term><option>--ignore-missing</option></term>
+     <term><option>--fix-missing</option></term>
+     <listitem><para>Ontbrekende pakketten negeren; indien pakketten niet opgehaald kunnen worden
+of indien na het ophalen de integriteitstoets mislukt (beschadigde
+pakketbestanden), behoud dan de geïnstalleerde versie van deze pakketten en
+ga om met het resultaat. Het gebruik van deze optie samen met
+<option>-f</option> kan in sommige situaties tot een fout leiden. Indien een
+pakket voor installatie geselecteerd werd (in het bijzonder wanneer het aan
+de commandoregel vermeld werd) en het niet opgehaald kon worden, dan zal het
+stilzwijgend op zijn huidige versie behouden blijven. Configuratie-item:
+<literal>APT::Get::Fix-Missing</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>--no-download</option></term>
+     <listitem><para>Schakelt het downloaden van pakketten uit. Dit wordt best gebruikt samen met
+<option>--ignore-missing</option> om APT te verplichten enkel .debs te
+gebruiken die het al gedownload heeft. Configuratie-item:
+<literal>APT::Get::Download</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>-q</option></term><term><option>--quiet</option></term>
+     <listitem><para>Stil; produceert uitvoer, geschikt voor een
+logboekbestand. Voortgangsindicatoren worden overgeslagen. Meer q's, met een
+maximum van 2, maken de uitvoer beknopter. U kunt ook <option>-q=#</option>
+gebruiken om het niveau van beknopte uitvoer in te stellen en de waarde uit
+het configuratiebestand te overschrijven. Merk op dat beknopte uitvoer van
+het niveau 2 de optie <option>-y</option> impliceert; u zou nooit -qq zonder
+een optie van het type niets doen, zoals -d, --print-uris of -s, moeten
+gebruiken, omdat APT kan beslissen iets te gaan doen waaraan u zich niet
+verwachtte. Configuratie-item: <literal>quiet</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>-s</option></term>
+                   <term><option>--simulate</option></term>
+		   <term><option>--just-print</option></term>
+		   <term><option>--dry-run</option></term>
+		   <term><option>--recon</option></term>
+		   <term><option>--no-act</option></term>
+     <listitem><para>Geen actie; voer een simulatie uit van de gebeurtenissen die zich zouden
+voordoen op basis van de actuele toestand van het systeem, maar voer geen
+effectieve wijzigingen aan het systeem door. Vergrendeling wordt
+uitgeschakeld (<option>Debug::NoLocking</option>), zodat de toestand van het
+systeem eventueel zou kunnen wijzigen terwijl <command>apt-get</command>
+bezig is. Ook een niet-systeembeheerder (non-root) kan simulaties uitvoeren
+en als die geen leestoegang heeft tot alle configuraties van apt, kan dit de
+simulatie vertekenen. Niet-systeembeheerders krijgen standaard ook een
+opmerking te zien waarin deze waarschuwing gegeven wordt
+(<option>APT::Get::Show-User-Simulation-Note</option>).  Configuratie-item:
+<literal>APT::Get::Simulate</literal>.</para>
+
+     <para>Als men een simulatie uitvoert, worden een aantal regels weergegeven,
+waarbij elke regel een operatie van <command>dpkg</command>
+vertegenwoordigt: configureren (<literal>Conf</literal>), verwijderen
+(<literal>Remv</literal>)  of uitpakken (<literal>Inst</literal>). Rechte
+haakjes duiden op defecte pakketten en lege rechte haakjes duiden op
+defecten zonder gevolgen (komt zelden voor).</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>-y</option></term><term><option>--yes</option></term>
+                   <term><option>--assume-yes</option></term>
+     <listitem><para>Een automatisch ja op vragen; ga uit van een ja-antwoord op alle vragen en
+voer de operatie niet-interactief uit. Indien er zich een niet-wenselijke
+situatie voordoet, zoals het wijzigen van een op zijn huidige versie
+vastgehouden pakket, een poging om een niet-geauthenticeerd pakket te
+installeren of het verwijderen van een essentieel pakket, zal
+<literal>apt-get</literal> afgebroken worden. Configuratie-item:
+<literal>APT::Get::Assume-Yes</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>--assume-no</option></term>
+     <listitem><para>Een automatisch "neen" op alle vragen. Configuratie-item:
+<literal>APT::Get::Assume-No</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>--no-show-upgraded</option></term>
+     <listitem><para>Geef geen lijst weer van alle pakketten die opgewaardeerd zullen
+worden. Configuratie-item: <literal>APT::Get::Show-Upgraded</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>-V</option></term><term><option>--verbose-versions</option></term>
+     <listitem><para>Geef het volledige versienummer weer van opgewaardeerde en geïnstalleerde
+pakketten. Configuratie-item: <literal>APT::Get::Show-Versions</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>-a</option></term>
+                   <term><option>--host-architecture</option></term>
+     <listitem><para>Deze optie regelt voor welke architectuur pakketten gebouwd worden met de
+opdracht <command>apt-get source --compile</command> en hoe aan kruiselingse
+bouwvereisten voldaan wordt. Standaard staat dit niet ingesteld hetgeen
+betekent dat de computer waarop het pakket gebouwd wordt dezelfde
+architectuur heeft als die waarvoor het gebouwd wordt (hetgeen ingesteld
+wordt met <literal>APT::Architecture</literal>). Configuratie-item:
+<literal>APT::Get::Host-Architecture</literal>.
+     </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>-P</option></term>
+                   <term><option>--build-profiles</option></term>
+     <listitem><para>Deze optie regelt het activeren van bouwprofielen waarvoor een bronpakket
+gebouwd wordt met <command>apt-get source --compile</command>. Ze regelt ook
+hoe voldaan wordt aan de bouwvereisten. Standaard is geen enkel bouwprofiel
+actief. Er kan meer dan een bouwprofiel tegelijk geactiveerd worden door ze
+gescheiden door en komma samen te voegen. Configuratie-item:
+<literal>APT::Build-Profiles</literal>.
+     </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>-b</option></term><term><option>--compile</option></term>
+                   <term><option>--build</option></term>
+     <listitem><para>Bronpakketten na het downloaden compileren. Configuratie-item:
+<literal>APT::Get::Compile</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>--ignore-hold</option></term>
+     <listitem><para>Instructies dat pakketten op hun huidige versie behouden moeten blijven,
+negeren; dit zorgt ervoor dat <command>apt-get</command> de bij een pakket
+horende instructie 'behouden op de huidige versie' negeert. Dit kan nuttig
+zijn in combinatie met <literal>dist-upgrade</literal> om een groot aantal
+onwenselijke instructies van het type 'behouden op de huidige versie' te
+overschrijven. Configuratie-item: <literal>APT::Ignore-Hold</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>--with-new-pkgs</option></term>
+     <listitem><para>Toelaten dat nieuwe pakketten geïnstalleerd worden als dit gebruikt wordt in
+combinatie met <literal>upgrade</literal>. Dit is nuttig als het voor het
+bijwerken van een geïnstalleerd pakket nodig is om nieuwe vereisten te
+installeren. In plaats van het pakket op de huidige versie vast te houden,
+zal <literal>upgrade</literal> het pakket opwaarderen en de nieuwe vereisten
+installeren. Merk op dat <literal>upgrade</literal> met deze optie nooit
+pakketten zal verwijderen. Enkel nieuwe toevoegen is dan
+toegestaan. Configuratie-item:
+<literal>APT::Get::Upgrade-Allow-New</literal>.
+     </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>--no-upgrade</option></term>
+     <listitem><para>Geen pakketten opwaarderen; als <literal>no-upgrade</literal> aan de
+commandoregel gebruikt wordt in combinatie met <literal>install</literal>,
+zal dat verhinderen dat reeds geïnstalleerde pakketten opgewaardeerd
+worden. Configuratie-item: <literal>APT::Get::Upgrade</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>--only-upgrade</option></term>
+     <listitem><para>Geen nieuwe pakketten installeren; wanneer <literal>only-upgrade</literal>
+gebruikt wordt in combinatie met <literal>install</literal>, zal het enkel
+voor reeds geïnstalleerde pakketten opwaarderingen installeren en verzoeken
+om nieuwe pakketten te installeren negeren. Configuratie-item:
+<literal>APT::Get::Only-Upgrade</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>--allow-downgrades</option></term>
+     <listitem><para>Dit is een gevaarlijke optie die er voor zorgt dat apt zonder vragen
+voortgaat als het degradaties doorvoert. U zou dit niet moeten gebruiken
+behalve in zeer bijzondere situaties. Dit gebruiken kan mogelijkerwijs tot
+de vernietiging van uw systeem leiden! Configuratie-item:
+<literal>APT::Get::allow-downgrades</literal>. Geïntroduceerd in APT 1.1.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>--allow-remove-essential</option></term>
+     <listitem><para>Een ja doordrukken; dit is een gevaarlijke optie die er voor zorgt dat apt
+zonder vragen voortgaat als het essentiële pakketten verwijdert. U zou dit
+niet moeten gebruiken behalve in zeer bijzondere situaties. Dit gebruiken
+kan mogelijkerwijs tot de vernietiging van uw systeem leiden!
+Configuratie-item:
+<literal>APT::Get::allow-remove-essential</literal>. Geïntroduceerd in APT
+1.1.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>--allow-change-held-packages</option></term>
+     <listitem><para>Een ja doordrukken; dit is een gevaarlijke optie die er voor zorgt dat apt
+zonder vragen voortgaat als het te handhaven pakketten wijzigt. U zou dit
+niet moeten gebruiken behalve in zeer bijzondere situaties. Dit gebruiken
+kan mogelijkerwijs tot de vernietiging van uw systeem leiden!
+Configuratie-item:
+<literal>APT::Get::allow-change-held-packages</literal>. Geïntroduceerd in
+APT 1.1.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>--force-yes</option></term>
+     <listitem><para>Een ja doordrukken; dit is een gevaarlijke optie die er voor zorgt dat apt
+zonder vragen voortgaat als het iets doet dat schadelijk kan zijn. U zou dit
+niet moeten gebruiken behalve in zeer bijzondere situaties. Het gebruik van
+<literal>force-yes</literal> kan mogelijkerwijs tot de vernietiging van uw
+systeem leiden! Configuratie-item:
+<literal>APT::Get::force-yes</literal>. Deze optie is verouderd en werd in
+1.1 vervangen door <option>--allow-unauthenticated</option> ,
+<option>--allow-downgrades</option> ,
+<option>--allow-remove-essential</option> ,
+<option>--allow-change-held-packages</option>. </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>--print-uris</option></term>
+     <listitem><para>In plaats van pakketten op te halen om ze te installeren wordt hun URI
+weergegeven. Elke URI bevat het pad en de naam van het doelbestand, zijn
+grootte en de verwachte MD5-frommel. Merk op dat de naam van het bestand
+waarnaartoe geschreven wordt niet steeds overeenkomt met de bestandsnaam op
+de externe site! Dit werkt ook met de commando's <literal>source</literal>
+en <literal>update</literal>. Bij gebruik in combinatie met het commando
+<literal>update</literal> zijn de MD5-frommel en de grootte niet inbegrepen
+en het is aan de gebruiker om eventuele gecomprimeerde bestanden uit te
+pakken. Configuratie-item: <literal>APT::Get::Print-URIs</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>--purge</option></term>
+     <listitem><para>Purge gebruiken in plaats van remove voor alles wat verwijderd zou
+worden. Er zal een sterretje ("*") staan naast de pakketten die ingepland
+staan om opgeruimd te worden. <option>remove --purge</option> is het
+equivalent van het commando <option>purge</option>. Configuratie-item:
+<literal>APT::Get::Purge</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>--reinstall</option></term>
+     <listitem><para>Pakketten die reeds met hun nieuwste versie geïnstalleerd zijn opnieuw
+installeren. Configuratie-item: <literal>APT::Get::ReInstall</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>--list-cleanup</option></term>
+     <listitem><para>Deze optie is standaard aangezet; gebruik
+<literal>--no-list-cleanup</literal> om ze uit te zetten. Indien ze
+geactiveerd is, zal <command>apt-get</command> automatisch de inhoud van
+<filename>&statedir;/lists</filename> beheren om te garanderen dat in
+onbruik geraakte bestanden verwijderd worden. De enige reden waarom u dit
+zou uitzetten is wanneer u vaak het bestand sources.list
+wijzigt. Configuratie-item: <literal>APT::Get::List-Cleanup</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>-t</option></term>
+                   <term><option>--target-release</option></term>
+                   <term><option>--default-release</option></term>
+     <listitem><para>Deze optie regelt de standaard invoer voor het aansturen van de
+beleidsvoering; ze stelt een standaard pinwaarde in op 990 voor de opgegeven
+release. Dit overschrijft de algemene instellingen uit
+<filename>/etc/apt/preferences</filename>. De waarde van deze optie heeft
+geen invloed op pakketten met een eigen pinwaarde. Kort samengevat laat deze
+optie u toe om op een eenvoudige wijze controle te houden over uit welke
+distributie pakketten opgehaald worden. Enkele gebruikelijke voorbeelden
+zijn <option>-t '2.1*'</option>, <option>-t unstable</option> en <option>-t
+sid</option>.  Configuratie-item: <literal>APT::Default-Release</literal>;
+raadpleeg ook de man-pagina van &apt-preferences;.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>--trivial-only</option></term>
+     <listitem><para>
+     Voer enkel 'banale' operaties uit. Logisch gezien kan men dit beschouwen als
+gerelateerd aan <option>--assume-yes</option>. Waar
+<option>--assume-yes</option> op elke vraag ja antwoordt, zal
+<option>--trivial-only</option> nee antwoorden. Configuratie-item:
+<literal>APT::Get::Trivial-Only</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>--no-remove</option></term>
+     <listitem><para>Indien een of ander pakket verwijderd zou moeten worden, zal apt-get
+onmiddellijk afgebroken worden zonder een vraag te
+stellen. Configuratie-item: <literal>APT::Get::Remove</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>--auto-remove</option></term><term><option>--autoremove</option></term>
+     <listitem><para>Indien het gegeven commando <literal>install</literal> of
+<literal>remove</literal> is, dan zal deze optie functioneren zoals wanneer
+de opdracht <literal>autoremove</literal> wordt uitgevoerd en zullen
+pakketten die niet langer door andere vereist worden, verwijderd
+worden. Configuratie-item: <literal>APT::Get::AutomaticRemove</literal>.
+     </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>--only-source</option></term>
+     <listitem><para>Is enkel betekenisvol voor de commando's <literal>source</literal> en
+<literal>build-dep</literal>. Geeft aan dat voor de opgegeven namen van
+bronpakketten niet naar een overeenkomst gezocht moet worden via de tabel
+met binaire pakketten. Dit houdt in dat indien deze optie opgegeven werd,
+deze commando's enkel de naam van bronpakketten als argument zullen
+aanvaarden en niet de naam van een binair pakket om nadien het
+overeenkomstige bronpakket te gaan opzoeken. Configuratie-item:
+<literal>APT::Get::Only-Source</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>--diff-only</option></term><term><option>--dsc-only</option></term><term><option>--tar-only</option></term>
+     <listitem><para>Enkel het diff-, dsc- of tar-bestand van een bronarchief
+downloaden. Configuratie-item: <literal>APT::Get::Diff-Only</literal>,
+<literal>APT::Get::Dsc-Only</literal>, en
+<literal>APT::Get::Tar-Only</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>--arch-only</option></term>
+     <listitem><para>Enkel architectuurafhankelijke bouwvereisten verwerken. Configuratie-item:
+<literal>APT::Get::Arch-Only</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>--indep-only</option></term>
+     <listitem><para>Enkel architectuur-onafhankelijke bouwvereisten
+verwerken. Configuratie-item: <literal>APT::Get::Indep-Only</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>--allow-unauthenticated</option></term>
+     <listitem><para>Negeer dat pakketten niet geauthenticeerd kunnen worden en stel er geen
+vragen over. Dit kan nuttig zijn als met lokale pakketbronnen gewerkt wordt,
+maar het houdt een enorm veiligheidsrisico in als de authenticiteit van de
+gegevens niet op een andere manier door de gebruiker zelf verzekerd
+wordt. Het gebruik van de optie <option>Trusted</option> voor regels uit
+&sources-list; valt gewoonlijk te verkiezen boven deze globale
+vervanging. Configuratie-item:
+<literal>APT::Get::AllowUnauthenticated</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>--no-allow-insecure-repositories</option></term>
+     <listitem><para>Sta het commando update niet toe om niet-verifieerbare gegevens op te halen
+uit geconfigureerde pakketbronnen. Het commando update van APT zal mislukken
+bij pakketbronnen zonder geldige cryptografische ondertekening. Zie ook
+&apt-secure; voor meer informatie over het concept en de
+implicaties. Configuratie-item:
+<literal>Acquire::AllowInsecureRepositories</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>--allow-releaseinfo-change</option></term>
+     <listitem><para>Sta het commando update toe om gegevens te blijven downloaden van een
+pakketbron waarvan de informatie over welke release die pakketbron bevat,
+gewijzigd is en bijvoorbeeld een nieuwe hoofdrelease aangeeft. Voor
+dergelijke pakketbronnen zal APT er niet in slagen het update-commando uit
+te voeren, totdat de verandering bevestigd is, om er zeker van te zijn dat
+de gebruiker voorbereid is op die verandering. Zie ook &apt-secure; voor
+informatie over concept en configuratie.
+     </para><para>
+     Er bestaan specialistische opties
+(<literal>--allow-releaseinfo-change-</literal><replaceable>veld</replaceable>)
+om enkel veranderingen toe te staan voor bepaalde velden, zoals
+<literal>origin</literal>, <literal>label</literal>,
+<literal>codename</literal>, <literal>suite</literal>,
+<literal>version</literal> en <literal>defaultpin</literal>. Zie ook
+&apt-preferences;. Configuratie-item:
+<literal>Acquire::AllowReleaseInfoChange</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>--show-progress</option></term>
+     <listitem><para>Bij het installeren, opwaarderen of verwijderen van pakketten
+gebruikersvriendelijke voortgangsinformatie in het terminalvenster
+weergeven. Voor een door een machine te lezen versie van deze gegevens kunt
+u README.progress-reporting raadplegen in apt's doc-map. Configuratie-item:
+<literal>Dpkg::Progress</literal> en
+<literal>Dpkg::Progress-Fancy</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>--with-source</option> <option>&synopsis-param-filename;</option></term>
+     <listitem><para>
+     Voegt het opgegeven bestand toe als een metadatabron. Kan herhaald worden om
+meerdere bestanden toe te voegen. Zie voor verdere details de beschrijving
+van de optie <option>--with-source</option> in &apt-cache;.
+     </para></listitem>
+     </varlistentry>
+
+     &apt-commonoptions;
+     
+   </variablelist>
+ </refsect1>
+
+ <refsect1><title>Bestanden</title>
+   <variablelist>
+     &file-sourceslist;
+     &file-aptconf;
+     &file-preferences;
+     &file-cachearchives;
+     &file-statelists;
+   </variablelist>
+ </refsect1>
+
+ <refsect1><title>Zie ook</title>
+   <para>&apt-cache;, &apt-cdrom;, &dpkg;, &sources-list;, &apt-conf;, &apt-config;,
+&apt-secure;, De gebruikershandleiding voor APT in &guidesdir;,
+&apt-preferences;, de Howto voor APT.</para>
+ </refsect1>
+
+ <refsect1><title>Diagnostiek</title>
+   <para><command>apt-get</command> geeft de terugkeerwaarde nul bij een normaal
+verlopen operatie, het decimaal getal 100 in geval van een fout.</para>
+ </refsect1>
+ &manbugs;
+ <refsect1><title>&translation-title;</title>
+   <para>&translation-holder;</para>
+   <para>&translation-english;</para>
+ </refsect1>
+</refentry>

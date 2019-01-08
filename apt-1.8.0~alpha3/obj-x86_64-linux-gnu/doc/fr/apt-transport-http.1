@@ -1,0 +1,172 @@
+'\" t
+.\"     Title: apt-transport-http
+.\"    Author: \('Equipe de d\('eveloppement d\*(AqAPT
+.\" Generator: DocBook XSL Stylesheets v1.79.1 <http://docbook.sf.net/>
+.\"      Date: 11\ \&mai\ \&2018
+.\"    Manual: APT
+.\"    Source: APT 1.8.0~alpha3
+.\"  Language: French
+.\"
+.TH "APT\-TRANSPORT\-HTTP" "1" "11\ \&mai\ \&2018" "APT 1.8.0~alpha3" "APT"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NOM"
+apt-transport-http \- Transport d\*(AqAPT pour t\('el\('echargement par HTTP (protocole de transfert hypertexte)
+.SH "DESCRIPTION"
+.PP
+Ce transport d\*(AqAPT permet d\*(Aqutiliser les d\('ep\(^ots auxquels on acc\(`ede au moyen de HTTP (Hypertext Transfer Protocol)\&. Il est disponible par d\('efaut et il est probablement le transport le plus utilis\('e de tous\&. Veuillez noter qu\*(Aqun transport n\*(Aqest jamais appel\('e directement par l\*(Aqutilisateur, mais utilis\('e par les outils d\*(AqAPT s\*(Aqappuyant sur la configuration de l\*(Aqutilisateur\&.
+.PP
+HTTP est un protocole de transport non chiffr\('e ce qui veut dire que toutes les communications avec le serveur distant (ou le mandataire) peuvent \(^etre observ\('ees par un attaquant suffisamment comp\('etent appel\('e couramment \(Fo\ \&homme du milieu\ \&\(Fc (MITM)\&. Cependant, un tel attaquant ne peut
+\fIpas\fR
+modifier la communication pour compromettre la s\('ecurit\('e du syst\(`eme dans la mesure o\(`u le mod\(`ele de s\('ecurit\('e des donn\('ees d\*(AqAPT est ind\('ependant de la m\('ethode de transport choisie\&. Cela est expliqu\('e en d\('etail dans
+\fBapt-secure\fR(8)\&. Un aper\(,cu des m\('ethodes de transport disponibles est donn\('e dans
+\fBsources.list\fR(5)\&.
+.SH "OPTIONS"
+.PP
+Diverses options peuvent \(^etre r\('egl\('ees dans un fichier
+\fBapt.conf\fR(5)
+pour modifier son comportement depuis la configuration d\*(Aqun mandataire \(`a des contournements pour les limites d\*(Aqun serveur particulier\&.
+.SS "Configuration du mandataire"
+.PP
+La variable d\*(Aqenvironnement
+\fBhttp_proxy\fR
+est prise en charge pour une configuration au niveau du syst\(`eme\&. Les mandataires particuliers \(`a APT peuvent \(^etre configur\('es gr\(^ace \(`a l\*(Aqoption
+Acquire::http::Proxy\&. Les mandataires qui devraient \(^etre utilis\('es seulement pour certains h\(^otes peuvent \(^etre sp\('ecifi\('es avec
+Acquire::http::Proxy::\fIh\(^ote\fR\&. Un contr\(^ole encore plus fin peut \(^etre obtenu avec l\*(Aqautod\('etection du mandataire, d\('etaill\('ee ci\-dessous\&. Toutes ces options utilisent le format d\*(AqURI
+\fIsch\('ema\fR://[[\fIutilisateur\fR][:\fImot_de_passe\fR]@]\fIh\(^ote\fR[:\fIport\fR]/\&. Les sch\('emas d\*(AqURI pris en charge sont
+socks5h
+(SOCKS5 avec r\('esolution distante de DNS),
+http
+et
+https\&. Les d\('etails d\*(Aqauthentification peuvent \(^etre fournis avec
+\fBapt_auth.conf\fR(5)
+plut\(^ot que de les inclure directement dans l\*(AqURI\&.
+.PP
+Les diverses options de configuration d\*(AqAPT prennent en charge la valeur particuli\(`ere
+DIRECT
+signifiant qu\*(Aqaucun mandataire ne doit \(^etre utilis\('e\&. La variable d\*(Aqenvironnement
+\fBno_proxy\fR
+est aussi prise en charge dans le m\(^eme but\&.
+.PP
+De plus, il y a trois options de configuration fournies pour le contr\(^ole des caches mandataire compatibles avec HTTP/1\&.1\ \&:
+Acquire::http::No\-Cache
+dit au mandataire de ne jamais utiliser les r\('eponses qu\*(Aqil a stock\('ees\&.
+Acquire::http::Max\-Age
+\('etablit l\*(Aqanciennet\('e maximale (en secondes) d\*(Aqun fichier d\*(Aqindex dans le cache du mandataire\&.
+Acquire::http::No\-Store
+indique que le mandataire ne doit pas mettre en cache les fichiers d\*(Aqarchive, ce qui peut \('eviter de polluer un cache mandataire avec des fichiers \&.deb tr\(`es grands\&.
+.SS "Configuration automatique du mandataire"
+.PP
+L\*(Aqoption
+Acquire::http::Proxy\-Auto\-Detect
+peut \(^etre utilis\('ee pour indiquer une commande externe pour d\('ecouvrir le mandataire HTTP \(`a utiliser\&. Le premier et seul param\(`etre est un URI indiquant l\*(Aqh\(^ote \(`a contacter pour permettre une configuration propre \(`a l\*(Aqh\(^ote\&. Apt s\*(Aqattend \(`a ce que la commande indique le mandataire sur la sortie standard sur une seule ligne dans le format d\*(AqURI pr\('ec\('edemment d\('efini ou le mot
+DIRECT
+si aucun mandataire ne doit \(^etre utilis\('e\&. Aucune sortie indique que le mandataire g\('en\('erique doit \(^etre utilis\('e\&.
+.PP
+Notez que l\*(Aqauto\-d\('etection ne sera pas ex\('ecut\('ee si une configuration sp\('ecifique de mandataire h\(^ote a d\('ej\(`a \('et\('e \('etablie par
+Acquire::http::Proxy::\fIh\(^ote\fR\&.
+.PP
+Voir les paquets
+\fBsquid-deb-proxy-client\fR(1)
+et
+\fBauto-apt-proxy\fR(1)
+pour des exemples d\*(Aqimpl\('ementation\&.
+.PP
+Cette option prend le pas sur l\*(Aqancien nom d\*(Aqoption
+Acquire::http::ProxyAutoDetect\&.
+.SS "Configuration de connexion"
+.PP
+L\*(Aqoption
+Acquire::http::Timeout
+positionne le compteur d\*(Aqexpiration du d\('elai (timeout) utilis\('e par la m\('ethode\&. Cela s\*(Aqapplique aussi bien \(`a la connexion qu\*(Aqaux donn\('ees\&.
+.PP
+La bande passante utilis\('ee peut \(^etre limit\('ee avec
+Acquire::http::Dl\-Limit
+qui peut prendre une valeur enti\(`ere, l\*(Aqunit\('e utilis\('ee \('etant le kilo\-octet par seconde\&. La valeur par d\('efaut est 0, ce qui correspond \(`a aucune limitation de bande passante\&. Veuillez noter que cette option d\('esactive implicitement le t\('el\('echargement simultan\('e depuis plusieurs serveurs\&.
+.PP
+Le r\('eglage
+Acquire::http::Pipeline\-Depth
+permet d\*(Aqutiliser l\*(Aqencha\(^inement HTTP (\(Fo\ \&HTTP pipelining\ \&\(Fc, RFC 2616 section\ \&8\&.1\&.2\&.2) ce qui peut \(^etre utile par exemple avec des connexions \(`a latence \('elev\('ee\&. Il indique le nombre de requ\(^etes envoy\('ees dans le tuyau\&. APT tente de d\('etecter et de contourner les serveurs web et les mandataires qui se comportent mal \(`a l\*(Aqex\('ecution, mais si vous savez que vos serveurs ne respectent pas la norme HTTP/1\&.1, l\*(Aqencha\(^inement peut \(^etre d\('esactiv\('e en d\('efinissant cette valeur \(`a\ \&0\&. Il est activ\('e par d\('efaut avec une valeur de\ \&10\&.
+.PP
+Acquire::http::AllowRedirect
+contr\(^ole le fait qu\*(AqAPT suive les redirections\&. Ce r\('eglage est activ\('e par d\('efaut\&.
+.PP
+L\*(Aqoption
+Acquire::http::User\-Agent
+peut \(^etre utilis\('ee pour envoyer une valeur User\-Agent modifi\('ee pour les t\('el\('echargements HTTP, ce qui peut par exemple \(^etre utile avec certains mandataires HTTP qui n\*(Aqautorisent l\*(Aqacc\(`es qu\*(Aqaux clients s\*(Aqidentifiant de mani\(`ere sp\('ecifique\&.
+.PP
+Acquire::http::SendAccept
+est activ\('e par d\('efaut et envoie un champ d\*(Aqen\-t\(^ete
+Accept: text/*
+au serveur pourles requ\(^etes sans extension de fichier pour \('eviter que le serveur ne tente une n\('egociation de contenu\&.
+.SH "EXEMPLES"
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+Acquire::http {
+	Proxy::example\&.org "DIRECT";
+	Proxy "socks5h://apt:pass@127\&.0\&.0\&.1:9050";
+	Proxy\-Auto\-Detect "/usr/local/bin/apt\-http\-proxy\-auto\-detect";
+	No\-Cache "true";
+	Max\-Age "3600";
+	No\-Store "true";
+	Timeout "10";
+	Dl\-Limit "42";
+	Pipeline\-Depth "0";
+	AllowRedirect "false";
+	User\-Agent "My APT\-HTTP";
+	SendAccept "false";
+};
+.fi
+.if n \{\
+.RE
+.\}
+.SH "VOIR AUSSI"
+.PP
+\fBapt.conf\fR(5)
+\fBapt_auth.conf\fR(5)
+\fBsources.list\fR(5)
+.SH "BOGUES"
+.PP
+\m[blue]\fBPage des bogues d\*(AqAPT\fR\m[]\&\s-2\u[1]\d\s+2\&. Si vous souhaitez signaler un bogue \(`a propos d\*(AqAPT, veuillez lire
+/usr/share/doc/debian/bug\-reporting\&.txt
+ou utiliser la commande
+\fBreportbug\fR(1)\&.
+.SH "TRADUCTEURS"
+.PP
+J\('er\(^ome Marant, Philippe Batailler, Christian Perrier
+<bubulle@debian\&.org>
+(2000, 2005, 2009, 2010), \('Equipe de traduction francophone de Debian
+<debian\-l10n\-french@lists\&.debian\&.org>
+.PP
+Veuillez noter que cette traduction peut contenir des parties non traduites\&. Cela est volontaire, pour \('eviter de perdre du contenu quand la traduction est l\('eg\(`erement en retard sur le contenu d\*(Aqorigine\&.
+.SH "AUTEUR"
+.PP
+\fB\('Equipe de d\('eveloppement d\*(AqAPT\fR
+.RS 4
+.RE
+.SH "NOTES"
+.IP " 1." 4
+Page des bogues d'APT
+.RS 4
+\%http://bugs.debian.org/src:apt
+.RE

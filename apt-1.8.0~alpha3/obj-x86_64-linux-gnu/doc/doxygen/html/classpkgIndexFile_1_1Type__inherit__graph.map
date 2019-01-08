@@ -1,0 +1,11 @@
+<map id="pkgIndexFile::Type" name="pkgIndexFile::Type">
+<area shape="rect" id="node2" href="$classdebIFTypeDebianSourceDir.xhtml" title="debIFTypeDebianSourceDir" alt="" coords="196,5,392,32"/>
+<area shape="rect" id="node3" href="$classdebIFTypeDebPkgFile.xhtml" title="debIFTypeDebPkgFile" alt="" coords="215,56,373,83"/>
+<area shape="rect" id="node4" href="$classdebIFTypeDscFile.xhtml" title="debIFTypeDscFile" alt="" coords="227,107,361,133"/>
+<area shape="rect" id="node5" href="$classdebIFTypePkg.xhtml" title="debIFTypePkg" alt="" coords="239,157,349,184"/>
+<area shape="rect" id="node7" href="$classdebIFTypeSrc.xhtml" title="debIFTypeSrc" alt="" coords="241,208,347,235"/>
+<area shape="rect" id="node8" href="$classdebIFTypeStatus.xhtml" title="debIFTypeStatus" alt="" coords="230,259,358,285"/>
+<area shape="rect" id="node9" href="$classedspIFType.xhtml" title="edspIFType" alt="" coords="247,309,341,336"/>
+<area shape="rect" id="node10" href="$classeippIFType.xhtml" title="eippIFType" alt="" coords="249,360,339,387"/>
+<area shape="rect" id="node6" href="$classdebIFTypeTrans.xhtml" title="debIFTypeTrans" alt="" coords="440,157,561,184"/>
+</map>

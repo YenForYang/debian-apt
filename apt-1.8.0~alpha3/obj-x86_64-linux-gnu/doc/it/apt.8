@@ -1,0 +1,173 @@
+'\" t
+.\"     Title: apt
+.\"    Author: Team APT
+.\" Generator: DocBook XSL Stylesheets v1.79.1 <http://docbook.sf.net/>
+.\"      Date: 20\ \&ottobre\ \&2015
+.\"    Manual: APT
+.\"    Source: APT 1.8.0~alpha3
+.\"  Language: Italian
+.\"
+.TH "APT" "8" "20\ \&ottobre\ \&2015" "APT 1.8.0~alpha3" "APT"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NOME"
+apt \- interfaccia a riga di comando
+.SH "SINOSSI"
+.HP \w'\fBapt\fR\ 'u
+\fBapt\fR [\fB\-h\fR] [\fB\-o=\fR\fB\fIstringa_config\fR\fR] [\fB\-c=\fR\fB\fIfile_config\fR\fR] [\fB\-t=\fR\fB\fIrilascio_obiettivo\fR\fR] [\fB\-a=\fR\fB\fIarchitettura\fR\fR] {list | search | show | update | install\ \fIpacch\fR\ [{=\fInumero_versione_pacch\fR\ |\ /\fIrilascio_obiettivo\fR}]...  | remove\ \fIpacch\fR...  | upgrade | full\-upgrade | edit\-sources | {\-v\ |\ \-\-version} | {\-h\ |\ \-\-help}}
+.SH "DESCRIZIONE"
+.PP
+\fBapt\fR
+fornisce un\*(Aqinterfaccia a riga di comando di alto livello per il sistema di gestione dei pacchetti\&. \(`E pensata come interfaccia per l\*(Aqutente finale e permette in modo predefinito alcune opzioni pi\(`u adatte per l\*(Aquso interattivo rispetto a strumenti APT pi\(`u specializzati come
+\fBapt-get\fR(8)
+e
+\fBapt-cache\fR(8)\&.
+.PP
+Proprio come
+\fBapt\fR
+stesso, la sua pagina di manuale \(`e pensata come interfaccia per l\*(Aqutente finale e, pertanto, menziona solamente i comandi e le opzioni pi\(`u utilizzati, in parte per non duplicare le informazioni in pi\(`u posti e in parte per evitare di travolgere i lettori con una valanga di opzioni e dettagli\&.
+.PP
+\fBupdate\fR (\fBapt-get\fR(8))
+.RS 4
+\fBupdate\fR
+viene usato per scaricare le informazioni sui pacchetti da tutte le fonti configurate\&. Altri comandi operano su questi dati, ad esempio per effettuare gli aggiornamenti dei pacchetti o per cercare e visualizzare i dettagli su tutti i pacchetti disponibili per l\*(Aqinstallazione\&.
+.RE
+.PP
+\fBupgrade\fR (\fBapt-get\fR(8))
+.RS 4
+\fBupgrade\fR
+viene usato per installare gli aggiornamenti disponibili per tutti i pacchetti attualmente installati nel sistema prendendoli dalle fonti configurate attraverso
+\fBsources.list\fR(5)\&. Nuovi pacchetti verranno installati se necessari per soddisfare le dipendenze, ma quelli esistenti non saranno mai rimossi\&. Se l\*(Aqaggiornamento di un pacchetto richiede la rimozione di un pacchetto installato, l\*(Aqaggiornamento di tale pacchetto non viene effettuato\&.
+.RE
+.PP
+\fBfull\-upgrade\fR (\fBapt-get\fR(8))
+.RS 4
+full\-upgrade
+effettua la funzione di aggiornamento ma rimuove i pacchetti attualmente installati se ci\(`o \(`e necessario per aggiornare il sistema nel suo complesso\&.
+.RE
+.PP
+\fBinstall\fR, \fBremove\fR, \fBpurge\fR (\fBapt-get\fR(8))
+.RS 4
+Effettua l\*(Aqazione richiesta su uno o pi\(`u pacchetti specificati attraverso
+\fBregex\fR(7),
+\fBglob\fR(7)
+o una corrispondenza esatta\&. L\*(Aqazione richiesta pu\(`o essere modificata per pacchetti specifici aggiungendo un segno pi\(`u (+) al nome di un pacchetto per installarlo o un segno meno (\-) per rimuoverlo\&.
+.sp
+\(`E possibile selezionare una versione specifica di un pacchetto per l\*(Aqinstallazione scrivendo dopo il nome del pacchetto un segno di uguale (=) e la versione del pacchetto da selezionare\&. In alternativa pu\(`o essere selezionata la versione da un rilascio specifico scrivendo dopo il nome del pacchetto una sbarra (\(Fo/\(Fc) e il nome in codice (stretch, buster, sid \&...) o il nome della suite (stable, testing, unstable)\&. Se necessarie per soddisfare la richiesta, anche le dipendenze del pacchetto in oggetto saranno selezionate da questo rilascio\&.
+.sp
+La rimozione di un pacchetto rimuove tutti i dati pacchettizzati, ma solitamente lascia piccoli file di configurazione utente (modificati), nel caso la rimozione sia avvenuta per errore\&. In questo caso basta una richiesta di installazione del pacchetto rimosso per sbaglio per ripristinare il suo funzionamento come era prima\&. D\*(Aqaltro canto ci si pu\(`o sbarazzare di questi avanzi di file chiamando
+\fBpurge\fR
+anche sui pacchetti gi\(`a rimossi\&. Notare che ci\(`o non ha effetto sui dati o le configurazioni memorizzate nelle directory personali degli utenti\&.
+.RE
+.PP
+\fBautoremove\fR (\fBapt-get\fR(8))
+.RS 4
+autoremove
+viene usato per rimuovere i pacchetti che sono stati installati automaticamente per soddisfare delle dipendenze per altri pacchetti e che non sono pi\(`u necessari perch\('e le dipendenze sono cambiate o perch\('e i pacchetti che li richiedevano sono stati nel frattempo rimossi\&.
+.sp
+Si dovrebbe controllare che la l\*(Aqelenco non includa applicazioni che sono nel frattempo diventate desiderate, anche se sono state inizialmente installate solo come dipendenze di un altro pacchetto\&. Si possono marcare tali pacchetti come installati manualmente usando
+\fBapt-mark\fR(8)\&. Anche i pacchetti che sono stati esplicitamente installati con
+\fBinstall\fR
+non vengono mai proposti per la rimozione automatica\&.
+.RE
+.PP
+\fBsearch\fR (\fBapt-cache\fR(8))
+.RS 4
+\fBsearch\fR
+pu\(`o essere usato per cercare daterminati termini
+\fBregex\fR(7)
+nell\*(Aqelenco dei pacchetti disponibili e per visualizzare le corrispondenze\&. Ci\(`o \(`e ad esempio utile se si stanno cercando pacchetti con una specifica funzionalit\(`a\&. Per cercare un pacchetto che contiene un file specifico provare
+\fBapt-file\fR(1)\&.
+.RE
+.PP
+\fBshow\fR (\fBapt-cache\fR(8))
+.RS 4
+Mostra informazioni sui pacchetti specificati, incluse le loro dipendenze, le dimensioni di installazione e scaricamento, le fonti da cui sono disponibili, le descrizioni del contenuto dei pacchetti e molto altro\&. Pu\(`o ad esempio essere utile per vedere tutte queste informazioni prima di permettere ad
+\fBapt\fR(8)
+di rimuovere un pacchetto o quando si cercano nuovi pacchetti da installare\&.
+.RE
+.PP
+\fBlist\fR (lavoro\-in\-corso)
+.RS 4
+\fBlist\fR
+\(`e in qualche modo simile a
+\fBdpkg\-query \-\-list\fR, nel senso che pu\(`o visualizzare un elenco di pacchetti che soddisfano determinati criteri\&. Supporta l\*(Aquso di modelli
+\fBglob\fR(7)
+per le corrispondenze con i nomi dei pacchetti, cos\(`i come opzioni per elencare le versioni installate (\fB\-\-installed\fR), aggiornabili (\fB\-\-upgradeable\fR) o disponibili (\fB\-\-all\-versions\fR)\&.
+.RE
+.PP
+\fBedit\-sources\fR (lavoro\-in\-corso)
+.RS 4
+edit\-sources
+permette di modificare i propri file
+\fBsources.list\fR(5)
+nell\*(Aqeditor di testo preferito e fornisce controlli di sanit\(`a di base\&.
+.RE
+.SH "USO DI SCRIPT E DIFFERENZE RISPETTO AD ALTRI STRUMENTI APT"
+.PP
+La riga di comando di
+\fBapt\fR(8)
+\(`e progettata come strumento per l\*(Aqutente finale e il suo comportamento pu\(`o cambiare da una versione ad un\*(Aqaltra\&. Sebbene si cerchi di non rompere la compatibilit\(`a all\*(Aqindietro, questa per\(`o non \(`e garantita se una modifica sembra utile per l\*(Aquso interattivo\&.
+.PP
+Tutte le funzionalit\(`a di
+\fBapt\fR(8)
+sono anche disponibili in strumenti APT dedicati come
+\fBapt-get\fR(8)
+e
+\fBapt-cache\fR(8)\&.
+\fBapt\fR(8)
+cambia solamente il valore predefinito di alcune opzioni (vedere
+\fBapt.conf\fR(5)
+e in particolare la sezione Binary)\&. Perci\(`o si raccomanda di preferire l\*(Aquso di questi comandi (potenzialmente con abilitate alcune opzioni aggiuntive) negli script, dato che essi mantengono il pi\(`u possibile la compatibilit\(`a all\*(Aqindietro\&.
+.SH "VEDERE ANCHE"
+.PP
+\fBapt-get\fR(8),
+\fBapt-cache\fR(8),
+\fBsources.list\fR(5),
+\fBapt.conf\fR(5),
+\fBapt-config\fR(8), la Guida dell\*(Aqutente di APT in /usr/share/doc/apt\-doc/,
+\fBapt_preferences\fR(5), l\*(AqAPT Howto\&.
+.SH "DIAGNOSTICA"
+.PP
+\fBapt\fR
+restituisce zero in caso di funzionamento normale e il valore decimale 100 in caso di errore\&.
+.SH "BUG"
+.PP
+\m[blue]\fBPagina dei bug di APT\fR\m[]\&\s-2\u[1]\d\s+2\&. Se si desidera segnalare un bug in APT, vedere
+/usr/share/doc/debian/bug\-reporting\&.txt
+o il comando
+\fBreportbug\fR(1)\&.
+.SH "TRADUZIONE"
+.PP
+Traduzione in italiano a cura del Team italiano di localizzazione di Debian
+<debian\-l10n\-italian@lists\&.debian\&.org>\&. In particolare hanno contribuito Eugenia Franzoni (2000), Hugh Hartmann (2000\-2012), Gabriele Stilli (2012), Beatrice Torracca (2012, 2014, 2015)\&.
+.PP
+Notare che questa versione tradotta del documento pu\(`o contenere parti non tradotte\&. Ci\(`o \(`e voluto, per evitare di perdere contenuti quando la traduzione non \(`e aggiornata rispetto all\*(Aqoriginale\&.
+.SH "AUTORE"
+.PP
+\fBTeam APT\fR
+.RS 4
+.RE
+.SH "NOTE"
+.IP " 1." 4
+Pagina dei bug di APT
+.RS 4
+\%http://bugs.debian.org/src:apt
+.RE

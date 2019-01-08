@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+  "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % aptent SYSTEM "apt.ent"> %aptent;
+<!ENTITY % aptverbatiment SYSTEM "apt-verbatim.ent"> %aptverbatiment;
+<!ENTITY % aptvendor SYSTEM "apt-vendor.ent"> %aptvendor;
+]>
+
+<refentry>
+ <refentryinfo>
+   <!-- The last update date -->
+&apt-author.jgunthorpe;
+   &apt-author.team;
+   &apt-email;
+   &apt-product;
+   
+   <date>2016-11-22T00:00:00Z</date>
+ </refentryinfo>
+
+ <refmeta>
+   <refentrytitle>apt-key</refentrytitle>
+   <manvolnum>8</manvolnum>
+   <refmiscinfo class="manual">APT</refmiscinfo>
+ </refmeta>
+ 
+ 
+ <!-- Man page title -->
+<refnamediv>
+    <refname>apt-key</refname>
+    <refpurpose>APT-Schlüsselverwaltungsdienstprogramm</refpurpose>
+ </refnamediv>
+
+ &synopsis-command-apt-key;
+
+ <refsect1><title>Beschreibung</title>
+   <para>
+   <command>apt-key</command> wird benutzt, um eine Liste von Schlüsseln zu
+verwalten, die APT benutzt, um Pakete zu authentifizieren. Pakete, die durch
+Benutzung dieser Schlüssel authentifiziert wurden, werden als
+vertrauenswürdig betrachtet.
+   </para>
+   <para>
+   Falls die Benutzung von <command>apt-key</command> gewünscht wird, beachten
+Sie, dass die Installation der GNU-Privacy-Guard-Programmsammlung (paketiert
+in <package>gnupg</package>) erforderlich ist. Allein aus diesem Grund wird
+vom programmatischen Gebrauch (insbesondere in Betreuerskripten)
+eindringlich abgeraten. Darüberhinaus ist das Ausgabeformat aller Befehle
+undefiniert und kann und wird sich immer dann ändern, wenn sich die
+darunterliegenden Befehle ändern. <command>apt-key</command> wird versuchen,
+derartige Benutzung zu erkennen und in diesen Fällen Warnungen auf der
+Standardfehlerausgabe erzeugen.
+   </para>
+</refsect1>
+
+<refsect1><title>Unterstützte Schlüsselbunddateien</title>
+<para>Apt-key unterstützt als Voreinstellung für Schlüsselbunddateien nur das
+binäre OpenPGP-Format (auch als öffentlicher GPG-Schlüsselbund bekannt) in
+den Dateien mit der Erweiterung »<literal>gpg</literal>«, nicht das
+Schlüsselkastendatenbankformat, das in neueren &gpg;-Versionen eingeführt
+wurde. Daher sollten binäre Schlüsselbunddateien, die mit allen
+APT-Versionen benutzt werden sollen, immer mit <command>gpg
+--export</command> erstellt werden.
+</para>
+<para>Falls auf allen Systeme, die den erzeugten Schlüsselbund verwenden sollen,
+mindestens eine APT-Version >= 1.4 installiert ist, können Sie alternativ
+das ASCII-geschützte Format mit der Erweiterung »<literal>asc</literal>«
+verwenden, das mit <command>gpg --armor --export</command> erstellt wird.
+</para>
+</refsect1>
+
+<refsect1><title>Befehle</title>
+   <variablelist>
+     <varlistentry><term><option>add</option> <option>&synopsis-param-filename;</option></term>
+     <listitem>
+     <para>
+       fügt einen neuen Schlüssel zur Liste der vertrauenswürdigen Schlüssel
+hinzu. Der Schlüssel wird aus &synopsis-param-filename; gelesen oder, wenn
+der Dateiname <literal>-</literal> ist, von der Standardeingabe.
+     </para>
+     <para>
+     Es ist kritisch, dass überprüft wird, ob diese manuell per
+<command>apt-key</command> hinzugefügten Schlüssel wirklich dem Eigentümer
+des Depots gehören, andernfalls wird die &apt-secure;-Infrastruktur komplett
+ausgehöhlt.
+     </para>
+     <para>
+       <emphasis>Hinweis</emphasis>: Anstatt diesen Befehl zu benutzen, sollte ein
+Schlüsselbund mit einem aussagekräftigen Namen und entweder
+»<literal>gpg</literal>« oder »<literal>asc</literal>« als
+Dateinamenserweiterung direkt im Verzeichnis
+<filename>/etc/apt/trusted.gpg.d/</filename> abgelegt werden.
+     </para>
+     </listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>del</option> <option>&synopsis-param-keyid;</option></term>
+     <listitem>
+     <para>
+
+       entfernt einen Schlüssel aus der Liste der vertrauenswürdigen Schlüssel.
+
+     </para>
+
+     </listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>export</option> <option>&synopsis-param-keyid;</option></term>
+     <listitem>
+     <para>
+
+        gibt den Schlüssel &synopsis-param-keyid; auf der Standardausgabe aus.
+
+     </para>
+
+     </listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>exportall</option></term>
+     <listitem>
+     <para>
+
+        gibt alle vertrauenswürdigen Schlüssel auf der Standardausgabe aus.
+
+     </para>
+
+     </listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>list</option>, <option>finger</option></term>
+     <listitem>
+     <para>
+
+       listet vertrauenswürdige Schlüssel mit Fingerabdrücken auf.
+
+     </para>
+
+     </listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>adv</option></term>
+     <listitem>
+     <para>
+     reicht erweiterte Optionen an GPG weiter. Mit <command>adv
+--recv-key</command> können Sie z.B. Schlüssel direkt vom Schlüsselserver in
+Ihre vertrauenswürdige Schlüsselsammlung herunterladen. Beachten Sie, dass
+dabei <emphasis>keine</emphasis> Prüfungen durchgeführt werden. Es ist daher
+einfach, die &apt-secure;-Infrastruktur komplett auszuhöhlen, falls dies
+ohne Sorgfalt benutzt wird.
+     </para>
+
+     </listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>update</option> (missbilligt)</term>
+     <listitem>
+     <para>
+       aktualisiert den lokalen Schlüsselbund mit dem Archivschlüsselbund und
+entfernt die Archivschlüssel, die nicht länger gültig sind, aus dem lokalen
+Schlüsselbund. Der Archivschlüsselbund wird im Paket
+<literal>archive-keyring</literal> Ihrer Distribution mitgeliefert, z.B. dem
+Paket &keyring-package; in &keyring-distro;.
+     </para>
+     <para>
+       Beachten Sie, dass eine Distribution diesen Befehl nicht benötigt und
+tatsächlich nicht länger nutzen sollte. Sie sollte stattdessen
+Schlüsselbunddateien im Verzeichnis
+<filename>/etc/apt/trusted.gpg.d/</filename> direkt mitliefern, da dies eine
+Abhängigkeit von <package>gnupg</package> vermeidet und die Verwaltung von
+Schlüsseln durch einfaches Hinzufügen und Entfernen von Dateien für
+Paketbetreuer und Benutzer gleichermaßen erleichtert.
+     </para>
+     </listitem>
+     </varlistentry>
+     
+     <varlistentry><term><option>net-update</option></term>
+     <listitem>
+     <para>
+
+       funktioniert ähnlich dem vorhergehenden Befehl <command>update</command>,
+bezieht aber den Archivschlüsselbund stattdessen von einem URI und bestätigt
+ihn anhand eines Master-Schlüssels. Dies erfordert ein installiertes &wget;
+und eine derart gebautes APT, bei dem ein Server konfiguriert ist, um den
+Master-Schlüsselbund zur Bestätigung abzuholen. APT unterstützt in Debian
+diesen Befehl nicht und beruht stattdessen auf <command>update</command>, in
+Ubuntu funktioniert dies aber.
+
+     </para>
+
+     </listitem>
+     </varlistentry>
+   </variablelist>
+</refsect1>
+
+ <refsect1><title>Optionen</title>
+<para>Beachten Sie, dass Optionen vor den im vorherigen Abschnitt beschriebenen
+Befehlen definiert sein müssen.</para>
+   <variablelist>
+      <varlistentry><term><option>--keyring</option> <option>&synopsis-param-filename;</option></term>
+      <listitem><para>Mit dieser Option ist es möglich, eine spezielle Schlüsselbunddatei
+anzugeben, mit der der Befehl arbeitet. Vorgabe ist, dass ein Befehl mit der
+Datei <filename>trusted.gpg</filename> ausgeführt wird, ebenso wie alle
+Teile im Verzeichnis <filename>trusted.gpg.d</filename>, wobei
+<filename>trusted.gpg</filename> der primäre Schlüsselbund wird, d.h. neue
+Schlüssel werden zu diesem hinzugefügt.
+      </para></listitem>
+      </varlistentry>
+   </variablelist>
+ </refsect1>
+
+ <refsect1><title>Dateien</title>
+   <variablelist>
+
+     &file-trustedgpg;
+
+   </variablelist>
+
+</refsect1>
+
+<refsect1><title>Siehe auch</title>
+<para>
+&apt-get;, &apt-secure;
+</para>
+</refsect1>
+
+ &manbugs;
+ &manauthor;
+
+ <refsect1><title>&translation-title;</title>
+   <para>&translation-holder;</para>
+   <para>&translation-english;</para>
+ </refsect1>
+</refentry>
+

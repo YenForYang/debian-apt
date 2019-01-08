@@ -1,0 +1,678 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+  "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % aptent SYSTEM "apt.ent"> %aptent;
+<!ENTITY % aptverbatiment SYSTEM "apt-verbatim.ent"> %aptverbatiment;
+<!ENTITY % aptvendor SYSTEM "apt-vendor.ent"> %aptvendor;
+]>
+
+<refentry>
+
+ <refentryinfo>
+   <!-- The last update date -->
+&apt-author.jgunthorpe;
+   &apt-author.team;
+   &apt-email;
+   &apt-product;
+   
+   <date>2016-11-11T00:00:00Z</date>
+ </refentryinfo>
+ 
+ <refmeta>
+   <refentrytitle>apt-ftparchive</refentrytitle>
+   <manvolnum>1</manvolnum>
+   <refmiscinfo class="manual">APT</refmiscinfo>
+ </refmeta>
+ 
+ 
+ <!-- Man page title -->
+<refnamediv>
+    <refname>apt-ftparchive</refname>
+    <refpurpose>Hulpprogramma om indexbestanden te maken</refpurpose>
+ </refnamediv>
+
+ &synopsis-command-apt-ftparchive;
+
+ <refsect1><title>Omschrijving</title>
+   <para><command>apt-ftparchive</command> is een gereedschap voor de commandoregel
+dat de indexbestanden maakt die APT gebruikt om toegang te hebben tot een
+distributiebron. De indexbestanden moeten aangemaakt worden op de site van
+oorsprong en gebaseerd zijn op de inhoud van die site.</para>
+
+   <para><command>apt-ftparchive</command> is een uitbreiding van het programma
+&dpkg-scanpackages; dat diens volledige functionaliteit incorporeert via het
+commando <literal>packages</literal>. Het bevat ook een programma,
+<literal>contents</literal>, voor het aanmaken van contents-bestanden en
+degelijk ontwikkelde middelen om dit aanmaakproces voor een volledig archief
+door een script te laten uitvoeren.</para>
+
+   <para><command>apt-ftparchive</command> kan uit zichzelf gebruik maken van binaire
+databases om de inhoud van een .deb-bestand te bufferen en het is van geen
+enkel extern programma afhankelijk met uitzondering van &gzip;. Wanneer een
+volledige aanmaak gebeurt, zal het automatisch een controle uitvoeren op
+gewijzigde bestanden en de gewenste gecomprimeerde uitvoerbestanden bouwen.</para>
+   
+   <para>Tenzij de optie <option>-h</option>, of <option>--help</option> opgegeven
+werd, moet een van de onderstaande commando's gebruikt worden.</para>
+   
+   <variablelist>
+     <varlistentry><term><option>packages</option></term>
+     <listitem><para>
+     Het commando packages maakt vertrekkend vanuit een mappenboom een
+package-bestand aan. Het begint bij de opgegeven map en doorzoekt de
+onderliggende mappen op de aanwezigheid van .deb-bestanden en schrijft voor
+elk ervan een pakketfiche weg naar de standaarduitvoer. Dit commando is bij
+benadering analoog aan &dpkg-scanpackages;.</para>
+
+     <para>De optie <option>--db</option> kan gebruikt worden om een bufferende binaire
+database op te geven.</para></listitem>
+     </varlistentry>
+     
+     <varlistentry><term><option>sources</option></term>
+     <listitem><para>
+     Het commando <literal>sources</literal> maakt vertrekkend vanuit een
+mappenboom een indexbestand over broncodebestanden aan. Het begint bij de
+opgegeven map en doorzoekt de onderliggende mappen op de aanwezigheid van
+.dsc-bestanden en schrijft voor elk ervan een broncodebestandsfiche weg naar
+de standaarduitvoer. Dit commando is bij benadering analoog aan
+&dpkg-scansources;.</para>
+     <para>
+     Indien een override-bestand opgegeven werd, zal gezocht worden naar een
+broncode-override-bestand met de extensie .src. De optie --source-override
+kan gebruikt worden om op te geven dat een ander broncode-override-bestand
+gebruikt zal worden.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>contents</option></term>
+     <listitem><para>
+     Het commando <literal>contents</literal> maakt voor een mappenboom een
+contents-bestand aan. Het begint bij de opgegeven map en doorzoekt de
+onderliggende mappen op de aanwezigheid van .deb-bestanden en leest van elk
+bestand de bestandenlijst. Daarna sorteert het de lijst van bestanden en
+schrijft die gekoppeld aan een pakket weg naar de standaarduitvoer. Mappen
+worden niet naar standaarduitvoer geschreven. Indien hetzelfde bestand aan
+meerdere pakketten toebehoort, worden in de uitvoer de pakketten door een
+komma gescheiden.</para>
+     <para>
+     De optie <option>--db</option> kan gebruikt worden om een bufferende binaire
+database op te geven.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>release</option></term>
+     <listitem><para>
+     Het commando <literal>release</literal> maakt voor een mappenboom een
+Release-bestand aan. Het begint bij de opgegeven map en zoekt daar en in de
+onderliggende mappen standaard naar niet-gecomprimeerde en gecomprimeerde
+<filename>Packages</filename>-, <filename>Sources</filename>,
+<filename>Contents</filename>, <filename>Components</filename> en
+<filename>icons</filename>-bestanden, alsook naar
+<filename>Release</filename>-, <filename>Index</filename>- en
+<filename>md5sum.txt</filename>-bestanden.
+(<literal>APT::FTPArchive::Release::Default-Patterns</literal>). Bijkomende
+bestandsnaampatronen kunnen toegevoegd worden door ze op te sommen
+in<literal>APT::FTPArchive::Release::Patterns</literal>. Het commando
+schrijft vervolgens naar de standaarduitvoer
+een<filename>Release</filename>-bestand dat (standaard) voor elk bestand een
+MD5-, SHA1-, SHA256 en SHA512-verzameling bevat.</para>
+     <para>
+     De waarden voor de bijkomende velden met metagegevens in het Release-bestand
+worden ontleend aan de overeenkomstige variabelen uit
+<literal>APT::FTPArchive::Release</literal>, bijvoorbeeld
+<literal>APT::FTPArchive::Release::Origin</literal>. De ondersteunde velden
+zijn: <literal>Origin</literal>, <literal>Label</literal>,
+<literal>Suite</literal>, <literal>Version</literal>,
+<literal>Codename</literal>, <literal>Date</literal>,
+<literal>NotAutomatic</literal>, <literal>ButAutomaticUpgrades</literal>,
+<literal>Acquire-By-Hash</literal>, <literal>Valid-Until</literal>,
+<literal>Signed-By</literal>, <literal>Architectures</literal>,
+<literal>Components</literal> en <literal>Description</literal>.</para></listitem>
+
+     </varlistentry>
+
+     <varlistentry><term><option>generate</option></term>
+     <listitem><para>
+     Het commando <literal>generate</literal> werd ontworpen voor gebruik in een
+cron-script en bouwt indexen volgens het opgegeven configuratiebestand. De
+configuratietaal voorziet in een flexibel instrument om op te geven welke
+indexbestanden over welke mappen gemaakt moeten worden en ze voorziet ook in
+een eenvoudig instrument voor het onderhoud van de vereiste instellingen.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>clean</option></term>
+     <listitem><para>
+     Het commando <literal>clean</literal> schoont de door het opgegeven
+configuratiebestand gebruikte gegevensbestanden op door er de niet langer
+gebruikte fiches uit te verwijderen.</para></listitem>
+     </varlistentry>     
+   </variablelist>  
+ </refsect1>
+
+ <refsect1><title>De configuratie van het generate-commando</title>
+   <para>
+   Het commando <literal>generate</literal> gebruikt een configuratiebestand
+met de beschrijving van de archieven die gegenereerd moeten worden. Het
+gebruikt het typische ISC configuratieformaat dat men aantreft in
+ISC-gereedschap zoals bind 8 en dhcpd.  &apt-conf; bevat een beschrijving
+van de syntaxis. Noteer dat de configuratie van generate per sectie ontleed
+wordt, maar dat &apt-conf; per boom ontleed wordt. Dit heeft enkel invloed
+op de manier waarop met het bereiklabel omgesprongen wordt.</para>
+
+   <para>
+   De configuratie van generate bevat vier aparte secties die hierna besproken
+worden.</para>
+
+     <refsect2><title>De sectie <literal>Dir</literal></title>
+     <para>
+     De sectie <literal>Dir</literal> definieert de standaardmappen waarin men de
+bestanden kan lokaliseren die nodig zijn tijdens het maakproces. Deze mappen
+worden voorafgegaan door bepaalde relatieve paden die in de volgende secties
+gedefinieerd worden om zo een volledig en absoluut pad te bekomen.</para>
+     <variablelist>     
+      <varlistentry><term><option>ArchiveDir</option></term>
+      <listitem><para>
+      Geeft de basismap van het FTP-archief op. In een standaardconfiguratie van
+Debian is dat de map die de nodes <filename>ls-LR</filename> en dist
+bevatten.</para></listitem>
+      </varlistentry>
+
+      <varlistentry><term><option>OverrideDir</option></term>
+      <listitem><para>
+      Geeft de locatie van de override-bestanden op.</para></listitem>
+      </varlistentry>
+      
+      <varlistentry><term><option>CacheDir</option></term>
+      <listitem><para>
+      Geeft de locatie van de cachebestanden op.</para></listitem>
+      </varlistentry>
+      
+      <varlistentry><term><option>FileListDir</option></term>
+      <listitem><para>
+      Geeft de locatie van de bestandenlijst-bestanden op, indien de instelling
+<literal>FileList</literal> hieronder gebruikt wordt.</para></listitem>
+      </varlistentry>
+     </variablelist>
+   </refsect2>
+   
+   <refsect2><title>De sectie <literal>Default</literal></title>
+     <para>
+     De sectie <literal>Default</literal> geeft standaardwaarden en instellingen
+op die de werking van de generator besturen. Andere secties kunnen deze
+standaardwaarden overschrijven met een sectiegebonden instelling.</para>
+     <variablelist>     
+      <varlistentry><term><option>Packages::Compress</option></term>
+      <listitem><para>
+      Stelt het standaard compressieschema in dat voor de pakketindexbestanden
+gebruikt wordt. Het is een tekenreeks die bestaat uit een door spaties
+gescheiden lijst van minstens een van de compressieprogramma's die via het
+configuratiebereik <option>APT::Compressor</option> geconfigureerd
+zijn. Voor alle compressieschema's is de standaardinstelling '. gzip'.</para></listitem>
+      </varlistentry>
+
+      <varlistentry><term><option>Packages::Extensions</option></term>
+      <listitem><para>
+      Stelt in wat de lijst is van bestandsextensies die er standaard op wijzen
+dat het pakketbestanden betreft. Dit is standaard ingesteld op '.deb'.</para></listitem>
+      </varlistentry>
+      
+      <varlistentry><term><option>Sources::Compress</option></term>
+      <listitem><para>
+      Dit is gelijkaardig aan <literal>Packages::Compress</literal>, behalve dat
+het de compressie van de Sources-bestanden regelt.</para></listitem>
+      </varlistentry>
+      
+      <varlistentry><term><option>Sources::Extensions</option></term>
+      <listitem><para>
+      Stelt in wat de lijst is van bestandsextensies die er standaard op wijzen
+dat het broncodebestanden betreft. Dit is standaard ingesteld op '.dsc'.</para></listitem>
+      </varlistentry>
+      
+      <varlistentry><term><option>Contents::Compress</option></term>
+      <listitem><para>
+      Dit is gelijkaardig aan <literal>Packages::Compress</literal>, behalve dat
+het de compressie van de Contents-bestanden regelt.</para></listitem>
+      </varlistentry>
+
+      <varlistentry><term><option>Translation::Compress</option></term>
+      <listitem><para>
+      Dit is gelijkaardig aan <literal>Packages::Compress</literal>, behalve dat
+het de compressie van het Translation-en hoofdbestand regelt.</para></listitem>
+      </varlistentry>
+
+      <varlistentry><term><option>DeLinkLimit</option></term>
+      <listitem><para>
+      Geeft het aantal kilobytes op dat per doorloop ontkoppeld (en vervangen door
+harde koppelingen) moet worden. Dit wordt gebruikt in samenhang met de
+sectiegebonden instelling <literal>External-Links</literal>.</para></listitem>
+      </varlistentry>
+      
+      <varlistentry><term><option>FileMode</option></term>
+      <listitem><para>
+      Stelt de modus in van alle aangemaakte indexbestanden. Standaard is dit
+ingesteld op 0644. Alle indexbestanden worden op deze modus ingesteld
+ongeacht het umask.</para></listitem>
+      </varlistentry>
+
+      <varlistentry><term><option>LongDescription</option></term>
+      <listitem><para>
+      Stelt in of de gedetailleerde beschrijvingen moeten opgenomen worden in het
+<filename>Packages</filename>-bestand of afgesplitst en in een
+<filename>Translation-en</filename> hoofdbestand moeten geplaatst worden.</para></listitem>
+      </varlistentry>
+     </variablelist>
+   </refsect2>
+   
+   <refsect2><title>De sectie <literal>TreeDefault</literal></title>
+     <para>
+     Stelt standaarden in die specifiek zijn voor de secties
+<literal>Tree</literal>. Al deze variabelen zijn substitutievariabelen
+waarbij de tekenreeksen $(DIST), $(SECTION) en $(ARCH) vervangen worden door
+hun respectieve waarden.</para>
+     
+     <variablelist>     
+      <varlistentry><term><option>MaxContentsChange</option></term>
+      <listitem><para>
+      Stelt in voor welk aantal kilobytes er iedere dag contents-bestanden
+gegenereerd worden. Contents-bestanden komen een na een aan de beurt, zodat
+ze over een periode van een aantal dagen allemaal opnieuw gebouwd worden.</para></listitem>
+      </varlistentry>
+      
+      <varlistentry><term><option>ContentsAge</option></term>
+      <listitem><para>
+      Regelt het aantal dagen dat een contents-bestand mag gebruikt worden zonder
+dat het gewijzigd werd. Indien die limiet overschreden wordt, zal het mtime
+van het contents-bestand bijgewerkt worden. Een dergelijke situatie kan zich
+voordoen als het pakketbestand op zo een manier gewijzigd wordt dat het niet
+resulteert in een nieuw contents-bestand [bijvoorbeeld een wijziging aan
+override]. Uitstel is toegelaten als gehoopt mag worden dat nieuwe
+.deb-bestanden geïnstalleerd zullen worden wat hoe dan ook een nieuw
+contents-bestand vereist. De standaard is 10, waarbij de eenheden in dagen
+uitgedrukt worden.</para></listitem>
+      </varlistentry>
+      
+      <varlistentry><term><option>Directory</option></term>
+      <listitem><para>
+      Stelt de basis van de .deb-mappenboom in. Standaard is dat
+<filename>$(DIST)/$(SECTION)/binary-$(ARCH)/</filename></para></listitem>
+      </varlistentry>
+      
+      <varlistentry><term><option>SrcDirectory</option></term>
+      <listitem><para>
+      Stelt de basis in van de mappenboom van broncodepakketten. Standaard is dat
+<filename>$(DIST)/$(SECTION)/source/</filename></para></listitem>
+      </varlistentry>
+      
+      <varlistentry><term><option>Packages</option></term>
+      <listitem><para>
+      Stelt in waar het Packages-bestand geschreven wordt. Standaard is dat
+<filename>$(DIST)/$(SECTION)/binary-$(ARCH)/Packages</filename></para></listitem>
+      </varlistentry>
+      
+      <varlistentry><term><option>Sources</option></term>
+      <listitem><para>
+      Stelt in waar het Sources-bestand geschreven wordt. Standaard is dat
+<filename>$(DIST)/$(SECTION)/source/Sources</filename></para></listitem>
+      </varlistentry>
+
+      <varlistentry><term><option>Translation</option></term>
+      <listitem><para>
+      Stelt in waar het hoofdbestand Translation-en geschreven wordt met daarin de
+uitgebreide beschrijvingen in het geval die niet in het bestand Packages
+opgenomen werden. De standaard is
+<filename>$(DIST)/$(SECTION)/i18n/Translation-en</filename></para></listitem>
+      </varlistentry>
+
+      <varlistentry><term><option>InternalPrefix</option></term>
+      <listitem><para>
+      Stelt het pad-prefix in dat regelt wanneer een symbolische koppeling als een
+interne en niet als een externe koppeling beschouwd moet worden. De
+standaard is <filename>$(DIST)/$(SECTION)/</filename></para></listitem>
+      </varlistentry>
+      
+      <varlistentry><term><option>Contents</option></term>
+      <listitem><para>
+      Stelt in waar het Contents-bestand geschreven wordt. De standaard is
+<filename>$(DIST)/$(SECTION)/Contents-$(ARCH)</filename>. Indien deze
+instelling ertoe leidt dat meerdere Packages-bestanden horen bij een enkel
+Contents-bestand (wat standaard het geval is), dan zal
+<command>apt-ftparchive</command> deze pakketbestanden automatisch tot een
+geheel integreren.</para></listitem>
+      </varlistentry>
+      
+      <varlistentry><term><option>Contents::Header</option></term>
+      <listitem><para>
+      Stelt het koptekstbestand in dat aan het begin van het aangemaakte
+contents-bestand moet komen.</para></listitem>
+      </varlistentry>
+
+      <varlistentry><term><option>BinCacheDB</option></term>
+      <listitem><para>
+      Stelt de binaire database in om als cache te dienen voor deze
+sectie. Meerdere secties kunnen gebruik maken van dezelfde database.</para></listitem>
+      </varlistentry>
+      
+      <varlistentry><term><option>FileList</option></term>
+      <listitem><para>
+      Stelt in dat <command>apt-ftparchive</command> de lijst van bestanden moet
+halen uit het opgegeven bestand en niet moet opmaken aan de hand van het
+doorlopen van de mappenboom. De archiefmap wordt als prefix aan relatieve
+bestandsnamen toegevoegd.</para></listitem>
+      </varlistentry>
+      
+      <varlistentry><term><option>SourceFileList</option></term>
+      <listitem><para>
+      Stelt in dat <command>apt-ftparchive</command> de lijst van bestanden moet
+halen uit het opgegeven bestand en niet moet opmaken aan de hand van het
+doorlopen van de mappenboom. De archiefmap wordt als prefix aan relatieve
+bestandsnamen toegevoegd. Dit wordt gebruikt bij het verwerken van
+broncode-indexen.</para></listitem>
+      </varlistentry>
+     </variablelist>     
+   </refsect2>
+   
+   <refsect2><title>De sectie <literal>Tree</literal></title>
+     <para>
+     De sectie <literal>Tree</literal> definieert een standaard bestandsboom voor
+Debian die bestaat uit een basismap met daarin dan meerdere secties en
+binnen elke sessie tenslotte meerdere architecturen. Het exacte pad dat
+gebruikt wordt, wordt gedefinieerd door de substitutievariabele
+<literal>Directory</literal>.</para> 
+     <para>
+     De sectie <literal>Tree</literal> werkt met een bereiklabel dat de variabele
+<literal>$(DIST)</literal> instelt en de basis van de boomstructuur
+definieert (vooraan aan het pad wordt <literal>ArchiveDir</literal>
+toegevoegd). Doorgaans is dat een instelling zoals
+<filename>dists/&debian-stable-codename;</filename>.</para>
+     <para>
+     Alle in de sectie <literal>TreeDefault</literal> gedefinieerde instellingen
+kunnen ook in een <literal>Tree</literal>-sectie gebruikt worden evenals
+drie nieuwe variabelen.</para>
+     <para>
+     Als <command>apt-ftparchive</command> een <literal>Tree</literal>-sectie
+verwerkt, voert het een operatie uit die vergelijkbaar is met: <programlisting>
+for i in Sections do 
+   for j in Architectures do
+      Generate for DIST=scope SECTION=i ARCH=j
+     </programlisting></para>
+
+     <variablelist>     
+      <varlistentry><term><option>Sections</option></term>
+      <listitem><para>
+      Dit is een door spaties gescheiden lijst van secties die onder de
+distributie te vinden zijn. Doorgaans is dat iets zoals <literal>main
+contrib non-free</literal></para></listitem>
+      </varlistentry>
+      
+      <varlistentry><term><option>Architectures</option></term>
+      <listitem><para>
+      Dit is een met spaties gescheiden lijst van alle architecturen die voorkomen
+onder de sectie waarin gezocht wordt. De bijzondere architectuur 'source'
+wordt gebruikt om aan te geven dat deze boomstructuur een archief met
+broncode bevat. De architectuur 'all' signaleert dat architectuurspecifieke
+bestanden zoals <filename>Packages</filename>, niet telkens in elk bestand
+informatie moeten opnemen over pakketten van het architectuurtype
+<literal>all</literal>, aangezien die te vinden is in een specifiek bestand.
+      </para></listitem>
+      </varlistentry>
+
+      <varlistentry><term><option>LongDescription</option></term>
+      <listitem><para>
+      Stelt in of de gedetailleerde beschrijvingen moeten opgenomen worden in het
+<filename>Packages</filename>-bestand of afgesplitst en in een
+<filename>Translation-en</filename> hoofdbestand moeten geplaatst worden.</para></listitem>
+      </varlistentry>
+
+      <varlistentry><term><option>BinOverride</option></term>
+      <listitem><para>
+      Stelt het binaire override-bestand in. Het override-bestand bevat informatie
+over sectie, prioriteit en het adres van de onderhouder.</para></listitem>
+      </varlistentry>
+
+      <varlistentry><term><option>SrcOverride</option></term>
+      <listitem><para>
+      Stelt het override-bestand van de broncode in. Het override-bestand bevat
+informatie over de sectie.</para></listitem>
+      </varlistentry>
+      
+      <varlistentry><term><option>ExtraOverride</option></term>
+      <listitem><para>
+      Stelt het binaire extra override-bestand in.</para></listitem>
+      </varlistentry>
+      
+      <varlistentry><term><option>SrcExtraOverride</option></term>
+      <listitem><para>
+      Stelt het extra override-bestand van de broncode in.</para></listitem> 
+      </varlistentry>
+     </variablelist>
+   </refsect2>
+   
+   <refsect2><title>De sectie <literal>BinDirectory</literal></title>
+     <para>
+     De sectie <literal>bindirectory</literal> definieert een binaire mappenboom
+zonder bijzondere structuur. Het bereiklabel specificeert de locatie van de
+binaire map en de instellingen zijn gelijkaardig aan die van de sectie
+<literal>Tree</literal> zonder substitutievariabelen of instellingen van het
+type <literal>Section</literal><literal>Architecture</literal>.</para>
+     <variablelist>
+      <varlistentry><term><option>Packages</option></term>
+      <listitem><para>
+      Stelt in waar het Packages-bestand aangemaakt wordt.</para></listitem>
+      </varlistentry>
+      
+      <varlistentry><term><option>Sources</option></term>
+      <listitem><para>
+      Stelt in waar het Sources-bestand aangemaakt wordt. Er is minstens een
+bestand <literal>Packages</literal> of <literal>Sources</literal> vereist.</para></listitem>
+      </varlistentry>
+      
+      <varlistentry><term><option>Contents</option></term>
+      <listitem><para>
+      Stelt in waar het Contents-bestand aangemaakt wordt (optioneel).</para></listitem>
+      </varlistentry>
+      
+      <varlistentry><term><option>BinOverride</option></term>
+      <listitem><para>
+      Stelt het binaire override-bestand in.</para></listitem>
+      </varlistentry>
+      
+      <varlistentry><term><option>SrcOverride</option></term>
+      <listitem><para>
+      Stelt het override-bestand voor de broncode in.</para></listitem>
+      </varlistentry>
+      
+      <varlistentry><term><option>ExtraOverride</option></term>
+      <listitem><para>
+      Stelt het binaire extra override-bestand in.</para></listitem>
+      </varlistentry>
+      
+      <varlistentry><term><option>SrcExtraOverride</option></term>
+      <listitem><para>
+      Stelt het extra override-bestand van de broncode in.</para></listitem>
+      </varlistentry>
+      
+      <varlistentry><term><option>BinCacheDB</option></term>
+      <listitem><para>
+      Stelt de cache database in.</para></listitem>
+      </varlistentry>
+      
+      <varlistentry><term><option>PathPrefix</option></term>
+      <listitem><para>
+      Voegt een pad toe aan al de paden van de uitvoer.</para></listitem>
+      </varlistentry>
+      
+      <varlistentry><term><option>FileList</option></term><term><option>SourceFileList</option></term>
+      <listitem><para>
+      Specificeert het bestand met de bestandslijst.</para></listitem>
+      </varlistentry>
+     </variablelist>
+   </refsect2>
+ </refsect1>
+
+
+ <refsect1><title>Het binaire override-bestand</title>
+   <para>Het binaire override-bestand is volledig compatibel met
+&dpkg-scanpackages;. Het bevat vier door spaties gescheiden velden. Het
+eerste veld bevat de pakketnaam, het tweede bevat de prioriteit die aan dat
+pakket gegeven moet worden, het derde bevat de sectie waarin dat pakket
+geplaatst moet worden en het laatste veld is voorbehouden voor het opgeven
+van een vervangende onderhouder.</para>
+   <para>De algemene vorm van het onderhouder-veld is: <literallayout>oude [// ouden]* => nieuwe</literallayout>, of gewoon <literallayout>nieuwe</literallayout> De eerste vorm laat toe om een lijst van oude e-mailadressen, van
+elkaar gescheiden door een dubbele slash, op te geven. Indien een ervan
+aangetroffen wordt, dan zal nieuw als de nieuwe waarde voor het
+onderhouder-veld gebruikt worden. De tweede vorm vervangt onvoorwaardelijk
+de inhoud van het onderhouder-veld.</para>
+ </refsect1>
+
+ 
+ <refsect1><title>Het override-bestand voor broncode</title>
+   <para>
+   Het override-bestand voor broncode is volledig compatibel met
+&dpkg-scansources;. Het bestaat uit twee velden die van elkaar gescheiden
+worden door een spatie. Het eerste veld bevat de naam van het broncodepakket
+en het tweede de sectie waartoe het moet behoren.</para>
+ </refsect1>   
+
+ <refsect1><title>Het extra override-bestand</title>
+   <para>
+   Het extra override-bestand maakt het mogelijk om gelijk welk arbitrair label
+toe te voegen of te vervangen in de uitvoer. Het bestaat uit drie
+kolommen. In de eerste staat het pakket vermeld, in de tweede het label en
+de rest van de regel bevat de nieuwe waarde die eraan toegekend wordt.</para>
+ </refsect1>   
+
+ <refsect1><title>opties</title>
+   &apt-cmdblurb;
+   
+   <variablelist>
+      <varlistentry>
+	 <term><option>--md5</option></term>
+	 <term><option>--sha1</option></term>
+	 <term><option>--sha256</option></term>
+	 <term><option>--sha512</option></term>
+     <listitem><para>
+     De vermelde controlesom genereren. Standaard staan deze opties aan. Indien
+ze uitgezet worden, dan zal het aangemaakte indexbestand zo mogelijk geen
+velden voor de controlesom bevatten. Configuratie-items:
+<literal>APT::FTPArchive::<replaceable>Checksum</replaceable></literal> en
+<literal>APT::FTPArchive::<replaceable>Index</replaceable>::<replaceable>Checksum</replaceable></literal>
+waarbij <literal><replaceable>Index</replaceable></literal> kan bestaan uit
+<literal>Packages</literal>, <literal>Sources</literal> of
+<literal>Release</literal> en
+<literal><replaceable>Checksum</replaceable></literal> kan bestaan uit
+<literal>MD5</literal>, <literal>SHA1</literal>, <literal>SHA256</literal>
+of <literal>SHA512</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>-d</option></term><term><option>--db</option></term>
+     <listitem><para>
+     Een bufferende binaire database gebruiken. Dit heeft geen invloed op het
+commando generate. Configuratie-item:
+<literal>APT::FTPArchive::DB</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>-q</option></term><term><option>--quiet</option></term>
+     <listitem><para>
+     Stille modus. Door het weglaten van de voortgangsindicatie produceert dit
+uitvoer die geschikt is om opgeslagen te worden in een logbestand. Meer q's,
+met een maximum van 2, resulteren in een verhoogde stille modus. U kunt ook
+<option>-q=#</option> gebruiken om het niveau van de stille modus in te
+stellen en op die manier het configuratiebestand te
+overschrijven. Configuratie-item: <literal>quiet</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>--delink</option></term>
+     <listitem><para>
+     Ontkoppelingen uitvoeren. Indien de instelling
+<literal>External-Links</literal> gebruikt wordt, dan maakt deze optie het
+eigenlijk mogelijk om de bestanden te ontkoppelen. Standaard staat dit
+aangezet en het kan uitgezet worden met <option>--no-delink</option>.
+Configuratie-item: <literal>APT::FTPArchive::DeLinkAct</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>--contents</option></term>
+     <listitem><para>
+     Het aanmaken van het contents-bestand uitvoeren. Indien deze optie aangezet
+wordt en de pakketindexen gegenereerd worden met een bufferende database,
+dan zal ook de bestandslijst geëxtraheerd worden en voor later gebruik in de
+database opgeslagen worden. Als het commando generate gebruikt wordt, laat
+deze optie ook toe om Contents-bestanden aan te maken. Standaard staat dit
+aangezet. Configuratie-item: <literal>APT::FTPArchive::Contents</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>-s</option></term><term><option>--source-override</option></term>
+     <listitem><para>
+     Het override-bestand voor broncode selecteren om met het commando
+<literal>sources</literal> te gebruiken. Configuratie-item:
+<literal>APT::FTPArchive::SourceOverride</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>--readonly</option></term>
+     <listitem><para>
+     De bufferende databases alleen lezen maken. Configuration Item:
+<literal>APT::FTPArchive::ReadOnlyDB</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>-a</option></term><term><option>--arch</option></term>
+     <listitem><para>Voor de commando's <literal>packages</literal> en
+<literal>contents</literal> enkel pakketbestanden toelaten die overeenkomen
+met <literal>*_arch.deb</literal> of <literal>*_all.deb</literal> in plaats
+van alle pakketbestanden in het opgegeven pad. Configuratie-item:
+<literal>APT::FTPArchive::Architecture</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>APT::FTPArchive::AlwaysStat</option></term>
+     <listitem><para>
+     &apt-ftparchive; buffert zoveel mogelijk metadata in een bufferende
+database. Indien er pakketten opnieuw gebouwd en/of uitgebracht worden met
+dezelfde versie, zal dit tot problemen leiden, aangezien de dan verouderde
+maar in de buffer aanwezige metadata, zoals grootte en controlesommen,
+gebruikt zullen worden. Indien deze optie aangezet wordt, zal dit niet meer
+gebeuren, vermits gecontroleerd zal worden of het bestand gewijzigd
+werd. Noteer dat deze optie standaard ingesteld staat op
+"<literal>false</literal>" (uit), omdat het niet aangewezen is om meerdere
+versies/bouwversies van een pakket met hetzelfde versienummer te
+uploaden. In theorie zal dus niemand met deze problemen geconfronteerd
+worden en daarom zijn al deze extra controles nutteloos.
+     </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>APT::FTPArchive::LongDescription</option></term>
+     <listitem><para>
+     Deze configuratieoptie staat standaard ingesteld op
+"<literal>true</literal>" (aan) en zou enkel moeten ingesteld worden op
+<literal>"false"</literal> (uit) indien het archief dat met &apt-ftparchive;
+gegenereerd wordt ook <filename>Translation</filename>-bestanden bevat. Merk
+op dat het hoofdbestand <filename>Translation-en</filename> enkel aangemaakt
+kan worden via het commando generate.
+     </para></listitem>
+     </varlistentry>
+
+     &apt-commonoptions;
+
+   </variablelist>
+ </refsect1>
+
+<refsect1><title>Voorbeelden</title>
+
+<para>Om voor een map met binaire pakketten (.deb) een gecomprimeerd
+Packages-bestand aan te maken: <programlisting>
+<command>apt-ftparchive</command> pakketten <replaceable>map</replaceable> | <command>gzip</command> > <filename>Packages.gz</filename>
+</programlisting></para>
+
+</refsect1>
+
+ <refsect1><title>Zie ook</title>
+   <para>&apt-conf;</para>
+ </refsect1>
+
+ <refsect1><title>Diagnostiek</title>
+   <para><command>apt-ftparchive</command> geeft de terugkeerwaarde nul bij een
+normaal verlopen operatie, het decimaal getal 100 in geval van een fout.</para>
+ </refsect1>
+
+ &manbugs;
+ 
+ <refsect1><title>&translation-title;</title>
+   <para>&translation-holder;</para>
+   <para>&translation-english;</para>
+ </refsect1>
+</refentry>

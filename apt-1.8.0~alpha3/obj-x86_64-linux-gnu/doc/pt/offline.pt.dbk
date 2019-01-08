@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+  "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % aptent SYSTEM "apt.ent"> %aptent;
+<!ENTITY % aptverbatiment SYSTEM "apt-verbatim.ent"> %aptverbatiment;
+<!ENTITY % aptvendor SYSTEM "apt-vendor.ent"> %aptvendor;
+]>
+
+<book lang="pt">
+
+<title>Usando o APT Offline</title>
+
+<bookinfo>
+
+<authorgroup>
+  <author>
+    <personname>Jason Gunthorpe</personname><email>jgg@debian.org</email>
+  </author>
+</authorgroup>
+
+<releaseinfo>Versão &apt-product-version;</releaseinfo>
+
+<abstract>
+<para>
+Este documento descreve como usar o APT num ambiente sem rede,
+especificamente uma aproximação 'sneaker-net' para executar actualizações.
+</para>
+</abstract>
+
+<copyright><year>1999</year><holder>Jason Gunthorpe</holder></copyright>
+
+<legalnotice>
+<title>Aviso de Licença</title>
+<para>
+"APT" e este documento são software livre; você pode distribuí-lo e/ou
+modificá-lo sob os termos da GNU General Public License como publicada pela
+Free Software Foundation; seja na versão 2 da Licença, ou (por sua opção)
+qualquer versão posterior.
+</para>
+<para>
+Para mais detalhes em sistemas Debian, veja o ficheiro
+/usr/share/common-licenses/GPL para a licença completa.
+</para>
+</legalnotice>
+
+</bookinfo>
+
+<chapter id="ch1"><title>Introdução</title>
+
+<section id="s1.1"><title>Visão geral</title>
+<para>
+Normalmente o APT requer acesso directo a um arquivo Debian, seja duma media
+local ou através de rede. Outra queixa comum e que uma máquina Debian está
+numa ligação lenta, como um modem e outra máquina tem uma ligação muito
+rápida mas estão fisicamente distantes.
+</para>
+<para>
+A solução para isto é usar grandes médias amovíveis como um disco Zip ou um
+disco SuperDisk. Estes discos não são suficientemente grandes para armazenar
+o arquivo Debian inteiro mas podem facilmente conter um subconjunto
+suficientemente grande para a maioria dos utilizadores. A ideia é usar o APT
+para gerar uma lista de pacotes que são necessários e depois obter-los para
+o disco usando outra máquina com boa ligação. É até possível usar outra
+máquina Debian com APT ou usar um SO completamente diferente e uma
+ferramenta de download como o wget. Deixe <emphasis>remote host</emphasis>
+representar a máquina que descarrega os pacotes, e <emphasis>target
+host</emphasis> aquela com má ou nenhuma ligação.
+</para>
+<para>
+Isto é conseguido ao manipular criativamente o ficheiro de configuração do
+APT. A premissa essencial para dizer ao APT para procurar num disco pelos
+seus ficheiros de arquivo. Note que o disco deve estar formatado com um
+sistema de ficheiros que saiba lidar com nomes de ficheiros longos como o
+ext2, fat32 ou vfat.
+</para>
+</section>
+
+</chapter>
+
+<chapter id="ch2"><title>Usando o APT em ambas máquinas</title>
+
+<section id="s2.1"><title>Visão geral</title>
+<para>
+Estando o APT disponível em ambas máquinas dá a configuração mais simples. A
+ideia básica é colocar uma cópia do ficheiro de estado no disco e usar a
+máquina remota para obter os ficheiros de pacotes mais recentes e decidir
+quais pacotes descarregar. A estrutura de directórios do disco deverá
+parecer-se com:
+</para>
+<screen>
+  /disc/
+    archives/
+       partial/
+    lists/
+       partial/
+    status
+    sources.list
+    apt.conf
+</screen>
+</section>
+
+<section id="s2.2"><title>O ficheiro de configuração</title>
+<para>
+O ficheiro de configuração deve dizer ao APT para armazenar os seus ficheiro
+no disco e usar os ficheiros de configuração do disco também. O sources.list
+deve conter os sites apropriados que deseja usar a partir da máquina remota,
+e o ficheiro de estado deve ser uma cópia de
+<emphasis>/var/lib/dpkg/status</emphasis> a partir do <emphasis>target
+host</emphasis>. Por favor note, se está a usar um arquivo local você deve
+usar copy URIs, a sintaxe é idêntica a file URIs.
+</para>
+<para>
+<emphasis>apt.conf</emphasis> tem de conter a informação necessária para
+fazer o APT usar o disco:
+</para>
+<screen>
+ APT
+ {
+   /* Isto não é necessário se as duas máquinas forem da mesma arquitectura, diz
+      ao APT remoto que arquitectura tem a máquina de destino */
+   Architecture "i386";
+
+   Get::Download-Only "true";
+ };
+
+ Dir
+ {
+   /* Usa o disco para informação de estado e redirecciona o ficheiro de estado a partir de
+      the /var/lib/dpkg default */
+   State "/disc/";
+   State::status "status";
+
+   // Caches binárias serão armazenadas localmente
+   Cache::archives "/disc/archives/";
+   Cache "/tmp/";
+
+   // Localização da lista de fontes.
+   Etc "/disc/";
+ };
+</screen>
+<para>
+Mais detalhes podem ser vistos ao examinar o manual do apt.conf e o exemplo
+de ficheiro de configuração em
+<emphasis>/usr/share/doc/apt/examples/apt.conf</emphasis>.
+</para>
+<para>
+Na máquina de destino a primeira coisa a fazer é montar o disco e copiar
+<emphasis>/var/lib/dpkg/status</emphasis> para ele. Você também precisa de
+criar os directórios delineados na Visão Geral,
+<emphasis>archives/partial/</emphasis> e
+<emphasis>lists/partial/</emphasis>. Depois leve o disco até à máquina
+remota e configure o sources.list. Na máquina remota execute o seguinte:
+</para>
+<screen>
+ # export APT_CONFIG="/disc/apt.conf"
+ # apt-get update
+ [ APT obtém os ficheiros de pacotes ]
+ # apt-get dist-upgrade
+ [ APT obtém todos os pacotes necessários para actualizar a máquina de destino ]
+</screen>
+<para>
+O comando dist-upgrade pode ser substituído por qualquer outro comando APT
+standard, particularmente dselect-upgrade. Você até pode usar um front-end
+do APT como o <emphasis>dselect</emphasis>. No entanto isto apresenta um
+problema ao comunicar as suas selecções de volta ao computador local.
+</para>
+<para>
+Agora o disco contém todos os ficheiros de índice e os arquivos necessários
+para actualizar a máquina de destino. Devolva o disco e corra:
+</para>
+<screen>
+  # export APT_CONFIG="/disc/apt.conf"
+  # apt-get check
+  [ APT gera uma cópia local dos ficheiros de cache ]
+  # apt-get --no-d -o dir::state::status=/var/lib/dpkg/status dist-upgrade
+  [ Ou qualquer outro comando APT ]
+</screen>
+<para>
+Para uma função apropriada é necessário re-especificar que o ficheiro de
+estado seja o ficheiro local. Isto é muito importante!
+</para>
+<para>
+Se está a usar dselect você pode fazer a operação muito arriscada de copiar
+disc/status para /var/lib/dpkg/status para que quaisquer selecções que faça
+na máquina remota sejam actualizadas. Eu recomendo altamente que as pessoas
+apenas façam selecções na máquina local - mas isto pode nem sempre ser
+possível. NÃO copie o ficheiro de estado se entretanto correu o dpkg ou o
+APT!!
+</para>
+</section>
+
+</chapter>
+
+<chapter id="ch3"><title>Usando APT e wget</title>
+
+<section id="s3.1"><title>Visão geral</title>
+<para>
+<emphasis>wget</emphasis> é uma ferramenta popular e portável de download
+que pode correr praticamente em qualquer máquina. Ao contrário do método
+acima, este requer que a máquina Debian já tenha uma lista de pacotes
+disponíveis.
+</para>
+<para>
+A ideia básica é criar um disco que tem apenas os ficheiros de arquivo
+descarregados do site remoto. Isto é feito ao usar a opção --print-uris no
+apt-get e depois preparar um script wget para realmente ir buscar os
+pacotes.
+</para>
+</section>
+
+<section id="s3.2"><title>Operação</title>
+<para>
+Ao contrário da técnica anterior, não são necessários ficheiros de
+configuração especiais. Nós usamos meramente os comandos standard do APT
+para gerar a lista de ficheiros.
+</para>
+<screen>
+ # apt-get dist-upgrade 
+ [ Escolha não quando perguntado, certifique-se que está contente com as acções ]
+ # apt-get -qq --print-uris dist-upgrade &gt; uris
+ # awk '{print "wget -O " $2 " " $1}' &lt; uris &gt; /disc/wget-script
+</screen>
+<para>
+Qualquer comando além do dist-upgrade pode ser usado aqui, incluindo
+dselect-upgrade.
+</para>
+<para>
+O ficheiro /disc/wget-script irá agora conter uma lista de comandos do wget
+para executar de modo a obter os arquivos necessários. Este script deve ser
+corrido com o directório actual sendo o ponto de montagem do disco para que
+grave os resultados no disco.
+</para>
+<para>
+A máquina remota deverá fazer algo como
+</para>
+<screen>
+  # cd /disc
+  # sh -x ./wget-script
+  [ wait.. ]
+</screen>
+<para>
+Após os arquivos serem descarregados e o disco retornado à máquina Debian, a
+instalação pode prosseguir usando,
+</para>
+<screen>
+  # apt-get -o dir::cache::archives="/disc/" dist-upgrade
+</screen>
+<para>
+O qual irá usar os arquivos já obtidos e que estão no disco.
+</para>
+</section>
+
+</chapter>
+
+</book>

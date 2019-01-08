@@ -1,0 +1,93 @@
+Format: 1.8
+Date: Tue, 18 Dec 2018 15:02:11 +0100
+Source: apt
+Binary: apt libapt-pkg5.0 libapt-inst2.0 apt-doc libapt-pkg-dev libapt-pkg-doc apt-utils apt-transport-https
+Built-For-Profiles: nobiarch nocheck nodoc
+Architecture: amd64 all
+Version: 1.8.0~alpha3
+Distribution: unstable
+Urgency: medium
+Maintainer: APT Development Team <deity@lists.debian.org>
+Changed-By: Julian Andres Klode <jak@debian.org>
+Description:
+ apt        - commandline package manager
+ apt-doc    - documentation for APT
+ apt-transport-https - transitional package for https support
+ apt-utils  - package management related utility programs
+ libapt-inst2.0 - deb package format runtime library
+ libapt-pkg-dev - development files for APT's libapt-pkg and libapt-inst
+ libapt-pkg-doc - documentation for APT development
+ libapt-pkg5.0 - package management runtime library
+Closes: 914096
+Changes:
+ apt (1.8.0~alpha3) unstable; urgency=medium
+ .
+   [ Manuel A. Fernandez Montecelo ]
+   * Remove "Ultimedia" config for Acquire::Changelogs
+   * Remove "Tanglu" config for Acquire::Changelogs and as vendor
+ .
+   [ Julian Andres Klode ]
+   * Adjust libapt-pkg Breaks aptitude to << 0.8.9
+   * Print useful error on "apt changelog" without arguments
+   * test-pdiff-usage: make transaction failure test case more robust
+   * Provide a "autopurge" shortcut.
+     Thanks to Michael Vogt for the initial work
+   * Override FileFd copy constructor to prevent copying
+   * Add support for /etc/apt/auth.conf.d/*.conf (netrcparts)
+   * Set PATH=/usr/sbin:/usr/bin:/sbin:/bin when running dpkg
+ .
+   [ David Kalnischkies ]
+   * Allow setting Referer header for http method
+   * Use quoted tagnames in config dumps
+ .
+   [ Алексей Шилин ]
+   * Russian program translation update (Closes: #914096)
+ .
+   [ Balint Reczey ]
+   * Set LC_ALL=C.UTF-8 for unattended-upgrades environment when parsing its --help
+     (LP: #1806076)
+ .
+   [ Milo Casagrande ]
+   * [l10n] Update Italian translation
+Checksums-Sha1:
+ 6d8db1c5a52d69d8a55a2c04fd7df9f8a10ccda8 7212696 apt-dbgsym_1.8.0~alpha3_amd64.deb
+ 1c65fe1a050d3dc53fa5e91cd2189bfad0b0574a 355600 apt-doc_1.8.0~alpha3_all.deb
+ 9e5adfef29c52740bf8e185219e308924b4c556e 147340 apt-transport-https_1.8.0~alpha3_all.deb
+ 71bf31dac915d11fbf0dbaa8dd387ff5140bae36 2008000 apt-utils-dbgsym_1.8.0~alpha3_amd64.deb
+ 5889feb0dbf8f0358c482cdeea5b3d9d9277c882 420416 apt-utils_1.8.0~alpha3_amd64.deb
+ 313c585a4c84b1fd2c711c770d68d83b1c5a3cdf 11744 apt_1.8.0~alpha3_amd64.buildinfo
+ b1a968dd401eb14eb9c978d4d378353655852ae4 1299956 apt_1.8.0~alpha3_amd64.deb
+ cc2438bb8f851e4c4c79e5484c5e12bf1ee1cfa3 275784 libapt-inst2.0-dbgsym_1.8.0~alpha3_amd64.deb
+ ca31f3ae94f8e825333b8151b294d0eace24dfad 202476 libapt-inst2.0_1.8.0~alpha3_amd64.deb
+ 756051483f77ce1f86782009b6354d86bb11e9ce 245636 libapt-pkg-dev_1.8.0~alpha3_amd64.deb
+ 05ea2da70633554600bd1aef4a0dd6d509e0189d 1044896 libapt-pkg-doc_1.8.0~alpha3_all.deb
+ 6dd0071c10f39189f33c3265610d48bb80504dfd 10274836 libapt-pkg5.0-dbgsym_1.8.0~alpha3_amd64.deb
+ 1beecabc29385fbb7d0b61fc16e1645828503416 946884 libapt-pkg5.0_1.8.0~alpha3_amd64.deb
+Checksums-Sha256:
+ 73b5b47f3995239684ddb5a344a1daa6d30ba0bb4d07bcb229d75f8968252ebe 7212696 apt-dbgsym_1.8.0~alpha3_amd64.deb
+ 1c93b8056131fc73f79df57c79bfadb19d7de18cb5ae0dbaf42c9bad2ea3bafe 355600 apt-doc_1.8.0~alpha3_all.deb
+ fcad6424e009f64375be1b0852257c4971acecace1bdeccc28ebc44653642999 147340 apt-transport-https_1.8.0~alpha3_all.deb
+ 9a1426cdc502925d02d09a12a3a748855195ef243845b789c2cb872ad0a6575b 2008000 apt-utils-dbgsym_1.8.0~alpha3_amd64.deb
+ c1a0b4a967f9303c84cc9556df560f3bf9f33bf5a09422160304523cc7397f34 420416 apt-utils_1.8.0~alpha3_amd64.deb
+ b7e7a44ce4991942822d7c303704fe3ad3e02b0312f7c0135400369784cc0201 11744 apt_1.8.0~alpha3_amd64.buildinfo
+ fcedd2676fdb6ea7c4d135d35e963a52aae21f80403a6a007d683ea36dfd6856 1299956 apt_1.8.0~alpha3_amd64.deb
+ fea27e8293688506dac5f3af063d241f047fbb6786ffca9854c84064adc5bd35 275784 libapt-inst2.0-dbgsym_1.8.0~alpha3_amd64.deb
+ 84ca0fb2beebe00433aa9806a1c07b9fe237677df2181fc498dcf6f7bb2921af 202476 libapt-inst2.0_1.8.0~alpha3_amd64.deb
+ 0b7678578551bd77be1c7877a3663fd2117ec5c4a82dd8ee5321e409e006e54f 245636 libapt-pkg-dev_1.8.0~alpha3_amd64.deb
+ 031b2647c2f312decb0fc170fbe952b854fb9376329d3d0d0ce7043bfe25d14b 1044896 libapt-pkg-doc_1.8.0~alpha3_all.deb
+ 819d522237f3dcc9da050314cca69e93f79aad442b7dc8a11d9ea030152293c2 10274836 libapt-pkg5.0-dbgsym_1.8.0~alpha3_amd64.deb
+ e3d6ef267d07907f2536a1a6b530f8a996c48d44149399a417381c24aca6cf41 946884 libapt-pkg5.0_1.8.0~alpha3_amd64.deb
+Files:
+ 34553383ce61c29e9529c17d83371694 7212696 debug optional apt-dbgsym_1.8.0~alpha3_amd64.deb
+ 3e7d92714d43e762f12b8b2348887fef 355600 doc optional apt-doc_1.8.0~alpha3_all.deb
+ 380a05381c2230b1fbd11dc021a2c00f 147340 oldlibs optional apt-transport-https_1.8.0~alpha3_all.deb
+ f9f8771b0dbcd62a6b8636642a44f024 2008000 debug optional apt-utils-dbgsym_1.8.0~alpha3_amd64.deb
+ ebe6a3a76c343c24cb46bded4bfec4f9 420416 admin important apt-utils_1.8.0~alpha3_amd64.deb
+ 838e389954cba542dde45d3f3f04f80a 11744 admin important apt_1.8.0~alpha3_amd64.buildinfo
+ 231809bd53a66a7e9efee071a25be860 1299956 admin important apt_1.8.0~alpha3_amd64.deb
+ 54716c135e41d3ca6704c73a02bc6929 275784 debug optional libapt-inst2.0-dbgsym_1.8.0~alpha3_amd64.deb
+ 774cd730eaba5a76b86f8e3db5754141 202476 libs optional libapt-inst2.0_1.8.0~alpha3_amd64.deb
+ 6834e480d872a0b03e46aa709f3a7da7 245636 libdevel optional libapt-pkg-dev_1.8.0~alpha3_amd64.deb
+ cd160ea3c64ce24812e6aad5133bdfe4 1044896 doc optional libapt-pkg-doc_1.8.0~alpha3_all.deb
+ 948d49def5145000d32e80ffdbab3fe7 10274836 debug optional libapt-pkg5.0-dbgsym_1.8.0~alpha3_amd64.deb
+ 116cd335f0c2e7f7e9de6fcbb4ae3ac3 946884 libs optional libapt-pkg5.0_1.8.0~alpha3_amd64.deb

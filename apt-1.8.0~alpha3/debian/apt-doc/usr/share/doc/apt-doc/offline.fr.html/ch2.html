@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Chapitre 2. Utilisation d'APT sur les deux machines</title>
+    <meta name="generator" content="DocBook XSL Stylesheets V1.79.1"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="home" href="index.html" title="Utilisation d'APT hors ligne"/>
+    <link rel="up" href="index.html" title="Utilisation d'APT hors ligne"/>
+    <link rel="prev" href="ch1.html" title="Chapitre 1. Introduction"/>
+    <link rel="next" href="ch3.html" title="Chapitre 3. Utilisation d'APT et wget"/>
+  </head>
+  <body>
+    <div class="navheader">
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Chapitre 2. Utilisation d'APT sur les deux machines</th>
+        </tr>
+        <tr>
+          <td align="left"><a accesskey="p" href="ch1.html">Précédent</a> </td>
+          <th width="60%" align="center"> </th>
+          <td align="right"> <a accesskey="n" href="ch3.html">Suivant</a></td>
+        </tr>
+      </table>
+      <hr/>
+    </div>
+    <div class="chapter">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h1 class="title"><a id="ch2"/>Chapitre 2. Utilisation d'APT sur les deux machines</h1>
+          </div>
+        </div>
+      </div>
+      <div class="toc">
+        <p>
+          <strong>Table des matières</strong>
+        </p>
+        <dl class="toc">
+          <dt>
+            <span class="section">
+              <a href="ch2.html#s2.1">2.1. Aperçu</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="section">
+              <a href="ch2.html#s2.2">2.2. Le fichier de configuration</a>
+            </span>
+          </dt>
+        </dl>
+      </div>
+      <div class="section">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h2 class="title"><a id="s2.1"/>2.1. Aperçu</h2>
+            </div>
+          </div>
+        </div>
+        <p>
+Si APT existe sur les deux machines, le cas est relativement simple. L'idée
+de base est de mettre une copie du fichier d'état sur le disque et
+d'utiliser la machine distante pour récupérer la dernière liste de paquets
+et choisir ceux à télécharger. La structure des répertoires du disque
+devraient ressembler à :
+</p>
+        <pre class="screen">
+  /disc/
+    archives/
+       partial/
+    lists/
+       partial/
+    status
+    sources.list
+    apt.conf
+</pre>
+      </div>
+      <div class="section">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h2 class="title"><a id="s2.2"/>2.2. Le fichier de configuration</h2>
+            </div>
+          </div>
+        </div>
+        <p>
+Le fichier de configuration indique à APT où conserver ses fichiers sur le
+disque et d'utiliser également les fichiers de configuration du disque. Le
+fichier sources.list devrait référencer les sites que vous souhaitez
+utiliser depuis la machine distante et le fichier d'état doit être une copie
+de <span class="emphasis"><em>/var/lib/dpkg/status</em></span> de l'<span class="emphasis"><em>ordinateur
+cible</em></span>. Veuillez noter que si sous utilisez une archive locale,
+les URI doivent en être copiés. La syntaxe est la même que celle des URI
+fichiers.
+</p>
+        <p>
+<span class="emphasis"><em>apt.conf</em></span> doit avoir les informations nécessaires pour
+qu'APT utilise le disque.disc:
+</p>
+        <pre class="screen">
+ APT
+ {
+   /* This is not necessary if the two machines are the same arch, it tells
+      the remote APT what architecture the target machine is */
+   Architecture "i386";
+
+   Get::Download-Only "true";
+ };
+
+ Dir
+ {
+   /* Use the disc for state information and redirect the status file from
+      the /var/lib/dpkg default */
+   State "/disc/";
+   State::status "status";
+
+   // Binary caches will be stored locally
+   Cache::archives "/disc/archives/";
+   Cache "/tmp/";
+
+   // Location of the source list.
+   Etc "/disc/";
+ };
+</pre>
+        <p>
+Plus d'informations peuvent être trouvées dans la page de manuel du fichier
+apt.conf et dans l'exemple de fichier de configuration que l'on peut trouver
+dans <span class="emphasis"><em>/usr/share/doc/apt/examples/apt.conf</em></span>.
+</p>
+        <p>
+Sur la machine cible, il est d'abord nécessaire de monter le disque et y
+copier le fichier <span class="emphasis"><em>/var/lib/dpkg/status</em></span>. Il sera aussi
+nécessaire de créer les répertoires dans l'aperçu (Overview),
+<span class="emphasis"><em>archives/partial/</em></span> and
+<span class="emphasis"><em>lists/partial/</em></span>. Connecter ensuite le disque à la
+machine distante et configurer le fichier sources.list. Sur la machine
+distante, exécuter la séquence de commandes suivante :
+</p>
+        <pre class="screen">
+ # export APT_CONFIG="/disc/apt.conf"
+ # apt-get update
+ [ APT récupère les fichiers des paquets ]
+ # apt-get dist-upgrade
+ [ APT récupère tous les fichiers nécessaires à la mise à jour de la machine distante ]
+</pre>
+        <p>
+La commande dist-upgrade peut être remplacée par toute autres commande
+usuelle d'APT, notamment dselect-upgrade. Il est même possible d'utiliser
+une interface comme <span class="emphasis"><em>dselect</em></span>. Cependant, cela complique
+la communication des choix vers l'ordinateur local.
+</p>
+        <p>
+Après cette opération, le disque contiendra tous les fichiers d'index et les
+archives nécessaires pour mettre à jour la machine cible. Il est alors
+possible d'y ramener le disque et exécuter :
+</p>
+        <pre class="screen">
+  # export APT_CONFIG="/disc/apt.conf"
+  # apt-get check
+  [ APT crée la copie locale des fichiers de cache ]
+  # apt-get --no-d -o dir::state::status=/var/lib/dpkg/status dist-upgrade
+  [ Ou toute autre commande APT ]
+</pre>
+        <p>
+Pour un fonctionnement correct, il est indispensable de ré-indiquer que le
+fichier d'état est le fichier local. Cela est très important.
+</p>
+        <p>
+Si vous utilisez dselect, vous pouvez effectuer l'opération dangereuse
+consistant à copier disc/status en /var/lib/dpkg/status, afin que les choix
+effectués sur la machine distante soient mis à jour. Il est recommandé de
+n'éffectuer les choix que sur la machine locale, mais ce n'est pas toujours
+possible. NE COPIEZ PAS le fichier d'état si dpkg ou APT ont été exécutés
+dans l'intervalle.
+</p>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr/>
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td align="left"><a accesskey="p" href="ch1.html">Précédent</a> </td>
+          <td align="center"> </td>
+          <td align="right"> <a accesskey="n" href="ch3.html">Suivant</a></td>
+        </tr>
+        <tr>
+          <td align="left" valign="top">Chapitre 1. Introduction </td>
+          <td align="center">
+            <a accesskey="h" href="index.html">Sommaire</a>
+          </td>
+          <td align="right" valign="top"> Chapitre 3. Utilisation d'APT et wget</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

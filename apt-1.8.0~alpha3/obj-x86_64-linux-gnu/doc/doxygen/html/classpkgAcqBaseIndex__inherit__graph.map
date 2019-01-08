@@ -1,0 +1,9 @@
+<map id="pkgAcqBaseIndex" name="pkgAcqBaseIndex">
+<area shape="rect" id="node5" href="$classpkgAcqIndex.xhtml" title="An acquire item that is responsible for fetching an index {{{ file (e.g., Packages or Sources)..." alt="" coords="17,304,123,331"/>
+<area shape="rect" id="node7" href="$classpkgAcqIndexDiffs.xhtml" title="An item that is responsible for fetching server&#45;merge patches {{{ that need to be applied to a given ..." alt="" coords="147,304,283,331"/>
+<area shape="rect" id="node8" href="$classpkgAcqIndexMergeDiffs.xhtml" title="An item that is responsible for fetching client&#45;merge patches {{{ that need to be applied to a given ..." alt="" coords="307,304,483,331"/>
+<area shape="rect" id="node2" href="$classpkgAcqTransactionItem.xhtml" title="baseclass for the indexes files to manage them all together " alt="" coords="128,155,303,181"/>
+<area shape="rect" id="node3" href="$classpkgAcquire_1_1Item.xhtml" title="Represents the process by which a pkgAcquire object should retrieve a file or a collection of files..." alt="" coords="189,80,241,107"/>
+<area shape="rect" id="node4" href="$classWeakPointable.xhtml" title="WeakPointable" alt="" coords="156,5,275,32"/>
+<area shape="rect" id="node6" href="$classpkgAcqDiffIndex.xhtml" title="An item that is responsible for fetching an index file of {{{ package list diffs and starting the pac..." alt="" coords="5,379,135,405"/>
+</map>

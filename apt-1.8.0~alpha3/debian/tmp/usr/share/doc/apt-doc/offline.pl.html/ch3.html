@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Rozdział 3. Używanie programów APT i wget</title>
+    <meta name="generator" content="DocBook XSL Stylesheets V1.79.1"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="home" href="index.html" title="Używanie APT w trybie offline"/>
+    <link rel="up" href="index.html" title="Używanie APT w trybie offline"/>
+    <link rel="prev" href="ch2.html" title="Rozdział 2. Używanie programu APT na obu komputerach"/>
+  </head>
+  <body>
+    <div class="navheader">
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Rozdział 3. Używanie programów APT i wget</th>
+        </tr>
+        <tr>
+          <td align="left"><a accesskey="p" href="ch2.html">Poprzedni</a> </td>
+          <th width="60%" align="center"> </th>
+          <td align="right"> </td>
+        </tr>
+      </table>
+      <hr/>
+    </div>
+    <div class="chapter">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h1 class="title"><a id="ch3"/>Rozdział 3. Używanie programów APT i wget</h1>
+          </div>
+        </div>
+      </div>
+      <div class="toc">
+        <p>
+          <strong>Spis treści</strong>
+        </p>
+        <dl class="toc">
+          <dt>
+            <span class="section">
+              <a href="ch3.html#s3.1">3.1. Wprowadzenie</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="section">
+              <a href="ch3.html#s3.2">3.2. Kolejne kroki</a>
+            </span>
+          </dt>
+        </dl>
+      </div>
+      <div class="section">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h2 class="title"><a id="s3.1"/>3.1. Wprowadzenie</h2>
+            </div>
+          </div>
+        </div>
+        <p>
+<span class="emphasis"><em>wget</em></span> jest popularnym i przenośnym programem
+narzędziowym pobierania plików, który działa prawie na każdym komputerze. W
+przeciwieństwie do metody opisanej powyżej ta wymaga, aby na lokalnym
+komputerze była aktualna lista dostępnych pakietów.
+</p>
+        <p>
+Należy stworzyć katalog disc tylko na pakiety do pobrania z innego
+komputera. Użyta zostanie do tego opcja --print-uris programu apt-get, a
+następnie przygotujemy skrypt dla programu wget, który pobierze właściwe
+pakiety.
+</p>
+      </div>
+      <div class="section">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h2 class="title"><a id="s3.2"/>3.2. Kolejne kroki</h2>
+            </div>
+          </div>
+        </div>
+        <p>
+W odróżnieniu od poprzedniej metody działania ta nie wymaga specjalnych
+plików konfiguracyjnych. Używamy jedynie podstawowych poleceń APT, by
+wygenerować listę plików.
+</p>
+        <pre class="screen">
+ # apt-get dist-upgrade 
+ [ Wybierz "no" po znaku zachęty, upewnij się, czy to właściwy wybór ]
+ # apt-get -qq --print-uris dist-upgrade &gt; uris
+ # awk '{print "wget -O " $2 " " $1}' &lt; uris &gt; /disc/wget-script
+</pre>
+        <p>
+Można tu użyć także polecenia innego niż dist-upgrade, na przykład
+dselect-upgrade.
+</p>
+        <p>
+Plik skryptu /disc/wget-script będzie teraz zawierać listę wywołań programu
+wget, niezbędnych do pobrania potrzebnych archiwów. Skrypt ten należy
+uruchomić w bieżącym katalogu o punkcie montowania disc, tak aby zapisywał
+dane na tym dysku.
+</p>
+        <p>
+Na oddalonym komputerze należy wykonać coś takiego
+</p>
+        <pre class="screen">
+  # cd /disc
+  # sh -x ./wget-script
+  [ czekaj.. ]
+</pre>
+        <p>
+Gdy archiwa zostaną pobrane i dysk wróci do komputera z Debianem,
+instalowanie można prowadzić dalej poleceniem:
+</p>
+        <pre class="screen">
+  # apt-get -o dir::cache::archives="/disc/" dist-upgrade
+</pre>
+        <p>
+Które użyje pobranych uprzednio archiwów z dysku.
+</p>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr/>
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td align="left"><a accesskey="p" href="ch2.html">Poprzedni</a> </td>
+          <td align="center"> </td>
+          <td align="right"> </td>
+        </tr>
+        <tr>
+          <td align="left" valign="top">Rozdział 2. Używanie programu APT na obu komputerach </td>
+          <td align="center">
+            <a accesskey="h" href="index.html">Spis treści</a>
+          </td>
+          <td align="right" valign="top"> </td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

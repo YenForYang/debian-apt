@@ -1,0 +1,624 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+  "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % aptent SYSTEM "apt.ent"> %aptent;
+<!ENTITY % aptverbatiment SYSTEM "apt-verbatim.ent"> %aptverbatiment;
+<!ENTITY % aptvendor SYSTEM "apt-vendor.ent"> %aptvendor;
+]>
+
+<refentry>
+
+ <refentryinfo>
+   <!-- The last update date -->
+&apt-author.jgunthorpe;
+   &apt-author.team;
+   &apt-email;
+   &apt-product;
+   
+   <date>2018-08-17T00:00:00Z</date>
+ </refentryinfo>
+ 
+ <refmeta>
+   <refentrytitle>sources.list</refentrytitle>
+   <manvolnum>5</manvolnum>
+   <refmiscinfo class="manual">APT</refmiscinfo>
+ </refmeta>
+ 
+ 
+ <!-- Man page title -->
+<refnamediv>
+    <refname>sources.list</refname>
+    <refpurpose>Lijst met geconfigureerde gegevensbronnen van APT</refpurpose>
+ </refnamediv>
+ 
+ <refsect1><title>Omschrijving</title>
+   <para>
+      De pakketbronnenlijst <filename>/etc/apt/sources.list</filename> en de
+bestanden die in <filename>/etc/apt/sources.list.d/</filename> te vinden
+zijn, werden ontwikkeld om gelijk welk aantal actieve bronnen en een
+variatie aan bronmedia te ondersteunen. In de bestanden wordt elke
+pakketbron op een aparte regel vermeld (de één-regelstijl) of ze bevatten
+uit meerdere regels bestaande elementen die per element een of meer
+pakketbronnen definiëren (de deb822 stijl), waarbij de meest wenselijke
+pakketbron eerst komt (voor het geval een bepaalde versie in meer dan één
+pakketbron te vinden is). De op deze geconfigureerde pakketbronnen
+beschikbare informatie wordt opgevraagd met <command>apt-get
+update</command> (of met een equivalent commando van een ander front-end
+voor APT).
+   </para>
+ </refsect1>
+ 
+ <refsect1><title>sources.list.d</title>
+    <para>De map <filename>/etc/apt/sources.list.d</filename> biedt de mogelijkheid om
+items voor sources.list in afzonderlijke bestanden toe te voegen. Zoals
+beschreven wordt in de volgende twee secties, zijn twee verschillende
+bestandsindelingen toegelaten. Bestandsnamen moeten eindigen op
+<filename>.list</filename> of <filename>.sources</filename>, afhankelijk van
+welke indeling ze bevatten. De bestandsnamen mogen enkel letters (a-z en
+A-Z), cijfers (0-9), lage streepjes (_), koppeltekens (-) en punten (.)
+bevatten. Is dit niet het geval, dan zal APT melden dat het een bestand
+overgeslagen heeft, tenzij dat bestand beantwoordt aan een patroon uit de
+configuratielijst <literal>Dir::Ignore-Files-Silently</literal> - in dat
+geval zal het stilzwijgend overgeslagen worden.</para>
+ </refsect1>
+
+ <refsect1><title>Indeling in één-regelstijl</title>
+    <para>
+       Bestanden met deze indeling hebben de extensie
+<filename>.list</filename>. Iedere regel die een pakketbron specificeert,
+begint met het type (bijv. <literal>deb-src</literal>), gevolgd door opties
+en argumenten voor dat type. Een individueel item mag niet tot op een
+volgende regel doorlopen. Lege regels worden overgeslagen en het teken
+<literal>#</literal> ergens op een regel geeft aan dat de rest van die regel
+commentaar bevat. Als gevolg daarvan kan een item gedeactiveerd worden door
+de hele regel uit te commentariëren. Indien er opties opgegeven moeten
+worden, worden ze van elkaar gescheiden door komma's en allemaal samen
+worden ze tussen rechte haakjes (<literal>[]</literal>) op de regel
+geplaatst na het type en daarvan gescheiden door een komma. Indien een optie
+meerdere waarden mag hebben, dan worden ze met een komma
+(<literal>,</literal>) van elkaar gescheiden. De naam van een optie wordt
+van zijn waarde(n) gescheiden met een gelijkheidsteken
+(<literal>=</literal>). Multi-waarde opties hebben ook <literal>-=</literal>
+en <literal>+=</literal> als scheidingstekens. In plaats van de
+standaardwaarde(n) te vervangen door de opgegeven waarde(n), wijzigen zij de
+standaardwaarde(n) door er de opgegeven waarden uit te verwijderen of eraan
+toe te voegen.
+   </para><para>
+       Dit is de traditionele indeling die door alle versies van apt ondersteund
+wordt. Merk op dat niet alle opties die hieronder beschreven worden door
+alle versies van apt ondersteund worden. Merk ook op dat sommige oudere
+toepassingen die zelfstandig deze indeling ontleden wellicht geen opties
+zullen verwachten, aangezien die ongebruikelijk waren voor de invoering van
+multi-architectuurondersteuning.
+    </para>
+ </refsect1>
+
+ <refsect1><title>Indeling in deb822-stijl</title>
+    <para>
+       Bestanden met deze indeling hebben de extensie
+<filename>.sources</filename>. Op het gebied van de syntaxis is de indeling
+gelijkaardig aan andere bestanden die door Debian en zijn derivaten gebruikt
+worden, zoals de metadatabestanden die apt ophaalt bij de geconfigureerde
+pakketbronnen of het bestand <filename>debian/control</filename> in een
+Debian broncodebestand. Individuele items worden van elkaar gescheiden door
+een witregel. Bijkomende witregels worden genegeerd en het teken
+<literal>#</literal> aan het begin van een regel markeert de volledige regel
+als commentaar. Een item kan dus gedeactiveerd worden door elke regel die
+onderdeel is van dat item, uit te commentariëren. Maar meestal is het
+eenvoudiger om het item te deactiveren door er het veld "Enabled: no" aan
+toe te voegen. Dat veld verwijderen of het instellen op yes, activeert het
+item opnieuw. Opties gebruiken dezelfde syntaxis als elk ander veld: een
+veldnaam gescheiden van zijn waarde(n) door een dubbele punt
+(<literal>:</literal>) en optionele spaties. Merk in het bijzonder op dat
+meerdere waarden onderling gescheiden worden door witruimte (zoals spaties,
+tabs en regeleindes) en niet door komma's, zoals het geval is bij de
+één-regelindeling. Multi-waarde velden, zoals
+<literal>Architectures</literal>, kennen ook
+<literal>Architectures-Add</literal> en
+<literal>Architectures-Remove</literal> om de standaardwaarde aan te passen
+in plaats van ze te vervangen.
+   </para><para>
+       Dit is een nieuwe indeling die door apt zelf ondersteund wordt sinds versie
+1.1. Eerdere versies negeren dergelijke bestanden met een
+kennisgevingsbericht zoals eerder beschreven. Het is de bedoeling dat deze
+indeling gaandeweg de standaardindeling wordt en dat de eerder beschreven
+één-regelstijl uitgefaseerd wordt, vermits het zowel voor mensen als voor
+machines makkelijker is om in deze nieuwe indeling items aan te maken, uit
+te breiden en te wijzigen, in het bijzonder als er een heleboel
+pakketbronnen en/of opties in het spel zijn. Ontwikkelaars die met
+pakketbronnen van apt werken en/of ze ontleden worden sterk aangemoedigd om
+ondersteuning voor deze indeling toe te voegen en om met het APT-team
+contact te nemen om dit werk te coördineren en met elkaar te
+delen. Gebruikers kunnen nu reeds ongehinderd op deze indeling
+overschakelen, maar kunnen eventueel problemen ondervinden met software die
+deze nieuwe indeling nog niet ondersteunt.
+    </para>
+ </refsect1>
+
+ <refsect1><title>De types deb en deb-src: algemene indeling</title>
+   <para>Het type <literal>deb</literal> verwijst naar een typisch Debian-archief met
+twee niveaus, <filename>distributie/component</filename>. De
+<literal>distributie</literal> is over het algemeen de naam van een suite
+zoals <literal>stable</literal> of <literal>testing</literal> of een
+codenaam zoals <literal>&debian-stable-codename;</literal> of
+<literal>&debian-testing-codename;</literal>, terwijl component een van de
+volgende kan zijn: <literal>main</literal>, <literal>contrib</literal> of
+<literal>non-free</literal>. Het type <literal>deb-src</literal> verwijst in
+dezelfde vorm als het type <literal>deb</literal> naar de broncode van een
+Debian distributie. Om bronnenindexen te kunnen ophalen is een
+<literal>deb-src</literal>-regel noodzakelijk.</para>
+
+   <para>De indeling van twee items in de één-regelstijl met de types
+<literal>deb</literal> en <literal>deb-src</literal>, ziet er zo uit:</para>
+
+   <literallayout>deb [ optie1=waarde1 optie2=waarde2 ] uri suite [component1] [component2] [...]
+deb-src [ optie1=waarde1 optie2=waarde2 ] uri suite [component1] [component2] [...]</literallayout>
+
+   <para>Anderzijds ziet het equivalent van dit item in deb822-stijl er als volgt
+uit: <literallayout>
+     Types: deb deb-src
+     URIs: uri
+     Suites: suite
+     Components: [component1] [component2] [...]
+     optie1: waarde1
+     optie2: waarde2
+   </literallayout>
+   </para>
+
+   <para>De URI voor het type <literal>deb</literal> moet de basis vermelden van de
+Debian distributie waar APT de benodigde informatie kan
+vinden. <literal>suite</literal> kan een exact pad opgeven en in dat geval
+moeten de componenten weggelaten worden en moet <literal>suite</literal>
+eindigen op een slash (<literal>/</literal>). Dit is nuttig in een geval
+waarbij enkel een specifieke sub-sectie van het archief dat door de URI
+aangeduid wordt, van belang is. Indien <literal>suite</literal> geen exact
+pad opgeeft, moet minstens één <literal>component</literal> vermeld worden.</para>
+
+   <para><literal>suite</literal> kan ook een variabele, <literal>$(ARCH)</literal>,
+bevatten, die omgezet wordt naar de Debian architectuur (zoals
+<literal>amd64</literal> of <literal>armel</literal>) die op het systeem in
+gebruik is. Dit laat toe om archtectuuronafhankelijke
+<filename>sources.list</filename>-bestanden te gebruiken. Over het algemeen
+is dit enkel van belang wanneer een exact pad opgegeven wordt. Anders zal
+<literal>APT</literal> automatisch een URI genereren met de huidige
+architectuur.</para>
+
+   <para>Als uit een bepaalde locatie een subset van alle beschikbare distributies of
+componenten gewenst wordt, kan het bij het hanteren van de één-regelstijl
+nodig zijn om meerdere regels voor dezelfde URI te gebruiken, aangezien er
+per regel slechts één distributie opgegeven kan worden. Nadat APT intern een
+complete set gegenereerd heeft, zal het de URI-lijst sorteren en
+bijvoorbeeld meerdere verwijzingen naar eenzelfde computer op het internet,
+samenbundelen in eenzelfde verbinding. Dit is om niet op een inefficiënte
+manier te werk te gaan door een FTP-verbinding tot stand te brengen, die te
+sluiten, iets anders te doen en vervolgens opnieuw een verbinding te moeten
+maken met dezelfde computer. APT zet ook parallelle verbindingen op met
+verschillende computers om effectiever om te gaan met sites met een geringe
+bandbreedte.</para>
+
+   <para>Het is belangrijk om pakketbronnen in volgorde van voorkeur te vermelden met
+de grootste voorkeur eerst. Een typisch gebruik is een ordening volgens
+snelheid van snelst naar traagst (bijvoorbeeld een CD gevolgd door computers
+op een lokaal netwerk en tenslotte afgelegen internetcomputers).</para>
+
+   <para>Bij wijze van voorbeeld zouden de pakketbronnen voor uw distributie er als
+volgt kunnen uitzien met de indeling in de één-regelstijl: <literallayout>&sourceslist-list-format;</literallayout> en als volgt met de indeling in de
+deb822-stijl: <literallayout>&sourceslist-sources-format;</literallayout></para>
+ </refsect1>
+
+ <refsect1><title>De types deb en deb-src: opties</title>
+    <para>Bij elk pakketbronitem kunnen opties opgegeven worden om aan te passen welke
+bron gebruikt wordt en op welke manier er gegevens van opgehaald
+worden. Indeling, syntaxis en namen van de opties variëren naargelang het
+een één-regelstijl of een deb822-stijl betreft, zoals eerder beschreven,
+maar met beide stijlen kunnen dezelfde opties gebruikt worden. Om het
+eenvoudig te houden vermelden we hier de veldnaam voor de deb822-stijl en
+geven we de naam voor de één-regelstijl er tussen haakjes bij. Onthoud dat u
+multi-waarde opties expliciet kunt vermelden, maar dat u daarnaast over de
+optie beschikt om ze aan te passen uitgaande van hun standaardwaarde. Maar
+hier geven we hun namen expliciet weer. Niet-ondersteunde opties worden door
+alle versies van APT geruisloos genegeerd.
+
+       <itemizedlist>
+	  <listitem><para><option>Architectures</option> (<option>arch</option>) is een multi-waarde
+optie waarmee opgegeven wordt voor welke architecturen er informatie
+opgehaald moet worden. Indien deze optie niet ingesteld werd, geldt als
+standaard alle architecturen die in de configuratieoptie
+<literal>APT::Architectures</literal> gedefinieerd zijn.
+	  </para></listitem>
+
+	  <listitem><para><option>Languages</option> (<option>lang</option>) is een multi-waarde optie
+waarmee opgegeven wordt voor welke talen er informatie, zoals vertaalde
+pakketbeschrijvingen, opgehaald moet worden. Indien deze optie niet
+ingesteld werd, geldt als standaard alle talen die in de configuratieoptie
+<literal>Acquire::Languages</literal> gedefinieerd zijn.
+	  </para></listitem>
+
+	  <listitem><para><option>Targets</option> (<option>target</option>) is een multi-waarde optie
+waarmee opgegeven wordt welke downloadtargets apt uit deze pakketbron zal
+trachten op te halen. Indien deze optie niet gespecificeerd werd, wordt de
+standaardset gedefinieerd door het configuratiebereik
+<option>Acquire::IndexTargets</option> (targets worden aan de hand van hun
+naam gepreciseerd in het veld <literal>Created-By</literal>). Daarenboven
+kunnen specifieke targets geactiveerd of gedeactiveerd worden door het veld
+<literal>Identifier</literal> als een optie met een booleaanse waarde te
+gebruiken in plaats van op deze multi-waarde optie beroep te doen.
+	  </para></listitem>
+
+	  <listitem><para><option>PDiffs</option> (<option>pdiffs</option>) is een yes/no (ja/nee)
+waarde die regelt of APT moet proberen om PDiffs op te halen om oude indexen
+bij te werken in plaats van de volledige nieuwe indexen te downloaden. De
+waarde van deze optie wordt genegeerd als de pakketbron niet aangeeft dat er
+PDiffs beschikbaar zijn. Standaard is dit de waarde van de optie met
+eenzelfde naam voor een specifiek indexbestand, zoals gedefinieerd in het
+bereik <option>Acquire::IndexTargets</option>, dat zelf als standaard de
+waarde krijgt van de configuratieoptie <option>Acquire::PDiffs</option>, die
+op zijn beurt standaard op <literal>yes</literal> ingesteld staat.
+	  </para></listitem>
+
+	  <listitem><para><option>By-Hash</option> (<option>by-hash</option>) kan als waarde hebben
+<literal>yes</literal>, <literal>no</literal> of <literal>force</literal> en
+regelt of APT moet proberen de indexen te bekomen via een URI die
+geconstrueerd wordt op basis van de hash-som van het verwachte bestand, in
+plaats van de welbekende stabiele bestandsnaam van het indexbestand te
+gebruiken. Dit gebruiken kan een discrepantie tussen hash-sommen voorkomen,
+maar het vereist wel een spiegelserver die dit ondersteunt. De waarde
+<literal>yes</literal> activeert en <literal>no</literal> deactiveert het
+gebruik van deze functionaliteit in het geval de pakketbron aangeeft dit te
+ondersteunen, terwijl <literal>force</literal> deze functionaliteit
+activeert, ongeacht wat de pakketbron aangeeft. Standaard is dit de waarde
+van de optie met eenzelfde naam voor een specifiek indexbestand, zoals
+gedefinieerd in het bereik <option>Acquire::IndexTargets</option>, dat zelf
+als standaard de waarde krijgt van de configuratieoptie
+<option>Acquire::By-Hash</option>, die op zijn beurt standaard op
+<literal>yes</literal> ingesteld staat.
+	  </para></listitem>
+
+       </itemizedlist>
+
+       Daarnaast zijn er opties die, als ze ingesteld worden, betrekking hebben op
+<emphasis>alle</emphasis> pakketbronnen met dezelfde URI en Suite, waardoor
+ze ingesteld moeten worden voor alle soortgelijke items en er niet
+gevarieerd kan worden tussen verschillende componenten. Als er zich
+dergelijke anomalieën manifesteren, zal APT ze proberen te ontdekken en
+verbeteren.
+
+       <itemizedlist>
+	  <listitem><para><option>Allow-Insecure</option> (<option>allow-insecure</option>),
+<option>Allow-Weak</option> (<option>allow-weak</option>) en
+<option>Allow-Downgrade-To-Insecure</option>
+(<option>allow-downgrade-to-insecure</option>) zijn booleaanse waarden die
+allemaal standaard de waarde <literal>no</literal> hebben. Indien ze op
+<literal>yes</literal> ingesteld worden, omzeilen ze delen van &apt-secure;
+en daarom zouden ze niet lichtzinnig gebruikt moeten worden!
+	  </para></listitem>
+
+	  <listitem><para><option>Trusted</option> (<option>trusted</option>) is een drie-status
+waarde die als standaardgedrag heeft dat APT uitmaakt of een pakketbron als
+betrouwbaar aanzien wordt, dan wel of er een waarschuwing getoond moet
+worden vooraleer bijvoorbeeld pakketten van die pakketbron geïnstalleerd
+worden. Deze optie kan gebruikt worden om die beslissing te omzeilen. De
+waarde <literal>yes</literal> zegt APT om die pakketbron steeds als
+betrouwbaar te beschouwen, zelfs als ze niet slaagt bij
+authenticatietoetsen. Ze schakelt delen van &apt-secure; uit en zou daarom
+enkel gebruikt mogen worden in een lokale en betrouwbare context (als men ze
+hoe dan ook al zou gebruiken), aangezien anders de beveiliging verbroken
+wordt. De waarde <literal>no</literal> doet het tegenovergestelde en zorgt
+ervoor dat een pakketbron behandeld wordt als onbetrouwbaar, zelfs al was ze
+succesvol bij de authenticatietoetsen. De standaardwaarde kan niet expliciet
+ingesteld worden.
+	  </para></listitem>
+
+	  <listitem><para><option>Signed-By</option> (<option>signed-by</option>)  is an option to
+require a repository to pass &apt-secure; verification with a certain set of
+keys rather than all trusted keys apt has configured.  It is specified as a
+list of absolute paths to keyring files (have to be accessible and readable
+for the <literal>_apt</literal> system user, so ensure everyone has
+read-permissions on the file) and fingerprints of keys to select from these
+keyrings. If no keyring files are specified the default is the
+<filename>trusted.gpg</filename> keyring and all keyrings in the
+<filename>trusted.gpg.d/</filename> directory (see <command>apt-key
+fingerprint</command>). If no fingerprint is specified all keys in the
+keyrings are selected. A fingerprint will accept also all signatures by a
+subkey of this key, if this isn't desired an exclamation mark
+(<literal>!</literal>) can be appended to the fingerprint to disable this
+behaviour.  The option defaults to the value of the option with the same
+name if set in the previously acquired <filename>Release</filename> file of
+this repository (only fingerprints can be specified there through).
+Otherwise all keys in the trusted keyrings are considered valid signers for
+this repository.
+	  </para></listitem>
+
+	  <listitem><para><option>Check-Valid-Until</option> (<option>check-valid-until</option>) is
+een yes/no (ja/nee) waarde die regelt of APT moet proberen om
+replay-aanvallen te ontdekken. De maker van een pakketbron kan een tijdstip
+bepalen tot wanneer de gegevens die door de pakketbron ter beschikking
+gesteld worden, als geldig beschouwd mogen worden. Als dat tijdstip
+aangebroken is en er geen nieuwe gegevens ter beschikking gesteld werden,
+zullen de gegevens als vervallen beschouwd worden en er zal een foutmelding
+gegeven worden. Dit verhoogt niet enkel de veiligheid, aangezien een
+aanvaller met kwade bedoelingen niet eeuwig oude gegevens kan blijven
+versturen om op die manier een gebruiker van een opwaardering af te houden,
+het helpt gebruikers ook om spiegelservers die niet langer bijgewerkt worden
+te detecteren. Sommige pakketbronnen, zoals historische archieven, worden
+evenwel met opzet niet langer bijgewerkt en om die reden kan deze toets
+uitgezet worden door deze optie op <literal>no</literal> in te stellen. Als
+standaard geldt de waarde van de configuratieoptie
+<option>Acquire::Check-Valid-Until</option>, die op haar beurt
+<literal>yes</literal> als standaard heeft.
+	  </para></listitem>
+
+	  <listitem><para><option>Valid-Until-Min</option> (<option>valid-until-min</option>) en
+<option>Valid-Until-Max</option> (<option>valid-until-max</option>) kunnen
+gebruikt worden om, uitgedrukt in seconden, de periode tot wanneer gegevens
+van deze pakketbron als geldig beschouwd mogen worden, te verlengen of te
+verkorten. -Max kan vooral nuttig zijn om uw eigen waarde in te stellen in
+het geval van een pakketbron met een Release-bestand waarin het veld
+Valid-Until ontbreekt, terwijl -Min gebruikt kan worden om de
+geldigheidsduur te verlengen van een zelden opgewaardeerde (lokale)
+spiegelserver van een vaker bijgewerkt, maar moeilijker toegankelijk archief
+(dat ook vermeld staat in sources.list). Op die manier hoeft men deze toets
+niet volledig uit te schakelen. Als standaard geldt de waarde van de
+configuratieopties <option>Acquire::Min-ValidTime</option> en
+<option>Acquire::Max-ValidTime</option>, die beide standaard niet ingesteld
+zijn.
+	  </para></listitem>
+
+	  <listitem><para><option>Check-Date</option> (<option>check-date</option>) is een waarde van
+het type yes/no. Ze regelt of APT de tijd op de machine als correct moet
+beschouwen en dus tijdgerelateerde toetsingen moet uitvoeren, zoals
+controleren of een Release-bestand zich niet in de toekomst situeert. Als
+men deze optie uitzet zet men ook de hierboven vermelde optie
+<option>Check-Valid-Until</option> uit.
+	  </para></listitem>
+
+	  <listitem><para><option>Date-Max-Future</option> (<option>date-max-future</option>) regelt
+hoe ver in de toekomst een pakketbron zich mag situeren. Is standaard
+ingesteld op de waarde van de configuratieoptie
+<option>Acquire::Max-FutureTime</option> die standaard de waarde van 10
+seconden heeft.
+	  </para></listitem>
+
+	  <listitem><para><option>InRelease-Path</option> (<option>inrelease-path</option>) bepaalt
+het pad naar het InRelease-bestand ten opzichte van de normale positie van
+een <filename>InRelease</filename>-bestand. Standaard staat deze optie uit
+en zal APT proberen een <filename>InRelease</filename>-bestand op te halen,
+en indien dat niet lukt, een <filename>Release</filename>-bestand en het
+daaraan gekoppelde <filename>Release.gpg</filename>-bestand. Als deze optie
+ingesteld wordt, zal het opgegeven pad gebruikt worden in plaats van het
+InRelease-bestand en wordt het terugvallen op
+<filename>Release</filename>-bestanden uitgeschakeld.
+	  </para></listitem>
+
+       </itemizedlist>
+
+    </para>
+ </refsect1>
+
+ <refsect1><title>URI-specificatie</title>
+
+    <para>De momenteel herkende URI-types zijn:
+   <variablelist>
+    <varlistentry><term><command>http</command> (&apt-transport-http;)</term>
+    <listitem><para>
+    De methode http geeft een HTTP-server op voor een archief. Dit is de meest
+gebruikelijke methode. De URI zelf kan rechtstreeks login-informatie
+bevatten als dat door het archief vereist wordt, maar de voorkeur moet
+gegeven worden aan het gebruik van &apt-authconf;. De methode biedt ook
+ondersteuning voor SOCKS5- en HTTP(S)-proxy's, ofwel geconfigureerd via een
+apt-specifieke configuratie, of gespecificeerd met de omgevingsvariabele
+<envar>http_proxy</envar> volgens de indeling
+<replaceable>http://gebruiker:wachtwoord@server:poort/</replaceable> (er
+vanuit gaand dat het om een HTTP-proxy gaat die authenticatie vereist). De
+authenticatie-informatie voor proxy's kan ook verstrekt worden via
+&apt-authconf;.</para>
+    <para>Merk op dat deze authenticatiemethodes onveilig zijn, aangezien de volledige
+communicatie met de externe server (of de proxy) onversleuteld
+verloopt. Daardoor kan een voldoende onderlegde aanvaller de logingegevens
+bekijken en opslaan evenals de rest van de interactie. De aanvaller kan
+evenwel de communicatie <emphasis>niet</emphasis> beïnvloeden, vermits het
+databeveiligingsmodel dat toegepast wordt door APT, onafhankelijk van de
+gekozen transportmethode functioneert. Raadpleeg voor details &apt-secure;.</para></listitem>
+    </varlistentry>
+
+    <varlistentry><term><command>https</command> (&apt-transport-https;)</term>
+    <listitem><para>
+    De methode https geeft een HTTPS-server op voor een archief en is inzake
+gebruik en beschikbare opties erg vergelijkbaar met de http-methode. Het
+grote verschil is dat de communicatie tussen apt en de server (of de proxy)
+versleuteld verloopt. Merk op dat de versleuteling niet verhindert dat een
+aanvaller kan te weten komen met welke server (of welke proxy) apt
+communiceert. En eventueel kan deze via een meer diepgaande analyse toch nog
+achterhalen welke gegevens gedownload werden. Indien dit een bekommernis is,
+kunnen de op Tor gebaseerde methodes die later behandeld worden, een
+adequaat alternatief vormen.</para></listitem>
+    </varlistentry>
+
+    <varlistentry><term><command>mirror</command>, <command>mirror+<replaceable>methode</replaceable></command> (&apt-transport-mirror;)</term>
+    <listitem><para>
+    De methode mirror (spiegelserver) geeft de locatie van een
+spiegelserverlijst aan. Standaard is de methode die voor de locatie gebruikt
+wordt, <literal>http</literal>, maar gelijk welke andere methode kan
+gebruikt worden via
+<command>mirror+<replaceable>methode</replaceable></command>. De
+spiegelserverlijst zelf kan veel verschillende URI's bevatten voor
+spiegelservers, welke de APT-cliënt op transparante wijze kan uitpikken,
+kiezen en erop terugvallen om op die manier bij te dragen tot het verdelen
+van de werklast over de beschikbare spiegelservers en ervoor te zorgen dat
+clients gegevens kunnen verkrijgen, zelfs als bepaalde geconfigureerde
+spiegelservers niet beschikbaar zijn.
+    </para></listitem>
+    </varlistentry>
+
+    <varlistentry><term><command>file</command></term>
+    <listitem><para>
+    De methode file laat toe om gelijk welke map uit het bestandssysteem als een
+archief te beschouwen. Dit is nuttig voor aankoppelingen via NFS, voor
+lokale spiegelservers en lokale archieven.</para></listitem>
+    </varlistentry>
+    
+    <varlistentry><term><command>cdrom</command></term>
+    <listitem><para>
+    De methode cdrom laat APT toe om een lokaal CD-, DVD- of USB-station te
+gebruiken en media te wisselen. Gebruik het programma &apt-cdrom; om regels
+met CD-pakketbronnen aan te maken in de lijst met pakketbronnen.</para></listitem>
+    </varlistentry>
+
+    <varlistentry><term><command>ftp</command></term>
+    <listitem><para>
+    De methode ftp geeft een FTP-server op voor een archief. Het gebruik van FTP
+is op de terugweg ten voordele van <literal>http</literal> en
+<literal>https</literal> en veel archieven hebben ofwel nooit FTP-toegang
+aangeboden of trekken die terug in. Indien u deze methode nog steeds nodig
+heeft, zijn er veel configuratieopties voor beschikbaar binnen de ruimte
+<literal>Acquire::ftp</literal>. Ze worden in &apt-conf; gedetailleerd.</para>
+    <para>Noteer dat een FTP-proxy opgegeven kan worden met de omgevingsvariabele
+<envar>ftp_proxy</envar>. Met deze omgevingsvariabele en
+<emphasis>enkel</emphasis> daarmee kan ook een HTTP-proxy opgegeven worden
+(HTTP proxyservers kunnen vaak omgaan met FTP-URL's). Proxy's die HTTP
+gebruiken en in het configuratiebestand vermeld staan worden genegeerd.</para></listitem>
+    </varlistentry>
+
+    <varlistentry><term><command>copy</command></term>
+    <listitem><para>
+    De methode copy is identiek aan de methode file behalve dat pakketten
+gekopieerd worden naar de cache-map in plaats van ze rechtstreeks op hun
+locatie te gebruiken. Dit is nuttig voor gebruikers van verwijderbare media
+om met behulp van APT bestanden te kopiëren.</para></listitem>
+    </varlistentry>
+    
+    <varlistentry><term><command>rsh</command></term><term><command>ssh</command></term>
+    <listitem><para>
+    De methode rsh/ssh maakt gebruik van RSH/SSH om een verbinding met een
+externe computer te maken en als een welbepaalde gebruiker toegang te
+krijgen tot de bestanden. Voorafgaandelijke configuratie van rhosts of
+RSA-sleutels wordt aanbevolen. De standaardcommando's
+<command>find</command> en <command>dd</command> worden gebruikt om de
+overdracht van bestanden van de externe computer uit te voeren.
+    </para></listitem>
+    </varlistentry>
+
+    <varlistentry><term>nog andere herkenbare URI-types toevoegen</term>
+    <listitem><para>
+    APT kan uitgebreid worden met extra methodes die door andere optionele
+pakketten ter beschikking gesteld worden en die moeten voldoen aan het
+naamgevingsschema
+<package>apt-transport-<replaceable>methode</replaceable></package>. Het
+APT-team onderhoudt bijvoorbeeld ook het pakket
+<package>apt-transport-tor</package>, dat methodes aanbiedt om toegang te
+krijgen tot HTTP- en HTTPS-URI's, waarbij een route via het Tor-netwerk
+genomen wordt.
+    </para></listitem>
+    </varlistentry>
+  </variablelist>
+ </para>
+ </refsect1>
+
+ <refsect1><title>Voorbeelden</title>
+   <para>Gebruikt het lokaal opgeslagen (of via NFS aangekoppelde) archief in
+/home/apt/debian voor stable/main, stable/contrib, en stable/non-free.</para>
+   <literallayout>deb file:/home/apt/debian stable main contrib non-free</literallayout>
+   <literallayout>Types: deb
+URIs: file:/home/apt/debian
+Suites: stable
+Components: main contrib non-free</literallayout>
+
+   <para>Zoals hierboven, behalve dat hier de distributie unstable (distributie in
+ontwikkeling) gebruikt wordt.</para>
+   <literallayout>deb file:/home/apt/debian unstable main contrib non-free</literallayout>
+   <literallayout>Types: deb
+URIs: file:/home/apt/debian
+Suites: unstable
+Components: main contrib non-free</literallayout>
+
+   <para>Specificatie voor de bronbestanden van het voorgaande.</para>
+   <literallayout>deb-src file:/home/apt/debian unstable main contrib non-free</literallayout>
+   <literallayout>Types: deb-src
+URIs: file:/home/apt/debian
+Suites: unstable
+Components: main contrib non-free</literallayout>
+
+   <para>De eerste regel haalt pakketinformatie op voor de architecturen uit
+<literal>APT::Architectures</literal> terwijl de tweede steeds
+<literal>amd64</literal> en <literal>armel</literal> ophaalt.</para>
+   <literallayout>deb http://deb.debian.org/debian &debian-stable-codename; main
+deb [ arch=amd64,armel ] http://deb.debian.org/debian &debian-stable-codename; main</literallayout>
+   <literallayout>Types: deb
+URIs: http://deb.debian.org/debian
+Suites: &debian-stable-codename;
+Components: main
+
+Types: deb
+URIs: http://deb.debian.org/debian
+Suites: &debian-stable-codename;
+Components: main
+Architectures: amd64 armel
+</literallayout>
+
+   <para>Gebruikt HTTP om toegang te krijgen tot het archief van archive.debian.org
+en gebruikt daar enkel het gebied hamm/main.</para>
+   <literallayout>deb http://archive.debian.org/debian-archive hamm main</literallayout>
+   <literallayout>Types: deb
+URIs: http://archive.debian.org/debian-archive
+Suites: hamm
+Components: main</literallayout>
+
+   <para>Gebruikt FTP om toegang te krijgen tot het archief op ftp.debian.org onder
+de map debian en gebruikt er enkel het gebied
+&debian-stable-codename;/contrib.</para>
+   <literallayout>deb ftp://ftp.debian.org/debian &debian-stable-codename; contrib</literallayout>
+   <literallayout>Types: deb
+URIs: ftp://ftp.debian.org/debian
+Suites: &debian-stable-codename;
+Components: contrib</literallayout>
+
+   <para>Gebruikt FTP om toegang te krijgen tot het archief op ftp.debian.org onder
+de map debian en gebruikt er enkel het gebied unstable/contrib. Indien deze
+regel en die uit het voorgaande voorbeeld allebei voorkomen in
+<filename>sources.list</filename> zal een enkele FTP-verbinding gebruikt
+worden voor beide regels met pakketbronnen.</para>
+   <literallayout>deb ftp://ftp.debian.org/debian unstable contrib</literallayout>
+   <literallayout>Types: deb
+URIs: ftp://ftp.debian.org/debian
+Suites: unstable
+Components: contrib</literallayout>
+
+   <para>Gebruikt HTTP om toegang te krijgen tot het archief op ftp.tlh.debian.org
+onder de map universe en gebruikt op i386-computers enkel bestanden die te
+vinden zijn onder <filename>unstable/binary-i386</filename> en op
+amd64-computers bestanden onder <filename>unstable/binary-amd64</filename>
+en zo verder voor andere ondersteunde architecturen. [Merk op dat dit
+voorbeeld enkel toont hoe de substitutievariabele moet gebruikt worden;
+officiële debian-archieven worden niet op die manier georganiseerd]
+<literallayout>deb http://ftp.tlh.debian.org/universe unstable/binary-$(ARCH)/</literallayout> <literallayout>Types: deb
+URIs: http://ftp.tlh.debian.org/universe
+Suites: unstable/binary-$(ARCH)/</literallayout>
+   </para>
+
+   <para>Gebruikt HTTP om binaire pakketten en broncode uit de suites stable, testing
+en unstable en uit de componenten main en contrib op te halen.</para>
+   <literallayout>deb http://deb.debian.org/debian stable main contrib
+deb-src http://deb.debian.org/debian stable main contrib
+deb http://deb.debian.org/debian testing main contrib
+deb-src http://deb.debian.org/debian testing main contrib
+deb http://deb.debian.org/debian unstable main contrib
+deb-src http://deb.debian.org/debian unstable main contrib</literallayout>
+   <literallayout>Types: deb deb-src
+URIs: http://deb.debian.org/debian
+Suites: stable testing unstable
+Components: main contrib
+</literallayout>
+
+ </refsect1>
+
+ <refsect1><title>Zie ook</title>
+   <para>&apt-get;, &apt-conf;, &apt-acquire-additional-files;</para>
+ </refsect1>
+
+ &manbugs;
+
+ <refsect1><title>&translation-title;</title>
+   <para>&translation-holder;</para>
+   <para>&translation-english;</para>
+ </refsect1>
+</refentry>

@@ -1,0 +1,171 @@
+'\" t
+.\"     Title: apt-transport-http
+.\"    Author: APT-Team
+.\" Generator: DocBook XSL Stylesheets v1.79.1 <http://docbook.sf.net/>
+.\"      Date: 11\ \&Mai\ \&2018
+.\"    Manual: APT
+.\"    Source: APT 1.8.0~alpha3
+.\"  Language: German
+.\"
+.TH "APT\-TRANSPORT\-HTTP" "1" "11\ \&Mai\ \&2018" "APT 1.8.0~alpha3" "APT"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+apt-transport-http \- APT\-Transportmethode zum Herunterladen \(:uber das Hypertext Transfer Protocol (HTTP)
+.SH "BESCHREIBUNG"
+.PP
+Diese APT\-Transportmethode erlaubt die Verwendung von Depots, auf die \(:uber das Hypertext Transfer Protocol (HTTP) zugegriffen wird\&. Es ist standardm\(:a\(ssig verf\(:ugbar und wahrscheinlich das meistverwendete aller Transporte\&. Beachten Sie, dass eine Transportmethode niemals direkt durch einen Benutzer aufgerufen wird, sondern von APT\-Werkzeugen basierend auf der Konfiguration des Benutzers\&.
+.PP
+HTTP ist ein unverschl\(:usseltes Transportprotokoll\&. Das bedeutet, dass die ganze Kommunikation mit einem fernen Server (oder Proxy) durch einen Angreifer mit ausreichenden F\(:ahigkeiten beobachtet werden kann, der landl\(:aufig als \(FcMann in der Mitte\(Fo (MITM) bezeichnet wird\&. Ein derartiger Angreifer kann die Kommunikation jedoch
+\fInicht\fR
+\(:andern, um die Sicherheit Ihres System zu kompromittieren, da APTs Datensicherheitsmodell unabh\(:angig von der gew\(:ahlten Transportmethode ist\&. Einzelheiten werden in
+\fBapt-secure\fR(8)
+erkl\(:art\&. Einen \(:Uberblick \(:uber verf\(:ugbare Transportmethoden gibt es in
+\fBsources.list\fR(5)\&.
+.SH "OPTIONEN"
+.PP
+Verschiedene Optionen k\(:onnen in einer
+\fBapt.conf\fR(5)\-Datei gesetzt werden, um sein Verhalten zu \(:andern\&. Dies reicht von einer Proxy\-Konfiguration bis hin zu einer Behelfsl\(:osung f\(:ur spezielle Serverbeschr\(:ankungen\&.
+.SS "Proxy\-Konfiguration"
+.PP
+Die Umgebungsvariable
+\fBhttp_proxy\fR
+wird zur systemweiten Konfiguration unterst\(:utzt\&. APT\-spezifische Proxys k\(:onnen mittels der Option
+Acquire::http::Proxy
+konfiguriert werden\&. Proxys, die nur f\(:ur bestimmte Rechner benutzt werden, k\(:onnen \(:uber
+Acquire::http::Proxy::\fIRechner\fR
+angegeben werden\&. Eine granularere Steuerung kann \(:uber die nachfolgend genauer beschriebene Proxy\-Autoerkennung erreicht werden\&. Alle diese Optionen verwenden das URI\-Format
+\fISchema\fR://[[\fIBenutzer\fR][:\fIPasswort\fR]@]\fIRechner\fR[:\fIPort\fR]/\&. Unters\(:utzte URI\-Schemen sind
+socks5h
+(SOCKS5 mit ferner DNS\-Aufl\(:osung),
+http
+und
+https\&. Authentifizierungseinzelheiten k\(:onnen \(:uber
+\fBapt_auth.conf\fR(5)
+bereitgestellt werden, statt sie direkt in den URI einzuf\(:ugen\&.
+.PP
+Die unterschiedlichen APT\-Konfigurationsoptionen unterst\(:utzen den Sonderwert
+DIRECT, der bedeutet, dass kein Proxy benutzt werden soll\&. Au\(sserdem wird die Umgebungsvariable
+\fBno_proxy\fR
+f\(:ur denselben Zweck unterst\(:utzt\&.
+.PP
+Desweiteren werden drei Einstellungen zur Steuerung des Zwischenspeichers mit HTTP/1\&.1\-konformen Proxy\-Zwischenspeichern bereitgestellt:
+Acquire::http::No\-Cache
+teilt dem Proxy mit, dass er unter keinen Umst\(:anden seine zwischengespeicherten Antworten benutzen soll,
+Acquire::http::Max\-Age
+setzt das maximal erlaubte Alter einer Indexdatei im Zwischenspeicher des Proxys (in Sekunden)\&.
+Acquire::http::No\-Store
+gibt an, dass der Proxy die angefragten Archivdateien nicht in seinem Zwischenspeicher ablegen soll\&. Das kann verwandt werden, um zu verhindern, dass der Proxy seinen Zwischenspeicher mit (gro\(ssen) \&.deb\-Dateien verunreinigt\&.
+.SS "Automatische Proxy\-Konfiguration"
+.PP
+Acquire::http::Proxy\-Auto\-Detect
+kann benutzt werden, um einen externen Befehl zum Auffinden des HTTP\-Proxys anzugeben, der benutzt werden soll\&. Der erste und einzige Parameter ist ein URI, der den Rechner bezeichnet, der kontaktiert werden soll, um eine rechnerspezifische Konfiguration zu erm\(:oglichen\&. APT erwartet dass der Befehl als Ausgabe auf der Standardausgabe den Proxy als einzelne Zeile im vorher angegebenen URI\-Format oder das Wort
+DIRECT
+ausgibt, falls kein Proxy benutzt werden soll\&. Fehlt die Ausgabe, zeigt dies an, dass die allgemeinen Proxy\-Einstellungen benutzt werden sollen\&.
+.PP
+Beachten Sie, dass die automatische Erkennung nicht f\(:ur einen Rechner benutzt wird, falls bereits eine rechnerspezifische Proxy\-Konfiguration per
+Acquire::http::Proxy::\fIRechner\fR
+gesetzt wurde\&.
+.PP
+Beispielimplementierungen finden Sie in den Paketen
+\fBsquid-deb-proxy-client\fR(1)
+und
+\fBauto-apt-proxy\fR(1)\&.
+.PP
+Diese Option hat Vorrang vor dem veralteten Optionsnamen
+Acquire::http::ProxyAutoDetect\&.
+.SS "Verbindungskonfiguration"
+.PP
+Die Option
+Acquire::http::Timeout
+stellt den Zeitnehmer, der von der Methode benutzt wird\&. Dieser Wert wird auf die Verbindungs\- sowie die Datenzeit\(:uberschreitungen angewendet\&.
+.PP
+Die benutzte Bandbreite kann durch
+Acquire::http::Dl\-Limit
+eingeschr\(:ankt werden, was Ganzzahlwerte in Kilobyte pro Sekunde akzeptiert\&. Der Vorgabewert ist 0, was die Beschr\(:ankung ausschaltet und versucht, s\(:amtliche verf\(:ugbare Bandbreite zu benutzen\&. Beachten Sie, dass diese Optionen implizit das Herunterladen von mehreren Servern zur gleichen Zeit deaktiviert\&.
+.PP
+Die Einstellung
+Acquire::http::Pipeline\-Depth
+kann verwandt werden, um HTTP\-Pipelining zu aktivieren (RFC 2616 Abschnitt 8\&.1\&.2\&.2), was z\&.B\&. bei Verbindungen mit hoher Latenz vorteilhaft sein kann\&. Sie gibt an, wie viele Anfragen in eine Leitung gesandt werden\&. APT versucht, zur Laufzeit Webserver und Proxys aufzusp\(:uren, die sich falsch verhalten und eine Behelfsl\(:osung zu finden\&. Falls Sie jedoch wissen, dass sich Ihrer nicht konform zur HTTP/1\&.1\-Spezifikation verh\(:alt, kann das Weiterleiten durch Setzen des Wertes auf 0 deaktiviert werden\&. Standardm\(:a\(ssig ist es mit dem Wert 10 aktiviert\&.
+.PP
+Acquire::http::AllowRedirect
+steuert, ob APT Umleitungen folgen wird, was standardm\(:a\(ssig aktiviert ist\&.
+.PP
+Acquire::http::User\-Agent
+kann benutzt werden, um einen anderen User\-Agent f\(:ur die HTTP\-Download\-Methode zu setzten, da einige Proxys den Clients nur dann Zugriff gew\(:ahren, wenn der Client einen bekannten Kennzeichner verwendet\&.
+.PP
+Acquire::http::SendAccept
+ist standardm\(:a\(ssig aktiviert und sendet f\(:ur Abfragen ohne Dateinamenserweiterungen ein
+Accept: text/*\-Kopfzeilenfeld an den Server, um zu verhindern, dass der Server versucht, Inhalt auszuhandeln\&.
+.SH "BEISPIELE"
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+Acquire::http {
+	Proxy::example\&.org "DIRECT";
+	Proxy "socks5h://apt:pass@127\&.0\&.0\&.1:9050";
+	Proxy\-Auto\-Detect "/usr/local/bin/apt\-http\-proxy\-auto\-detect";
+	No\-Cache "true";
+	Max\-Age "3600";
+	No\-Store "true";
+	Timeout "10";
+	Dl\-Limit "42";
+	Pipeline\-Depth "0";
+	AllowRedirect "false";
+	User\-Agent "My APT\-HTTP";
+	SendAccept "false";
+};
+.fi
+.if n \{\
+.RE
+.\}
+.SH "SIEHE AUCH"
+.PP
+\fBapt.conf\fR(5)
+\fBapt_auth.conf\fR(5)
+\fBsources.list\fR(5)
+.SH "FEHLER"
+.PP
+\m[blue]\fBAPT\-Fehlerseite\fR\m[]\&\s-2\u[1]\d\s+2\&. Wenn Sie einen Fehler in APT berichten m\(:ochten, lesen Sie bitte
+/usr/share/doc/debian/bug\-reporting\&.txt
+oder den
+\fBreportbug\fR(1)\-Befehl\&. Verfassen Sie Fehlerberichte bitte auf Englisch\&.
+.SH "\(:UBERSETZUNG"
+.PP
+Die deutsche \(:Ubersetzung wurde 2009 von Chris Leick
+<c\&.leick@vollbio\&.de>
+in Zusammenarbeit mit dem deutschen l10n\-Team von Debian
+<debian\-l10n\-german@lists\&.debian\&.org>
+angefertigt\&.
+.PP
+Beachten Sie, dass diese \(:Ubersetzung Teile enthalten kann, die nicht \(:ubersetzt wurden\&. Dies ist so, damit kein Inhalt verloren geht, wenn die \(:Ubersetzung hinter dem Originalinhalt hinterherh\(:angt\&.
+.SH "AUTOR"
+.PP
+\fBAPT\-Team\fR
+.RS 4
+.RE
+.SH "FU\(ssNOTEN"
+.IP " 1." 4
+APT-Fehlerseite
+.RS 4
+\%http://bugs.debian.org/src:apt
+.RE

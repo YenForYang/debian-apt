@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+  "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % aptent SYSTEM "apt.ent"> %aptent;
+<!ENTITY % aptverbatiment SYSTEM "apt-verbatim.ent"> %aptverbatiment;
+<!ENTITY % aptvendor SYSTEM "apt-vendor.ent"> %aptvendor;
+]>
+
+<refentry>
+
+ <refentryinfo>
+   <!-- The last update date -->
+&apt-author.jgunthorpe;
+   &apt-author.team;
+   &apt-email;
+   &apt-product;
+   
+   <date>2013-11-30T00:00:00Z</date>
+ </refentryinfo>
+ 
+ <refmeta>
+   <refentrytitle>apt-config</refentrytitle>
+   <manvolnum>8</manvolnum>
+   <refmiscinfo class="manual">APT</refmiscinfo>
+ </refmeta>
+ 
+ 
+ <!-- Man page title -->
+<refnamediv>
+    <refname>apt-config</refname>
+    <refpurpose>APT-Konfigurationsabfrageprogramm</refpurpose>
+ </refnamediv>
+
+ &synopsis-command-apt-config;
+
+ <refsect1><title>Beschreibung</title>
+   <para><command>apt-config</command> ist ein internes Programm, das von vielen
+Teilen der APT-Programmsammlung benutzt wird, um einheitliche
+Konfigurierbarkeit bereitzustellen. Es greift auf die
+Hauptkonfigurationsdatei <filename>/etc/apt/apt.conf</filename> auf eine Art
+zu, die leicht für geskriptete Anwendungen zu benutzen ist.</para>
+
+   <para>Sofern nicht die <option>-h</option>-, oder <option>--help</option>-Option
+angegeben ist, muss einer der nachfolgend aufgeführten Befehle vorkommen.
+   </para>
+   
+   <variablelist>
+     <varlistentry><term><option>shell</option></term>
+     <listitem><para>
+     »shell« wird benutzt, um aus einem Shellskript auf
+Konfigurationsinformationen zuzugreifen. Es wird ein Paar von Argumenten
+angegeben – das erste ist eine Shell-Variable und das zweite ein
+Konfigurationswert, der abgefragt werden soll. Als Ausgabe führt es
+Shell-Zuweisungsbefehle für jeden vorhandenen Wert auf. In einen Shellskript
+sollte es wie folgt benutzt werden:
+     </para>
+     
+<informalexample><programlisting>
+OPTS="-f"
+RES=`apt-config shell OPTS MyApp::options`
+eval $RES
+</programlisting></informalexample>
+
+     <para>Dies wird die Shell-Umgebungsvariable $OPT auf den Wert von MyApp::options
+mit einer Vorgabe von <option>-f</option> setzen.</para>
+
+     
+     <para>An das Konfigurationselement kann /[fdbi] angehängt werden. »f« gibt
+Dateinamen zurück, »d« gibt Verzeichnisse zurück, »b« gibt »true« oder
+»false« zurück und »i« gibt eine Ganzzahl zurück. Jede Rückgabe ist normiert
+und intern geprüft.</para>
+     </listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>dump</option></term>
+     <listitem><para>
+     Nur der Inhalt des Konfigurationsbereichs wird angezeigt.</para>
+     </listitem>
+     </varlistentry>
+
+   </variablelist>
+ </refsect1>
+
+ <refsect1><title>Optionen</title>
+   &apt-cmdblurb;
+   
+   <variablelist>
+     <varlistentry>
+      <term><option>--empty</option></term>
+      <listitem><para>schließt Optionen ein, die einen leeren Wert haben. Dies ist die Vorgabe,
+benutzen Sie daher --no-empty, um sie aus der Ausgabe zu entfernen.</para></listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><option>--format '<replaceable>&percnt;f &#x0022;&percnt;v&#x0022;;&percnt;n</replaceable>'</option></term>
+      <listitem><para>definiert die Ausgabe jeder Konfigurationsoption. &percnt;t wird durch den
+individuellen Namen ersetzt, &percnt;f durch ihren vollständigen
+hierarchichen Namen und &percnt;v durch ihren Wert. Verwenden Sie
+Großbuchstaben; Sonderzeichen in dem Wert werden kodiert, um
+sicherzustellen, dass sie z.B. in einer maskierten Zeichenkette, wie sie
+RFC822 definiert, sicher verwandt werden kann. &percnt;n wird zusätzlich
+durch einen Zeilenumbruch ersetzt, &percnt;N durch einen Tabulator. Ein
+&percnt; kann mittels &percnt;&percnt; ausgegeben werden.</para></listitem>
+     </varlistentry>
+
+     &apt-commonoptions;
+     
+   </variablelist>
+ </refsect1>
+
+ <refsect1><title>Siehe auch</title>
+   <para>&apt-conf;
+   </para>
+ </refsect1>
+
+ <refsect1><title>Diagnose</title>
+   <para><command>apt-config</command> gibt bei normalen Aktionen 0 zurück, dezimal
+100 bei Fehlern.
+   </para>
+ </refsect1>
+
+ &manbugs;
+ 
+ <refsect1><title>&translation-title;</title>
+   <para>&translation-holder;</para>
+   <para>&translation-english;</para>
+ </refsect1>
+</refentry>
+

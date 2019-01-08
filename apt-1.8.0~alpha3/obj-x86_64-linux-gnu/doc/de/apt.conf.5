@@ -1,0 +1,1235 @@
+'\" t
+.\"     Title: apt.conf
+.\"    Author: Jason Gunthorpe
+.\" Generator: DocBook XSL Stylesheets v1.79.1 <http://docbook.sf.net/>
+.\"      Date: 10\ \&Dezember\ \&2018
+.\"    Manual: APT
+.\"    Source: APT 1.8.0~alpha3
+.\"  Language: German
+.\"
+.TH "APT\&.CONF" "5" "10\ \&Dezember\ \&2018" "APT 1.8.0~alpha3" "APT"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+apt.conf \- Konfigurationsdatei f\(:ur APT
+.SH "BESCHREIBUNG"
+.PP
+/etc/apt/apt\&.conf
+ist die Hauptkonfigurationsdatei, die alle Werkzeuge der APT\-Programmsammlung gemeinsam nutzen, es ist jedoch beileibe nicht der einzige Ort, an dem Optionen gesetzt werden k\(:onnen\&. Die Programmsammlung benutzt au\(sserdem einen gemeinsamen Befehlszeilenauswerter, um eine einheitliche Umgebung bereitzustellen\&.
+.PP
+Wenn ein APT\-Werkzeug startet, wird es die Konfigurationsdateien in der folgenden Reihenfolge lesen:
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 1.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  1." 4.2
+.\}
+die Datei, die durch die Umgebungsvariable
+\fBAPT_CONFIG\fR
+angegeben wird (falls gesetzt)
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 2.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  2." 4.2
+.\}
+alle Dateien in
+Dir::Etc::Parts
+in aufsteigender alphanumerischer Reihenfolge, die entweder keine oder \(Fcconf\(Fo als Dateinamenserweiterung haben und die nur alphanumerische Zeichen, Bindestriche (\-), Unterstriche (_) und Punkte (\&.) enthalten\&. Andernfalls wird APT einen Hinweis ausgeben, dass es eine Datei ignoriert hat, falls die Datei nicht auf ein Muster in der Konfigurationsliste
+Dir::Ignore\-Files\-Silently
+passt \(en in diesem Fall wird sie stillschweigend ignoriert\&.
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 3.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  3." 4.2
+.\}
+die Hauptkonfigurationsdatei, die durch
+Dir::Etc::main
+angegeben wird
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 4.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  4." 4.2
+.\}
+Alle in der programmspezifischen Konfigurationsunterbaumstruktur gesetzten Optionen werden in die Wurzel der Baumstruktur verschoben\&.
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 5.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  5." 4.2
+.\}
+Die Befehlszeilenoptionen werden angewendet, um die Konfigurationsdirektiven au\(sser Kraft zu setzen oder um sogar weitere Konfigurationsdateien zu laden\&.
+.RE
+.SH "SYNTAX"
+.PP
+Die Konfigurationsdatei ist in einem Baum mit Optionen organisiert, die in funktionellen Gruppen organisiert sind\&. Optionsspezifikation wird mit einer doppelten Doppelpunktschreibweise angegeben, zum Beispiel ist
+APT::Get::Assume\-Yes
+eine Option innerhalb der APT\-Werkzeuggruppe f\(:ur das Werkzeug Get\&. Optionen werden nicht von ihren Elterngruppe geerbt\&.
+.PP
+Syntaktisch ist die Konfigurationssprache dem nachempfunden, was die ISC\-Werkzeuge, wie bind und dhcp, benutzen\&. Zeilen, die mit
+//
+beginnen, werden als Kommentar betrachtet (und ignoriert), ebenso wie jeglicher Text zwischen
+/*
+und
+*/, wie bei C/C++\-Kommentaren\&. Jede Zeile hat die Form
+APT::Get::Assume\-Yes "true";\&. Die Anf\(:uhrungszeichen und abschlie\(ssenden Strichpunkte werden ben\(:otigt\&. Der Wert muss in einer Zeile stehen und es gibt keine M\(:oglichkeit, Zeichenketten aneinander zu h\(:angen\&. Werte d\(:urfen keine R\(:uckw\(:artsschr\(:agstriche oder zus\(:atzliche Anf\(:uhrungszeichen enthalten\&. Optionsnamen werden aus alphanumerischen Zeichen und den Zeichen \(Fc/\-:\&._+\(Fo gebildet\&. Ein neuer Geltungsbereich kann mit geschweiften Klammern ge\(:offnet werden, wie:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+   
+APT {
+  Get {
+    Assume\-Yes "true";
+    Fix\-Broken "true";
+  };
+};
+.fi
+.if n \{\
+.RE
+.\}
+.PP
+mit eingef\(:ugten Zeilenumbr\(:uchen, um es leserlicher zu gestalten\&. Listen k\(:onnen erstellt werden, indem ein Geltungsbereich ge\(:offnet wird und eine einzelne, von Anf\(:uhrungszeichen, denen ein Semikolon folgt, eingeschlossene Zeichenkette eingef\(:ugt wird\&. Es k\(:onnen mehrere Eintr\(:age eingef\(:ugt werden, jeweils getrennt durch ein Semikolon\&.
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+   
+DPkg::Pre\-Install\-Pkgs {"/usr/sbin/dpkg\-preconfigure \-\-apt";};
+.fi
+.if n \{\
+.RE
+.\}
+.PP
+Im Allgemeinen bietet die Beispielkonfigurationsdatei
+/usr/share/doc/apt/examples/configure\-index\&.gz
+eine gute Anleitung, wie dies aussehen k\(:onnte\&.
+.PP
+Die Gro\(ss\- und Kleinschreibung ist in Namen der Konfigurationselemente nicht von Bedeutung, deshalb k\(:onnten Sie im vorherigen Beispiel auch
+dpkg::pre\-install\-pkgs
+benutzen\&.
+.PP
+Namen f\(:ur die Konfigurationselemente sind optional, wenn eine Liste, wie sie im Beispiel
+DPkg::Pre\-Install\-Pkgs
+oberhalb gesehen werden kann, definiert ist\&. Wenn Sie keinen neuen Namen angeben, wird ein neuer Eintrag der Liste lediglich eine neue Option hinzuf\(:ugen\&. Wenn Sie einen Namen eingeben, k\(:onnen Sie die Option, wie jede andere Option, au\(sser Kraft setzen, indem Sie der Option erneut einen neuen Wert zuweisen\&.
+.PP
+Es sind zwei Spezialbefehle definiert:
+#include
+(was missbilligt ist und von alternativen Implementierungen nicht unterst\(:utzt wird) und
+#clear:
+#include
+wird die angegebene Datei einf\(:ugen, au\(sser, wenn der Dateiname mit einem Schr\(:agstrich endet, in diesem Fall wird das ganze Verzeichnis eingef\(:ugt\&.
+#clear
+wird benutzt, um einen Teil des Konfigurationsbaums zu l\(:oschen\&. Das angegebene Element und alle davon darunterliegenden Elemente werden gel\(:oscht\&. (Beachten Sie, dass diese Zeilen auch mit einem Semikolon enden m\(:ussen\&.)
+.PP
+Der
+#clear\-Befehl ist die einzig Art, eine Liste oder einen kompletten Geltungsbereich zu l\(:oschen\&. Erneutes \(:Offnen eines Geltungsbereichs (oder die unten beschriebene Syntax mit angeh\(:angten
+::) wird vorherige geschriebene Eintr\(:age
+\fInicht\fR
+au\(sser Kraft setzen\&. Optionen k\(:onnen nur au\(sser Kraft gesetzt werden, indem ein neuer Wert an sie adressiert wird \(en Listen und Geltungsbereiche k\(:onnen nicht au\(sser Kraft gesetzt, sondern nur bereinigt werden\&.
+.PP
+Alle APT\-Werkzeuge akzeptieren eine Option \-o, die es erlaubt, eine beliebige Konfigurationsdirektive auf der Befehlszeile anzugeben\&. Die Syntax ist ein vollst\(:andiger Optionsname (APT::Get::Assume\-Yes
+zum Beispiel), gefolgt von einem Gleichheitszeichen und dann dem neuen Wert der Option\&. Um ein neues Element an eine Liste anzuh\(:angen, h\(:angen Sie ein
+::
+an den Namen der Liste an\&. (Wie Sie vielleicht erraten haben: Die Geltungsbereichssyntax kann nicht auf der Befehlszeile benutzt werden\&.)
+.PP
+Beachten Sie, dass das Anh\(:angen von Elementen an eine Liste mittels
+::
+nur f\(:ur ein Element pro Zeile funktioniert, Sie sollten es nicht nicht in Verbindung mit einer Geltungsbereichssyntax benutzen (die \(Fc::\(Fo implizit hinzuf\(:ugt)\&. Die Benutzung der Syntax von beiden zusammen wird einen Fehler ausl\(:osen, auf den sich einige Benutzer ung\(:unstigerweise verlassen: eine Option mit dem un\(:ublichen Namen \(Fc::\(Fo, die sich wie jede andere Option mit einem Namen verh\(:alt\&. Dies leitet viele Probleme ein; zum einen werden Benutzer, die mehrere Zeilen in dieser
+\fIfalschen\fR
+Syntax in der Hoffnung, etwas an die Liste anzuh\(:angen, schreiben, das Gegenteil erreichen, da nur die letzte Zuweisung zu dieser Option \(Fc::\(Fo benutzt wird\&. Zuk\(:unftige APT\-Versionen werden Fehler ausgeben und die Arbeit stoppen, wenn sie auf diese falsche Verwendung sto\(ssen\&. Korrigieren Sie deshalb nun solche Anweisungen, solange sich APT nicht explizit dar\(:uber beklagt\&.
+.SH "DIE APT\-GRUPPE"
+.PP
+Diese Gruppe von Optionen steuert das allgemeine Verhalten von APT, ebenso wie es die Optionen f\(:ur alle Werkzeuge enth\(:alt\&.
+.PP
+\fBArchitecture\fR
+.RS 4
+Systemarchitektur; setzt die Architektur, die benutzt wird, wenn Dateien heruntergeladen und Paketlisten ausgewertet werden\&. Die interne Vorgabe ist die Architektur f\(:ur die APT kompiliert wurde\&.
+.RE
+.PP
+\fBArchitectures\fR
+.RS 4
+alle Architekturen, die das System unterst\(:utzt\&. Zum Beispiel sind CPUs, die den
+amd64\-Befehlssatz implementieren (auch
+x86\-64
+genannt), ebenso in der Lage, Programme auszuf\(:uhren, die f\(:ur den
+i386\-Befehlssatz (x86) kompiliert wurden\&. Diese Liste wird benutzt, wenn Dateien abgerufen und Paketlisten ausgewertet werden\&. Die anf\(:angliche Vorgabe ist immer die native Architektur des Systems (APT::Architecture) und fremde Architekturen werden der vorgegebenen Liste hinzugef\(:ugt, wenn sie per
+\fBdpkg \-\-print\-architectures\fR
+registriert werden\&.
+.RE
+.PP
+\fBCompressor\fR
+.RS 4
+Dieser G\(:ultigkeitsbereich definiert, welche Komprimierungsformate unterst\(:utzt werden, wie Komprimierung und Dekomprimierung durchgef\(:uhrt werden k\(:onnen, falls die Unterst\(:utzung f\(:ur dieses Format nicht direkt in APT eingebaut wurde und einen Kostenwert, der anzeigt, wie aufw\(:andig es ist, etwas in dieses Format zu komprimieren\&. Als Beispiel w\(:urde es der folgende Konfigurationsabschnitt APT erlauben, Dateien herunterzuladen und zu dekomprimieren sowie mit der kosteng\(:unstigen
+\&.reversed
+Dateiendung zu erzeugen und zu speichern\&. Dadurch werden sie ohne zus\(:atzliche Befehlszeilenparameter zum Komprimieren und Dekomprimieren an den Befehl
+\fBrev\fR
+\(:ubergeben:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+APT::Compressor::rev {
+	Name "rev";
+	Extension "\&.reversed";
+	Binary "rev";
+	CompressArg {};
+	UncompressArg {};
+	Cost "10";
+};
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.PP
+\fBBuild\-Profiles\fR
+.RS 4
+Liste aller Bauprofile ohne das Namensraum\-Pr\(:afix \(Fcprofile\&.\(Fo, die f\(:ur die Aufl\(:osung der Bauabh\(:angigkeiten aktiviert sind\&. Standardm\(:a\(ssig ist diese Liste leer\&.
+\fBDEB_BUILD_PROFILES\fR
+setzt so, wie es durch
+\fBdpkg-buildpackage\fR(1)
+benutzt wird, die Listenschreibweise au\(sser Kraft\&.
+.RE
+.PP
+\fBDefault\-Release\fR
+.RS 4
+Standard\-Release von dem Pakete installiert werden, wenn mehr als eine Version verf\(:ugbar ist\&. Enth\(:alt Release\-Name, Codename oder Release\-Version\&. Beispiele: \(Fcstable\(Fo, \(Fctesting, \(Fcunstable\(Fo, \(Fcstretch\(Fo, \(Fcbuster\(Fo, \(Fc4\&.0\(Fo, \(Fc5\&.0*\(Fo\&. Siehe auch
+\fBapt_preferences\fR(5)\&.
+.RE
+.PP
+\fBIgnore\-Hold\fR
+.RS 4
+Halten von Paketen ignorieren\&. Diese globale Option veranlasst den Probleml\(:oser, gehaltene Pakete beim Treffen von Entscheidungen zu ignorieren\&.
+.RE
+.PP
+\fBClean\-Installed\fR
+.RS 4
+standardm\(:a\(ssig auf on (ein)\&. Wenn es auf on gesetzt wird, wird die automatische Bereinigungsfunktion alle Pakete entfernen, die nicht l\(:anger aus dem Zwischenspeicher heruntergeladen werden k\(:onnen\&. Wenn es auf off gesetzt wird, dann werden au\(sserden die Pakete, die lokal installiert sind, vom Bereinigen ausgeschlossen \(en beachten Sie jedoch, dass APT keine direkten M\(:oglichkeiten bereitstellt, um sie erneut zu installieren\&.
+.RE
+.PP
+\fBImmediate\-Configure\fR
+.RS 4
+ist standardm\(:a\(ssig aktiviert, was APT veranlassen wird, essenzielle und wichtige Pakete so bald wie m\(:oglich in einer Installations\-/Aktualisierungstransaktion zu installieren, um die Auswirkungen eines scheiternden
+\fBdpkg\fR(1)\-Aufrufs zu begrenzen\&. Falls diese Option deaktiviert ist, betrachtet APT ein wichtiges Paket auf die gleiche Weise wie ein zus\(:atzliches Paket: Zwischen dem Entpacken des Pakets A und seiner Konfiguration k\(:onnen viele andere Entpack\- oder Konfigurationsaufrufe f\(:ur andere, nicht zugeh\(:orige Pakete B, C usw\&. liegen\&. Falls dies zum Scheitern des
+\fBdpkg\fR(1)\-Aufrufs f\(:uhrt (z\&.B\&. weil Betreuerskripte des Pakets B einen Fehler erzeugen), f\(:uhrt dies zu einem Systemstatus, in dem Paket A entpackt, aber nicht konfiguriert ist, daher ist nicht l\(:anger gew\(:ahrleistet, dass irgendein Paket, das von A abh\(:angt, weiter funktioniert, da seine Abh\(:angigkeit von A nicht l\(:anger erf\(:ullt wird\&.
+.sp
+Au\(sserdem wird die unmittelbare Konfigurationsmarkierung im potenziell problematischen Fall zirkul\(:arer Abh\(:angigkeiten angewendet, da eine Abh\(:angigkeit mit der Unmittelbarmarkierung einer Vorabh\(:angigkeit entspricht\&. Theoretisch erm\(:oglicht dies APT, eine Situation zu erkennen, in der es keine unmittelbare Konfiguration durchf\(:uhren kann, abzubrechen und dem Benutzer vorzuschlagen, dass er die Option zeitweise deaktivieren soll, um ein Fortsetzen der Transaktion zu erm\(:oglichen\&. Beachten Sie hier das Wort \(Fctheoretisch\(Fo; im wahren Leben ist dieses Problem selten in instabilen Distributionsversionen aufgetreten und es wurde durch falsche Abh\(:angigkeiten des fraglichen Pakets verursacht oder durch ein System in einem bereits besch\(:adigten Zustand; daher sollten Sie diese Option nicht blind deaktivieren, da das zuvor erw\(:ahnte Szenario nicht das einzige Problem ist, das es \(:uberhaupt erst verhindern kann\&.
+.sp
+Bevor eine umfangreiche Transaktion wie
+dist\-upgrade
+mit dieser ausgeschalteten Option ausgef\(:uhrt wird, sollten Sie versuchen, explizit
+install
+f\(:ur das Paket auszuf\(:uhren, das APT nicht unmittelbar konfigurieren kann\&. Stellen Sie aber bitte sicher, dass Sie Ihr Problem au\(sserdem an Ihre Distribution und an das APT\-Team mit dem Verweis zur Fehlermeldung unten melden, so dass sie an der Verbesserung und Korrektur des Upgrade\-Prozesses arbeiten k\(:onnen\&.
+.RE
+.PP
+\fBForce\-LoopBreak\fR
+.RS 4
+Schalten Sie diese Option niemals ein, au\(sser wenn Sie
+\fIwirklich\fR
+wissen, was Sie tun\&. Es erlaubt APT, tempor\(:ar ein essenzielles Paket zu entfernen, um eine Conflicts/Conflicts\- oder Conflicts/Pre\-Depends\-Schleife zwischen zwei essenziellen Paketen zu durchbrechen\&.
+\fISolch eine Schleife sollte niemals existieren und ist ein schwerwiegender Fehler\fR\&. Diese Option wird funktionieren, wenn die essenziellen Pakete nicht
+\fBtar\fR,
+\fBgzip\fR,
+\fBlibc\fR,
+\fBdpkg\fR,
+\fBdash\fR
+oder etwas, was davon abh\(:angt, sind\&.
+.RE
+.PP
+\fBCache\-Start\fR, \fBCache\-Grow\fR, \fBCache\-Limit\fR
+.RS 4
+APT benutzt seit Version 0\&.7\&.26 eine gr\(:o\(ssenver\(:anderbare, speicherbasierte Zwischenspeicherdatei, um verf\(:ugbare Informationen zu speichern\&.
+Cache\-Start
+dient als Hinweis, auf welche Gr\(:o\(sse der Zwischenspeicher wachsen wird und enth\(:alt daher den Betrag, welchen Speicher APT beim Start abruft\&. Die Vorgabe ist 20971520 Byte (~20 MB)\&. Beachten Sie, dass diese Speichermenge f\(:ur APT verf\(:ugbar sein muss, da es sonst unsch\(:on scheitert\&. F\(:ur Ger\(:ate mit eingeschr\(:anktem Speicher sollten diese Werte vermindert werden, w\(:ahrend sie f\(:ur Systeme mit vielen konfigurierten Quellen erh\(:oht werden sollte\&.
+Cache\-Grow
+definiert in Byte mit einer Vorgabe von 1048576 (~1 MB) um wieviel die Gr\(:o\(sse des Zwischenspeichers verg\(:o\(ssert werden soll, falls der durch
+Cache\-Start
+vorreservierte nicht ausreicht\&. Dieser Wert wird wieder und wieder verwandt bis entweder der Zwischenspeicher gro\(ss genug ist, um alle Informationen zu speichern oder die Zwischenspeichergr\(:o\(sse das
+Cache\-Limit
+erreicht\&. Vorgabe f\(:ur
+Cache\-Limit
+ist 0, was bedeutet, dass es kein Limit gibt\&. Falls
+Cache\-Grow
+auf 0 gesetzt ist, kann der Zwischenspeicher nicht automatisch wachsen\&.
+.RE
+.PP
+\fBBuild\-Essential\fR
+.RS 4
+definiert, welche Pakete als essenzielle Bauabh\(:angigkeiten betrachtet werden\&.
+.RE
+.PP
+\fBGet\fR
+.RS 4
+Der Get\-Unterabschnitt steuert das
+\fBapt-get\fR(8)\-Werkzeug\&. Lesen Sie bitte dessen Dokumentation, um weitere Informationen \(:uber die dortigen Optionen zu erhalten\&.
+.RE
+.PP
+\fBCache\fR
+.RS 4
+Der Cache\-Unterabschnitt steuert das
+\fBapt-cache\fR(8)\-Werkzeug\&. Lesen Sie bitte dessen Dokumentation, um weitere Informationen \(:uber die dortigen Optionen zu erhalten\&.
+.RE
+.PP
+\fBCDROM\fR
+.RS 4
+Der CDROM\-Unterabschnitt steuert das
+\fBapt-cdrom\fR(8)\-Werkzeug\&. Lesen Sie bitte dessen Dokumentation, um weitere Informationen \(:uber die dortigen Optionen zu erhalten\&.
+.RE
+.SH "DIE BESCHAFFUNGSGRUPPE"
+.PP
+Die
+Acquire\-Gruppe der Optionen steuert das Herunterladen von Paketen ebenso wie die verschiedenen \(FcBeschaffungsmethoden\(Fo, die f\(:ur das Herunterladen selbst zust\(:andig sind (siehe auch
+\fBsources.list\fR(5))\&.
+.PP
+\fBCheck\-Date\fR
+.RS 4
+Sicherheitsbezogene Optionen sind auf \(Fctrue\(Fo voreingestellt, wodurch zeitbezogene Pr\(:ufungen aktiviert sind\&. Deaktivieren bedeutet, dass der Zeit auf der Maschine nicht vertraut wird\&. Dann wird APT alle zeitbezogenen Pr\(:ufungen wie
+\fBCheck\-Valid\-Until\fR
+und die Pr\(:ufung, ob das Datumsfeld einer Release\-Datei in der Zukunft liegt, deaktivieren\&.
+.RE
+.PP
+\fBMax\-FutureTime\fR
+.RS 4
+maximale Zeit (in Sekunden) vor ihrer Erzeugung (die in der Kopfzeile
+Date
+angegeben ist), die die Datei
+Release
+als g\(:ultig angesehen wird\&. Der voreingestellte Wert ist
+10\&. Archivspezifische Einstellungen k\(:onnen durch Anh\(:angen der Archivbezeichnung an den Optionsnamen vorgenommen werden\&. Vorzugsweise kann dasselbe f\(:ur bestimmte
+\fBsources.list\fR(5)\-Eintr\(:age erreicht werden, indem dort die Option
+\fBDate\-Max\-Future\fR
+benutzt wird\&.
+.RE
+.PP
+\fBCheck\-Valid\-Until\fR
+.RS 4
+Die sicherheitsbezogene Option wird als \(Fctrue\(Fo vorgegeben\&. Damit werden Wiederholungsangriffe \(:uber einen l\(:angeren Zeitraum hinweg verhindert, indem der \(:Uberpr\(:ufung der Datei Release ein Ablaufdatum gegeben wird\&. Beispielsweise wird Benutzern damit auch geholfen, l\(:anger nicht aktualisierte Spiegel zu erkennen \(en diese Funktion h\(:angt jedoch von der Richtigkeit der Zeiteinstellung auf dem Benutzersystem ab\&. Archivbetreuer sind aufgefordert, Release\-Dateien mit der Kopfzeile
+Valid\-Until
+zu erstellen\&. Falls sie das nicht tun oder ein strengerer Wert gew\(:unscht wird, kann die Option
+Max\-ValidTime
+benutzt werden (siehe unten)\&. Der Option
+\fBCheck\-Valid\-Until\fR
+von
+\fBsources.list\fR(5)\-Eintr\(:agen zum wahlweisen Deaktivieren der Pr\(:ufung sollte der Vorzug gegeben werden, anstatt dies global mit dieser Einstellung au\(sser Kraft zu setzen\&.
+.RE
+.PP
+\fBMax\-ValidTime\fR
+.RS 4
+maximale Zeit (in Sekunden) nach ihrer Erzeugung (die in der Kopfzeile
+Date
+angegeben ist), die die Datei
+Release
+als g\(:ultig angesehen wird\&. Falls die Release\-Datei selbst eine
+Valid\-Until\-Kopfzeile enth\(:alt, wird das fr\(:uhere der beiden Daten als Ablaufdatum verwandt\&. Vorgabe ist
+0, was f\(:ur \(Fcf\(:ur immer g\(:ultig\(Fo steht\&. Archivspezifische Einstellungen k\(:onnen durch Anh\(:angen der Archivbezeichnung an den Optionsnamen vorgenommen werden\&. Vorzugsweise kann dasselbe f\(:ur bestimmte
+\fBsources.list\fR(5)\-Eintr\(:age erreicht werden, indem dort die Option
+\fBValid\-Until\-Max\fR
+benutzt wird\&.
+.RE
+.PP
+\fBMin\-ValidTime\fR
+.RS 4
+minimale Zeit (in Sekunden), nach der Erzeugung (die in der Kopfzeile
+Date
+angegeben ist), die die Datei
+Release
+als g\(:ultig angesehen wird\&. Benutzen Sie dies, falls Sie einen selten aktualisierten (lokalen) Spiegel eines h\(:aufiger aktualisierten Archivs mit einer
+Valid\-Until\-Kopfzeile haben, anstatt die \(:Uberpr\(:ufung des Ablaufdatums komplett zu deaktivieren\&. Archivspezifische Einstellungen k\(:onnen und sollten durch Anh\(:angen der Archivbezeichnung an den Optionsnamen vorgenommen werden\&. Vorzugsweise kann dasselbe f\(:ur bestimmte
+\fBsources.list\fR(5)\-Eintr\(:age erreicht werden, indem dort die Option
+\fBValid\-Until\-Min\fR
+benutzt wird\&.
+.RE
+.PP
+\fBAllowTLS\fR
+.RS 4
+erm\(:oglicht die Verwendung interner TLS\-Unterst\(:utzung in der HTTP\-Methode\&. Falls auf \(Fcfalse\(Fo gesetzt, deaktiviert dies vollst\(:andig die Unterst\(:utzung f\(:ur TLS in den eigenen Methoden von APT (au\(sser bei den cURL\-basierten HTTPS\-Methoden)\&. Es werden keine TLS\-bezogenen Funktionen mehr aufgerufen\&.
+.RE
+.PP
+\fBPDiffs\fR
+.RS 4
+versucht Unterschiede, die
+PDiffs
+genannt werden, f\(:ur Indexe (wie
+Packages\-Dateien) statt der kompletten Dateien herunterzuladen\&. Vorgabe ist \(Fctrue\(Fo\&. Vorzugsweise kann dies f\(:ur bestimmte
+\fBsources.list\fR(5)\-Eintr\(:age oder Index\-Dateien gesetzt werden, indem dort die Option
+\fBPDiffs\fR
+benutzt wird\&.
+.sp
+Es sind au\(sserdem zwei Unteroptionen verf\(:ugbar, um die Benutzung von PDiffs zu begrenzen:
+FileLimit
+kann verwandt werden, um die maximale Anzahl von PDiff\-Dateien anzugeben, die zum Aktualisieren einer Datei heruntergeladen werden sollen\&. Andererseits gibt
+SizeLimit
+die maximale Prozentzahl der Gr\(:o\(sse aller Patches im Vergleich zur Zieldatei an\&. Wenn eine dieser Begrenzungen \(:uberschritten wird, wird die komplette Datei anstelle der Patche heruntergeladen\&.
+.RE
+.PP
+\fBBy\-Hash\fR
+.RS 4
+versucht Indexe \(:uber einen URI der aus der Hash\-Summe der erwarteten Datei gebildet wurde, statt \(:uber einen gut bekannten stabilen Dateinamen herunterzuladen\&. Standardm\(:a\(ssig \(Fctrue\(Fo, wird aber automatisch deaktiviert, falls die Quelle anzeigt, dass es nicht unterst\(:utzt wird\&. Der Gebrauch kann mit dem speziellen Wert \(Fcforce\(Fo erzwungen werden\&. Vorzugsweise kann dies f\(:ur bestimmte
+\fBsources.list\fR(5)\-Eintr\(:age oder Index\-Dateien gesetzt werden, indem dort die Option
+\fBBy\-Hash\fR
+benutzt wird\&.
+.RE
+.PP
+\fBQueue\-Mode\fR
+.RS 4
+Warteschlangenmodus;
+Queue\-Mode
+kann entweder
+host
+oder
+access
+sein, wodurch festgelegt wird, wie APT ausgehende Verbindungen parallelisiert\&.
+host
+bedeutet, dass eine Verbindung pro Zielrechner ge\(:offnet wird,
+access
+bedeutet, dass eine Verbindung pro URI\-Art ge\(:offnet wird\&.
+.RE
+.PP
+\fBRetries\fR
+.RS 4
+Anzahl der auszuf\(:uhrenden erneuten Versuche\&. Wenn dies nicht Null ist, wird APT fehlgeschlagene Dateien die angegebene Anzahl erneut versuchen\&.
+.RE
+.PP
+\fBSource\-Symlinks\fR
+.RS 4
+benutzt symbolische Verweise f\(:ur Quellarchive\&. Falls dies auf \(Fctrue\(Fo gesetzt ist, werden Quellarchive, wenn m\(:oglich, symbolisch verkn\(:upft, anstatt kopiert zu werden\&. Die Voreinstellung ist \(Fctrue\(Fo\&.
+.RE
+.PP
+\fBhttp\fR \fBhttps\fR
+.RS 4
+Die Optionen in diesen Bereichen konfigurieren, wie APT Transporte \(:uber die Protokolle HTTP und HTTPS abwickelt\&. Sie sind in den Handbuchseiten
+\fBapt-transport-http\fR(1)
+beziehungsweise
+\fBapt-transport-https\fR(1)
+dokumentiert\&.
+.RE
+.PP
+\fBftp\fR
+.RS 4
+ftp::Proxy
+setzt den Standard\-Proxy, der f\(:ur FTP\-URIs benutzt werden soll\&. Er wird in der Standardform
+ftp://[[Benutzer][:Passwort]@]Rechner[:Port]/
+angegeben\&. Proxys pro Rechner k\(:onnen au\(sserdem in der Form
+ftp::Proxy::<Rechner>
+angegeben werden\&. Hierbei bedeutet das spezielle Schl\(:usselwort
+DIRECT, dass keine Proxys benutzt werden\&. Falls keine der obigen Einstellungen angegeben wurde, wird die Umgebungsvariable
+\fBftp_proxy\fR
+benutzt\&. Um einen FTP\-Proxy zu benutzen, m\(:ussen Sie in der Konfigurationsdatei das Skript
+ftp::ProxyLogin
+setzen\&. Dieser Eintrag gibt die Befehle an, die gesendet werden m\(:ussen, um dem Proxy\-Server mitzuteilen, womit er sich verbinden soll\&. Ein Beispiel, wie das funktioniert, finden Sie unter
+/usr/share/doc/apt/examples/configure\-index\&.gz\&. Die Platzhaltervariablen, die f\(:ur den zugeh\(:origen URI\-Bestandteil stehen, sind
+$(PROXY_USER),
+$(PROXY_PASS),
+$(SITE_USER),
+$(SITE_PASS),
+$(SITE)
+und
+$(SITE_PORT)\&.
+.sp
+Die Option
+timeout
+stellt den Zeitnehmer, der von der Methode benutzt wird\&. Dieser Wert wird auf die Verbindungs\- sowie die Datenzeit\(:uberschreitungen angewendet\&.
+.sp
+Mehrere Einstellungen werden zum Steuern des passiven Modus bereitgestellt\&. Generell ist es sicher, den passiven Modus eingeschaltet zu lassen, er funktioniert in nahezu jeder Umgebung\&. Jedoch erfordern einige Situationen, dass der passive Modus ausgeschaltet und stattdessen Port\-Modus\-FTP benutzt wird\&. Dies kann global eingestellt werden oder f\(:ur Verbindungen, die durch einen Proxy oder zu einem bestimmten Rechner gehen (Beispiele finden Sie in der Musterkonfigurationsdatei)\&.
+.sp
+Es ist m\(:oglich, FTP \(:uber HTTP zu leiten, indem die Umgebungsvariable
+\fBftp_proxy\fR
+auf eine HTTP\-URL gesetzt wird \(en lesen Sie die Besprechung der HTTP\-Methode oberhalb bez\(:uglich der Syntax\&. Sie k\(:onnen dies nicht in der Konfigurationsdatei setzen und es wird wegen der geringen Effizienz nicht empfohlen, FTP \(:uber HTTP zu benutzen\&.
+.sp
+Die Einstellung
+ForceExtended
+steuert die Benutzung der RFC\-2428\-Befehle
+EPSV
+und
+EPRT\&. Die Vorgabe ist \(Fcfalse\(Fo, was bedeutet, dass diese Befehle nur benutzt werden, wenn die Steuerverbindung IPv6 ist\&. Durch Stellen auf \(Fctrue\(Fo wird die Benutzung selbst auf IPv4\-Verbindungen erzwungen\&. Beachten Sie, dass die wenigsten FTP\-Server RFC 2428 unterst\(:utzen\&.
+.RE
+.PP
+\fBcdrom\fR
+.RS 4
+F\(:ur URIs, die die Methode
+cdrom
+verwenden, ist die einzige Option der Einh\(:angepunkt,
+cdrom::Mount, der der Einh\(:angepunkt des CD\-ROM\-Laufwerks sein muss (oder der DVD oder was auch immer), wie er in
+/etc/fstab
+angegeben wurde\&. Es ist m\(:oglich, alternative Ein\- und Aush\(:angebefehle anzugeben, falls Ihr Einh\(:angepunkt nicht in der fstab aufgef\(:uhrt werden kann\&. Die Syntax besteht darin,
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+/cdrom/::Mount "foo";
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+in den
+cdrom\-Block einzuf\(:ugen\&. Der abschlie\(ssende Schr\(:agstrich ist wichtig\&. Aush\(:angebefehle k\(:onnen per UMount angegeben werden\&.
+.RE
+.PP
+\fBgpgv\fR
+.RS 4
+Die einzige Konfigurationsoption f\(:ur GPGV\-URIs ist
+gpgv::Options, um zus\(:atzliche Parameter an Gpgv weiterzuleiten\&.
+.RE
+.PP
+\fBCompressionTypes\fR
+.RS 4
+Liste der Kompressionstypen, die von den \(FcBeschaffungsmethoden verstanden werden\&. Dateien wie
+Packages
+k\(:onnen in verschiedenen Kompressionsformaten verf\(:ugbar sein\&. Standardm\(:a\(ssig k\(:onnen die \(FcBeschaffungsmethoden viele gebr\(:auchliche Formate wie
+\fBxz\fR\- und
+\fBgzip\fR\-komprimierte Dateien dekomprimieren und erneut komprimieren\&. In diesem Bereich k\(:onnen die unterst\(:utzten Formate abgefragt, ver\(:andert sowie Unterst\(:utzung f\(:ur weitere Formate hinzugef\(:ugt werden (siehe auch
+\fBAPT::Compressor\fR)\&. Die Syntax daf\(:ur lautet:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+Acquire::CompressionTypes::\fIDateierweiterung\fR "\fIMethodenname\fR";
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+Au\(sserdem kann die Untergruppe
+Order
+benutzt werden, um zu definieren, in welcher Reihenfolge das \(FcBeschaffungssystem\(Fo die komprimierten Dateien herunterzuladen versucht\&. Das \(FcAcquire\(Fo\-System wird die erste ausprobieren und bei einem Fehler mit dem n\(:achsten Kompressionstyp in dieser Liste fortfahren\&. Um daher einen Typ einem anderen vorzuziehen, f\(:ugen Sie einfach den bevorzugten Typ an erster Stelle in die Liste ein \- Typen, die noch nicht hinzugef\(:ugt wurden, werden vorbehaltlos an das Ende der Liste angeh\(:angt, so kann z\&.B\&.
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+Acquire::CompressionTypes::Order:: "gz";
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+benutzt werden, um
+\fBgzip\fR\-komprimierten Dateien den Vorzug gegen\(:uber allen anderen Formaten zu geben\&. Falls
+\fBxz\fR
+gegen\(:uber
+\fBgzip\fR
+und
+\fBbzip2\fR
+den Vorzug erhalten soll, sollte die Konfigurationseinstellung so aussehen:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+Acquire::CompressionTypes::Order { "xz"; "gz"; };
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+\&. Es ist nicht n\(:otig,
+bz2
+explizit zur Liste hinzuzuf\(:ugen, da es automatisch hinzuf\(:ugt wird\&.
+.sp
+Beachten Sie, dass
+Dir::Bin::\fIMethodenname\fR
+zur Laufzeit gepr\(:uft wird\&. Falls diese Option gesetzt ist und die Unterst\(:utzung f\(:ur dieses Format nicht direkt in APT eingebaut wurde, wird die Methode nur benutzt, wenn die Datei existiert, z\&.B\&. ist die (integrierte) Einstellung f\(:ur die
+bzip2\-Methode:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+Dir::Bin::bzip2 "/bin/bzip2";
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+\&. Beachten Sie auch, dass auf der Befehlszeile eingegebene Eintr\(:age an das Ende der Liste angeh\(:angt werden, die in den Konfigurationsdateien angegeben wurde, aber vor den Standardeintr\(:agen\&. Um einen Typ in diesem Fall gegen\(:uber einem, der \(:uber die Konfigurationsdatei angegebenen wurde, zu bevorzugen, k\(:onnen Sie diese Option direkt setzen \(en nicht im Listenstil\&. Dies wird die definierte Liste nicht au\(sser Kraft setzen, es wird diesen Typ nur vor die Liste setzen\&.
+.sp
+Der besondere Typ
+uncompressed
+kann benutzt werden, um unkomprimierten Dateien einen Vorrang zu geben, beachten Sie jedoch, dass die meisten Archive keine unkomprimierten Dateien bereitstellen, so dass dies meist nur f\(:ur lokale Spiegel benutzt werden kann\&.
+.RE
+.PP
+\fBGzipIndexes\fR
+.RS 4
+Wenn
+gzip\-komprimierte Indexe heruntergeladen werden (Packages, Sources oder Translations), speichere sie lokal mit gzip\-Komprimierung\&. Dies spart eine Menge Festplattenplatz, aber ben\(:otigt mehr CPU\-Ressourcen bei der Erstellung des lokalen Paketzwischenspeicher\&. Vorgabe ist \(Fcfalse\(Fo\&.
+.RE
+.PP
+\fBLanguages\fR
+.RS 4
+Der Unterabschnitt Languages steuert, welche
+Translation\-Dateien heruntergeladen werden und in welcher Reihenfolge APT versucht, die Beschreibungs\(:ubersetzungen anzuzeigen\&. APT wird versuchen, die erste verf\(:ugbare Beschreibung f\(:ur die zuerst aufgelistete Sprache anzuzeigen\&. Sprachen k\(:onnen durch ihre kurzen oder langen Sprachcodes definiert sein\&. Beachten Sie, dass nicht alle Archive
+Translation\-Dateien f\(:ur jede Sprache bereitstellen \(en insbesondere sind die langen Sprachcodes selten\&.
+.sp
+Die Standardliste beinhaltet \(Fcenvironment\(Fo und \(Fcen\(Fo\&. \(Fcenvironment\(Fo hat hier eine besondere Bedeutung: Es wird zur Laufzeit durch die Sprachcodes ersetzt, die aus der Umgebungsvariable
+LC_MESSAGES
+extrahiert wurden\&. Es wird au\(sserdem sicherstellen, dass diese Codes nicht zweimal in der Liste enthalten sind\&. Falls
+LC_MESSAGES
+auf \(FcC\(Fo gesetzt ist, wird nur die Datei
+Translation\-en
+(falls verf\(:ugbar) benutzt\&. Um APT zu zwingen, keine \(:Ubersetzungsdatei zu verwenden, benutzen Sie die Einstellung
+Acquire::Languages=none\&. \(Fcnone\(Fo ist ein weiterer Code mit besonderer Bedeutung, der die Suche nach einer passenden
+Translation\-Datei stoppen wird\&. Dies weist APT an, diese \(:Ubersetzungen auch herunterzuladen, ohne sie tats\(:achlich zu verwenden, es sei denn, die Umgebungsvariable gibt diese Sprachen an\&. Daher wird die folgende Beispielkonfiguration in einer englischen Spracheinstellung zu der Reihenfolge \(Fcen,de\(Fo und in einer deutschen Spracheinstellung zu \(Fcde,en\(Fo f\(:uhren\&. Beachten Sie, dass \(Fcfr\(Fo heruntergeladen, aber nur benutzt wird, falls APT in einer franz\(:osischen Spracheinstellung benutzt wird (wobei die Reihenfolge \(Fcfr, de, en\(Fo w\(:are)\&.
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+Acquire::Languages { "environment"; "de"; "en"; "none"; "fr"; };
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+Hinweis: Um Problemen vorzubeugen, die daher kommen, dass APT in unterschiedlichen Umgebungen ausgef\(:uhrt wird (z\&.B\&. durch verschiedene Benutzer oder durch andere Programme) werden alle Translation\-Dateien, die in
+/var/lib/apt/lists/
+gefunden werden, an das Ende der Liste hinzugef\(:ugt (nach einem impliziten \(Fcnone\(Fo)\&.
+.RE
+.PP
+\fBForceIPv4\fR
+.RS 4
+Beim Herunterladen wird die Verwendung des IPv4\-Protokolls erzwungen\&.
+.RE
+.PP
+\fBForceIPv6\fR
+.RS 4
+Beim Herunterladen wird die Verwendung des IPv6\-Protokolls erzwungen\&.
+.RE
+.PP
+\fBMaxReleaseFileSize\fR
+.RS 4
+die maximale Dateigr\(:o\(sse von Release\-/Release\&.gpg\-/InRelease\-Dateien\&. Die Voreinstellung ist 10 MB\&.
+.RE
+.PP
+\fBEnableSrvRecords\fR
+.RS 4
+Diese Option steuert, ob APT den in RFC 2782 spezifizierten DNS\-SRV\-Serverdatensatz benutzt, um einen alternativen Server zur Verbindung auszuw\(:ahlen\&. Die Voreinstellung ist \(Fctrue\(Fo\&.
+.RE
+.PP
+\fBAllowInsecureRepositories\fR
+.RS 4
+Erm\(:oglicht Aktualisierungsaktionen, Datendateien aus Depots ohne ausreichende Sicherheitsinformationen zu laden\&. Die Voreinstellung ist \(Fcfalse\(Fo\&. Konzept, Auswirkungen sowie Alternativen werden ausf\(:uhrlich in
+\fBapt-secure\fR(8)
+erkl\(:art\&.
+.RE
+.PP
+\fBAllowWeakRepositories\fR
+.RS 4
+Erm\(:oglicht Aktualisierungsaktionen, um Datendateien aus Depots zu laden, die Sicherheitsinformationen bereitstellen, die jedoch nicht mehr als kryptografisch stark genug erachtet werden\&. Die Voreinstellung ist \(Fcfalse\(Fo\&. Konzept, Auswirkungen sowie Alternativen werden ausf\(:uhrlich in
+\fBapt-secure\fR(8)
+erkl\(:art\&.
+.RE
+.PP
+\fBAllowDowngradeToInsecureRepositories\fR
+.RS 4
+Erm\(:oglicht, dass ein Depot, das vorher per GPG signiert war, w\(:ahrend einer Aktualisierungstransaktion seine Signatur verliert\&. Wenn ein vorher vertrauensw\(:urdiges Depot keine g\(:ultige Signatur mehr hat, wird APT die Aktualisierung verweigern\&. Diese Option kann verwendet werden, um diesen Schutz au\(sser Kraft zu setzen\&. Sie wollen dies wahrscheinlich nahezu nie aktivieren\&. Die Voreinstellung ist \(Fcfalse\(Fo\&. Konzept, Auswirkungen sowie Alternativen werden ausf\(:uhrlich in
+\fBapt-secure\fR(8)
+erkl\(:art\&.
+.RE
+.PP
+\fBChangelogs::URI\fR G\(:ultigkeitsbereich
+.RS 4
+Changelogs k\(:onnen nur beschafft werden, falls ein URI bekannt ist, von dem sie geholt werden k\(:onnen\&. Vorzugsweise gibt die Release\-Datei ihn in einem \(FcChangelogs\(Fo\-Feld an\&. Falls dies nicht verf\(:ugbar ist, werden die Felder \(FcLabel\(Fo und \(FcOrigin\(Fo der Release\-Datei benutzt, um zu pr\(:ufen, ob eine
+Acquire::Changelogs::URI::Label::\fIBESCHRIFTUNG\fR\- oder
+Acquire::Changelogs::URI::Origin::\fIURSPRUNG\fR\-Option existiert und, falls dies der Fall ist, wird dieser Wert genommen\&. Der Wert in der Release\-Datei kann mit
+Acquire::Changelogs::URI::Override::Label::\fIBESCHRIFTUNG\fR
+oder
+Acquire::Changelogs::URI::Override::Origin::\fIURSPRUNG\fR
+au\(sser Kraft gesetzt werden\&. Der Wert sollte ein normaler URI auf eine Textdatei sein, au\(sser dass paketspezifische Daten durch den Platzhalter
+@CHANGEPATH@
+ersetzt werden\&. Der Wert daf\(:ur ist: 1\&. Falls das Paket von einem Bestandteil stammt (z\&.B\&.
+main), ist dies der erste Teil, ansonsten wird er weggelassen\&. 2\&. der erste Buchstabe des Quellpaketnamens, es sei denn, der Paketname beginnt mit \(Fclib\(Fo\&. In diesem Fall werden es die vier ersten Buchstaben sein\&. 3\&. der komplette Quellpaketname\&. 4\&. wieder der vollst\(:andige Name und 5\&. die Quellversion\&. Der erste (falls vorhanden), zweite, dritte und vierte Teil werden durch einen Schr\(:agstrich (\(Fc/\(Fo) voneinander getrennt und zwischen dem vierten und f\(:unften ist ein Unterstrich (\(Fc_\(Fo)\&. Der Spezialwert \(Fcno\(Fo, der f\(:ur diese Option verf\(:ugbar ist, gibt an, dass diese Quelle nicht benutzt werden kann, um von dort Changelog\-Dateien zu beschaffen\&. In diesem Fall wird, falls verf\(:ugbar, eine andere Quelle ausprobiert\&.
+.RE
+.SH "PROGRAMMSPEZIFISCHE KONFIGURATION"
+.PP
+Insbesondere kann es mit der Einf\(:uhrung des
+\fBapt\fR\-Programms n\(:utzlich sein, bestimmte Optionen nur f\(:ur ein bestimmtes Programm zu setzen, da sogar Optionen, die aussehen, als ob sie nur ein bestimmtes Programm betr\(:afen, wie
+\fBAPT::Get::Show\-Versions\fR, sowohl
+\fBapt\-get\fR
+als auch
+\fBapt\fR
+beeinflussen\&.
+.PP
+Eine Option alleine f\(:ur ein bestimmtes Programm zu setzen kann erreicht werden, indem die Option innerhalb des G\(:ultigkeitsbereichs
+\fBBinary::\fR\fB\fIbestimmtes_Programm\fR\fR
+gesetzt wird\&. Das Setzen der Option
+\fBAPT::Get::Show\-Versions\fR
+f\(:ur ausschlie\(sslich
+\fBapt\fR
+kann z\&.B\&. stattdessen durch Setzen von
+\fBBinary::apt::APT::Get::Show\-Versions\fR
+erledigt werden\&.
+.PP
+Beachten Sie, dass Sie, wie im Abschnitt BESCHREIBUNG weiter oben gesehen, die programmspezifischen Optionen weder auf der Befehlszeile selbst, noch in Konfigurationsdateien, die \(:uber die Befehlszeile geladen werden, setzen k\(:onnen\&.
+.SH "VERZEICHNISSE"
+.PP
+Der
+Dir::State\-Abschnitt hat Verzeichnisse, die zu lokalen Statusinformationen geh\(:oren\&.
+lists
+ist das Verzeichnis, in das heruntergeladene Paketlisten abgelegt werden und
+status
+ist der Name der
+\fBdpkg\fR(1)\-Statusdatei\&.
+preferences
+ist der Name der APT\-preferences\-Datei\&.
+Dir::State
+enth\(:alt das Standardverzeichnis, das allen Unterelementen vorangestellt wird, falls sie nicht mit
+/
+oder
+\&./
+beginnen\&.
+.PP
+Dir::Cache
+enth\(:alt Orte, die zu lokalen Zwischenspeicherinformationen geh\(:oren, so wie die beiden Paketzwischenspeicher
+srcpkgcache
+und
+pkgcache, sowie den Ort, an den heruntergeladene Archive abgelegt werden,
+Dir::Cache::archives\&. Die Generierung von Zwischenspeichern kann ausgeschaltet werden, indem
+pkgcache
+oder
+srcpkgcache
+auf
+""
+gesetzt wird\&. Dies wird den Start verlangsamen, aber Plattenplatz sparen\&. Es ist vermutlich vorzuziehen, statt des \(Fcsrcpkgcache\(Fos den \(Fcpkgcache\(Fo auszuschalten\&. Wie
+Dir::State
+ist das Standardverzeichnis in
+Dir::Cache
+enthalten\&.
+.PP
+Dir::Etc
+enth\(:alt den Ort der Konfigurationsdateien,
+sourcelist
+gibt den Ort der Quellliste und
+main
+ist die Standardkonfigurationsdatei (Einstellung hat keine Auswirkung, au\(sser wenn sie aus der in
+\fBAPT_CONFIG\fR
+angegebenen Konfigurationsdatei erfolgt)\&.
+.PP
+Die
+Dir::Parts\-Einstellung liest alle Konfigurationsteile in lexikalischer Reihenfolge vom angegebenen Verzeichnis ein\&. Nachdem dies geschehen ist, wird die Hauptkonfigurationsdatei geladen\&.
+.PP
+Auf Programme wird von
+Dir::Bin
+verwiesen\&.
+Dir::Bin::Methods
+gibt den Ort des Methodensteuerungsprogramms an und
+gzip,
+bzip2,
+lzma,
+dpkg,
+apt\-get,
+dpkg\-source,
+dpkg\-buildpackage
+und
+apt\-cache
+geben den Ort des jeweiligen Programms an\&.
+.PP
+Das Konfigurationselement
+RootDir
+hat eine besondere Bedeutung\&. Falls es gesetzt ist, sind alle Pfad relativ zu
+RootDir,
+\fIsogar Pfade, die absolut angegeben wurden\fR\&. So wird zum Beispiel, wenn
+RootDir
+auf
+/tmp/staging
+und
+Dir::State::status
+auf
+/var/lib/dpkg/status
+gesetzt ist, nach der Statusdatei in
+/tmp/staging/var/lib/dpkg/status
+nachgesehen\&. Falls Sie etwas nur relativen Pfaden voranstellen m\(:ochten, setzen Sie stattdessen
+Dir\&.
+.PP
+Die Liste
+Ignore\-Files\-Silently
+kann benutzt werden, um anzugeben, welche Dateien APT beim Auswerten der Dateien in den Fragment\-Verzeichnissen stillschweigend ignorieren sollte\&. Standardm\(:a\(ssig werden Dateien, die auf
+\&.disabled,
+~,
+\&.bak
+oder
+\&.dpkg\-[a\-z]+
+enden stillschweigend ignoriert\&. Wie beim letzten Vorgabewert gesehen, kann die Syntax f\(:ur regul\(:are Ausdr\(:ucke f\(:ur diese Muster verwandt werden\&.
+.SH "APT IN DSELECT"
+.PP
+Wenn APT als eine
+\fBdselect\fR(1)\-Methode benutzt wird, steuern mehrere Konfigurationsdirektiven das Standardverhalten\&. Diese stehen im Abschnitt
+DSelect\&.
+.PP
+\fBClean\fR
+.RS 4
+Zwischenspeicherbereinigungsmodus; dieser Wert kann entweder \(Fcalways\(Fo, \(Fcprompt\(Fo, \(Fcauto\(Fo, \(Fcpre\-auto\(Fo oder \(Fcnever\(Fo sein\&. \(Fcalways\(Fo und \(Fcprompt\(Fo werden, nachdem das Upgrade durchgef\(:uhrt wurde, alle Pakete aus dem Zwischenspeicher entfernen, \(Fcprompt\(Fo (die Vorgabe) tut dies bedingt\&. \(Fcauto\(Fo entfernt nur jene Pakete, die nicht l\(:anger heruntergeladen werden k\(:onnen (zum Beispiel, weil sie durch eine neue Version ersetzt wurden)\&. \(Fcpre\-auto\(Fo f\(:uhrt diese Aktion vor dem Herunterladen neuer Pakete durch\&.
+.RE
+.PP
+\fBoptions\fR
+.RS 4
+Die Inhalte dieser Variablen werden als Befehlszeilenoptionen an
+\fBapt-get\fR(8)
+\(:ubermittelt, wenn es f\(:ur die Installationsphase durchlaufen wird\&.
+.RE
+.PP
+\fBUpdateoptions\fR
+.RS 4
+Die Inhalte dieser Variable werden als Befehlszeilenoptionen an
+\fBapt-get\fR(8)
+\(:ubermittelt, wenn es f\(:ur die Aktualisierungsphase durchlaufen wird\&.
+.RE
+.PP
+\fBPromptAfterUpdate\fR
+.RS 4
+Falls \(Fctrue\(Fo, wird die Aktualisierungsaktion [U] in
+\fBdselect\fR(1)
+immer nachfragen, um fortzufahren\&. Vorgabe ist es, nur bei Fehlern nachzufragen\&.
+.RE
+.SH "WIE APT DPKG(1) AUFRUFT"
+.PP
+Mehrere Konfigurationsdirektiven steuern, wie APT
+\fBdpkg\fR(1)
+aufruft\&. Diese stehen im Abschnitt
+DPkg\&.
+.PP
+\fBoptions\fR
+.RS 4
+Dies ist eine Liste von Optionen, die an
+\fBdpkg\fR(1)
+\(:ubermittelt werden\&. Die Optionen m\(:ussen unter Benutzung der Listenschreibweise angegeben werden und jedes Listenelement wird als einzelnes Argument an
+\fBdpkg\fR(1)
+\(:ubermittelt\&.
+.RE
+.PP
+\fBPath\fR
+.RS 4
+This is a string that defines the
+\fBPATH\fR
+environment variable used when running dpkg\&. It may be set to any valid value of that environment variable; or the empty string, in which case the variable is not changed\&.
+.RE
+.PP
+\fBPre\-Invoke\fR, \fBPost\-Invoke\fR
+.RS 4
+Dies ist eine Liste von Shell\-Befehlen, die vor/nach dem Aufruf von
+\fBdpkg\fR(1)
+ausgef\(:uhrt werden\&. Wie
+options
+muss dies in Listenschreibweise angegeben werden\&. Die Befehle werden der Reihenfolge nach mit
+/bin/sh
+aufgerufen, sollte einer fehlschlagen, wird APT abgebrochen\&.
+.RE
+.PP
+\fBPre\-Install\-Pkgs\fR
+.RS 4
+Dies ist eine Liste von Shell\-Befehlen, die vor dem Aufruf von
+\fBdpkg\fR(1)
+ausgef\(:uhrt werden\&. Wie
+options
+muss dies in Listenschreibweise angegeben werden\&. Die Befehle werden der Reihenfolge nach mit
+/bin/sh
+aufgerufen, sollte einer fehlschlagen, wird APT abgebrochen\&. APT wird den Befehlen die Dateinamen aller \&.deb\-Dateien, die es installieren wird, einen pro Zeile, an den angeforderten standardm\(:a\(ssig auf die Standardeingabe verweisenden Dateideskriptor, \(:ubergeben\&.
+.sp
+Version 2 dieses Protokolls sendet mehr Informationen durch den angeforderten Dateideskriptor: eine Zeile mit dem Text
+VERSION 2, den APT\-Konfigurationsraum und eine Liste von Paketaktionen mit Dateinamen und Versionsinformationen\&.
+.sp
+Jede Zeile der Konfigurationsrichtlinien hat die Form
+Schl\(:ussel=Wert\&. Sonderzeichen (Gleichheitszeichen, Zeilenumbr\(:uche, nicht druckbare Zeichen, Anf\(:uhrungszeichen und Prozentzeichen in
+Schl\(:ussel
+und Zeilenumbr\(:uche, nicht druckbare Zeichen und Prozentzeichen in
+Wert) werden %\-kodiert\&. Listen werden durch mehrere
+Schl\(:ussel=Wert\-Zeilen mit demselben Schl\(:ussel dargestellt\&. Der Konfigurationsabschnitt endet mit einer leeren Zeile\&.
+.sp
+Paketaktionszeilen bestehen in Version 2 aus f\(:unf Feldern: Paketname (ohne Architektureignung, sogar wenn fremd), alte Version, Richtung der Versions\(:anderung (\(Fc<\(Fo f\(:ur Upgrades, \(Fc>\(Fo f\(:ur Downgrades, \(Fc=\(Fo f\(:ur keine \(:Anderung), neue Version, Aktion\&. Die Versionsfelder sind \(Fc\-\(Fo f\(:ur gar keine Version (zum Beispiel, wenn ein Paket zum ersten Mal installiert wird; keine Version wird als \(:alter als jede echte Version angesehen, daher wird ein Upgrade als
+\- < 1\&.23\&.4
+angezeigt)\&. Das Aktionsfeld ist \(Fc**CONFIGURE**\(Fo, falls das Paket konfiguriert wird, \(Fc**REMOVE**\(Fo, falls es entfernt wird oder der Dateiname einer \&.deb\-Datei, falls es entpackt wird\&.
+.sp
+In Version 3 folgt nach jedem Versionsfeld die Architektur dieser Version\&. Sie ist \(Fc\-\(Fo, falls es dort keine Version gibt, und ein Feld, das die Multiarch\-Typen \(Fcsame\(Fo, \(Fcforeign\(Fo, \(Fcallowed\(Fo oder \(Fcnone\(Fo anzeigt\&. Beachten Sie, dass \(Fcnone\(Fo kein korrekter Typenname ist\&. Er wird nur beibehalten, um kompatibel zu bleiben\&. Er sollte als \(Fcno\(Fo gelesen werden und Benutzer werden ermutigt, beides zu unterst\(:utzen\&.
+.sp
+Die Protokollversion, die f\(:ur den Befehl
+\fIBefehl\fR
+benutzt werden soll, kann durch entsprechendes Setzen von
+DPkg::Tools::options::\fIBefehl\fR::Version
+ausgew\(:ahlt werden, Voreinstellung ist Version 1\&. Falls APT die angefragte Version nicht unterst\(:utzt, wird es stattdessen die Informationen in der h\(:ochsten Version senden, f\(:ur die es Unterst\(:utzung bietet\&.
+.sp
+Der Dateideskriptor, der zum Senden der Informationen benutzt wird, kann mit
+DPkg::Tools::options::\fIBefehl\fR::InfoFD
+abgefragt werden\&. Er ist standardm\(:a\(ssig
+0
+f\(:ur die Standardeingabe und seit Version 0\&.9\&.11 verf\(:ugbar\&. Sie k\(:onnen durch Pr\(:ufen der Umgebungsvariable
+\fBAPT_HOOK_INFO_FD\fR
+ermitteln, ob die Option unters\(:utzt wird\&. Sie enth\(:alt die Nummer des verwendeten Dateideskriptors als eine Best\(:atigung\&.
+.RE
+.PP
+\fBRun\-Directory\fR
+.RS 4
+APT wechselt mit chdir in dieses Verzeichnis, bevor
+\fBdpkg\fR(1)
+aufgerufen wird, die Vorgabe ist
+/\&.
+.RE
+.PP
+\fBBuild\-options\fR
+.RS 4
+Diese Optionen werden an
+\fBdpkg-buildpackage\fR(1)
+beim Kompilieren von Paketen \(:ubermittelt\&. Standardm\(:a\(ssig wird das Signieren ausgeschaltet und alle Programme werden erstellt\&.
+.RE
+.PP
+\fBDPkg::ConfigurePending\fR
+.RS 4
+Wenn diese Option gesetzt ist, wird APT
+\fBdpkg \-\-configure \-\-pending\fR
+aufrufen, um
+\fBdpkg\fR(1)
+alle ben\(:otigten Konfigurationen und Trigger handhaben zu lassen\&. Diese Option ist als Vorgabe aktiviert, sie zu Deaktivieren k\(:onnte jedoch n\(:utzlich sein, wenn Sie APT mehrmals hintereinander ausf\(:uhren m\(:ochten \(en z\&.B\&. in einem Installationsprogramm\&. In diesem Szenario k\(:onnten Sie diese Option in allen au\(sser der letzten Ausf\(:uhrung deaktivieren\&.
+.RE
+.SH "PERIODISCHE\- UND ARCHIVOPTIONEN"
+.PP
+APT::Periodic\- und
+APT::Archives\-Gruppen von Optionen konfigurieren das Verhalten periodischer APT\-Aktualisierungen, die vom Skript
+/usr/lib/apt/apt\&.systemd\&.daily
+durchgef\(:uhrt werden\&. Lesen Sie den Anfang dieses Skripts, um eine kurze Dokumentation dieser Optionen zu erhalten\&.
+.SH "FEHLERSUCHOPTIONEN"
+.PP
+Einschalten von Optionen im Abschnitt
+Debug::
+wird veranlassen, dass Fehlersuchinformationen an die Standardfehlerausgabe des Programms gesendet werden, das die
+apt\-Bibliotheken benutzt oder besondere Programmmodi einschaltet, die in erster Linie f\(:ur das Fehlersuchverhalten von
+apt
+n\(:utzlich sind\&. Die meisten dieser Optionen sind f\(:ur den normalen Benutzer uninteressant, aber ein paar k\(:onnten es sein:
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Debug::pkgProblemResolver
+schaltet die Ausgabe \(:uber die von
+dist\-upgrade, upgrade, install, remove, purge
+getroffenen Entscheidungen ein\&.
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Debug::NoLocking
+schaltet jegliches Sperren von Dateien aus\&. Dies kann benutzt werden, um einige Aktionen (zum Beispiel
+apt\-get \-s install) als nicht root\-Benutzer auszuf\(:uhren\&.
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Debug::pkgDPkgPM
+gibt die tats\(:achliche Befehlszeile jedesmal aus, wenn
+apt
+\fBdpkg\fR(1)
+aufruft\&.
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+
+Debug::IdentCdrom
+schaltet das Einbeziehen von statfs\-Daten in CD\-ROM\-IDs aus\&.
+.RE
+.PP
+Eine vollst\(:andige Liste der Fehlersuchoptionen von APT folgt\&.
+.PP
+\fBDebug::Acquire::cdrom\fR
+.RS 4
+gibt Informationen aus, die sich auf Zugriffe von
+cdrom://\-Quellen beziehen\&.
+.RE
+.PP
+\fBDebug::Acquire::ftp\fR
+.RS 4
+gibt Informationen aus, die sich auf das Herunterladen von Paketen per FTP beziehen\&.
+.RE
+.PP
+\fBDebug::Acquire::http\fR
+.RS 4
+gibt Informationen aus, die sich auf das Herunterladen von Paketen per HTTP beziehen\&.
+.RE
+.PP
+\fBDebug::Acquire::https\fR
+.RS 4
+gibt Informationen aus, die sich auf das Herunterladen von Paketen per HTTPS beziehen\&.
+.RE
+.PP
+\fBDebug::Acquire::gpgv\fR
+.RS 4
+gibt Informationen aus, die sich auf das Pr\(:ufen kryptografischer Signaturen mittels
+gpg
+beziehen\&.
+.RE
+.PP
+\fBDebug::aptcdrom\fR
+.RS 4
+gibt Informationen \(:uber den Zugriffsprozess auf Paketsammlungen aus, die auf CD\-ROMs gespeichert sind\&.
+.RE
+.PP
+\fBDebug::BuildDeps\fR
+.RS 4
+beschreibt den Prozess der Aufl\(:osung von Bauabh\(:angigkeiten in
+\fBapt-get\fR(8)\&.
+.RE
+.PP
+\fBDebug::Hashes\fR
+.RS 4
+gibt jeden kryptografischen Hash aus, der von den
+apt\-Bibliotheken generiert wurde\&.
+.RE
+.PP
+\fBDebug::IdentCDROM\fR
+.RS 4
+schlie\(sst keine Informationen von
+statfs
+ein, und zwar die Anzahl der benutzten und freien Bl\(:ocke auf dem CD\-ROM\-Dateisystem, wenn eine ID f\(:ur eine CD\-ROM generiert wird\&.
+.RE
+.PP
+\fBDebug::NoLocking\fR
+.RS 4
+schaltet jegliches Sperren von Dateien aus\&. Dies wird zum Beispiel erlauben, dass zwei Instanzen von
+\(Bqapt\-get update\(lq
+zur gleichen Zeit laufen\&.
+.RE
+.PP
+\fBDebug::pkgAcquire\fR
+.RS 4
+protokolliert, wenn Elemente in die globalen Warteschlange zum Herunterladen hinzugef\(:ugt oder aus ihr entfernt werden\&.
+.RE
+.PP
+\fBDebug::pkgAcquire::Auth\fR
+.RS 4
+gibt Statusmeldungen und Fehler aus, die sich auf das Pr\(:ufen von Pr\(:ufsummen und kryptografischen Signaturen von heruntergeladenen Dateien beziehen\&.
+.RE
+.PP
+\fBDebug::pkgAcquire::Diffs\fR
+.RS 4
+gibt Informationen \(:uber das Herunterladen und Anwenden von Paketindexlisten\-Diffs und Fehler, die die Paketindexlisten\-Diffs betreffen, aus\&.
+.RE
+.PP
+\fBDebug::pkgAcquire::RRed\fR
+.RS 4
+gibt Informationen aus, die sich auf das Patchen von Paketlisten von APT beziehen, wenn Index\-Diffs anstelle vollst\(:andiger Indexe heruntergeladen werden\&.
+.RE
+.PP
+\fBDebug::pkgAcquire::Worker\fR
+.RS 4
+protokolliert alle Interaktionen mit Unterprozessen, die das eigentliche Herunterladen durchf\(:uhren\&.
+.RE
+.PP
+\fBDebug::pkgAutoRemove\fR
+.RS 4
+protokolliert alle Ereignisse, die sich auf den automatisch\-installiert\-Status von Paketen und auf das Entfernen von nicht benutzten Paketen beziehen\&.
+.RE
+.PP
+\fBDebug::pkgDepCache::AutoInstall\fR
+.RS 4
+generiert Fehlersuchmeldungen, die beschreiben, welche Pakete automatisch installiert werden, um Abh\(:angigkeiten aufzul\(:osen\&. Dies entspricht dem anfangs durchgef\(:uhrten auto\-install\-Durchlauf, z\&.B\&. in
+apt\-get install
+und nicht dem vollst\(:andigen
+apt\-Abh\(:angigkeitsaufl\(:oser\&. Lesen Sie daf\(:ur
+Debug::pkgProblemResolver\&.
+.RE
+.PP
+\fBDebug::pkgDepCache::Marker\fR
+.RS 4
+generiert Fehlersuchmeldungen, die beschreiben, welches Paket als \(Fckeep\(Fo/\(Fcinstall\(Fo/\(Fcremove\(Fo markiert ist, w\(:ahrend der ProblemResolver seine Arbeit verrichtet\&. Jedes Hinzuf\(:ugen oder L\(:oschen kann zus\(:atzliche Aktionen ausl\(:osen\&. Sie werden nach zwei einger\(:uckten Leerzeichen unter dem Originaleintrag angezeigt\&. Jede Zeile hat das Format
+MarkKeep,
+MarkDelete
+oder
+MarkInstall
+gefolgt von
+Paketname <a\&.b\&.c \-> d\&.e\&.f | x\&.y\&.z> (Abschnitt)
+wobei
+a\&.b\&.c
+die aktuelle Version des Paketes,
+d\&.e\&.f
+die Version, die zur Installation vorgesehen und
+x\&.y\&.z
+eine neuere Version, die aber nicht zur Installation vorgesehen ist (aufgrund einer niedrigen Pinning\-Bewertung)\&. Die letzten beiden k\(:onnen weggelassen werden, wenn es keine gibt oder wenn sie die gleiche Version haben, wie die, die zur installierten Version identisch ist\&.
+Abschnitt
+ist der Name des Abschnitts, in dem das Paket erscheint\&.
+.RE
+.PP
+\fBDebug::pkgDPkgPM\fR
+.RS 4
+gibt, wenn
+\fBdpkg\fR(1)
+aufgerufen wird, die genauen Befehlszeile mit der es aufgerufen wurde, mit Argumenten, die durch einzelne Leerzeichen getrennt sind, aus\&.
+.RE
+.PP
+\fBDebug::pkgDPkgProgressReporting\fR
+.RS 4
+gibt alle von
+\fBdpkg\fR(1)
+\(:uber einen Status\-Datei\-Deskriptor empfangenen Daten und alle w\(:ahrend deren Auswertung gefundenen Fehler aus\&.
+.RE
+.PP
+\fBDebug::pkgOrderList\fR
+.RS 4
+generiert eine Aufzeichnung des Algorithmus, der \(:uber die Reihenfolge entscheidet, in der
+apt
+Pakete an
+\fBdpkg\fR(1)
+weiterleiten soll\&.
+.RE
+.PP
+\fBDebug::pkgPackageManager\fR
+.RS 4
+gibt Statusmeldungen aus, die die Schritte nachverfolgen, die beim Aufruf von
+\fBdpkg\fR(1)
+ausgef\(:uhrt werden\&.
+.RE
+.PP
+\fBDebug::pkgPolicy\fR
+.RS 4
+gibt die Priorit\(:at jeder Paketliste beim Start aus\&.
+.RE
+.PP
+\fBDebug::pkgProblemResolver\fR
+.RS 4
+verfolgt die Ausf\(:uhrung des Abh\(:angigkeitsaufl\(:osers (dies wird nur auf das angewendet, was geschieht, wenn ein komplexes Abh\(:angigkeitsproblem aufgetreten ist)\&.
+.RE
+.PP
+\fBDebug::pkgProblemResolver::ShowScores\fR
+.RS 4
+zeigt eine Liste aller installierten Pakete mit ihren berechneten Bewertungen, die vom pkgProblemResolver benutzt werden, an\&. Die Beschreibung des Pakets stimmt mit der in
+Debug::pkgDepCache::Marker
+\(:uberein\&.
+.RE
+.PP
+\fBDebug::sourceList\fR
+.RS 4
+gibt die Informationen \(:uber die aus
+/etc/apt/vendors\&.list
+gelesenen Anbieter aus\&.
+.RE
+.PP
+\fBDebug::RunScripts\fR
+.RS 4
+zeigt die externen Befehle, die durch APT\-Hooks aufgerufen werden\&. Dies schlie\(sst z\&.B\&. die Konfigurationsoptionen
+DPkg::{Pre,Post}\-Invoke
+oder
+APT::Update::{Pre,Post}\-Invoke
+mit ein\&.
+.RE
+.SH "BEISPIELE"
+.PP
+/usr/share/doc/apt/examples/configure\-index\&.gz
+ist eine Konfigurationsdatei, die Beispielwerte f\(:ur alle m\(:oglichen Optionen zeigen\&.
+.SH "DATEIEN"
+.PP
+/etc/apt/apt\&.conf
+.RS 4
+APT\-Konfigurationsdatei\&. Konfigurationselement:
+Dir::Etc::Main\&.
+.RE
+.PP
+/etc/apt/apt\&.conf\&.d/
+.RS 4
+APT\-Konfigurationsdatei\-Fragmente\&. Konfigurationselement:
+Dir::Etc::Parts\&.
+.RE
+.SH "SIEHE AUCH"
+.PP
+
+\fBapt-cache\fR(8),
+\fBapt-config\fR(8),
+\fBapt_preferences\fR(5)\&.
+.SH "FEHLER"
+.PP
+\m[blue]\fBAPT\-Fehlerseite\fR\m[]\&\s-2\u[1]\d\s+2\&. Wenn Sie einen Fehler in APT berichten m\(:ochten, lesen Sie bitte
+/usr/share/doc/debian/bug\-reporting\&.txt
+oder den
+\fBreportbug\fR(1)\-Befehl\&. Verfassen Sie Fehlerberichte bitte auf Englisch\&.
+.SH "\(:UBERSETZUNG"
+.PP
+Die deutsche \(:Ubersetzung wurde 2009 von Chris Leick
+<c\&.leick@vollbio\&.de>
+in Zusammenarbeit mit dem deutschen l10n\-Team von Debian
+<debian\-l10n\-german@lists\&.debian\&.org>
+angefertigt\&.
+.PP
+Beachten Sie, dass diese \(:Ubersetzung Teile enthalten kann, die nicht \(:ubersetzt wurden\&. Dies ist so, damit kein Inhalt verloren geht, wenn die \(:Ubersetzung hinter dem Originalinhalt hinterherh\(:angt\&.
+.SH "AUTOREN"
+.PP
+\fBJason Gunthorpe\fR
+.RS 4
+.RE
+.PP
+\fBAPT\-Team\fR
+.RS 4
+.RE
+.PP
+\fBDaniel Burrows\fR <\&dburrows@debian\&.org\&>
+.RS 4
+urspr\(:ungliche Dokumentation von Debug::*\&.
+.RE
+.SH "FU\(ssNOTEN"
+.IP " 1." 4
+APT-Fehlerseite
+.RS 4
+\%http://bugs.debian.org/src:apt
+.RE

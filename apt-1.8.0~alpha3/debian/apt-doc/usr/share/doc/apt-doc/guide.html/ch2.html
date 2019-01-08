@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Chapter 2. apt-get</title>
+    <meta name="generator" content="DocBook XSL Stylesheets V1.79.1"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="home" href="index.html" title="APT User's Guide"/>
+    <link rel="up" href="index.html" title="APT User's Guide"/>
+    <link rel="prev" href="ch1.html" title="Chapter 1. General"/>
+    <link rel="next" href="ch3.html" title="Chapter 3. DSelect"/>
+  </head>
+  <body>
+    <div class="navheader">
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Chapter 2. apt-get</th>
+        </tr>
+        <tr>
+          <td align="left"><a accesskey="p" href="ch1.html">Prev</a> </td>
+          <th width="60%" align="center"> </th>
+          <td align="right"> <a accesskey="n" href="ch3.html">Next</a></td>
+        </tr>
+      </table>
+      <hr/>
+    </div>
+    <div class="chapter">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h1 class="title"><a id="ch2"/>Chapter 2. apt-get</h1>
+          </div>
+        </div>
+      </div>
+      <p>
+<span class="command"><strong>apt-get</strong></span> provides a simple way to install packages from the
+command line. Unlike <span class="command"><strong>dpkg</strong></span>, <span class="command"><strong>apt-get</strong></span> does
+not understand .deb files, it works with the package's proper name and can only
+install .deb archives from a <span class="emphasis"><em>Source</em></span>.
+</p>
+      <p>
+The first <a href="#ftn.idm41" class="footnote" id="idm41"><sup class="footnote">[1]</sup></a> thing that should be done before using <span class="command"><strong>apt-get</strong></span>
+is to fetch the package lists from the <span class="emphasis"><em>Sources</em></span> so that it
+knows what packages are available. This is done with <code class="literal">apt-get
+update</code>. For instance,
+</p>
+      <pre class="screen">
+# apt-get update
+Get http://ftp.de.debian.org/debian-non-US/ stable/binary-i386/ Packages
+Get http://llug.sep.bnl.gov/debian/ testing/contrib Packages
+Reading Package Lists... Done
+Building Dependency Tree... Done
+</pre>
+      <p>
+Once updated there are several commands that can be used:
+</p>
+      <div class="variablelist">
+        <dl class="variablelist">
+          <dt>
+            <span class="term">upgrade</span>
+          </dt>
+          <dd>
+            <p>
+Upgrade will attempt to gently upgrade the whole system. Upgrade will never
+install a new package or remove an existing package, nor will it ever upgrade a
+package that might cause some other package to break. This can be used daily
+to relatively safely upgrade the system. Upgrade will list all of the packages
+that it could not upgrade, this usually means that they depend on new packages
+or conflict with some other package. <span class="command"><strong>dselect</strong></span> or
+<code class="literal">apt-get install</code> can be used to force these packages to
+install.
+</p>
+          </dd>
+          <dt>
+            <span class="term">install</span>
+          </dt>
+          <dd>
+            <p>
+Install is used to install packages by name. The package is automatically
+fetched and installed. This can be useful if you already know the name of the
+package to install and do not want to go into a GUI to select it. Any number
+of packages may be passed to install, they will all be fetched. Install
+automatically attempts to resolve dependency problems with the listed packages
+and will print a summary and ask for confirmation if anything other than its
+arguments are changed.
+</p>
+          </dd>
+          <dt>
+            <span class="term">dist-upgrade</span>
+          </dt>
+          <dd>
+            <p>
+Dist-upgrade is a complete upgrader designed to simplify upgrading between
+releases of Debian. It uses a sophisticated algorithm to determine the best
+set of packages to install, upgrade and remove to get as much of the system to
+the newest release. In some situations it may be desired to use dist-upgrade
+rather than spend the time manually resolving dependencies in
+<span class="command"><strong>dselect</strong></span>. Once dist-upgrade has completed then
+<span class="command"><strong>dselect</strong></span> can be used to install any packages that may have
+been left out.
+</p>
+            <p>
+It is important to closely look at what dist-upgrade is going to do, its
+decisions may sometimes be quite surprising.
+</p>
+          </dd>
+        </dl>
+      </div>
+      <p>
+<span class="command"><strong>apt-get</strong></span> has several command line options that are detailed
+in its man page,
+<span class="citerefentry"><span class="refentrytitle">apt-get</span>(8)</span>. The
+most useful option is <code class="literal">-d</code> which does not install the
+fetched files. If the system has to download a large number of package it
+would be undesired to start installing them in case something goes wrong. When
+<code class="literal">-d</code> is used the downloaded archives can be installed by
+simply running the command that caused them to be downloaded again without
+<code class="literal">-d</code>.
+</p>
+      <div class="footnotes">
+        <br/>
+        <hr/>
+        <div id="ftn.idm41" class="footnote">
+          <p><a href="#idm41" class="para"><sup class="para">[1] </sup></a> If you are using an http proxy server you must set
+the http_proxy environment variable first, see sources.list(5) </p>
+        </div>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr/>
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td align="left"><a accesskey="p" href="ch1.html">Prev</a> </td>
+          <td align="center"> </td>
+          <td align="right"> <a accesskey="n" href="ch3.html">Next</a></td>
+        </tr>
+        <tr>
+          <td align="left" valign="top">Chapter 1. General </td>
+          <td align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td align="right" valign="top"> Chapter 3. DSelect</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,264 @@
+'\" t
+.\"     Title: apt-secure
+.\"    Author: Gunthorpe Jason[FAMILY Given]
+.\" Generator: DocBook XSL Stylesheets v1.79.1 <http://docbook.sf.net/>
+.\"      Date: 06\ \&8 月\ \&2016
+.\"    Manual: APT
+.\"    Source: APT 1.8.0~alpha3
+.\"  Language: Japanese
+.\"
+.TH "APT\-SECURE" "8" "06\ \&8 月\ \&2016" "APT 1.8.0~alpha3" "APT"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "名前"
+apt-secure \- APT アーカイブ認証サポート
+.SH "説明"
+.PP
+Starting with version 0\&.6,
+\fBAPT\fR
+contains code that does signature checking of the Release file for all repositories\&. This ensures that data like packages in the archive can\*(Aqt be modified by people who have no access to the Release file signing key\&. Starting with version 1\&.1
+\fBAPT\fR
+requires repositories to provide recent authentication information for unimpeded usage of the repository\&. Since version 1\&.5 changes in the information contained in the Release file about the repository need to be confirmed before APT continues to apply updates from this repository\&.
+.PP
+注意:
+\fBapt-get\fR(8)、\fBaptitude\fR(8)、\fBsynaptic\fR(8)
+といった APT ベースのパッケージ管理フロントエンドは全てこの新しい証明機能をサポートしています。この man ページでは単純化するためだけに、その全てを参照するのに
+APT
+を使っています。
+.SH "UNSIGNED REPOSITORIES"
+.PP
+アーカイブに署名されていない Release ファイルがある、または Release ファイルが全くない場合は、現在の APT バージョンは
+\fBupdate\fR
+操作によるそこからのダウンロードをデフォルトで拒否し、ダウンロードを強制した場合でも、インストール要求に証明されていないアーカイブからのパッケージが含まれる場合には
+\fBapt\-get\fR
+のようなフロントエンドは明示的な確認を要求します。
+.PP
+設定オプション
+\fBAcquire::AllowInsecureRepositories\fR
+に
+true
+を設定するとどの APT クライアントでも警告だけを出すように強制できます。\fBsources.list\fR(5)
+オプション
+allow\-insecure=yes
+を使うと個々のリポジトリについて安全でないことを許可するようにもできます。安全でないリポジトリは全く勧められるものではなく、apt にそのサポート継続を強制させるオプションは全て最終的には削除されることに注意してください。ユーザ側では警告についても無効化する
+\fBTrusted\fR
+オプションを利用することもできますが、\fBsources.list\fR(5)
+で述べているように、その影響を必ず理解してください。
+.PP
+以前は証明されていたけれども
+\fBupdate\fR
+操作の結果その効力がなくなったリポジトリについては、安全でないリポジトリの利用を許可あるいは禁止するオプションに関わらず、どの APT クライアントでもエラーを出します。追加で
+\fBAcquire::AllowDowngradeToInsecureRepositories\fR
+に
+true
+をセットするか
+\fBsources.list\fR(5)
+のオプション
+allow\-downgrade\-to\-insecure=yes
+を個々のリポジトリに設定することでこのエラーを無視させることもできます。
+.SH "SIGNED REPOSITORIES"
+.PP
+APT アーカイブからエンドユーザまでの信頼の輪は、いくつかのステップで構成されています。\fBapt\-secure\fR
+は、この輪の最後のステップで、「アーカイブを信頼する」ということは、パッケージに悪意のあるコードが含まれていないことを信頼するということではなく、アーカイブメンテナを信頼するということを意味します。これは、アーカイブの完全性が保たれていることを保証するのは、アーカイブメンテナの責任だということです。
+.PP
+apt\-secure はパッケージレベルの署名検証は行いません。そのようなツールが必要な場合は、\fBdebsig\-verify\fR
+や
+\fBdebsign\fR
+(debsig\-verify パッケージと devscripts パッケージでそれぞれ提供されています) を確認してください。
+.PP
+Debian における信頼の輪は、(例えば) 新しいパッケージやパッケージの新バージョンを、メンテナが Debian アーカイブにアップロードすることから始まります。これが有効になるには、アップロードの際に、Debian メンテナキーリング (debian\-keyring パッケージに収録) にあるメンテナのキーで署名する必要があります。メンテナのキーは、キーの所有者の ID を確保するため、事前に確立した手続きの後で、他のメンテナに署名されています。同様の手順は、すべての Debian ベースのディストリビューションに存在します。
+.PP
+アップロードされたパッケージが検証されてアーカイブに格納されると、メンテナの署名を取り外し、パッケージのチェックサムを計算して、Packages ファイルに格納します。その後、全 Packages ファイルのチェックサムを計算して、Release ファイルに格納します。Release ファイルは、その Debian リリースのアーカイブキーで署名され、Debian ミラーサイトでパッケージや Packages ファイルとともに配布されます。このキーは、debian\-archive\-keyring
+パッケージに収録されている、Debian アーカイブキーリングに含まれます。
+.PP
+エンドユーザは誰でも、Release ファイルの署名をチェックし、パッケージのチェックサムを抽出して、手でダウンロードしたパッケージのチェックサムと比較できます。また、APT が自動的に行うのに任せることもできます。
+.PP
+以上は、パッケージごとの署名チェックとは違うことに注意してください。以下のように考えられる 2 種類の攻撃を防ぐよう設計されています。
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+ネットワーク中間者攻撃。署名をチェックしないと、悪意あるエージェントがパッケージダウンロードプロセスに割り込んだり、ネットワーク構成要素 (ルータ、スイッチなど) の制御や、悪漢サーバへのネットワークトラフィックのリダイレクトなど (ARP スプーフィング攻撃や DNS スプーフィング攻撃) で、悪意あるソフトウェアを掴まされたりします。
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+ミラーネットワーク感染。署名をチェックしないと、悪意あるエージェントがミラーホストに感染し、このホストからダウンロードしたユーザすべてに、悪意あるソフトウェアが伝播するようにファイルを変更できます。
+.RE
+.PP
+しかしこれは、(パッケージに署名する) マスターサーバ自体の侵害や、Release ファイルに署名するのに使用したキーの漏洩を防げません。いずれにせよ、この機構はパッケージごとの署名を補完することができます。
+.SH "INFORMATION CHANGES"
+.PP
+A Release file contains beside the checksums for the files in the repository also general information about the repository like the origin, codename or version number of the release\&.
+.PP
+This information is shown in various places so a repository owner should always ensure correctness\&. Further more user configuration like
+\fBapt_preferences\fR(5)
+can depend and make use of this information\&. Since version 1\&.5 the user must therefore explicitly confirm changes to signal that the user is sufficiently prepared e\&.g\&. for the new major release of the distribution shipped in the repository (as e\&.g\&. indicated by the codename)\&.
+.SH "ユーザ設定"
+.PP
+\fBapt\-key\fR
+は、リポジトリを信頼するために APT が使用するキーリストを管理するプログラムです。信頼されたキーのリストにキーを追加または削除するために使用することができます。キーが署名することができるアーカイブは、\fBsources.list\fR(5)
+中の
+\fBSigned\-By\fR
+を介して制限可能です。
+.PP
+デフォルトのインストールでは、すでにデフォルトのリポジトリからセキュアにパッケージを取得するためにすべてのキーが含まれていることに注意してください。そのため、サードパーティのリポジトリを追加している場合は
+\fBapt\-key\fR
+で操作する必要があります。
+.PP
+新しいキーを追加するためには、まずキーをダウンロードする必要があります (取得する際には、信頼できる通信チャネルを使用するよう、特に留意してください)。取得したキーを、\fBapt\-key\fR
+で追加し、\fBapt\-get update\fR
+を実行してください。以上により、apt は設定済みのアーカイブから、InRelease
+ファイルや
+Release\&.gpg
+ファイルをダウンロード・検証できるようになります。
+.SH "REPOSITORY CONFIGURATION"
+.PP
+あなたがメンテナンスしているアーカイブで、アーカイブ署名を提供したい場合、以下のようにしてください。
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+既に存在しているのでなければ、\fI最上位 Release ファイルを作成してください\fR。\fBapt\-ftparchive release\fR
+(apt\-utils で提供) を実行すると、作成できます。
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+\fI署名\fRします。\fBgpg \-\-clearsign \-o InRelease Release\fR
+や
+\fBgpg \-abs \-o Release\&.gpg Release\fR
+を実行して、署名してください。
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+\fIキーのフィンガープリントを公開\fRします。これにより、ユーザは、アーカイブ内のファイルを認証するためにインポートする必要があるキーを知るでしょう。これは、ディストリビューションのアップデートとキーの更新を後で自動的に行うことができる
+debian\-archive\-keyring
+を実行する Debian のような独自のキーリングパッケージで鍵を公開するのが最善です。
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+\fIアーカイブとキーを追加する方法について説明します\fR。ユーザがセキュアにキーを取得できない場合は、上述の信頼の輪が壊れています。ユーザのキー追加を助けることができる方法は、アーカイブとすでに信頼のウェブを活用するように (ディストリビューションのデフォルトのリポジトリのように) 設定している別のアーカイブユーザに含まれたあなたのキーリングパッケージを持つまでは、アーカイブと対象者に依存します。
+.RE
+.PP
+アーカイブの内容に変化がある場合 (新しいパッケージの追加や削除)、アーカイブメンテナは前述の最初の 2 ステップに従わなければなりません。
+.SH "関連項目"
+.PP
+\fBapt.conf\fR(5),
+\fBapt-get\fR(8),
+\fBsources.list\fR(5),
+\fBapt-key\fR(8),
+\fBapt-ftparchive\fR(1),
+\fBdebsign\fR(1),
+\fBdebsig-verify\fR(1),
+\fBgpg\fR(1)
+.PP
+詳細な背景情報を検証するのなら、Securing Debian Manual (harden\-doc パッケージにも収録) の
+\m[blue]\fBDebian Security Infrastructure\fR\m[]\&\s-2\u[1]\d\s+2
+章や、V\&. Alex Brennen による
+\m[blue]\fBStrong Distribution HOWTO\fR\m[]\&\s-2\u[2]\d\s+2
+をご覧ください。
+.SH "バグ"
+.PP
+\m[blue]\fBAPT バグページ\fR\m[]\&\s-2\u[3]\d\s+2
+をご覧ください。 APT のバグを報告する場合は、
+/usr/share/doc/debian/bug\-reporting\&.txt
+や
+\fBreportbug\fR(1)
+コマンドをご覧ください。
+.SH "著者"
+.PP
+APT は APT チーム
+<apt@packages\&.debian\&.org>
+によって書かれました。
+.SH "マニュアルページ作者"
+.PP
+このマニュアルページは Javier Fern\('andez\-Sanguino Pe\(~na, Isaac Jones, Colin Walters, Florian Weimer, Michael Vogt の作業を元にしています。
+.SH "翻訳"
+.PP
+倉澤 望
+<nabetaro@debian\&.or\&.jp>
+(2003\-2006,2009\-2012), Takuma Yamada
+<tyamada@takumayamada\&.com>
+(2016), Debian JP Documentation ML
+<debian\-doc@debian\&.or\&.jp>
+.PP
+この翻訳文書には未訳部分が含まれている可能性があることに 注意してください。 翻訳がオリジナルに追従できていない場合、 内容を失わないようにこのようにしています。
+.SH "著者"
+.PP
+\fBGunthorpe Jason[FAMILY Given]\fR
+.RS 4
+.RE
+.PP
+\fB[FAMILY Given]\fR
+.RS 4
+.RE
+.SH "注記"
+.IP " 1." 4
+Debian Security Infrastructure
+.RS 4
+\%http://www.debian.org/doc/manuals/securing-debian-howto/ch7
+.RE
+.IP " 2." 4
+Strong Distribution HOWTO
+.RS 4
+\%http://www.cryptnet.net/fdp/crypto/strong_distro.html
+.RE
+.IP " 3." 4
+APT バグページ
+.RS 4
+\%http://bugs.debian.org/src:apt
+.RE

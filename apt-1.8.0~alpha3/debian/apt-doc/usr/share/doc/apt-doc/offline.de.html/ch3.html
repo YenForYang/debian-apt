@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Kapitel 3. APT und Wget benutzen</title>
+    <meta name="generator" content="DocBook XSL Stylesheets V1.79.1"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="home" href="index.html" title="APT offline verwenden"/>
+    <link rel="up" href="index.html" title="APT offline verwenden"/>
+    <link rel="prev" href="ch2.html" title="Kapitel 2. APT auf beiden Maschinen benutzen"/>
+  </head>
+  <body>
+    <div class="navheader">
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Kapitel 3. APT und Wget benutzen</th>
+        </tr>
+        <tr>
+          <td align="left"><a accesskey="p" href="ch2.html">Zurück</a> </td>
+          <th width="60%" align="center"> </th>
+          <td align="right"> </td>
+        </tr>
+      </table>
+      <hr/>
+    </div>
+    <div class="chapter">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h1 class="title"><a id="ch3"/>Kapitel 3. APT und Wget benutzen</h1>
+          </div>
+        </div>
+      </div>
+      <div class="toc">
+        <p>
+          <strong>Inhaltsverzeichnis</strong>
+        </p>
+        <dl class="toc">
+          <dt>
+            <span class="section">
+              <a href="ch3.html#s3.1">3.1. Übersicht</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="section">
+              <a href="ch3.html#s3.2">3.2. Betrieb</a>
+            </span>
+          </dt>
+        </dl>
+      </div>
+      <div class="section">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h2 class="title"><a id="s3.1"/>3.1. Übersicht</h2>
+            </div>
+          </div>
+        </div>
+        <p>
+<span class="emphasis"><em>wget</em></span> ist ein beliebtes und portierbares
+Herunterladewerkzeug, das auf nahezu jeder Maschine laufen kann. Anders als
+die Methode oben wird hierfür benötigt, dass die Debian-Maschine bereits
+eine Liste verfügbarer Pakete hat.
+</p>
+        <p>
+Die Grundidee besteht darin, eine Platte zu erzeugen, die nur die
+heruntergeladenen Archivdateien von der fernen Site enthält. Dies wird durch
+Benutzen der Option »--print-uris« von Apt-get und dem anschließenden
+Erstellen eines Wget-Skripts getan, das dann die Pakete tatsächlich
+herunterlädt.
+</p>
+      </div>
+      <div class="section">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h2 class="title"><a id="s3.2"/>3.2. Betrieb</h2>
+            </div>
+          </div>
+        </div>
+        <p>
+Anders als bei der vorherigen Technik werden keine speziellen
+Konfigurationsdateien benötigt. Es werden lediglich die Standard-APT-Befehle
+benutzt, um die Dateiliste zu erstellen.
+</p>
+        <pre class="screen">
+ # apt-get dist-upgrade 
+ [ Antworten Sie »nein« auf gestellte Fragen; stellen Sie sicher, dass Sie
+ mit den Aktionen zufrieden sind ]
+ # apt-get -qq --print-uris dist-upgrade &gt; uris
+ # awk '{print "wget -O " $2 " " $1}' &lt; uris &gt; /Platte/wget-script
+</pre>
+        <p>
+Es könnte auch jeder andere Befehl neben »dist-upgrade« hier benutzt werden,
+einschließlich »upgrade«.
+</p>
+        <p>
+Die Datei /Platte/wget-script wird nun eine Liste der Wget-Befehle
+enthalten, um die erforderlichen Archive herunterzuladen. Dieses Skript
+sollte mit dem aktuellen Verzeichnis als Platteneinhängepunkt ausgeführt
+werden, so dass die Ausgabe auf die Platte gespeichert wird.
+</p>
+        <p>
+Die Maschine in der Ferne würde etwas wie das folgende tun
+</p>
+        <pre class="screen">
+  # cd /Platte
+  # sh -x ./wget-script
+  [ warten … ]
+</pre>
+        <p>
+Sobald die Archive heruntergeladen und die Platte zur Debian-Maschine
+zurückgekehrt ist, kann die Installation durch Benutzung von 
+</p>
+        <pre class="screen">
+  # apt-get -o dir::cache::archives="/Platte/" dist-upgrade
+</pre>
+        <p>
+fortfahren, wodurch die bereits auf der Platte heruntergeladenen Archive
+benutzt werden.
+</p>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr/>
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td align="left"><a accesskey="p" href="ch2.html">Zurück</a> </td>
+          <td align="center"> </td>
+          <td align="right"> </td>
+        </tr>
+        <tr>
+          <td align="left" valign="top">Kapitel 2. APT auf beiden Maschinen benutzen </td>
+          <td align="center">
+            <a accesskey="h" href="index.html">Zum Anfang</a>
+          </td>
+          <td align="right" valign="top"> </td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

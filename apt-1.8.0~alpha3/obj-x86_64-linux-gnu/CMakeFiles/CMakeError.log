@@ -1,0 +1,154 @@
+Determining if the pthread_create exist failed with the following output:
+Change Dir: /dev/shm/apt/apt-1.8.0~alpha3/obj-x86_64-linux-gnu/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/ninja" "cmTC_04853"
+[1/2] Building C object CMakeFiles/cmTC_04853.dir/CheckSymbolExists.c.o
+as: /lib/x86_64-linux-gnu/libz.so.1: no version information available (required by /usr/lib/x86_64-linux-gnu/libbfd-2.31.1-system.so)
+[2/2] Linking C executable cmTC_04853
+FAILED: cmTC_04853 
+: && /usr/bin/gcc-8 -g -O2 -fdebug-prefix-map=/dev/shm/apt/apt-1.8.0~alpha3=. -Wformat -march=native -pipe -Wformat-security -Wdate-time -D_FORTIFY_SOURCE=2  -Wl,-z,now -Wl,--as-needed CMakeFiles/cmTC_04853.dir/CheckSymbolExists.c.o  -o cmTC_04853   && :
+/usr/bin/ld: /lib/x86_64-linux-gnu/libz.so.1: no version information available (required by /usr/lib/x86_64-linux-gnu/libbfd-2.31.1-system.so)
+/usr/bin/ld: CMakeFiles/cmTC_04853.dir/CheckSymbolExists.c.o: in function `main':
+./obj-x86_64-linux-gnu/CMakeFiles/CMakeTmp/CheckSymbolExists.c:8: undefined reference to `pthread_create'
+collect2: error: ld returned 1 exit status
+ninja: build stopped: subcommand failed.
+
+File /dev/shm/apt/apt-1.8.0~alpha3/obj-x86_64-linux-gnu/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+#include <pthread.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef pthread_create
+  return ((int*)(&pthread_create))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+
+Determining if the function pthread_create exists in the pthreads failed with the following output:
+Change Dir: /dev/shm/apt/apt-1.8.0~alpha3/obj-x86_64-linux-gnu/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/ninja" "cmTC_26519"
+[1/2] Building C object CMakeFiles/cmTC_26519.dir/CheckFunctionExists.c.o
+as: /lib/x86_64-linux-gnu/libz.so.1: no version information available (required by /usr/lib/x86_64-linux-gnu/libbfd-2.31.1-system.so)
+[2/2] Linking C executable cmTC_26519
+FAILED: cmTC_26519 
+: && /usr/bin/gcc-8 -g -O2 -fdebug-prefix-map=/dev/shm/apt/apt-1.8.0~alpha3=. -Wformat -march=native -pipe -Wformat-security -Wdate-time -D_FORTIFY_SOURCE=2 -DCHECK_FUNCTION_EXISTS=pthread_create  -Wl,-z,now -Wl,--as-needed CMakeFiles/cmTC_26519.dir/CheckFunctionExists.c.o  -o cmTC_26519  -lpthreads && :
+/usr/bin/ld: /lib/x86_64-linux-gnu/libz.so.1: no version information available (required by /usr/lib/x86_64-linux-gnu/libbfd-2.31.1-system.so)
+/usr/bin/ld: cannot find -lpthreads
+collect2: error: ld returned 1 exit status
+ninja: build stopped: subcommand failed.
+
+
+Determining if files sys/params.h exist failed with the following output:
+Change Dir: /dev/shm/apt/apt-1.8.0~alpha3/obj-x86_64-linux-gnu/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/ninja" "cmTC_d1edf"
+[1/2] Building C object CMakeFiles/cmTC_d1edf.dir/HAVE_PARAMS_H.c.o
+FAILED: CMakeFiles/cmTC_d1edf.dir/HAVE_PARAMS_H.c.o 
+/usr/bin/gcc-8   -g -O2 -fdebug-prefix-map=/dev/shm/apt/apt-1.8.0~alpha3=. -Wformat -march=native -pipe -Wformat-security -Wdate-time -D_FORTIFY_SOURCE=2 -o CMakeFiles/cmTC_d1edf.dir/HAVE_PARAMS_H.c.o   -c '/dev/shm/apt/apt-1.8.0~alpha3/obj-x86_64-linux-gnu/CMakeFiles/CheckIncludeFiles/HAVE_PARAMS_H.c'
+as: /lib/x86_64-linux-gnu/libz.so.1: no version information available (required by /usr/lib/x86_64-linux-gnu/libbfd-2.31.1-system.so)
+/dev/shm/apt/apt-1.8.0~alpha3/obj-x86_64-linux-gnu/CMakeFiles/CheckIncludeFiles/HAVE_PARAMS_H.c:2:10: fatal error: sys/params.h: No such file or directory
+ #include <sys/params.h>
+          ^~~~~~~~~~~~~~
+compilation terminated.
+ninja: build stopped: subcommand failed.
+
+Source:
+/* */
+#include <sys/params.h>
+
+
+int main(void){return 0;}
+
+Determining if the statfs exist failed with the following output:
+Change Dir: /dev/shm/apt/apt-1.8.0~alpha3/obj-x86_64-linux-gnu/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/ninja" "cmTC_daeb0"
+[1/2] Building C object CMakeFiles/cmTC_daeb0.dir/CheckSymbolExists.c.o
+FAILED: CMakeFiles/cmTC_daeb0.dir/CheckSymbolExists.c.o 
+/usr/bin/gcc-8   -g -O2 -fdebug-prefix-map=/dev/shm/apt/apt-1.8.0~alpha3=. -Wformat -march=native -pipe -Wformat-security -Wdate-time -D_FORTIFY_SOURCE=2 -o CMakeFiles/cmTC_daeb0.dir/CheckSymbolExists.c.o   -c CheckSymbolExists.c
+as: /lib/x86_64-linux-gnu/libz.so.1: no version information available (required by /usr/lib/x86_64-linux-gnu/libbfd-2.31.1-system.so)
+CheckSymbolExists.c: In function 'main':
+CheckSymbolExists.c:8:19: error: 'statfs' undeclared (first use in this function)
+   return ((int*)(&statfs))[argc];
+                   ^~~~~~
+CheckSymbolExists.c:8:19: note: each undeclared identifier is reported only once for each function it appears in
+ninja: build stopped: subcommand failed.
+
+File /dev/shm/apt/apt-1.8.0~alpha3/obj-x86_64-linux-gnu/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+#include <sys/mount.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef statfs
+  return ((int*)(&statfs))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+
+Determining if files machine/endian.h exist failed with the following output:
+Change Dir: /dev/shm/apt/apt-1.8.0~alpha3/obj-x86_64-linux-gnu/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/ninja" "cmTC_e5919"
+[1/2] Building C object CMakeFiles/cmTC_e5919.dir/HAVE_MACHINE_ENDIAN_H.c.o
+FAILED: CMakeFiles/cmTC_e5919.dir/HAVE_MACHINE_ENDIAN_H.c.o 
+/usr/bin/gcc-8   -g -O2 -fdebug-prefix-map=/dev/shm/apt/apt-1.8.0~alpha3=. -Wformat -march=native -pipe -Wformat-security -Wdate-time -D_FORTIFY_SOURCE=2 -o CMakeFiles/cmTC_e5919.dir/HAVE_MACHINE_ENDIAN_H.c.o   -c '/dev/shm/apt/apt-1.8.0~alpha3/obj-x86_64-linux-gnu/CMakeFiles/CheckIncludeFiles/HAVE_MACHINE_ENDIAN_H.c'
+as: /lib/x86_64-linux-gnu/libz.so.1: no version information available (required by /usr/lib/x86_64-linux-gnu/libbfd-2.31.1-system.so)
+/dev/shm/apt/apt-1.8.0~alpha3/obj-x86_64-linux-gnu/CMakeFiles/CheckIncludeFiles/HAVE_MACHINE_ENDIAN_H.c:2:10: fatal error: machine/endian.h: No such file or directory
+ #include <machine/endian.h>
+          ^~~~~~~~~~~~~~~~~~
+compilation terminated.
+ninja: build stopped: subcommand failed.
+
+Source:
+/* */
+#include <machine/endian.h>
+
+
+int main(void){return 0;}
+
+Determining if files sys/endian.h exist failed with the following output:
+Change Dir: /dev/shm/apt/apt-1.8.0~alpha3/obj-x86_64-linux-gnu/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/ninja" "cmTC_70a0f"
+[1/2] Building C object CMakeFiles/cmTC_70a0f.dir/HAVE_SYS_ENDIAN_H.c.o
+FAILED: CMakeFiles/cmTC_70a0f.dir/HAVE_SYS_ENDIAN_H.c.o 
+/usr/bin/gcc-8   -g -O2 -fdebug-prefix-map=/dev/shm/apt/apt-1.8.0~alpha3=. -Wformat -march=native -pipe -Wformat-security -Wdate-time -D_FORTIFY_SOURCE=2 -o CMakeFiles/cmTC_70a0f.dir/HAVE_SYS_ENDIAN_H.c.o   -c '/dev/shm/apt/apt-1.8.0~alpha3/obj-x86_64-linux-gnu/CMakeFiles/CheckIncludeFiles/HAVE_SYS_ENDIAN_H.c'
+as: /lib/x86_64-linux-gnu/libz.so.1: no version information available (required by /usr/lib/x86_64-linux-gnu/libbfd-2.31.1-system.so)
+/dev/shm/apt/apt-1.8.0~alpha3/obj-x86_64-linux-gnu/CMakeFiles/CheckIncludeFiles/HAVE_SYS_ENDIAN_H.c:2:10: fatal error: sys/endian.h: No such file or directory
+ #include <sys/endian.h>
+          ^~~~~~~~~~~~~~
+compilation terminated.
+ninja: build stopped: subcommand failed.
+
+Source:
+/* */
+#include <sys/endian.h>
+
+
+int main(void){return 0;}
+
+Determining if the function res_init exists failed with the following output:
+Change Dir: /dev/shm/apt/apt-1.8.0~alpha3/obj-x86_64-linux-gnu/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/ninja" "cmTC_3fe1a"
+[1/2] Building C object CMakeFiles/cmTC_3fe1a.dir/CheckFunctionExists.c.o
+as: /lib/x86_64-linux-gnu/libz.so.1: no version information available (required by /usr/lib/x86_64-linux-gnu/libbfd-2.31.1-system.so)
+[2/2] Linking C executable cmTC_3fe1a
+FAILED: cmTC_3fe1a 
+: && /usr/bin/gcc-8 -g -O2 -fdebug-prefix-map=/dev/shm/apt/apt-1.8.0~alpha3=. -Wformat -march=native -pipe -Wformat-security -Wdate-time -D_FORTIFY_SOURCE=2 -DCHECK_FUNCTION_EXISTS=res_init  -Wl,-z,now -Wl,--as-needed CMakeFiles/cmTC_3fe1a.dir/CheckFunctionExists.c.o  -o cmTC_3fe1a   && :
+/usr/bin/ld: /lib/x86_64-linux-gnu/libz.so.1: no version information available (required by /usr/lib/x86_64-linux-gnu/libbfd-2.31.1-system.so)
+/usr/bin/ld: CMakeFiles/cmTC_3fe1a.dir/CheckFunctionExists.c.o: in function `main':
+/usr/share/cmake-3.13/Modules/CheckFunctionExists.c:17: undefined reference to `res_init'
+collect2: error: ld returned 1 exit status
+ninja: build stopped: subcommand failed.
+
+

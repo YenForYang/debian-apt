@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Capítulo 1. Geral</title>
+    <meta name="generator" content="DocBook XSL Stylesheets V1.79.1"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="home" href="index.html" title="Guia de Utilizador do APT"/>
+    <link rel="up" href="index.html" title="Guia de Utilizador do APT"/>
+    <link rel="prev" href="index.html" title="Guia de Utilizador do APT"/>
+    <link rel="next" href="ch2.html" title="Capítulo 2. apt-get"/>
+  </head>
+  <body>
+    <div class="navheader">
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Capítulo 1. Geral</th>
+        </tr>
+        <tr>
+          <td align="left"><a accesskey="p" href="index.html">Anterior</a> </td>
+          <th width="60%" align="center"> </th>
+          <td align="right"> <a accesskey="n" href="ch2.html">Próximo</a></td>
+        </tr>
+      </table>
+      <hr/>
+    </div>
+    <div class="chapter">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h1 class="title"><a id="ch1"/>Capítulo 1. Geral</h1>
+          </div>
+        </div>
+      </div>
+      <div class="toc">
+        <p>
+          <strong>Índice</strong>
+        </p>
+        <dl class="toc">
+          <dt>
+            <span class="section">
+              <a href="ch1.html#s1.1">1.1. Anatomia do Sistema de Pacotes</a>
+            </span>
+          </dt>
+        </dl>
+      </div>
+      <p>
+O pacote APT contém actualmente duas secções, o método
+<span class="command"><strong>dselect</strong></span> do APT e a interface de utilizador de linha de
+comandos <span class="command"><strong>apt-get</strong></span>. Ambos disponibilizam uma maneira de
+instalar e remover pacotes assim como descarregar novos pacotes da Internet.
+</p>
+      <div class="section">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h2 class="title"><a id="s1.1"/>1.1. Anatomia do Sistema de Pacotes</h2>
+            </div>
+          </div>
+        </div>
+        <p>
+O sistema de pacotes Debian tem uma grande quantidade de informação
+associada a cada pacote para ajudar a assegurar que este se integra de modo
+limpo e fácil no sistema. A mais proeminente das suas funcionalidades é o
+sistema de dependências.
+</p>
+        <p>
+O sistema de dependências permite a programas individuais fazerem uso de
+elementos partilhados no sistema tais como as bibliotecas. Facilita a
+colocação de porções de um programa usadas raramente em pacotes separados
+para reduzir o número de coisas que é necessário instalar ao utilizador
+médio. Também permite opções em agentes de transporte de mail, servidores X
+e mais.
+</p>
+        <p>
+O primeiro passo para compreender o sistema de dependências é pegar no
+conceito de uma dependência simples. O significado de uma dependência
+simples é que um pacote requer outro pacote seja instalado ao mesmo tempo
+para funcionar correctamente.
+</p>
+        <p>
+Por exemplo, mailcrypt é uma extensão do emacs que ajuda a encriptar mail
+com GPG. Sem o GPGP instalado o mailcrypt é inútil, então o mailcrypt tem
+uma dependência simples do GPG. Também, porque é uma extensão do emacs, tem
+uma dependência simples do emacs, e sem o emacs é completamente inútil.
+</p>
+        <p>
+A outra dependência importante a compreender é a dependência de
+conflito. Significa que um pacote, quando instalado com outro pacote, não
+irá funcionar e pode ser extremamente prejudicial para o sistema. Como
+exemplo considere um agente de transporte de mail como o sendmail, exim ou
+qmail. Não é possível ter dois agentes de transporte de mail instalados
+porque ambos precisam de escutar na rede para receberem mail. Tentar
+instalar dois irá danificar seriamente o sistema, por isso todos os agentes
+de transporte de mail têm uma dependência de conflito com todos os outros
+agentes de transporte de mail.
+</p>
+        <p>
+Como uma complicação adicional existe a possibilidade de um pacote fingir
+ser outro pacote. Considere que exim e sendmail para muitas intenções são
+idênticos, ambos entregam mail e compreendem uma interface comum. Por isso,
+o sistema de pacotes tem um modo para eles declararem que são ambos
+mail-transport-agents. Portanto, ambos exim e sendmail declaram que
+disponibilizam um mail-transport-agent e outros pacotes que precisam de um
+agente de transporte de mail dependem de um mail-transport-agent. Isto pode
+adicionar uma grande confusão quando se tenta corrigir pacotes manualmente.
+</p>
+        <p>
+Em qualquer altura uma única dependência pode ser satisfeita por pacotes que
+já estão instalados ou podem não estar. O APT tenta ajudar a resolver
+problemas com dependências ao disponibilizar um número de algoritmos
+automáticos que ajudam a seleccionar os pacotes para instalação.
+</p>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr/>
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td align="left"><a accesskey="p" href="index.html">Anterior</a> </td>
+          <td align="center"> </td>
+          <td align="right"> <a accesskey="n" href="ch2.html">Próximo</a></td>
+        </tr>
+        <tr>
+          <td align="left" valign="top">Guia de Utilizador do APT </td>
+          <td align="center">
+            <a accesskey="h" href="index.html">Início</a>
+          </td>
+          <td align="right" valign="top"> Capítulo 2. apt-get</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

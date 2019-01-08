@@ -1,0 +1,448 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+  "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % aptent SYSTEM "apt.ent"> %aptent;
+<!ENTITY % aptverbatiment SYSTEM "apt-verbatim.ent"> %aptverbatiment;
+<!ENTITY % aptvendor SYSTEM "apt-vendor.ent"> %aptvendor;
+]>
+
+<book lang="ja">
+
+<title>APT ユーザガイド</title>
+
+<bookinfo>
+
+<authorgroup>
+  <author>
+    <personname>Jason Gunthorpe</personname><email>jgg@debian.org</email>
+  </author>
+</authorgroup>
+
+<releaseinfo>バージョン &apt-product-version;</releaseinfo>
+
+<abstract>
+<para>
+This document provides an overview of how to use the APT package manager.
+</para>
+</abstract>
+
+<copyright><year>1998</year><holder>Jason Gunthorpe</holder></copyright>
+
+<legalnotice>
+<title>ライセンスについて</title>
+<para>
+"APT" and this document are free software; you can redistribute them and/or
+modify them under the terms of the GNU General Public License as published
+by the Free Software Foundation; either version 2 of the License, or (at
+your option) any later version.
+</para>
+</legalnotice>
+
+<legalnotice>
+<para>
+For more details, on Debian systems, see the file
+/usr/share/common-licenses/GPL for the full license.
+</para>
+</legalnotice>
+
+</bookinfo>
+
+<chapter id="ch1"><title>全般</title>
+<para>
+APT パッケージは現在、APT <command>dselect</command> メソッドと <command>apt-get</command>
+コマンドラインユーザインターフェイスの2つを収録しています。両方ともインターネットから新しいパッケージをダウンロードするのと同様、パッケージをインストール、削除する方法を提供しています。
+</para>
+
+<section id="s1.1"><title>パッケージシステムの構造</title>
+<para>
+Debian
+パッケージシステムには各パッケージに関連する膨大な情報があり、システムに手際良く簡単に統合することを支援します。その最も重要な機能は依存システムです。
+</para>
+<para>
+依存システムにより、システムにあるライブラリ等の共有要素を個々のプログラムを使えるようになります。簡単に言うと、プログラムのうちまれに利用される部分を別個のパッケージに配置して、平均的ユーザがインストールを必要とするものの数を減らします。また、メール転送エージェントや
+X サーバ等の選択ができるようにもなります。
+</para>
+<para>
+依存システムの理解はまず単純な依存の概念を把握することから始まります。単純な依存というのは、あるパッケージが適切に機能するためには別のパッケージが同時にインストールされている必要があるということです。
+</para>
+<para>
+例えば mailcrypt は emacs を拡張するプログラムで、GPG によるメールの暗号化を支援します。GPGP がインストールされていなければ
+mailcrypt は役に立たないので mailcrypt には GPG に単純に依存しています。また、これは emacs の拡張なので emacs
+に単純に依存し、emacs がないと何の役にも立ちません。
+</para>
+<para>
+理解しておかないといけないもう一つの重要な依存に競合する依存があります。これはあるパッケージが別のパッケージと同時にインストールされていると機能せず、システムにとってひどく有害なこともあります。例として
+sendmail や exim、qmail
+等のメール転送エージェントで考えてみましょう。メール転送エージェントはどれもメールを受け取るのにネットワークを待ち受ける必要があるため、2つインストールすることは不可能です。複数インストールするとシステムに重大な被害を与える可能性があるため、メール転送エージェントはどれも他のあらゆるメール転送エージェントと競合依存となっています。
+</para>
+<para>
+複雑な例としては、別のパッケージのように装うパッケージがあります。exim と sendmail
+について見てみると、その多くの目的は同一で、両方ともメールを配送し、一般的インターフェイスを解釈します。そこで、パッケージシステムにはどちらも
+mail-transport-agents だと宣言する方法があります。そうして exim と sendmail は両方とも
+mail-transport-agent を提供すると宣言し、他のメール転送エージェントを必要とするパッケージは
+mail-transport-agent に依存します。手作業によりパッケージを修正しようとしたときに多大な混乱が生まれる可能性があります。
+</para>
+<para>
+既にインストールされている、あるいはされていないパッケージについて、1つの依存が生まれる可能性は常にあります。APT
+はインストールするパッケージの選択を支援する自動化でのアルゴリズムをいくつか提供することで依存問題の解決支援に努めます。
+</para>
+</section>
+
+</chapter>
+
+<chapter id="ch2"><title>apt-get</title>
+<para>
+<command>apt-get</command>
+はコマンドラインからパッケージをインストールする簡単な方法を提供します。<command>dpkg</command>
+とは異なり、<command>apt-get</command> は .deb
+ファイルを解釈せず、連携するのはパッケージ特有の名前で、インストールできるのは<emphasis>ソース</emphasis>にある .deb
+アーカイブだけです。
+</para>
+<para>
+<command>apt-get</command> を使う前にまずやるべきことは<footnote><para> http プロキシサーバを使っている場合はまず http_proxy 環境変数をセットする必要があります。sources.list(5) を見てください </para>
+</footnote>パッケージ一覧を<emphasis>ソース</emphasis>から取得することで、それにより利用できるパッケージがわかるようになります。これには
+<literal>apt-get update</literal> を実行します。例えば
+</para>
+<screen>
+# apt-get update
+取得 http://ftp.de.debian.org/debian-non-US/ stable/binary-i386/ Packages
+取得 http://llug.sep.bnl.gov/debian/ testing/contrib Packages
+パッケージリストを読み込んでいます... 完了
+</screen>
+<para>
+更新後は複数のコマンドを使えます:
+</para>
+<variablelist>
+<varlistentry>
+<term>upgrade</term>
+<listitem>
+<para>
+upgrade
+を行うとシステム全体を穏やかにアップグレードします。アップグレードでは新しいパッケージのインストールや既存のパッケージの削除、アップグレードすると他のパッケージを破壊する可能性のある場合のそのパッケージのアップグレードは行いません。これは毎日実行してシステムを比較的安全にアップグレードできます。upgrade
+を行うとアップグレードできないパッケージがある場合にその一覧を表示します。これは通常新しいパッケージに依存しているか他のパッケージと競合しているということになります。<command>dselect</command>
+や <literal>apt-get install</literal> を使うとそういったパッケージを強制的にインストールできます。
+</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>install</term>
+<listitem>
+<para>
+install
+を使ってパッケージを名前によりインストールします。パッケージは自動的に取得、インストールされます。これはインストールするパッケージの名前が既にわかっていて
+GUI を使って選択したくない場合に有用です。インストールするパッケージはいくらでも指定でき、全て取得されます。install
+では対象パッケージ一覧から自動的に依存問題の解決に努めてまとめを提示し、指示以外の変更がある場合は確認を促します。
+</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>dist-upgrade</term>
+<listitem>
+<para>
+dist-upgrade は完全なアップグレードを行うように設計されていて、Debian
+のリリース間のアップグレードを単純化します。洗練されたアルゴリズムを使って、システムをできるだけ最新のリリースにするためにインストール、アップグレード、削除する最善のパッケージ群を決定します。状況によっては
+<command>dselect</command> で手作業により時間を掛けて依存を解決するよりも dist-upgrade
+を使う方が希望には合うかもしれません。dist-upgrade 完了後は <command>dselect</command>
+を使って、残っているパッケージがあればインストールできます。
+</para>
+<para>
+dist-upgrade が実行する内容をよく観察するのは重要です。かなり驚くような判断がなされることもあります。
+</para>
+</listitem>
+</varlistentry>
+</variablelist>
+<para>
+<command>apt-get</command> にはコマンドラインオプションが複数あり、man ページの
+<citerefentry><refentrytitle>apt-get</refentrytitle><manvolnum>8</manvolnum></citerefentry>
+で詳細に説明されています。最も有用なオプションは取得したファイルをインストールしない <literal>-d</literal>
+です。システムが大量のパッケージをダウンロードする必要がある場合、何かうまくいかなかったときにインストールを開始するのは望ましくはないでしょう。<literal>-d</literal>
+を指定すると、ダウンロードしたときのコマンドを単純に再び、<literal>-d</literal>
+を付けずに実行することでダウンロードしたアーカイブをインストールできます。
+</para>
+</chapter>
+
+<chapter id="ch3"><title>DSelect</title>
+<para>
+APT の <command>dselect</command> メソッドは <command>dselect</command> パッケージ選択
+GUI を使った完全な APT システムを提供します。インストールや削除するパッケージの選択には <command>dselect</command>
+を使い、実際のインストールは APT が行います。
+</para>
+<para>
+APT メソッドを有効にするには、<command>dselect</command> でアクセス(a) を選択し、それから APT
+メソッドを選択する必要があります。そうするとアーカイブの取得先の場所となる<emphasis>ソース</emphasis>群を聞かれます。これにはリモートのインターネットサイトやローカルの
+Debian ミラー、CD-ROM を指定できます。各ソースで Debian アーカイブ全体のうちの一部を提供でき、APT
+は自動的に組み合わせてパッケージ群一式を構成します。CD-ROM
+がある場合はまずそれを指定し、それからミラーを指定するのが良い方法で、そうすることで最新のバグ修正にアクセスできるようになります。APT
+はインターネットからダウンロードする前に CD-ROM にあるパッケージを自動的に利用します。
+</para>
+<screen>
+   ディストリビューションソース位置一覧の準備
+
+ Debian ディストリビューションの基底 URL を指定してください。
+ 認識できるアクセス方法: http file
+
+ 例:
+      file:/mnt/debian,
+      ftp://ftp.debian.org/debian,
+      http://ftp.de.debian.org/debian,
+
+
+ URL [http://llug.sep.bnl.gov/debian]:
+</screen>
+<para>
+<emphasis>ソース</emphasis>の準備は基礎となる Debian アーカイブの質問から始まり、デフォルトは HTTP
+ミラーとなっています。その次は取得するディストリビューションを質問します。
+</para>
+<screen>
+ 取得するディストリビューションのタグやパッケージファイルへのパスを
+ / で終える形式で指定してください。ディストリビューションのタグには
+ 以下のようなものがあります: stable unstable testing non-US
+
+ ディストリビューション [stable]:
+</screen>
+<para>
+ディストリビューションはアーカイブ中の Debian バージョンを参照し、<emphasis>stable</emphasis>
+は最新のリリース版を、<emphasis>unstable</emphasis>
+は開発版を参照します。<emphasis>non-US</emphasis>
+は一部のミラーでのみ利用可能で、合衆国からの輸出ができない暗号化技術その他のものを収録するパッケージを参照します。ただしこういったパッケージの合衆国への輸入は合法です。
+</para>
+<screen>
+ 取得するコンポーネントを指定してください
+ コンポーネントには以下のようなものがあります: main contrib non-free
+
+ コンポーネント [main contrib non-free]:
+</screen>
+<para>
+コンポーネント一覧は取得するサブディストリビューションの一覧を参照します。このディストリビューションはソフトウェアのライセンスを基にして分けられています。main
+にあるのは DFSG フリーのパッケージですが contrib や non-free
+には利用目的や配布形態に様々な制限を課せられているものが収録されています。
+</para>
+<para>
+ソースはいくらでも追加できます。準備スクリプトは必要なソースを全て指定するまで聞き続けます。
+</para>
+<para>
+<command>dselect</command> を使う前にメニューから更新(u)を選択して利用可能なパッケージ一覧を更新する必要があります。これは
+<literal>apt-get update</literal> の上位集合で、取得した情報を <command>dselect</command>
+から利用できるようにします。以前に <literal>apt-get update</literal>
+を実行していても更新(u)を実行する必要があります。
+</para>
+<para>
+その後は選択(s)を使って選択し、導入(i)を使ってインストールします。APT
+メソッドを使っている場合は設定(c)や削除(r)コマンドに意味はなく、導入(i)コマンドがその両方を実行します。
+</para>
+<para>
+デフォルトで APT はインストールに成功したパッケージ (.deb) ファイルを自動的に削除します。この挙動を変更するには
+/etc/apt/apt.conf 中に <literal>Dselect::clean "prompt";</literal> と記述します。
+</para>
+</chapter>
+
+<chapter id="ch4"><title>インターフェース</title>
+<para>
+APT の <command>dselect</command> メソッドと <command>apt-get</command>
+は共に同一のインターフェイスを共有しています。通常は行う内容を告知して実行する簡単なシステムです。<footnote><para> <command>dselect</command> メソッドは実際に <command>apt-get</command>
+に対するラッパースクリプト群です。このメソッドでは <command>apt-get</command>
+単体に存在している以上の機能を実際に提供しています。 </para> </footnote> 実行内容のまとめを告知した後 APT
+が参考になる状態メッセージをいくらか表示するため、どれくらい進んでいるのか、あるいは残り作業がどれくらいあるのか見積もることができるようになっています。
+</para>
+
+<section id="s4.1"><title>スタートアップ</title>
+<para>
+update 以外のあらゆる操作で、APT はいくつか処理を行い内部状態を準備します。また、システムの状態についてもいくらか確認します。この処理は
+<literal>apt-get check</literal> によりいつでも実行できます。
+</para>
+<screen>
+# apt-get check
+パッケージリストを読み込んでいます... 完了
+依存関係ツリーを作成しています
+状態情報を読み取っています... 完了
+</screen>
+<para>
+これが最初に行うのはパッケージファイルを全てメモリに読み込むことです。APT
+はキャッシュを使うようになっているので、この処理は次に実行するときには早く終わります。見つけられないパッケージファイルがある場合は無視され、apt-get
+終了時に注意を表示します。
+</para>
+<para>
+最後の処理はシステムの依存関係の詳細な分析です。インストール、あるいは展開されたパッケージの依存関係を全て確認し、問題ないか判断します。問題が見つかった場合は報告し、<command>apt-get</command>
+の実行を拒否します。
+</para>
+<screen>
+# apt-get check
+パッケージリストを読み込んでいます... 完了
+依存関係ツリーを作成しています
+状態情報を読み取っています... 完了
+これらを直すためには 'apt --fix-broken install' を実行する必要があるかもしれません。
+下のパッケージには満たせない依存関係があります:
+  9fonts: 依存: xlib6g しかし、インストールされていません
+  uucp: 依存: mailx しかし、インストールされていません
+  blast: 依存: xlib6g (&gt;= 3.3-5) しかし、インストールされていません
+  adduser: 依存: perl-base しかし、インストールされていません
+  aumix: 依存: libgpmg1 しかし、インストールされていません
+  debiandoc-sgml: 依存: sgml-base しかし、インストールされていません
+  bash-builtins: 依存: bash (&gt;= 2.01) しかし、2.0-3 はインストールされています
+  cthugha: 依存: svgalibg1 しかし、インストールされていません
+           依存: xlib6g (&gt;= 3.3-5) しかし、インストールされていません
+  libreadlineg2: 競合:libreadline2 (&lt;&lt; 2.1-2.1)
+</screen>
+<para>
+この例ではシステムに libreadlineg2
+に関する重大な問題を含めて多数の問題があります。未解決の依存関係があれば各パッケージごとにそのパッケージに問題があることを示し、併せて未解決の依存関係を1行で出力します。そのパッケージの依存問題の理由について簡潔な説明も添えられます。
+</para>
+<para>
+システムがこのように壊れた状態となる原因は2つあります。1つ目はアップグレード実行時にパッケージ間の難解な依存関係を
+<command>dpkg</command> がいくらか欠いていることによります。<footnote><para> APT はそれでも既知の依存関係を全て検討し、パッケージが壊れた状態となることを回避しようとします。 </para> </footnote>2つ目はパッケージのインストール処理中に何か失敗した場合です。この状況では依存するパッケージがインストールされないままパッケージが展開されている可能性があります。
+</para>
+<para>
+APT がパッケージのインストール順序に特定の制約を設けていることにより2つ目の状況は1つ目の状況と比べて重大ですらなくなります。どちらの場合でも
+<command>apt-get</command> に <literal>-f</literal> オプションを指定することで APT
+は解決方法を推測し、処理を続けます。APT <command>dselect</command> メソッドでは常に
+<literal>-f</literal> オプションを有効にして、メンテナスクリプトでの問題が起きた場合でも簡単に処理を継続できるようにしています。
+</para>
+<para>
+しかし、1つ目の状況により重大な壊れ方になっているシステムの修正に <literal>-f</literal>
+オプションを使った場合はインストールにすぐに失敗、あるいはインストール順序がおかしくなる可能性があります。どちらの場合も、APT
+が処理を十分に進められるところまで手作業により dpkg を使って (恐らく強制するオプションを指定して) 状況を修正する必要があります。
+</para>
+</section>
+
+<section id="s4.2"><title>状態レポート</title>
+<para>
+処理を続ける前に <command>apt-get</command>
+は実行しようとする処理について報告します。通常この報告は実行される操作の種類を反映したものになりますが、一般的要素がいくつかあります。どの場合でもこの処理一覧は最終的な状態を示し、<literal>-f</literal>
+オプションその他の実行されるコマンドに関連する動作を考慮したものとなります。
+</para>
+
+<section id="s4.2.1"><title>追加パッケージリスト</title>
+<screen>
+以下の特別パッケージがインストールされます:
+  libdbd-mysql-perl xlib6 zlib1 xzx libreadline2 libdbd-msql-perl
+  mailpgp xdpkg fileutils pinepgp zlib1g xlib6g perl-base
+  bin86 libgdbm1 libgdbmg1 quake-lib gmp2 bcc xbuffy
+  squake pgp-i python-base debmake ldso perl libreadlineg2
+  ssh
+</screen>
+<para>
+追加パッケージリストはコマンドラインで指示した以外にインストールやアップグレードされるパッケージを全て表示します。これは
+<literal>install</literal>
+コマンドの場合にのみ生成されます。一覧に挙げられるパッケージは自動インストールの結果による場合が多くなります。
+</para>
+</section>
+
+<section id="s4.2.2"><title>削除するパッケージ</title>
+<screen>
+以下のパッケージは「削除」されます:
+The following packages will be REMOVED:
+  xlib6-dev xpat2 tk40-dev xkeycaps xbattle xonix
+  xdaliclock tk40 tk41 xforms0.86 ghostview xloadimage xcolorsel
+  xadmin xboard perl-debug tkined xtetris libreadline2-dev perl-suid
+  nas xpilot xfig
+</screen>
+<para>
+削除するパッケージリストはシステムから削除されるパッケージを全て表示します。これはどの操作でも起きるもので、重要なものが失われることのないように注意深く確認すべきです。<literal>-f</literal>
+オプションを使った場合はパッケージの削除を伴うことが特に多く、そのためこのオプションを指定した場合は特に注意を払うようにしてください。この一覧にはインストールの中止等により一部だけがインストールされているために削除されるパッケージが含まれることがあります。
+</para>
+</section>
+
+<section id="s4.2.3"><title>新規パッケージリスト</title>
+<screen>
+以下のパッケージが新たにインストールされます:
+  zlib1g xlib6g perl-base libgdbmg1 quake-lib gmp2 pgp-i python-base
+</screen>
+<para>
+新規パッケージリストでは単純にこれから起きることを再通知します。このパッケージ一覧は現在システムにインストールされておらず、APT
+処理後には存在することになります。
+</para>
+</section>
+
+<section id="s4.2.4"><title>一時固定リスト</title>
+<screen>
+以下のパッケージは保留されます
+  compface man-db tetex-base msql libpaper svgalib1
+  gs snmp arena lynx xpat2 groff xscreensaver
+</screen>
+<para>
+システム全体をアップグレードする場合、新しいパッケージが必要であったり既にインストールされているパッケージと競合するためにパッケージの新しいバージョンがインストールできないということがあります。この場合、そのパッケージは一時固定リストに表示されます。この一覧に挙げられたパッケージをインストールする最善の方法は
+<literal>apt-get install</literal> または <command>dselect</command>
+を使ってその問題を解決することです。
+</para>
+</section>
+
+<section id="s4.2.5"><title>保留パッケージの警告</title>
+<screen>
+以下の変更禁止パッケージは変更されます:
+  cvs
+</screen>
+<para>
+保留となっているパッケージをインストールするように APT
+に指示することもできます。その際、保留となっているパッケージを変更することを警告します。これは dist-upgrade または install
+を指示したときにしか起きないはずです。
+</para>
+</section>
+
+<section id="s4.2.6"><title>最後のまとめ</title>
+<para>
+最後に、APT は発生する全変更のまとめを表示します。
+</para>
+<screen>
+アップグレード: 206 個、新規インストール: 8 個、削除: 23 個、保留: 51 個。
+12 個のパッケージが完全にインストールまたは削除されていません。
+66.7MB 中 65.7MB のアーカイブを取得する必要があります。
+この操作後に追加で 26.5MB のディスク容量が消費されます。
+</screen>
+<para>
+まとめの1行目は単純に一覧を全て短くまとめたもので、アップグレードされる (既にインストールされていて新しいバージョンが利用可能な)
+パッケージの数についても示します。2行目は設定が完了していないパッケージの数を示し、インストールを中止した場合にこれに集計されることがあります。最終行はそのインストールで必要となる容量の要件を示します。最初の数値の組はアーカイブファイルのサイズを示します。この1つ目の数値はリモートから取得してくる必要のあるバイト数、2つ目は必要となる全アーカイブの合計サイズを示します。次の数値は現在インストールされているパッケージと新しくインストールしたパッケージのサイズの違いを示します。これは処理が全て終わった後に
+/usr で消費される容量にほぼ相当します。パッケージを大量に削除する場合は解放される容量を示すこともあります。
+</para>
+<para>
+他の報告として、-u オプションを使うとアップグレードされるパッケージを表示します。これは前に示した例と似たものです。
+</para>
+</section>
+
+</section>
+
+<section id="s4.3"><title>状態表示</title>
+<para>
+アーカイブやパッケージファイルのダウンロード中、APT は状態を示す一連のメッセージを表示します。
+</para>
+<screen>
+# apt-get update
+取得:1 http://ftp.de.debian.org/debian-non-US/ stable/non-US/ Packages
+取得:2 http://llug.sep.bnl.gov/debian/ testing/contrib Packages
+ヒット http://llug.sep.bnl.gov/debian/ testing/main Packages
+取得:4 http://ftp.de.debian.org/debian-non-US/ unstable/binary-i386/ Packages
+取得:5 http://llug.sep.bnl.gov/debian/ testing/non-free Packages
+11% [5 testing/non-free `Waiting for file' 0/32.1k 0%] 2203b/s 1m52s
+</screen>
+<para>
+APT
+がファイルの取得を開始すると、最終行でダウンロードの進捗状況を示しつつ<emphasis>取得</emphasis>で始まる行が表示されます。進捗の最初のパーセント値は全ファイルに対する取得済みの全体での割合を示します。残念ながらパッケージファイルのサイズは不明なので
+<literal>apt-get update</literal> は不正確な予測を行う可能性があります。
+</para>
+<para>
+状態を示す行の次の節は各ダウンロードスレッドごとに1度ずつ繰り返され、進行中の操作や処理についての有用な情報をいくらか示します。この節は単純に
+<emphasis>Forking</emphasis> となっていることもあり、その場合は OS
+がダウンロード用のモジュールを読み込んでいることを示します。[
+の後の最初の語は履歴に表示されている取得番号です。その次の語はダウンロード対象の名前の短縮形です。アーカイブの場合は取得中のパッケージの名前が入ります。
+</para>
+<para>
+単一引用符内はダウンロードのやりとりの進捗を示す有益な文字列です。標準的には<emphasis>...へ接続しています</emphasis>から<emphasis>ファイルを待っています</emphasis>へ、それから<emphasis>...をダウンロードしています</emphasis>または<emphasis>...を再開しています</emphasis>へと進みます。最後の値はリモートサイトからダウンロードしたバイト数です。ダウンロードが始まるとこれは
+<literal>102/10.2k</literal>
+のように表示され、この場合10.2キロバイトのうち102バイトが取得済みであることを示します。合計サイズは常に4ケタで表示され、表示空間を保つようになっています。サイズ表示の後はそのファイル自体の進捗状況を百分率で示したものです。その2つ後は瞬間的な平均速度です。この値は5秒ごとに更新され、その間のデータ転送速度を反映します。最後は推定転送時間を表示しています。これは定期的に更新され、表示している転送速度で全て完了する時間を表示します。
+</para>
+<para>
+状態表示は0.5秒ごとに更新してダウンロードの進捗状況を絶えず通知し、取得行は新しいファイルの処理が始まるたびに流れていきます。状態表示は絶えず更新されるためファイルへの記録には適しません。<literal>-q</literal>
+オプションを使うと状態を表示しないようにできます。
+</para>
+</section>
+
+<section id="s4.4"><title>Dpkg</title>
+<para>
+APT はアーカイブのインストールに <command>dpkg</command> を使い、ダウンロードの完了後は
+<command>dpkg</command> インターフェイスに切り替わります。<command>dpkg</command>
+もパッケージの処理中にいくつか質問し、パッケージ自体も複数質問するかもしれません。通常それぞれの質問の前にそれが何を聞いているのか説明します。その質問の内容は多岐にわたるものであり、ここで説明できるものでは全くありません。
+</para>
+</section>
+
+</chapter>
+
+</book>

@@ -1,0 +1,424 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Capítulo 4. La interfaz</title>
+    <meta name="generator" content="DocBook XSL Stylesheets V1.79.1"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="home" href="index.html" title="Guía de usuario de APT"/>
+    <link rel="up" href="index.html" title="Guía de usuario de APT"/>
+    <link rel="prev" href="ch3.html" title="Capítulo 3. DSelect"/>
+  </head>
+  <body>
+    <div class="navheader">
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Capítulo 4. La interfaz</th>
+        </tr>
+        <tr>
+          <td align="left"><a accesskey="p" href="ch3.html">Anterior</a> </td>
+          <th width="60%" align="center"> </th>
+          <td align="right"> </td>
+        </tr>
+      </table>
+      <hr/>
+    </div>
+    <div class="chapter">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h1 class="title"><a id="ch4"/>Capítulo 4. La interfaz</h1>
+          </div>
+        </div>
+      </div>
+      <div class="toc">
+        <p>
+          <strong>Tabla de contenidos</strong>
+        </p>
+        <dl class="toc">
+          <dt>
+            <span class="section">
+              <a href="ch4.html#s4.1">4.1. Arranque</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="section">
+              <a href="ch4.html#s4.2">4.2. El informe de estado</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="section">
+              <a href="ch4.html#s4.3">4.3. La pantalla de estado</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="section">
+              <a href="ch4.html#s4.4">4.4. Dpkg</a>
+            </span>
+          </dt>
+        </dl>
+      </div>
+      <p>
+El método <span class="command"><strong>dselect</strong></span> de APT y <span class="command"><strong>apt-get</strong></span>
+comparten la misma interfaz. Es un sencillo programa que le informa de lo
+que va a hacer, para después llevarlo a cabo. <a href="#ftn.idm107" class="footnote" id="idm107"><sup class="footnote">[2]</sup></a> Después de mostrar el resumen de lo que va a pasar APT mostrará
+mensajes de estado informativos para ofrecer una estimación de cuánto queda
+por hacer.
+</p>
+      <div class="section">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h2 class="title"><a id="s4.1"/>4.1. Arranque</h2>
+            </div>
+          </div>
+        </div>
+        <p>
+APT realiza un número de acciones para preparar su estado interno antes de
+cualquier operación, a excepción de «update». También realiza algunas
+revisiones del estado del sistema. Puede llevar a cabo estas acciones en
+cualquier momento ejecutando <code class="literal">apt-get check</code>.
+</p>
+        <pre class="screen">
+# apt-get check
+Leyendo lista de paquetes... Hecho
+Creando árbol de dependencias... Hecho
+</pre>
+        <p>
+La primera acción que ejecuta es pasar todos los ficheros de paquete a la
+memoria. APT usa un esquema de almacenado con lo cual esta operación será
+más rápida la segunda vez que la ejecute. De no encontrar algún fichero de
+paquete, éstos se ignorarán y verá una advertencia al finalizar apt-get.
+</p>
+        <p>
+La última acción realiza un detallado análisis de las dependencias del
+sistema. Revisa cada dependencia de cada paquete instalado o sin
+desempaquetar analiza su validación. En caso de error aparecerá un informe,
+y <span class="command"><strong>apt-get</strong></span> se negará a ejecutarse.
+</p>
+        <pre class="screen">
+# apt-get check
+Leyendo lista de paquetes... Hecho
+Creando árbol de dependencias... Hecho
+Tal vez quiera ejecutar 'apt --fix-broken install' para corregirlo.
+Los siguientes paquetes tienen dependencias incumplidas:
+  9fonts: Depende: xlib6g pero no está instalado
+  uucp: Depende: mailx pero no está instalado
+  blast: Depende: xlib6g (&gt;= 3.3-5) pero no está instalado
+  adduser: Depende: perl-base pero no está instalado
+  aumix: Depende: libgpmg1 pero no está instalado
+  debiandoc-sgml: Depende: sgml-base pero no está instalado
+  bash-builtins: Depende: bash (&gt;= 2.01) pero 2.0-3 está instalado
+  cthugha: Depende: svgalibg1 pero no está instalado
+           Depende: xlib6g (&gt;= 3.3-5) pero no está instalado
+  libreadlineg2: Entra en conflicto:libreadline2 (&lt;&lt; 2.1-2.1)
+</pre>
+        <p>
+En este ejemplo el sistema tiene varios problemas, incluyendo un serio
+problema con libreadlineg2. Una línea aparecerá por cada paquete con
+dependencias no satisfechas indicando el paquete con el problema y las
+dependencias no satisfechas. También incluye una explicación de porqué el
+paquete tiene un problema de dependencias.
+</p>
+        <p>
+Hay dos formas de que el sistema tenga un estado roto como éste. El primero
+es causado por la omisión de <span class="command"><strong>dpkg</strong></span> de ciertas relaciones
+delicadas entre paquetes al realizar una actualización. <a href="#ftn.idm124" class="footnote" id="idm124"><sup class="footnote">[3]</sup></a>. El segundo ocurre se la instalación de un paquete
+falla durante la operación. En esta situación puede que un paquete se haya
+desempaquetado sin que sus dependencias estuviesen instaladas previamente.
+</p>
+        <p>
+La segunda situación es mucho menos grave que la primera ya que APT define
+ciertos límites en el orden de instalación de los paquetes. En ambos casos,
+introducir la opción <code class="literal">-f</code> a <span class="command"><strong>apt-get</strong></span>
+causará que APT deduzca una posible solución al problema para después
+continuar. El método <span class="command"><strong>dselect</strong></span> de APT siempre ofrece la
+opción <code class="literal">-f</code> para permitir una fácil continuación cuando
+existen scripts fallidos del mantenedor.
+</p>
+        <p>
+Aún así, de usar la opción <code class="literal">-f</code> para corregir un sistema
+gravemente roto por el primer caso cabe que la acción falle inmediatamente o
+que la secuencia de instalación se interrumpa. En cualquier caso es
+necesario usar dpkg manualmente (puede que con opciones de forzado) para
+corregir la situación lo suficiente como para que APT pueda continuar.
+</p>
+      </div>
+      <div class="section">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h2 class="title"><a id="s4.2"/>4.2. El informe de estado</h2>
+            </div>
+          </div>
+        </div>
+        <p>
+Antes de proceder <span class="command"><strong>apt-get</strong></span> presentará un informe de lo que
+va a ocurrir. Generalmente el informe refleja el tipo de operación a
+realizar, pero hay ciertos elementos comunes. La lista refleja el estado
+final de las cosas en todos los casos, teniendo en cuenta la opción
+<code class="literal">-f</code> y cualquier otra actividad relevante a la orden
+ejecutada.
+</p>
+        <div class="section">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h3 class="title"><a id="s4.2.1"/>4.2.1. La lista de paquetes extras</h3>
+              </div>
+            </div>
+          </div>
+          <pre class="screen">
+Se instalarán los siguientes paquetes extras:
+  libdbd-mysql-perl xlib6 zlib1 xzx libreadline2 libdbd-msql-perl
+  mailpgp xdpkg fileutils pinepgp zlib1g xlib6g perl-base
+  bin86 libgdbm1 libgdbmg1 quake-lib gmp2 bcc xbuffy
+  squake pgp-i python-base debmake ldso perl libreadlineg2
+  ssh
+</pre>
+          <p>
+La lista de paquetes extras muestra todos los paquetes que se van a instalar
+o actualizar en adición a aquellos mencionados en la línea de órdenes. Sólo
+se genera para la orden <code class="literal">install</code>. Generalmente, los
+paquetes listados son el resultado de una instalación automática.
+</p>
+        </div>
+        <div class="section">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h3 class="title"><a id="s4.2.2"/>4.2.2. Los paquetes a eliminar</h3>
+              </div>
+            </div>
+          </div>
+          <pre class="screen">
+Los siguientes paquetes se ELIMINARÁN:
+  xlib6-dev xpat2 tk40-dev xkeycaps xbattle xonix
+  xdaliclock tk40 tk41 xforms0.86 ghostview xloadimage xcolorsel
+  xadmin xboard perl-debug tkined xtetris libreadline2-dev perl-suid
+  nas xpilot xfig
+</pre>
+          <p>
+La lista de paquetes a eliminar muestra todos los paquetes que se van a
+eliminar del sistema. Puede aparecer durante cualquier operación, y se
+debería revisar cuidadosamente para asegurar que no se va a eliminar nada
+importante. La opción <code class="literal">-f</code> puede generar varios paquetes a
+eliminar así que se debe utilizar con precaución. La lista puede contener
+paquetes a eliminar porque están parcialmente instalados, posiblemente
+debido a una instalación interrumpida.
+</p>
+        </div>
+        <div class="section">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h3 class="title"><a id="s4.2.3"/>4.2.3. La lista de paquetes nuevos</h3>
+              </div>
+            </div>
+          </div>
+          <pre class="screen">
+Se instalarán los siguientes paquetes NUEVOS:
+  zlib1g xlib6g perl-base libgdbmg1 quake-lib gmp2 pgp-i python-base
+</pre>
+          <p>
+La lista de paquetes nuevos es sólo un recordatorio de lo que va a
+ocurrir. Los paquetes listados no se encuentran instalados en el sistema
+pero lo estarán cuando APT finalice.
+</p>
+        </div>
+        <div class="section">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h3 class="title"><a id="s4.2.4"/>4.2.4. La lista de paquetes retenidos</h3>
+              </div>
+            </div>
+          </div>
+          <pre class="screen">
+Los siguientes paquetes se han retenido:
+  compface man-db tetex-base msql libpaper svgalib1
+  gs snmp arena lynx xpat2 groff xscreensaver
+</pre>
+          <p>
+Puede que al actualizar el sistema por completo no se puedan instalar
+versiones nuevas de paquetes porque requieren nuevos elementos que entran en
+conflicto con paquetes ya instalados. En este caso, el paquete aparecerá en
+la lista de paquetes retenidos. La mejor manera de instalar paquetes
+listados aquí es mediante <code class="literal">apt-get install</code> o mediante
+<span class="command"><strong>dselect</strong></span> para así resolver esos problemas.
+</p>
+        </div>
+        <div class="section">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h3 class="title"><a id="s4.2.5"/>4.2.5. Advertencia de paquetes retenidos</h3>
+              </div>
+            </div>
+          </div>
+          <pre class="screen">
+Se cambiarán los siguientes paquetes retenidos:
+  cvs
+</pre>
+          <p>
+Puede que a veces ordene a APT que instale un paquete retenido, en cuyo caso
+verá una advertencia de que el paquete retenido se va a modificar. Esto sólo
+debería ocurrir durante un «dist-upgrade» o un «install».
+</p>
+        </div>
+        <div class="section">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h3 class="title"><a id="s4.2.6"/>4.2.6. Resumen final</h3>
+              </div>
+            </div>
+          </div>
+          <p>
+Por último, APT mostrará un resumen de los cambios que se llevarán a cabo.
+</p>
+          <pre class="screen">
+206 paquetes actualizados, 8 se instalarán, 23 para eliminar y 51 no
+actualizados.
+12 paquetes no instalados del todo o eliminados.
+Se necesita descargar 65.7M/66.7M de archivos. Se usarán 26.5M después de desempaquetar.
+</pre>
+          <p>
+La primera línea del resumen es simplemente una versión reducida de todas
+las listas e incluye el número de actualizaciones, esto es, paquetes ya
+instalados y de los cuales existen versiones nuevas disponibles. La segunda
+línea indica el número de paquetes mal configurados, posiblemente el
+resultado de una instalación interrumpida. La última línea muestra los
+requerimientos de espacio para la instalación. El primer par de números
+indican el tamaño de los ficheros del archivo. El primer número indica el
+número de bytes que se tienen que obtener de ubicaciones remotas, y el
+segundo indica el tamaño total de todos los archivos requeridos. El
+siguiente número indica la diferencia de tamaño entre los paquetes
+instalados y los paquetes nuevos a instalar. Básicamente equivale al espacio
+requerido en «/usr» al finalizar el proceso. En caso de existir varios
+paquetes a eliminar el valor puede indicar la cantidad de espacio que se va
+a liberar.
+</p>
+          <p>
+Puede generar otros informes con la opción «-u» para mostrar los paquetes a
+actualizar, similar a los ejemplos anteriores.
+</p>
+        </div>
+      </div>
+      <div class="section">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h2 class="title"><a id="s4.3"/>4.3. La pantalla de estado</h2>
+            </div>
+          </div>
+        </div>
+        <p>
+APT muestra una serie de mensajes de estado en el transcurso de descargar
+ficheros de paquete y archivo.
+</p>
+        <pre class="screen">
+# apt-get update
+Des:1 http://ftp.de.debian.org/debian-non-US/ stable/non-US/ Packages
+Des:2 http://llug.sep.bnl.gov/debian/ testing/contrib Packages
+Obj http://llug.sep.bnl.gov/debian/ testing/main Packages
+Des:4 http://ftp.de.debian.org/debian-non-US/ unstable/binary-i386/ Packages
+es:5 http://llug.sep.bnl.gov/debian/ testing/non-free Packages
+11% [5 testing/non-free Esperando las cabeceras 0/32.1k 0%] 2203b/s 1m52s
+</pre>
+        <p>
+Las líneas comenzando con <span class="emphasis"><em>Des</em></span> aparecen cuando APT
+inicia la obtención de un fichero, mientras que la última línea indica el
+progreso de la descarga. El primer valor porcentual en la barra de progreso
+indica el porcentaje total de los ficheros ya
+descargados. Desafortunadamente, <code class="literal">apt-get update</code> desconoce
+el tamaño de los ficheros de paquete y por ello genera una estimación que
+puede ser inexacta.
+</p>
+        <p>
+La siguiente sección de la línea de estado se repite por cada instancia de
+descarga e indica la operación realizada, así como información útil relativa
+a lo que está pasando. Puede que esta sección sólo muestre
+<span class="emphasis"><em>Forking</em></span>, lo cual significa que el sistema operativo
+está cargando el módulo de descargas. La primera palabra después de «[» es
+el número de obtención tal y como se muestra en la línea del histórico. La
+siguiente palabra es la forma corta del nombre del objeto en descarga. Al
+conectarse con los archivos, contendrá el nombre del paquete obtenido.
+</p>
+        <p>
+Una cadena informativa aparecerá entre comillas simples indicando el
+progreso de la fase de negociación de la descarga. Generalmente progresa de
+<span class="emphasis"><em>Conectando</em></span> a <span class="emphasis"><em>Esperando fichero</em></span>,
+finalizando con <span class="emphasis"><em>Descargando</em></span> o
+<span class="emphasis"><em>Continuando</em></span>. El último valor es el número de bytes
+descargados desde el sitio remoto. Una vez que la descarga arranque se
+representará como <code class="literal">102/10.2k</code> indicando que ya se han
+obtenido 102 bytes y que se esperan 10.2 kilobytes. El tamaño total siempre
+aparece con la notación de la figura 4 para conservar espacio. A
+continuación aparece un medidor porcentual del fichero. El penúltimo
+elemento es la media instantánea de velocidad. Estos valores se actualizan
+cada 5 segundos y reflejan la tasa de descarga de datos de ese periodo. Por
+último puede ver el tiempo estimado para la transferencia. Esto se actualiza
+regularmente y refleja el tiempo restante para completar todo tal y como se
+ve en la tasa de transferencia visible.
+</p>
+        <p>
+La pantalla de estado se actualiza cada medio segundo para ofrecer una
+constante información del progreso de la descarga, mientras que las líneas
+«Des» se desplazan hacia atrás cuando se inicia la descarga de otro
+fichero. Ya que la pantalla de estado se actualiza constantemente carece de
+utilidad para su registro en un fichero. Puede usar la opción
+<code class="literal">-q</code> para omitir la pantalla de estado.
+</p>
+      </div>
+      <div class="section">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h2 class="title"><a id="s4.4"/>4.4. Dpkg</h2>
+            </div>
+          </div>
+        </div>
+        <p>
+APT usa <span class="command"><strong>dpkg</strong></span> para instalar ficheros, y pasará a
+interactuar con <span class="command"><strong>dpkg</strong></span> al finalizar la
+descarga. <span class="command"><strong>dpkg</strong></span> también planteará un número de preguntas a
+medida que procesa los paquetes, los cuales también pueden formular
+preguntas. A cada pregunta generalmente le precede una descripción de la
+pregunta en sí. Éstas son demasiado variadas como para poder tratarlas aquí
+en su totalidad.
+</p>
+      </div>
+      <div class="footnotes">
+        <br/>
+        <hr/>
+        <div id="ftn.idm107" class="footnote">
+          <p><a href="#idm107" class="para"><sup class="para">[2] </sup></a> El método <span class="command"><strong>dselect</strong></span> es en realidad un conjunto de scripts
+en torno a <span class="command"><strong>apt-get</strong></span>. En realidad, el método ofrece más
+funcionalidad que la presente en <span class="command"><strong>apt-get</strong></span> por si mismo. </p>
+        </div>
+        <div id="ftn.idm124" class="footnote">
+          <p><a href="#idm124" class="para"><sup class="para">[3] </sup></a> APT, de todas formas, considera todas las dependencias conocidas e intenta
+prevenir paquetes rotos </p>
+        </div>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr/>
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td align="left"><a accesskey="p" href="ch3.html">Anterior</a> </td>
+          <td align="center"> </td>
+          <td align="right"> </td>
+        </tr>
+        <tr>
+          <td align="left" valign="top">Capítulo 3. DSelect </td>
+          <td align="center">
+            <a accesskey="h" href="index.html">Inicio</a>
+          </td>
+          <td align="right" valign="top"> </td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

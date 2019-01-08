@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>第1章 全般</title>
+    <meta name="generator" content="DocBook XSL Stylesheets V1.79.1"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="home" href="index.html" title="APT ユーザガイド"/>
+    <link rel="up" href="index.html" title="APT ユーザガイド"/>
+    <link rel="prev" href="index.html" title="APT ユーザガイド"/>
+    <link rel="next" href="ch2.html" title="第2章 apt-get"/>
+  </head>
+  <body>
+    <div class="navheader">
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">第1章 全般</th>
+        </tr>
+        <tr>
+          <td align="left"><a accesskey="p" href="index.html">戻る</a> </td>
+          <th width="60%" align="center"> </th>
+          <td align="right"> <a accesskey="n" href="ch2.html">次へ</a></td>
+        </tr>
+      </table>
+      <hr/>
+    </div>
+    <div class="chapter">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h1 class="title"><a id="ch1"/>第1章 全般</h1>
+          </div>
+        </div>
+      </div>
+      <div class="toc">
+        <p>
+          <strong>目次</strong>
+        </p>
+        <dl class="toc">
+          <dt>
+            <span class="section">
+              <a href="ch1.html#s1.1">1.1. パッケージシステムの構造</a>
+            </span>
+          </dt>
+        </dl>
+      </div>
+      <p>
+APT パッケージは現在、APT <span class="command"><strong>dselect</strong></span> メソッドと <span class="command"><strong>apt-get</strong></span>
+コマンドラインユーザインターフェイスの2つを収録しています。両方ともインターネットから新しいパッケージをダウンロードするのと同様、パッケージをインストール、削除する方法を提供しています。
+</p>
+      <div class="section">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h2 class="title"><a id="s1.1"/>1.1. パッケージシステムの構造</h2>
+            </div>
+          </div>
+        </div>
+        <p>
+Debian
+パッケージシステムには各パッケージに関連する膨大な情報があり、システムに手際良く簡単に統合することを支援します。その最も重要な機能は依存システムです。
+</p>
+        <p>
+依存システムにより、システムにあるライブラリ等の共有要素を個々のプログラムを使えるようになります。簡単に言うと、プログラムのうちまれに利用される部分を別個のパッケージに配置して、平均的ユーザがインストールを必要とするものの数を減らします。また、メール転送エージェントや
+X サーバ等の選択ができるようにもなります。
+</p>
+        <p>
+依存システムの理解はまず単純な依存の概念を把握することから始まります。単純な依存というのは、あるパッケージが適切に機能するためには別のパッケージが同時にインストールされている必要があるということです。
+</p>
+        <p>
+例えば mailcrypt は emacs を拡張するプログラムで、GPG によるメールの暗号化を支援します。GPGP がインストールされていなければ
+mailcrypt は役に立たないので mailcrypt には GPG に単純に依存しています。また、これは emacs の拡張なので emacs
+に単純に依存し、emacs がないと何の役にも立ちません。
+</p>
+        <p>
+理解しておかないといけないもう一つの重要な依存に競合する依存があります。これはあるパッケージが別のパッケージと同時にインストールされていると機能せず、システムにとってひどく有害なこともあります。例として
+sendmail や exim、qmail
+等のメール転送エージェントで考えてみましょう。メール転送エージェントはどれもメールを受け取るのにネットワークを待ち受ける必要があるため、2つインストールすることは不可能です。複数インストールするとシステムに重大な被害を与える可能性があるため、メール転送エージェントはどれも他のあらゆるメール転送エージェントと競合依存となっています。
+</p>
+        <p>
+複雑な例としては、別のパッケージのように装うパッケージがあります。exim と sendmail
+について見てみると、その多くの目的は同一で、両方ともメールを配送し、一般的インターフェイスを解釈します。そこで、パッケージシステムにはどちらも
+mail-transport-agents だと宣言する方法があります。そうして exim と sendmail は両方とも
+mail-transport-agent を提供すると宣言し、他のメール転送エージェントを必要とするパッケージは
+mail-transport-agent に依存します。手作業によりパッケージを修正しようとしたときに多大な混乱が生まれる可能性があります。
+</p>
+        <p>
+既にインストールされている、あるいはされていないパッケージについて、1つの依存が生まれる可能性は常にあります。APT
+はインストールするパッケージの選択を支援する自動化でのアルゴリズムをいくつか提供することで依存問題の解決支援に努めます。
+</p>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr/>
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td align="left"><a accesskey="p" href="index.html">戻る</a> </td>
+          <td align="center"> </td>
+          <td align="right"> <a accesskey="n" href="ch2.html">次へ</a></td>
+        </tr>
+        <tr>
+          <td align="left" valign="top">APT ユーザガイド </td>
+          <td align="center">
+            <a accesskey="h" href="index.html">ホーム</a>
+          </td>
+          <td align="right" valign="top"> 第2章 apt-get</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

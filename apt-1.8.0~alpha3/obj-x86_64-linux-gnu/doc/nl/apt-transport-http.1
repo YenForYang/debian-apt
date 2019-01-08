@@ -1,0 +1,171 @@
+'\" t
+.\"     Title: apt-transport-http
+.\"    Author: APT-team
+.\" Generator: DocBook XSL Stylesheets v1.79.1 <http://docbook.sf.net/>
+.\"      Date: 11\ \&mei\ \&2018
+.\"    Manual: APT
+.\"    Source: APT 1.8.0~alpha3
+.\"  Language: Dutch
+.\"
+.TH "APT\-TRANSPORT\-HTTP" "1" "11\ \&mei\ \&2018" "APT 1.8.0~alpha3" "APT"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+apt-transport-http \- Transportmethode van APT voor het downloaden via het Hypertext Transfer Protocol (HTTP)
+.SH "OMSCHRIJVING"
+.PP
+Deze transportmethode van APT laat toe pakketbronnen te gebruiken die benaderd worden via het Hypertext Transfer Protocol (HTTP)\&. Ze is standaard beschikbaar en wellicht de meest gebruikte van alle transportmethodes\&. Merk op dat een transportmethode nooit rechtstreeks door een gebruiker aangesproken wordt, maar door APT\-gereedschap gebruikt wordt op basis van de gebruikersconfiguratie\&.
+.PP
+HTTP is een niet\-versleuteld transportprotocol, hetgeen betekent dat de volledige communicatie met de externe server (of de proxy) kan bekeken worden door een voldoende onderlegde aanvaller, die men gewoonlijk aanduidt met "man in the middle" (MITM \- persoon in het midden)\&. De aanvaller kan evenwel de communicatie
+\fIniet\fR
+be\(:invloeden om de beveiliging van uw systeem aan te tasten, vermits het databeveiligingsmodel dat toegepast wordt door APT, onafhankelijk van de gekozen transportmethode functioneert\&. Dit wordt gedetailleerd uitgelegd in
+\fBapt-secure\fR(8)\&. Een overzicht van beschikbare transportmethodes wordt in
+\fBsources.list\fR(5)
+gegeven\&.
+.SH "OPTIES"
+.PP
+In een
+\fBapt.conf\fR(5)\-bestand kunnen verschillende opties ingesteld worden om de werking aan te passen, gaande van proxy\-configuratie tot het omzeilen van specifieke serverbeperkingen\&.
+.SS "Proxyconfiguratie"
+.PP
+De omgevingsvariabele
+\fBhttp_proxy\fR
+wordt gebruikt voor de configuratie die op het hele systeem van toepassing is\&. Proxy\*(Aqs die specifiek zijn voor APT kunnen via de optie
+Acquire::http::Proxy
+geconfigureerd worden\&. Proxy\*(Aqs die enkel voor bepaalde computers gebruikt moeten worden, kunnen via
+Acquire::http::Proxy::\fIhost\fR
+opgegeven worden\&. Er kan zelfs nog een meer fijnmazige regeling bekomen worden via de automatische proxydetectie die verderop behandeld wordt\&. Al deze opties maken gebruik van de URI\-indeling
+\fImethode\fR://[[\fIgebruiker\fR][:\fIwachtwoord\fR]@]\fIcomputer\fR[:\fIpoort\fR]/\&. Ondersteunde URI\-methodes zijn
+socks5h
+(SOCKS5 met externe DNS\-opzoeking),
+http
+en
+https\&. Authenticatie\-informatie kan verstrekt worden via
+\fBapt_auth.conf\fR(5)
+in plaats van ze rechtstreeks op te nemen in de URI\&.
+.PP
+De onderscheiden configuratieopties van APT ondersteunen de bijzondere waarde
+DIRECT, hetgeen betekent dat geen proxy gebruikt mag worden\&. Voor hetzelfde doel wordt ook de omgevingsvariabele
+\fBno_proxy\fR
+ondersteund\&.
+.PP
+Daarenboven worden drie instellingen voorzien om HTTP/1\&.1\-compatibele proxy\-caches te beheren:
+Acquire::http::No\-Cache
+zegt de proxy om in geen geval gebruik te maken van het in zijn cache beschikbare antwoord\&.
+Acquire::http::Max\-Age
+stelt de maximaal toegelaten ouderdom (in seconden) in van een indexbestand in de cache van de proxy\&.
+Acquire::http::No\-Store
+geeft aan dat de proxy de opgevraagde archiefbestanden niet in zijn cache moet opslaan\&. Zo kan men voorkomen dat de cache van de proxy vervuild raakt met (grote) \&.deb\-bestanden\&.
+.SS "Automatische Proxyconfiguratie"
+.PP
+Acquire::http::Proxy\-Auto\-Detect
+kan gebruikt worden om een extern commando op te geven voor het vinden van de te gebruiken HTTP\-proxy\&. De eerste en enige parameter is een URI die aangeeft met welke computer contact gemaakt moet worden om computerspecifieke configuratie in aanmerking te nemen\&. APT verwacht dat het commando de proxy op de standaarduitvoer op \('e\('en enkele regel weergeeft volgens de eerder gespecificeerde URI\-indeling of anders het woord
+DIRECT
+in geval geen proxy gebruikt moet worden\&. Geen uitvoer geeft aan dat de generieke proxy\-instellingen gebruikt moeten worden\&.
+.PP
+Merk op dat geen autodetectie gebruikt zal worden voor een computer indien reeds een computerspecifieke proxyconfiguratie ingesteld werd via
+Acquire::http::Proxy::\fIcomputer\fR\&.
+.PP
+Raadpleeg de pakketten
+\fBsquid-deb-proxy-client\fR(1)
+en
+\fBauto-apt-proxy\fR(1)
+voor voorbeeldtoepassinggen\&.
+.PP
+Deze optie heeft voorrang op de verouderde optienaam
+Acquire::http::ProxyAutoDetect\&.
+.SS "Verbindingsconfiguratie"
+.PP
+De optie
+Acquire::http::Timeout
+stelt de tijdslimiet in die gehanteerd moet worden door de timer die door de methode gebruikt wordt\&. Deze waarde is zowel van toepassing op de tijdslimiet van de verbinding als op die van de data\-overdracht\&.
+.PP
+De gebruikte bandbreedte kan beperkt worden via
+Acquire::http::Dl\-Limit
+dat in gehele getallen uitgedrukte waarden in kilobytes per seconde accepteert\&. De standaardwaarde is 0 waardoor de limiet gedeactiveerd wordt en er geprobeerd wordt om alle beschikbare bandbreedte te gebruiken\&. Merk op dat deze optie impliciet het gelijktijdig downloaden vanaf meerdere servers uitschakelt\&.
+.PP
+De instelling
+Acquire::http::Pipeline\-Depth
+kan gebruikt worden om de pijplijnmethode van HTTP (RFC 2616 sectie 8\&.1\&.2\&.2) toe te passen\&. Die kan bijvoorbeeld nuttig zijn bij verbindingen met een hoge vertraging (high\-latency connections)\&. Ze definieert hoeveel verzoeken er in een pijplijn verzonden worden\&. APT tracht tijdens het uitvoeren van de bewerking webservers en proxy\*(Aqs die zich niet correct gedragen, te ontdekken en te omzeilen, maar als u weet dat de uwe niet conform de HTTP/1\&.1 specificatie is, kan het werken met een pijplijn uitgeschakeld worden door de waarde op 0 te zetten\&. Standaard is dit geactiveerd met de waarde 10\&.
+.PP
+Acquire::http::AllowRedirect
+regelt of APT eventuele omleidingen volgt\&. Standaard staat dit aan\&.
+.PP
+Acquire::http::User\-Agent
+kan gebruikt worden om voor User\-Agent een andere waarde in te stellen om bij de http\-downloadmethode te gebruiken\&. Sommige proxy\*(Aqs verlenen een cli\(:ent enkel toegang als die een gekende identificatie gebruikt\&.
+.PP
+Acquire::http::SendAccept
+is standaard geactiveerd en zendt een kopveld
+Accept: text/*
+naar de server voor verzoeken zonder bestandsextensie om te voorkomen dat de server content negotiation (inhoudsonderhandeling) zou proberen toe te passen\&.
+.SH "VOORBEELDEN"
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+Acquire::http {
+	Proxy::example\&.org "DIRECT";
+	Proxy "socks5h://apt:pass@127\&.0\&.0\&.1:9050";
+	Proxy\-Auto\-Detect "/usr/local/bin/apt\-http\-proxy\-auto\-detect";
+	No\-Cache "true";
+	Max\-Age "3600";
+	No\-Store "true";
+	Timeout "10";
+	Dl\-Limit "42";
+	Pipeline\-Depth "0";
+	AllowRedirect "false";
+	User\-Agent "Mijn APT\-HTTP";
+	SendAccept "false";
+};
+.fi
+.if n \{\
+.RE
+.\}
+.SH "ZIE OOK"
+.PP
+\fBapt.conf\fR(5)
+\fBapt_auth.conf\fR(5)
+\fBsources.list\fR(5)
+.SH "BUGS"
+.PP
+\m[blue]\fBAPT bugpagina\fR\m[]\&\s-2\u[1]\d\s+2\&. Indien u een bug in APT wilt rapporteren, raadpleeg dan
+/usr/share/doc/debian/bug\-reporting\&.txt
+of het
+\fBreportbug\fR(1)
+commando\&.
+.SH "VERTALING"
+.PP
+De Nederlandse vertaling werd in 2015 gemaakt door Frans Spiesschaert
+<Frans\&.Spiesschaert@yucom\&.be>, in samenwerking met het Debian Dutch l10n Team
+<debian\-l10n\-dutch@lists\&.debian\&.org>\&.
+.PP
+Merk op dat de vertaling van dit document nog onvertaalde delen kan bevatten\&. Dit is intentioneel om te vermijden dat inhoud verloren zou gaan door een vertaling die achterop loopt op het origineel\&.
+.SH "AUTEUR"
+.PP
+\fBAPT\-team\fR
+.RS 4
+.RE
+.SH "OPMERKINGEN"
+.IP " 1." 4
+APT bugpagina
+.RS 4
+\%http://bugs.debian.org/src:apt
+.RE

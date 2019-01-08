@@ -1,0 +1,426 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+  "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % aptent SYSTEM "apt.ent"> %aptent;
+<!ENTITY % aptverbatiment SYSTEM "apt-verbatim.ent"> %aptverbatiment;
+<!ENTITY % aptvendor SYSTEM "apt-vendor.ent"> %aptvendor;
+]>
+
+<refentry>
+
+ <refentryinfo>
+   <!-- The last update date -->
+&apt-author.jgunthorpe;
+   &apt-author.team;
+   &apt-email;
+   &apt-product;
+   
+   <date>2016-08-16T00:00:00Z</date>
+ </refentryinfo>
+ 
+ <refmeta>
+   <refentrytitle>apt-cache</refentrytitle>
+   <manvolnum>8</manvolnum>
+   <refmiscinfo class="manual">APT</refmiscinfo>
+ </refmeta>
+ 
+ 
+ <!-- Man page title -->
+<refnamediv>
+    <refname>apt-cache</refname>
+    <refpurpose>zoeken in de cache van APT</refpurpose>
+ </refnamediv>
+
+ &synopsis-command-apt-cache;
+
+ <refsect1><title>Omschrijving</title>
+    <para>
+       <command>apt-cache</command> voert verschillende operaties uit op de
+pakketcache van APT. <command>apt-cache</command> wijzigt de toestand van
+het systeem niet, maar voorziet in operaties die de metadata van een pakket
+doorzoeken en er interessante uitvoer mee genereren. De metadata worden
+verkregen en bijgewerkt via het commando 'update' van bijvoorbeeld
+<command>apt-get</command>, waardoor ze verouderd kunnen zijn als de laatste
+update te lang geleden is. Maar daartegenover staat dat de werking van
+<command>apt-cache</command> niet afhankelijk is van de beschikbaarheid van
+de geconfigureerde pakketbronnen (bijv. offline).
+    </para>
+
+   <para>Tenzij de optie <option>-h</option>, of <option>--help</option> opgegeven
+werd, moet een van de onderstaande commando's gebruikt worden.</para>
+
+   <variablelist>
+     <varlistentry><term><option>gencaches</option></term>
+     <listitem><para><literal>gencaches</literal> maakt de pakketcache van APT aan. Als die
+ontbreekt of verouderd is, wordt dit commando impliciet uitgevoerd door alle
+commando's die deze cache nodig hebben.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>showpkg</option> <option><replaceable>&synopsis-pkg;</replaceable>…</option></term>
+     <listitem><para><literal>showpkg</literal> geeft informatie weer over de aan de
+commandoregel opgesomde pakketten. De overige argumenten zijn
+pakketnamen. De beschikbare versies en achterwaartse vereisten van ieder
+opgesomd pakket worden weergegeven, evenals de voorwaartse vereisten voor
+elke versie. Voorwaartse (normaal) vereisten zijn die pakketten waarvan het
+pakket in kwestie afhankelijk is. Achterwaartse vereisten zijn die pakketten
+die afhankelijk zijn van het pakket in kwestie. Dus, aan de voorwaartse
+vereisten van een pakket moet voldaan worden, aan de achterwaartse vereisten
+niet. Bijvoorbeeld, <command>apt-cache showpkg libreadline2</command> zal
+uitvoer genereren in de zin van:</para>
+     
+<informalexample><programlisting>
+Package: libreadline2
+Versions: 2.1-12(/var/state/apt/lists/foo_Packages),
+Reverse Depends: 
+  libreadlineg2,libreadline2
+  libreadline2-altdev,libreadline2
+Dependencies:
+2.1-12 - libc5 (2 5.4.0-0) ncurses3.0 (0 (null))
+Provides:
+2.1-12 - 
+Reverse Provides: 
+</programlisting></informalexample>
+			    
+     <para>Hier is dus te zien dat libreadline2, versie 2.1-12, afhankelijk is van
+libc5 en ncurses3.0 die geïnstalleerd moeten zijn opdat libreadline2 zou
+werken. Op hun beurt zijn libreadlineg2 en libreadline2-altdev afhankelijk
+van libreadline2. Indien libreadline2 geïnstalleerd wordt, moeten ook libc5
+en ncurses3.0 (en ldso) geïnstalleerd zijn; libreadlineg2 en
+libreadline2-altdev moeten niet geïnstalleerd worden. Om de exacte betekenis
+van de rest van de uitvoer te kennen, raadpleegt u best de broncode van apt.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>stats</option></term><listitem><para><literal>stats</literal> geeft enkele statistieken weer over de cache. Er
+worden geen andere argumenten verwacht. De weergegeven statistieken zijn:
+     <itemizedlist>
+       <listitem><para><literal>Total package names</literal> is het aantal pakketnamen dat in de
+cache gevonden werd.</para>
+       </listitem>
+       
+       <listitem><para><literal>Normal packages</literal> is het aantal reguliere, gewone
+pakketnamen; dit zijn pakketten met een één-op-één relatie tussen hun naam
+en de naam waarmee andere pakketten naar hen verwijzen om een vereiste aan
+te geven. De meerderheid van de pakketten valt in deze categorie.</para>
+       </listitem>
+
+       <listitem><para><literal>Pure virtual packages</literal> is het aantal pakketten dat enkel
+bestaat als een virtuele pakketnaam. Dit houdt in dat pakketten enkel
+"voorzien in" de virtuele pakketnaam en dat geen enkel pakket echt die naam
+gebruikt. Bijvoorbeeld, "mail-transport-agent" is in het Debian systeem een
+zuiver virtueel pakket. Verschillende pakketten voorzien in
+"mail-transport-agent", maar er is geen enkel pakket dat de naam
+"mail-transport-agent" draagt.</para>
+       </listitem>
+   
+       <listitem><para><literal>Single virtual packages</literal> is het aantal virtuele pakketten
+waarvoor slechts een pakket in dat specifieke virtuele pakket voorziet. In
+het Debian systeem is bijvoorbeeld "X11-text-viewer" een virtueel pakket,
+maar slechts een pakket, xless, voorziet in "X11-text-viewer".</para>
+       </listitem>
+
+       <listitem><para><literal>Mixed virtual packages</literal> is het aantal pakketten dat ofwel
+voorziet in een specifiek virtueel pakket of als pakketnaam de naam van het
+virtueel pakket draagt. In het Debian systeem is "debconf" bijvoorbeeld
+tegelijk een echt pakket en tevens wordt er in voorzien door het pakket
+debconf-tiny.</para>
+       </listitem>
+   
+       <listitem><para><literal>Missing</literal> is het aantal pakketnamen waarnaar verwezen wordt
+in een vereiste, maar waarin door geen enkel pakket voorzien
+wordt. Ontbrekende pakketten kunnen opduiken wanneer men geen toegang heeft
+tot een volledige distributie of indien een pakket (reëel of virtueel)
+verwijderd werd uit de distributie. Gewoonlijk wordt ernaar verwezen in een
+Conflicts of een Breaks declaratie.</para>
+       </listitem>
+
+       <listitem><para><literal>Total distinct</literal> versies is het aantal pakketversies dat in
+de cache aangetroffen wordt. Indien er gebruik gemaakt wordt van meer dan
+een distributie (bijvoorbeeld "stable" en "unstable"), dan kan deze waarde
+aanzienlijk groter zijn dan het totale aantal pakketnamen.</para>
+       </listitem>
+
+       <listitem><para><literal>Total dependencies</literal> is het totaal aantal vereistenrelaties
+die alle pakketten die zich in de cache bevinden, samen opvragen.</para>
+       </listitem>
+     </itemizedlist>
+     </para></listitem>
+     </varlistentry>
+     
+     <varlistentry><term><option>showsrc</option> <option><replaceable>&synopsis-pkg;</replaceable>…</option></term>
+     <listitem><para><literal>showsrc</literal> geeft alle fiches van bronpakketten weer die
+overeenkomen met de opgegeven pakketnamen. Alle versies worden weergegeven
+evenals alle fiches van binaire pakketten die met de naam
+overeenkomen. Gebruik <option>--only-source</option> om louter bronpakketten
+weer te geven.
+     </para></listitem>
+     </varlistentry>
+     
+     <varlistentry><term><option>dump</option></term>
+     <listitem><para><literal>dump</literal> geeft een beknopte lijst weer van alle pakketten uit
+de cache. Dit is in de eerste plaats bedoeld om te debuggen.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>dumpavail</option></term>
+     <listitem><para><literal>dumpavail</literal> geeft op stdout een lijst van beschikbare
+pakketten weer. Dit is geschikt om gebruikt te worden met &dpkg; en ook de
+meethode &dselect; maakt er gebruik van.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>unmet</option></term>
+     <listitem><para><literal>unmet</literal> geeft een samenvatting van alle vereisten waaraan
+in de pakketcache niet voldaan wordt.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>show</option> <option><replaceable>&synopsis-pkg;</replaceable>…</option></term>
+     <listitem><para><literal>show</literal> vervult een functie die vergelijkbaar is met
+<command>dpkg --print-avail</command>. Het geeft de pakketsteekkaarten weer
+van de genoemde pakketten.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>search</option> <option><replaceable>&synopsis-regex;</replaceable>…</option></term>
+     <listitem><para><literal>search</literal> doorzoekt de volledige inhoud van alle beschikbare
+pakketlijsten aan de hand van de opgegeven POSIX reguliere expressie; zie
+&regex;. Het zoekt in de pakketnamen en de beschrijvingen of de reguliere
+expressie erin aangetroffen wordt en geeft de pakketnaam en de beknopte
+beschrijving weer, met inbegrip van de pakketnamen van virtuele
+pakketten. Indien <option>--full</option> opgegeven werd, dan wordt voor elk
+overeenkomstig pakket een uitvoer geproduceerd die identiek is aan die van
+<literal>show</literal>. En indien <option>--names-only</option> werd
+opgegeven, dan wordt niet in de uitgebreide omschrijving gezocht, maar wordt
+enkel de pakketnaam en de pakketten waarin voorzien wordt doorzocht.</para>
+     <para>
+     Men kan afzonderlijke argumenten opgeven om verschillende zoekpatronen te
+specificeren, waarop dan een logische en toegepast wordt.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>depends</option> <option><replaceable>&synopsis-pkg;</replaceable>…</option></term>
+     <listitem><para><literal>depends</literal> geeft een lijst weer van alle vereisten van een
+pakket en alle mogelijke andere pakketten die aan deze vereisten tegemoet
+kunnen komen.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>rdepends</option> <option><replaceable>&synopsis-pkg;</replaceable>…</option></term>
+     <listitem><para><literal>rdepends</literal> geeft de lijst van alle achterwaartse vereisten
+van een pakket weer.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>pkgnames</option> <optional><replaceable>&synopsis-prefix;</replaceable></optional></term>
+     <listitem><para>Dit commando geeft de naam weer van elk pakket dat door APT gekend is. Een
+prefix om de lijst van pakketnamen te filteren kan als optioneel argument
+gegeven worden. De uitvoer is geschikt om gebruikt te worden met de
+shell-functie Tab-aanvulling en ze wordt extreem snel gegenereerd. Dit
+commando wordt best gebruikt met de optie <option>--generate</option>.</para>
+     <para>Merk op dat een pakket waarvan APT weet heeft niet noodzakelijk gedownload
+of geïnstalleerd kan worden of geïnstalleerd is. Virtuele pakketten worden
+bijvoorbeeld ook opgenomen in de gegenereerde lijst.
+     </para></listitem>
+     </varlistentry>
+     
+     <varlistentry><term><option>dotty</option> <option><replaceable>&synopsis-pkg;</replaceable>…</option></term>
+     <listitem><para><literal>dotty</literal> pikt op de commandoregel een lijst pakketten op en
+genereert uitvoer die geschikt is om gebruikt te worden door dotty uit het
+pakket <ulink
+url="http://www.research.att.com/sw/tools/graphviz/">GraphViz</ulink>. Het
+resultaat is een geheel van knooppunten en gebogen lijnen die de relaties
+tussen pakketten voorstellen. Standaard trekken de als argument opgegeven
+pakketten al hun vereisten na, hetgeen een zeer uitgebreide grafiek kan
+opleveren. Om de uitvoer te beperken tot die pakketten die expliciet
+opgegeven werden aan de commandoregel, stelt men de optie
+<literal>APT::Cache::GivenOnly</literal> in.</para>
+
+     <para>De knooppunten in het weergegeven resultaat kunnen verschillende vormen
+aannemen: gewone pakketten worden als een vierkant voorgesteld, zuivere
+virtuele pakketten als een driehoek, gemengde virtuele pakketten als
+diamanten en ontbrekende pakketten als een zeshoek. Een vierkant met een
+oranje kleur stelt het einde van een recursiviteit voor (leaf package -
+eindpakket). Blauwe lijnen stellen een voorafgaandelijke vereiste voor en
+groene lijnen symboliseren conflicten.</para>
+
+     <para>Opgelet, dotty kan geen grafiek maken van een uitgebreide set pakketten.</para></listitem>
+     </varlistentry>
+     
+     <varlistentry><term><option>xvcg</option> <option><replaceable>&synopsis-pkg;</replaceable>…</option></term>
+	 <listitem><para>Hetzelfde als <literal>dotty</literal>, maar dan voor xvcg uit het <ulink
+url="http://rw4.cs.uni-sb.de/users/sander/html/gsvcg1.html">VCG
+gereedschap</ulink>.
+	 </para></listitem></varlistentry>
+
+	 <varlistentry><term><option>policy</option> <optional><replaceable>&synopsis-pkg;</replaceable>…</optional></term>
+     <listitem><para><literal>policy</literal> is bedoeld om te helpen bij het debuggen van
+problemen die verband houden met het bestand preferences. Zonder argumenten
+zal het de prioriteiten van elke pakketbron weergeven. Anders zal het voor
+het opgegeven pakket gedetailleerde informatie over de prioriteitskeuze
+weergeven.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>madison</option> <option><replaceable>&synopsis-pkg;</replaceable>…</option></term>
+     <listitem><para>Het commando <literal>madison</literal> van <literal>apt-cache</literal>
+tracht het uitvoerformaat en een deel van de functionaliteit na te bootsen
+van <literal>madison</literal>, het Debian gereedschap voor
+archiefbeheer. Het geeft de beschikbare versies van een pakket weer in een
+tabelformaat. In tegenstelling tot het originele <literal>madison</literal>,
+kan het enkel informatie weergeven betreffende de architectuur waarvoor APT
+pakketlijsten opgehaald heeft (<literal>APT::Architecture</literal>).</para></listitem>
+     </varlistentry>
+   </variablelist>
+ </refsect1>
+ 
+ <refsect1><title>opties</title>
+   &apt-cmdblurb;
+   
+   <variablelist>
+     <varlistentry><term><option>-p</option></term><term><option>--pkg-cache</option></term>
+     <listitem><para>Het bestand waarin de pakketcache opgeslagen wordt kiezen. De pakketcache is
+de primaire cache die door alle operaties aangesproken
+wordt. Configuratie-item: <literal>Dir::Cache::pkgcache</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>-s</option></term><term><option>--src-cache</option></term>
+     <listitem><para>Het bestand kiezen waarin de broncache opgeslagen wordt. Deze broncache
+wordt enkel door <literal>gencaches</literal> gebruikt en het bevat een
+verwerkte versie van de pakketinformatie afkomstig van externe
+bronnen. Wanneer de pakketcache opgebouwd wordt, wordt gebruik gemaakt van
+de broncache om te vermijden dat alle pakketbestanden opnieuw verwerkt
+moeten worden. Configuratie-item:
+<literal>Dir::Cache::srcpkgcache</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>-q</option></term><term><option>--quiet</option></term>
+     <listitem><para>Stille modus. Door het weglaten van voortgangsindicatoren genereert het
+uitvoer die geschikt is voor logbestanden. Meer q's, met een maximum van 2,
+leveren een hogere mate van beknopte uitvoer op. U kunt ook
+<option>-q=#</option> gebruiken om de mate van gereduceerde uitvoer in te
+stellen en zo de instelling uit het configuratiebestand
+overschrijven. Configuratie-item: <literal>quiet</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>-i</option></term><term><option>--important</option></term>
+     <listitem><para>Enkel belangrijke vereisten weergeven. Is bedoeld voor gebruik met
+<literal>unmet</literal> en <literal>depends</literal>. Maakt dat enkel de
+relaties Depends en Pre-Depends weergegeven worden. Configuratie-item:
+<literal>APT::Cache::Important</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>--no-pre-depends</option></term>
+		   <term><option>--no-depends</option></term>
+		   <term><option>--no-recommends</option></term>
+		   <term><option>--no-suggests</option></term>
+		   <term><option>--no-conflicts</option></term>
+		   <term><option>--no-breaks</option></term>
+		   <term><option>--no-replaces</option></term>
+		   <term><option>--no-enhances</option></term>
+		   <listitem><para>Standaard geven de opdrachten <literal>depends</literal> en
+<literal>rdepends</literal> alle vereisten weer. Met deze opties kan dit
+aangepast worden, waardoor het opgegeven vereistentype weggelaten
+wordt. Configuratie-item:
+<literal>APT::Cache::Show<replaceable>DependencyType</replaceable></literal>,
+bijvoorbeeld <literal>APT::Cache::ShowRecommends</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>--implicit</option></term>
+	<listitem><para>Standaard geven <literal>depends</literal> en <literal>rdepends</literal>
+enkel die vereisten weer die expliciet in de metadata vermeld worden. Met
+deze optie worden ook vereisten getoond die impliciet toegevoegd worden op
+basis van de gevonden gegevens. Bijvoorbeeld een <literal>Conflicts:
+foo</literal> houdt impliciet in dat dit pakket ook tegenstrijdig is met het
+pakket foo uit om het even welke andere architectuur. Configuratie-item:
+<literal>APT::Cache::ShowImplicit</literal>.
+	</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>-f</option></term><term><option>--full</option></term>
+     <listitem><para>Bij zoekbewerkingen de volledige steekkaart van pakketten
+weergeven. Configuratie-item: <literal>APT::Cache::ShowFull</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>-a</option></term><term><option>--all-versions</option></term>
+     <listitem><para>De volledige steekkaart van alle beschikbare versies weergeven. Dit is de
+standaard. Om dit uit te schakelen moet u <option>--no-all-versions</option>
+gebruiken. Indien <option>--no-all-versions</option> werd opgegeven, zal
+enkel de informatie over het pakket dat kandidaat voor installatie is,
+getoond worden. Deze optie is enkel op het commando <literal>show</literal>
+van toepassing. Configuratie-item:
+<literal>APT::Cache::AllVersions</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>-g</option></term><term><option>--generate</option></term>
+     <listitem><para>Automatisch een nieuwe pakketcache genereren, eerder dan de bestaande
+pakketcache te gebruiken. Dit is de standaard. Om dit uit te schakelen moet
+u <option>--no-generate</option> gebruiken. Configuratie-item:
+<literal>APT::Cache::Generate</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>--names-only</option></term><term><option>-n</option></term>
+     <listitem><para>Enkel zoeken in de pakketnamen en in de pakketnamen waarin voorzien wordt en
+niet in de uitgebreide beschrijvingen. Configuratie-item:
+<literal>APT::Cache::NamesOnly</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>--all-names</option></term>
+     <listitem><para><literal>pkgnames</literal> alle namen laten weergeven, inclusief virtuele
+pakketten en ontbrekende vereisten. Configuratie-item:
+<literal>APT::Cache::AllNames</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>--recurse</option></term>
+     <listitem><para><literal>depends</literal> en <literal>rdepends</literal> recursief laten
+werken, zodat alle vermelde pakketten eenmaal weergegeven
+worden. Configuratie-item: <literal>APT::Cache::RecurseDepends</literal>.</para></listitem>
+     </varlistentry>
+
+      <varlistentry><term><option>--installed</option></term>
+      <listitem><para>
+      De uitvoer van <literal>depends</literal> en <literal>rdepends</literal>
+beperken tot pakketten die momenteel geïnstalleerd zijn. Configuratie-item:
+<literal>APT::Cache::Installed</literal>.</para></listitem>
+      </varlistentry>
+
+      <varlistentry><term><option>--with-source</option> <option>&synopsis-param-filename;</option></term>
+      <listitem><para>
+      Voegt het opgegeven bestand toe als een bron voor metadata. Kan herhaald
+worden om meerdere bestanden toe te voegen. Momenteel worden de bestanden
+<literal>*.deb</literal>, <literal>*.dsc</literal>,
+<literal>*.changes</literal>, <literal>Sources</literal> en
+<literal>Packages</literal> ondersteund evenals mappen van
+broncodepakketten. Overeenstemmende bestanden worden enkel op basis van hun
+naam gevonden, niet op basis van hun inhoud!</para>
+      <para>Bestanden <literal>Sources</literal> en <literal>Packages</literal> mogen
+gecomprimeerd worden in elk formaat dat door apt ondersteund wordt, zolang
+ze de correcte extensie hebben. Indien u in één map meerdere van deze
+bestanden moet opslaan, kunt u aan de naam een voorvoegsel naar keuze
+toevoegen met als laatste letter een liggend streepje
+("<literal>_</literal>"). Bijvoorbeeld: mijn.voorbeeld_Packages.xz</para>
+      <para>Merk op dat deze bronnen beschouwd worden als te vertrouwen (zie
+&apt-secure;).  Configuratie-item: <literal>APT::Sources::With</literal>.</para></listitem>
+      </varlistentry>
+
+     &apt-commonoptions;
+     
+   </variablelist>
+ </refsect1>
+
+ <refsect1><title>Bestanden</title>
+   <variablelist>
+     &file-sourceslist;
+     &file-statelists;
+   </variablelist>
+ </refsect1>
+
+ <refsect1><title>Zie ook</title>
+   <para>&apt-conf;, &sources-list;, &apt-get;
+   </para>
+ </refsect1>
+
+ <refsect1><title>Diagnostiek</title>
+   <para><command>apt-cache</command> geeft de terugkeerwaarde nul bij een normaal
+verlopen operatie, het decimaal getal 100 in geval van een fout.
+   </para>
+ </refsect1>
+
+ &manbugs;
+ 
+ <refsect1><title>&translation-title;</title>
+   <para>&translation-holder;</para>
+   <para>&translation-english;</para>
+ </refsect1>
+</refentry>

@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+  "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % aptent SYSTEM "apt.ent"> %aptent;
+<!ENTITY % aptverbatiment SYSTEM "apt-verbatim.ent"> %aptverbatiment;
+<!ENTITY % aptvendor SYSTEM "apt-vendor.ent"> %aptvendor;
+]>
+
+<refentry>
+
+ <refentryinfo>
+   <!-- The last update date -->
+&apt-author.team;
+   &apt-email;
+   &apt-product;
+   
+   <date>2015-10-20T00:00:00Z</date>
+ </refentryinfo>
+ 
+ <refmeta>
+   <refentrytitle>apt</refentrytitle>
+   <manvolnum>8</manvolnum>
+   <refmiscinfo class="manual">APT</refmiscinfo>
+ </refmeta>
+ 
+ 
+ <!-- Man page title -->
+<refnamediv>
+    <refname>apt</refname>
+    <refpurpose>interfaccia a riga di comando</refpurpose>
+ </refnamediv>
+
+ &synopsis-command-apt;
+
+ <refsect1><title>Descrizione</title>
+   <para><command>apt</command> fornisce un'interfaccia a riga di comando di alto
+livello per il sistema di gestione dei pacchetti. È pensata come interfaccia
+per l'utente finale e permette in modo predefinito alcune opzioni più adatte
+per l'uso interattivo rispetto a strumenti APT più specializzati come
+&apt-get; e &apt-cache;.
+   </para><para>
+   Proprio come <command>apt</command> stesso, la sua pagina di manuale è
+pensata come interfaccia per l'utente finale e, pertanto, menziona solamente
+i comandi e le opzioni più utilizzati, in parte per non duplicare le
+informazioni in più posti e in parte per evitare di travolgere i lettori con
+una valanga di opzioni e dettagli.
+   </para>
+
+   <variablelist>
+     <varlistentry><term><option>update</option> (&apt-get;)</term>
+     <listitem><para><option>update</option> viene usato per scaricare le informazioni sui
+pacchetti da tutte le fonti configurate. Altri comandi operano su questi
+dati, ad esempio per effettuare gli aggiornamenti dei pacchetti o per
+cercare e visualizzare i dettagli su tutti i pacchetti disponibili per
+l'installazione.
+     </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>upgrade</option> (&apt-get;)</term>
+     <listitem><para><option>upgrade</option> viene usato per installare gli aggiornamenti
+disponibili per tutti i pacchetti attualmente installati nel sistema
+prendendoli dalle fonti configurate attraverso &sources-list;. Nuovi
+pacchetti verranno installati se necessari per soddisfare le dipendenze, ma
+quelli esistenti non saranno mai rimossi. Se l'aggiornamento di un pacchetto
+richiede la rimozione di un pacchetto installato, l'aggiornamento di tale
+pacchetto non viene effettuato.
+     </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>full-upgrade</option> (&apt-get;)</term>
+     <listitem><para><literal>full-upgrade</literal> effettua la funzione di aggiornamento ma
+rimuove i pacchetti attualmente installati se ciò è necessario per
+aggiornare il sistema nel suo complesso.
+     </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>install</option>, <option>remove</option>, <option>purge</option> (&apt-get;)</term>
+     <listitem><para>Effettua l'azione richiesta su uno o più pacchetti specificati attraverso
+&regex;, &glob; o una corrispondenza esatta. L'azione richiesta può essere
+modificata per pacchetti specifici aggiungendo un segno più (+) al nome di
+un pacchetto per installarlo o un segno meno (-) per rimuoverlo.
+     </para><para>
+	   È possibile selezionare una versione specifica di un pacchetto per
+l'installazione scrivendo dopo il nome del pacchetto un segno di uguale (=)
+e la versione del pacchetto da selezionare. In alternativa può essere
+selezionata la versione da un rilascio specifico scrivendo dopo il nome del
+pacchetto una sbarra («/») e il nome in codice (&debian-stable-codename;,
+&debian-testing-codename;, sid …) o il nome della suite (stable, testing,
+unstable). Se necessarie per soddisfare la richiesta, anche le dipendenze
+del pacchetto in oggetto saranno selezionate da questo rilascio.
+     </para><para>
+	   La rimozione di un pacchetto rimuove tutti i dati pacchettizzati, ma
+solitamente lascia piccoli file di configurazione utente (modificati), nel
+caso la rimozione sia avvenuta per errore. In questo caso basta una
+richiesta di installazione del pacchetto rimosso per sbaglio per
+ripristinare il suo funzionamento come era prima. D'altro canto ci si può
+sbarazzare di questi avanzi di file chiamando <command>purge</command> anche
+sui pacchetti già rimossi. Notare che ciò non ha effetto sui dati o le
+configurazioni memorizzate nelle directory personali degli utenti.
+     </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>autoremove</option> (&apt-get;)</term>
+     <listitem><para>
+	   <literal>autoremove</literal> viene usato per rimuovere i pacchetti che sono
+stati installati automaticamente per soddisfare delle dipendenze per altri
+pacchetti e che non sono più necessari perché le dipendenze sono cambiate o
+perché i pacchetti che li richiedevano sono stati nel frattempo rimossi.
+     </para><para>
+	   Si dovrebbe controllare che la l'elenco non includa applicazioni che sono
+nel frattempo diventate desiderate, anche se sono state inizialmente
+installate solo come dipendenze di un altro  pacchetto. Si possono marcare
+tali pacchetti come installati manualmente usando &apt-mark;. Anche i
+pacchetti che sono stati esplicitamente installati con
+<command>install</command> non vengono mai proposti per la rimozione
+automatica.
+     </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>search</option> (&apt-cache;)</term>
+     <listitem><para><option>search</option> può essere usato per cercare daterminati termini
+&regex; nell'elenco dei pacchetti disponibili e per visualizzare le
+corrispondenze. Ciò è ad esempio utile se si stanno cercando pacchetti con
+una specifica funzionalità. Per cercare un pacchetto che contiene un file
+specifico provare &apt-file;.
+     </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>show</option> (&apt-cache;)</term>
+     <listitem><para>Mostra informazioni sui pacchetti specificati, incluse le loro dipendenze,
+le dimensioni di installazione e scaricamento, le fonti da cui sono
+disponibili, le descrizioni del contenuto dei pacchetti e molto altro. Può
+ad esempio essere utile per vedere tutte queste informazioni prima di
+permettere ad &apt; di rimuovere un pacchetto o quando si cercano nuovi
+pacchetti da installare.
+     </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>list</option> (lavoro-in-corso)</term>
+     <listitem><para><option>list</option> è in qualche modo simile a <command>dpkg-query
+--list</command>, nel senso che può visualizzare un elenco di pacchetti che
+soddisfano determinati criteri. Supporta l'uso di modelli &glob; per le
+corrispondenze con i nomi dei pacchetti, così come opzioni per elencare le
+versioni installate (<option>--installed</option>), aggiornabili
+(<option>--upgradeable</option>) o disponibili
+(<option>--all-versions</option>).
+     </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>edit-sources</option> (lavoro-in-corso)</term>
+     <listitem><para><literal>edit-sources</literal> permette di modificare i propri file
+&sources-list; nell'editor di testo preferito e fornisce controlli di sanità
+di base.
+     </para></listitem>
+     </varlistentry>
+
+
+   </variablelist>
+ </refsect1>
+
+ <refsect1><title>Uso di script e differenze rispetto ad altri strumenti APT</title>
+  <para>
+   La riga di comando di &apt; è progettata come strumento per l'utente finale
+e il suo comportamento può cambiare da una versione ad un'altra. Sebbene si
+cerchi di non rompere la compatibilità all'indietro, questa però non è
+garantita se una modifica sembra utile per l'uso interattivo.
+  </para><para>
+   Tutte le funzionalità di &apt; sono anche disponibili in strumenti APT
+dedicati come &apt-get; e &apt-cache;. &apt; cambia solamente il valore
+predefinito di alcune opzioni (vedere &apt-conf; e in particolare la sezione
+Binary). Perciò si raccomanda di preferire l'uso di questi comandi
+(potenzialmente con abilitate alcune opzioni aggiuntive) negli script, dato
+che essi mantengono il più possibile la compatibilità all'indietro.
+   </para>
+ </refsect1>
+
+ <refsect1><title>Vedere anche</title>
+   <para>&apt-get;, &apt-cache;, &sources-list;, &apt-conf;, &apt-config;, la Guida
+dell'utente di APT in &guidesdir;, &apt-preferences;, l'APT Howto.</para>
+ </refsect1>
+
+ <refsect1><title>Diagnostica</title>
+   <para><command>apt</command> restituisce zero in caso di funzionamento normale e
+il valore decimale 100 in caso di errore.</para>
+ </refsect1>
+ &manbugs;
+ <refsect1><title>&translation-title;</title>
+   <para>&translation-holder;</para>
+   <para>&translation-english;</para>
+ </refsect1>
+</refentry>

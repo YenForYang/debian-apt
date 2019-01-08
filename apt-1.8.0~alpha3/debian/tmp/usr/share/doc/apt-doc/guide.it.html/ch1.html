@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Capitolo 1. Descrizione generale</title>
+    <meta name="generator" content="DocBook XSL Stylesheets V1.79.1"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="home" href="index.html" title="Guida dell'utente di APT"/>
+    <link rel="up" href="index.html" title="Guida dell'utente di APT"/>
+    <link rel="prev" href="index.html" title="Guida dell'utente di APT"/>
+    <link rel="next" href="ch2.html" title="Capitolo 2. apt-get"/>
+  </head>
+  <body>
+    <div class="navheader">
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Capitolo 1. Descrizione generale</th>
+        </tr>
+        <tr>
+          <td align="left"><a accesskey="p" href="index.html">Indietro</a> </td>
+          <th width="60%" align="center"> </th>
+          <td align="right"> <a accesskey="n" href="ch2.html">Avanti</a></td>
+        </tr>
+      </table>
+      <hr/>
+    </div>
+    <div class="chapter">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h1 class="title"><a id="ch1"/>Capitolo 1. Descrizione generale</h1>
+          </div>
+        </div>
+      </div>
+      <div class="toc">
+        <p>
+          <strong>Indice</strong>
+        </p>
+        <dl class="toc">
+          <dt>
+            <span class="section">
+              <a href="ch1.html#s1.1">1.1. Anatomia del sistema dei pacchetti</a>
+            </span>
+          </dt>
+        </dl>
+      </div>
+      <p>
+Il pacchetto APT al momento contiene due sezioni, il metodo APT per
+<span class="command"><strong>dselect</strong></span> e l'interfaccia utente a riga di comando
+<span class="command"><strong>apt-get</strong></span>; entrambi forniscono un modo per installare e
+rimuovere pacchetti, così come per scaricarne di nuovi da Internet.
+</p>
+      <div class="section">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h2 class="title"><a id="s1.1"/>1.1. Anatomia del sistema dei pacchetti</h2>
+            </div>
+          </div>
+        </div>
+        <p>
+Il sistema dei pacchetti di Debian contiene un gran numero di informazioni
+associate a ciascun pacchetto, per garantire che si integri facilmente ed in
+maniera pulita nel sistema. La sua caratteristica più importante è il
+sistema di dipendenze.
+</p>
+        <p>
+Il sistema di dipendenze permette ai singoli programmi di fare uso degli
+elementi condivisi del sistema, quali le librerie. Semplifica l'inserimento
+delle porzioni di un programma usate raramente in pacchetti separati per
+ridurre il numero di cose che l'utente medio deve installare. Inoltre, rende
+possibile avere più di una scelta per cose quali i programmi di
+trasferimento della posta elettronica, i server X e così via.
+</p>
+        <p>
+Il primo passo per capire il sistema di dipendenze è la comprensione del
+concetto di dipendenza semplice: un pacchetto richiede che un altro sia
+installato insieme ad esso per poter funzionare.
+</p>
+        <p>
+Ad esempio, mailcrypt è un'estensione di emacs che aiuta a cifrare i
+messaggi di posta elettronica GPG. Se GPG non è installato, mailcrypt è
+inutile, quindi mailcrypt ha una dipendenza semplice da GPG. Inoltre, dato
+che si tratta di un'estensione di emacs, mailcrypt ha anche una dipendenza
+semplice da emacs, senza il quale è totalmente inutile.
+</p>
+        <p>
+L'altro tipo di dipendenza importante da capire è la dipendenza di
+conflitto; significa che un pacchetto, quando è installato insieme ad un
+altro, non funziona e potrebbe potenzialmente causare seri danni al
+sistema. Come esempio, si consideri un programma di trasporto della posta,
+quale sendmail, exim o qmail: non è possibile averne installati due
+contemporaneamente, perché entrambi hanno bisogno di restare in ascolto
+sulla rete per ricevere la posta. Tentare di installarne due danneggerebbe
+seriamente il sistema, quindi ciascun programma di trasporto della posta ha
+una dipendenza di conflitto verso tutti gli altri.
+</p>
+        <p>
+Come ulteriore complicazione, c'è la possibilità per un pacchetto di far
+finta di essere un altro. Ad esempio, exim e sendmail sono dal lato pratico
+identici, dato che entrambi consegnano la posta e utilizzano un'interfaccia
+comune. Il sistema dei pacchetti quindi fornisce un mezzo con cui entrambi
+possono dichiarare di essere programmi di trasporto della posta; perciò
+entrambi dichiarano di fornire un mail-transport-agent e gli altri pacchetti
+che hanno bisogno di un programma di trasferimento della posta possono
+dipendere da mail-transport-agent. Quando si cerca di modificare a mano i
+pacchetti, questo può portare a moltissima confusione.
+</p>
+        <p>
+In un determinato momento una singola dipendenza può essere soddisfatta dai
+pacchetti già installati o può non esserlo; APT cerca di risolvere i
+problemi di dipendenze fornendo svariati algoritmi automatici, che aiutano a
+selezionare i pacchetti da installare.
+</p>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr/>
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td align="left"><a accesskey="p" href="index.html">Indietro</a> </td>
+          <td align="center"> </td>
+          <td align="right"> <a accesskey="n" href="ch2.html">Avanti</a></td>
+        </tr>
+        <tr>
+          <td align="left" valign="top">Guida dell'utente di APT </td>
+          <td align="center">
+            <a accesskey="h" href="index.html">Partenza</a>
+          </td>
+          <td align="right" valign="top"> Capitolo 2. apt-get</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

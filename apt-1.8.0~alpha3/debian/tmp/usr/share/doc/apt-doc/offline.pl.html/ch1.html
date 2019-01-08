@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Rozdział 1. Wstęp</title>
+    <meta name="generator" content="DocBook XSL Stylesheets V1.79.1"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="home" href="index.html" title="Używanie APT w trybie offline"/>
+    <link rel="up" href="index.html" title="Używanie APT w trybie offline"/>
+    <link rel="prev" href="index.html" title="Używanie APT w trybie offline"/>
+    <link rel="next" href="ch2.html" title="Rozdział 2. Używanie programu APT na obu komputerach"/>
+  </head>
+  <body>
+    <div class="navheader">
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Rozdział 1. Wstęp</th>
+        </tr>
+        <tr>
+          <td align="left"><a accesskey="p" href="index.html">Poprzedni</a> </td>
+          <th width="60%" align="center"> </th>
+          <td align="right"> <a accesskey="n" href="ch2.html">Następny</a></td>
+        </tr>
+      </table>
+      <hr/>
+    </div>
+    <div class="chapter">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h1 class="title"><a id="ch1"/>Rozdział 1. Wstęp</h1>
+          </div>
+        </div>
+      </div>
+      <div class="toc">
+        <p>
+          <strong>Spis treści</strong>
+        </p>
+        <dl class="toc">
+          <dt>
+            <span class="section">
+              <a href="ch1.html#s1.1">1.1. Wprowadzenie</a>
+            </span>
+          </dt>
+        </dl>
+      </div>
+      <div class="section">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h2 class="title"><a id="s1.1"/>1.1. Wprowadzenie</h2>
+            </div>
+          </div>
+        </div>
+        <p>
+Zazwyczaj APT wymaga bezpośredniego dostępu do archiwów Debiana przez sieć
+lokalną albo przez sieć internetową. Kolejną niedogodnością może być fakt,
+że nasz komputer, który pracuje na powolnym łączu takim jak modem, jest
+znacznie oddalony od innego komputera z szybkim łączem.
+</p>
+        <p>
+Rozwiązaniem tego problemu jest użycie pojemnych przenośnych nośników takich
+jak dyskietka Zip lub dysk SuperDisk. Nośniki te nie są wystarczająco
+pojemne, by zgromadzić kompletne archiwum Debiana, ale można śmiało
+dopasować podzbiór dużego archiwum wystarczający dla większości
+użytkowników. Pomysł polega na tym, by użyć programu APT do wygenerowania
+listy pakietów, które są wymagane, a następnie pobraniu ich na dysk,
+używając innego komputera z właściwą zwartością. Jest nawet możliwe, by użyć
+innego komputera z Debianem z zainstalowanym programem APT lub zupełnie
+innym systemem operacyjnym i programem narzędziowym do pobierania plików
+takim jak wget.
+</p>
+        <p>
+This is achieved by creatively manipulating the APT configuration file. The
+essential premise to tell APT to look on a disc for it's archive files. Note
+that the disc should be formatted with a filesystem that can handle long
+file names such as ext2, fat32 or vfat.
+</p>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr/>
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td align="left"><a accesskey="p" href="index.html">Poprzedni</a> </td>
+          <td align="center"> </td>
+          <td align="right"> <a accesskey="n" href="ch2.html">Następny</a></td>
+        </tr>
+        <tr>
+          <td align="left" valign="top">Używanie APT w trybie offline </td>
+          <td align="center">
+            <a accesskey="h" href="index.html">Spis treści</a>
+          </td>
+          <td align="right" valign="top"> Rozdział 2. Używanie programu APT na obu komputerach</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

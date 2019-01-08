@@ -1,0 +1,13 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" href="$classAPT_1_1CacheFilter_1_1Matcher.xhtml" title="Matcher" alt="" coords="5,132,80,159"/>
+<area shape="rect" id="node2" href="$classAPT_1_1CacheFilter_1_1ANDMatcher.xhtml" title="ANDMatcher" alt="" coords="141,5,243,32"/>
+<area shape="rect" id="node3" href="$classAPT_1_1CacheFilter_1_1FalseMatcher.xhtml" title="FalseMatcher" alt="" coords="139,56,245,83"/>
+<area shape="rect" id="node4" href="$classAPT_1_1CacheFilter_1_1NOTMatcher.xhtml" title="NOTMatcher" alt="" coords="141,107,243,133"/>
+<area shape="rect" id="node5" href="$classAPT_1_1CacheFilter_1_1ORMatcher.xhtml" title="ORMatcher" alt="" coords="145,157,239,184"/>
+<area shape="rect" id="node6" href="$classAPT_1_1CacheFilter_1_1PackageMatcher.xhtml" title="PackageMatcher" alt="" coords="128,208,256,235"/>
+<area shape="rect" id="node11" href="$classAPT_1_1CacheFilter_1_1TrueMatcher.xhtml" title="TrueMatcher" alt="" coords="141,259,243,285"/>
+<area shape="rect" id="node7" href="$classAPT_1_1CacheFilter_1_1PackageArchitectureMatchesSpecification.xhtml" title="PackageArchitectureMatches\lSpecification" alt="" coords="312,117,521,158"/>
+<area shape="rect" id="node8" href="$classAPT_1_1CacheFilter_1_1PackageIsNewInstall.xhtml" title="PackageIsNewInstall" alt="" coords="339,183,495,209"/>
+<area shape="rect" id="node9" href="$classAPT_1_1CacheFilter_1_1PackageNameMatchesFnmatch.xhtml" title="PackageNameMatchesFnmatch" alt="" coords="304,233,529,260"/>
+<area shape="rect" id="node10" href="$classAPT_1_1CacheFilter_1_1PackageNameMatchesRegEx.xhtml" title="PackageNameMatchesRegEx" alt="" coords="312,284,521,311"/>
+</map>

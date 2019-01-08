@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+  "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % aptent SYSTEM "apt.ent"> %aptent;
+<!ENTITY % aptverbatiment SYSTEM "apt-verbatim.ent"> %aptverbatiment;
+<!ENTITY % aptvendor SYSTEM "apt-vendor.ent"> %aptvendor;
+]>
+
+<refentry>
+
+ <refentryinfo>
+   <!-- The last update date -->
+&apt-author.jgunthorpe;
+   &apt-author.team;
+   &apt-email;
+   &apt-product;
+   
+   <date>2014-03-27T00:00:00Z</date>
+ </refentryinfo>
+ 
+ <refmeta>
+   <refentrytitle>apt-extracttemplates</refentrytitle>
+   <manvolnum>1</manvolnum>
+   <refmiscinfo class="manual">APT</refmiscinfo>
+ </refmeta>
+ 
+ 
+ <!-- Man page title -->
+<refnamediv>
+    <refname>apt-extracttemplates</refname>
+    <refpurpose>Hulpprogramma om configuratie-informatie en sjablonen voor
+<command>debconf</command> uit Debian-pakketten te extraheren</refpurpose>
+ </refnamediv>
+
+ &synopsis-command-apt-extracttemplates;
+
+ <refsect1><title>Omschrijving</title>
+   <para><command>apt-extracttemplates</command> gebruikt een of meer pakketbestanden
+van Debian als invoer en schrijft (naar een tijdelijke map) alle ermee
+verband houdende configuratiescripts en sjabloonbestanden weg. Voor elk
+verwerkt pakket dat configuratiescripts en sjablonen bevat wordt een regel
+met uitvoer aangemaakt volgens de indeling:</para>
+   <para>pakketversie sjabloonbestand configuratiescript</para>
+   <para>sjabloonbestand en configuratiescript worden opgeslagen in de tijdelijke map
+die opgegeven werd met de optie <option>-t</option> of
+<option>--tempdir</option>
+(<literal>APT::ExtractTemplates::TempDir</literal>) in bestandsnamen met de
+vorm <filename>package.template.XXXXXX</filename> en
+<filename>package.config.XXXXXX</filename></para>
+ </refsect1>
+ 
+ <refsect1><title>opties</title>
+   &apt-cmdblurb;
+
+   <variablelist>
+     <varlistentry><term><option>-t</option></term><term><option>--tempdir</option></term>
+     <listitem><para>
+     Tijdelijke map om er geëxtraheerde sjabloonbestanden en configuratiescripts
+voor <command>debconf</command> in op te slaan. Configuratie-item:
+<literal>APT::ExtractTemplates::TempDir</literal></para></listitem>
+     </varlistentry>
+
+     &apt-commonoptions;
+     
+   </variablelist>
+     
+   
+ </refsect1>
+
+ <refsect1><title>Zie ook</title>
+   <para>&apt-conf;</para>
+ </refsect1>
+
+ <refsect1><title>Diagnostiek</title>
+   <para><command>apt-extracttemplates</command> geeft de terugkeerwaarde nul bij een
+normaal verlopen operatie, het decimaal getal 100 in geval van een fout.</para>
+ </refsect1>
+
+ &manbugs;
+ 
+ <refsect1><title>&translation-title;</title>
+   <para>&translation-holder;</para>
+   <para>&translation-english;</para>
+ </refsect1>
+</refentry>

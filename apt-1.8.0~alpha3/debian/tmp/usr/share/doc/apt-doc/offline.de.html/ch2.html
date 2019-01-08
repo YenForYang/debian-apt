@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Kapitel 2. APT auf beiden Maschinen benutzen</title>
+    <meta name="generator" content="DocBook XSL Stylesheets V1.79.1"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="home" href="index.html" title="APT offline verwenden"/>
+    <link rel="up" href="index.html" title="APT offline verwenden"/>
+    <link rel="prev" href="ch1.html" title="Kapitel 1. Einleitung"/>
+    <link rel="next" href="ch3.html" title="Kapitel 3. APT und Wget benutzen"/>
+  </head>
+  <body>
+    <div class="navheader">
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Kapitel 2. APT auf beiden Maschinen benutzen</th>
+        </tr>
+        <tr>
+          <td align="left"><a accesskey="p" href="ch1.html">Zurück</a> </td>
+          <th width="60%" align="center"> </th>
+          <td align="right"> <a accesskey="n" href="ch3.html">Weiter</a></td>
+        </tr>
+      </table>
+      <hr/>
+    </div>
+    <div class="chapter">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h1 class="title"><a id="ch2"/>Kapitel 2. APT auf beiden Maschinen benutzen</h1>
+          </div>
+        </div>
+      </div>
+      <div class="toc">
+        <p>
+          <strong>Inhaltsverzeichnis</strong>
+        </p>
+        <dl class="toc">
+          <dt>
+            <span class="section">
+              <a href="ch2.html#s2.1">2.1. Übersicht</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="section">
+              <a href="ch2.html#s2.2">2.2. Die Konfigurationsdatei</a>
+            </span>
+          </dt>
+        </dl>
+      </div>
+      <div class="section">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h2 class="title"><a id="s2.1"/>2.1. Übersicht</h2>
+            </div>
+          </div>
+        </div>
+        <p>
+Ein verfügbares APT auf beiden Maschinen stellt die einfachste Konfiguration
+dar. Die Grundidee besteht darin, eine Kopie der Statusdatei auf der Platte
+abzulegen und die Maschine in der Ferne zu benutzen, um die neusten
+Paketdateien herunterzuladen und zu entscheiden, welche Pakete
+heruntergeladen werden. Die Plattenverzeichnisstruktur sollte so aussehen:
+</p>
+        <pre class="screen">
+  /Platte/
+    Archive/
+       partial/
+    lists/
+       partial/
+    status
+    sources.list
+    apt.conf
+</pre>
+      </div>
+      <div class="section">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h2 class="title"><a id="s2.2"/>2.2. Die Konfigurationsdatei</h2>
+            </div>
+          </div>
+        </div>
+        <p>
+Die Konfigurationsdatei sollte APT mitteilen, dass es seine Dateien auf der
+Platte speichert und obendrein die Konfigurationsdateien auf der Platte
+benutzt. Die »sources.list« sollte genau die Sites enthalten, die Sie auf
+der fernen Maschine benutzen möchten und die Statusdatei sollte eine Kopie
+von <span class="emphasis"><em>/var/lib/dpkg/status</em></span> vom
+<span class="emphasis"><em>Zielrechner</em></span> sein. Bitte beachten Sie, falls Sie lokale
+Archive benutzen, dass Sie »copy«-URIs benutzen müssen. Die Syntax
+entspricht der von »file«-URIs.
+</p>
+        <p>
+<span class="emphasis"><em>apt.conf</em></span> muss die nötigen Informationen enthalten,
+damit APT die Platte benutzt:
+</p>
+        <pre class="screen">
+ APT
+ {
+   /* Dies ist nicht nötig, falls die beiden Maschinen die gleiche
+      Architektur haben. Es teilt dem fernen APT mit, welche Architektur die
+      Zielmaschine hat */
+   Architecture "i386";
+
+   Get::Download-Only "true";
+ };
+
+ Dir
+ {
+   /* Die Platte für Statusinformationen benutzen und die Statusdatei von der
+      Vorgabe /var/lib/dpkg umleiten */
+   State "/disc/";
+   State::status "status";
+
+   // Programmzwischenspeicher werden lokal gespeichert
+   Cache::archives "/disc/archives/";
+   Cache "/tmp/";
+
+   // Ort der Quellenliste.
+   Etc "/disc/";
+ };
+</pre>
+        <p>
+Weitere Details finden sich in der apt.conf-Handbuchseite und der
+Musterkonfigurationsdatei in
+<span class="emphasis"><em>/usr/share/doc/apt/examples/apt.conf</em></span>.
+</p>
+        <p>
+Das Erste, was auf der Zielmaschine getan werden muss, ist das Einhängen der
+Platte und das Kopieren von <span class="emphasis"><em>/var/lib/dpkg/status</em></span>
+dorthin. Sie werden außerdem die in der Übersicht umrissenen Verzeichnisse
+<span class="emphasis"><em>archives/partial/</em></span> und
+<span class="emphasis"><em>lists/partial/</em></span> erstellen müssen. Dann bringen Sie die
+Platte zu der fernen Maschine und konfigurieren Sie die
+»sources.list«. Führen Sie das folgende auf der fernen Maschine aus:
+</p>
+        <pre class="screen">
+ # export APT_CONFIG="/disc/apt.conf"
+ # apt-get update
+ [ APT lädt die Paketdateien herunter ]
+ # apt-get dist-upgrade
+ [ APT lädt all die Pakete herunter, die die Zielmaschine benötigt, um ein
+   Upgrade durchzuführen ]
+</pre>
+        <p>
+Der Befehl »dist-upgrade« kann durch alle anderen Standard-APT-Befehle
+ersetzt werden, insbesondere »dselect-upgrade«. Sie können sogar eine
+APT-Oberfläche, wie <span class="emphasis"><em>dselect</em></span>, benutzen. Jedoch stellt
+dies ein Problem dar, Ihre Auswahl zurück an den lokalen Rechner zu
+kommunizieren.
+</p>
+        <p>
+Nun enthält die Platte alle Indexdateien und Archive, die nötig sind, um ein
+Upgrade der Zielmaschine durchzuführen. Bringen Sie die Platte zurück und
+starten Sie:
+</p>
+        <pre class="screen">
+  # export APT_CONFIG="/Platte/apt.conf"
+  # apt-get check
+  [ APT erstellt eine lokale Kopie der Zwischenspeicherdateien ]
+  # apt-get --no-d -o dir::state::status=/var/lib/dpkg/status dist-upgrade
+  [ Oder irgendeinen anderen APT-Befehl ]
+</pre>
+        <p>
+Es ist für ordentliches Funktionieren notwendig, die Statusdatei erneut als
+die lokale anzugeben. Dies ist sehr wichtig!
+</p>
+        <p>
+Wenn Sie Dselect benutzen, können Sie die sehr riskante Aktion durchführen,
+disc/status auf /var/lib/dpkg/status zu kopieren, so dass die von Ihnen auf
+der fernen Maschine gemachte Auswahl aktualisiert wird. Es wird in höchstem
+Maße empfohlen, dass Leute nur auf der lokalen Maschine Auswahlen treffen –
+aber dies könnte manchmal unmöglich sein. Kopieren Sie die Statusdatei
+NICHT, falls Dpkg oder APT in der Zwischenzeit benutzt wurden!
+</p>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr/>
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td align="left"><a accesskey="p" href="ch1.html">Zurück</a> </td>
+          <td align="center"> </td>
+          <td align="right"> <a accesskey="n" href="ch3.html">Weiter</a></td>
+        </tr>
+        <tr>
+          <td align="left" valign="top">Kapitel 1. Einleitung </td>
+          <td align="center">
+            <a accesskey="h" href="index.html">Zum Anfang</a>
+          </td>
+          <td align="right" valign="top"> Kapitel 3. APT und Wget benutzen</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

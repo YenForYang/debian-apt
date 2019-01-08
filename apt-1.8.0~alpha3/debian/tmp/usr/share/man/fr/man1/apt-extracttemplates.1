@@ -1,0 +1,126 @@
+'\" t
+.\"     Title: apt-extracttemplates
+.\"    Author: Jason Gunthorpe
+.\" Generator: DocBook XSL Stylesheets v1.79.1 <http://docbook.sf.net/>
+.\"      Date: 27\ \&mars\ \&2014
+.\"    Manual: APT
+.\"    Source: APT 1.8.0~alpha3
+.\"  Language: French
+.\"
+.TH "APT\-EXTRACTTEMPLATE" "1" "27\ \&mars\ \&2014" "APT 1.8.0~alpha3" "APT"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NOM"
+apt-extracttemplates \- Outil d\*(Aqextraction des textes et fichiers de configuration pour \fBdebconf\fR contenu dans un paquet Debian
+.SH "SYNOPSIS"
+.HP \w'\fBapt\-extracttemplates\fR\ 'u
+\fBapt\-extracttemplates\fR [\fB\-t=\fR\fB\fIr\('epertoire_temporaire\fR\fR] \fInom_de_fichier\fR... {\-v\ |\ \-\-version} {\-h\ |\ \-\-help}
+.SH "DESCRIPTION"
+.PP
+\fBApt\-extracttemplates\fR
+prend un ou plusieurs paquets Debian en param\(`etre et extrait (dans un r\('epertoire temporaire) tous les scripts et guides de configuration associ\('es\&. Pour chaque paquet trait\('e contenant des scripts et guides de configuration, une ligne est affich\('ee au format suivant\ \&:
+.PP
+paquet version guide\-de\-configuration script\-de\-configuration
+.PP
+Les scripts et guides de configuration sont \('ecrits dans le r\('epertoire temporaire indiqu\('e par l\*(Aqoption
+\fB\-t\fR
+ou
+\fB\-\-tempdir\fR
+(APT::ExtractTemplates::TempDir)\ \&; les noms de fichier sont de la forme
+package\&.template\&.XXXXXX
+ou
+package\&.config\&.XXXXXX\&.
+.SH "OPTIONS"
+.PP
+Toutes les options de la ligne de commande peuvent \(^etre d\('efinies dans le fichier de configuration, les descriptions indiquant l\*(Aqoption de configuration concern\('ee\&. Pour les options bool\('eennes, vous pouvez inverser les r\('eglages du fichiers de configuration avec
+\fB\-f\-\fR,\fB\-\-no\-f\fR,
+\fB\-f=no\fR
+et d\*(Aqautres variantes analogues\&.
+.PP
+\fB\-t\fR, \fB\-\-tempdir\fR
+.RS 4
+R\('epertoire temporaire dans lequel \('ecrire les scripts de configuration et mod\(`eles d\*(Aq\('ecrans pour
+\fBdebconf\fR\&. \('El\('ement de configuration\ \&:
+APT::ExtractTemplates::TempDir\&.
+.RE
+.PP
+\fB\-h\fR, \fB\-\-help\fR
+.RS 4
+Afficher un bref r\('esum\('e de l\*(Aqutilisation\&.
+.RE
+.PP
+\fB\-v\fR, \fB\-\-version\fR
+.RS 4
+Afficher la version du programme\&.
+.RE
+.PP
+\fB\-c\fR, \fB\-\-config\-file\fR
+.RS 4
+Fichier de configuration\ \&; indique le fichier de configuration \(`a utiliser\&. Le programme lira le fichier de configuration par d\('efaut puis le fichier indiqu\('e ici\&. Si les r\('eglages de configuration doivent \(^etre \('etablis avant l\*(Aqanalyse des fichiers de configuration par d\('efaut, un fichier peut \(^etre indiqu\('e avec la variable d\*(Aqenvironnement
+\fBAPT_CONFIG\fR\&. Veuillez consulter
+\fBapt.conf\fR(5)
+pour des informations sur la syntaxe d\*(Aqutilisation\&.
+.RE
+.PP
+\fB\-o\fR, \fB\-\-option\fR
+.RS 4
+D\('efinir une option de configuration\ \&; permet de r\('egler une option de configuration donn\('ee\&. La syntaxe est
+\fB\-o Foo::Bar=bar\fR\&.
+\fB\-o\fR
+et
+\fB\-\-option\fR
+peuvent \(^etre utilis\('ees plusieurs fois pour d\('efinir des options diff\('erentes\&.
+.RE
+.SH "VOIR AUSSI"
+.PP
+\fBapt.conf\fR(5)
+.SH "DIAGNOSTICS"
+.PP
+\fBapt\-extracttemplates\fR
+retourne z\('ero si tout se passe bien, le nombre 100 en cas d\*(Aqerreur\&.
+.SH "BOGUES"
+.PP
+\m[blue]\fBPage des bogues d\*(AqAPT\fR\m[]\&\s-2\u[1]\d\s+2\&. Si vous souhaitez signaler un bogue \(`a propos d\*(AqAPT, veuillez lire
+/usr/share/doc/debian/bug\-reporting\&.txt
+ou utiliser la commande
+\fBreportbug\fR(1)\&.
+.SH "TRADUCTEURS"
+.PP
+J\('er\(^ome Marant, Philippe Batailler, Christian Perrier
+<bubulle@debian\&.org>
+(2000, 2005, 2009, 2010), \('Equipe de traduction francophone de Debian
+<debian\-l10n\-french@lists\&.debian\&.org>
+.PP
+Veuillez noter que cette traduction peut contenir des parties non traduites\&. Cela est volontaire, pour \('eviter de perdre du contenu quand la traduction est l\('eg\(`erement en retard sur le contenu d\*(Aqorigine\&.
+.SH "AUTEURS"
+.PP
+\fBJason Gunthorpe\fR
+.RS 4
+.RE
+.PP
+\fB\('Equipe de d\('eveloppement d\*(AqAPT\fR
+.RS 4
+.RE
+.SH "NOTES"
+.IP " 1." 4
+Page des bogues d'APT
+.RS 4
+\%http://bugs.debian.org/src:apt
+.RE

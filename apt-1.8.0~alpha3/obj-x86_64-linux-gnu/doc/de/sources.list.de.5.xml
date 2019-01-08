@@ -1,0 +1,613 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+  "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % aptent SYSTEM "apt.ent"> %aptent;
+<!ENTITY % aptverbatiment SYSTEM "apt-verbatim.ent"> %aptverbatiment;
+<!ENTITY % aptvendor SYSTEM "apt-vendor.ent"> %aptvendor;
+]>
+
+<refentry>
+
+ <refentryinfo>
+   <!-- The last update date -->
+&apt-author.jgunthorpe;
+   &apt-author.team;
+   &apt-email;
+   &apt-product;
+   
+   <date>2018-08-17T00:00:00Z</date>
+ </refentryinfo>
+ 
+ <refmeta>
+   <refentrytitle>sources.list</refentrytitle>
+   <manvolnum>5</manvolnum>
+   <refmiscinfo class="manual">APT</refmiscinfo>
+ </refmeta>
+ 
+ 
+ <!-- Man page title -->
+<refnamediv>
+    <refname>sources.list</refname>
+    <refpurpose>Liste konfigurierter APT-Datenquellen</refpurpose>
+ </refnamediv>
+ 
+ <refsect1><title>Beschreibung</title>
+   <para>
+      Die Quellenliste <filename>/etc/apt/sources.list</filename> und die in
+<filename>/etc/apt/sources.list.d/</filename> enthaltenen Dateien wurden
+entworfen, um eine beliebige Anzahl aktiver Quellen und unterschiedlicher
+Quellmedien zu unterstützen. Die Dateien führen eine Quelle je Zeile auf
+(einzeiliger Stil) oder enthalten mehrzeilige Absätze, die eine oder mehrere
+Quellen pro Absatz definieren (Deb822-Stil), bei der die bevorzugte Quelle
+zuerst aufgeführt wird (im Fall, dass eine einzelne Version von mehr als
+einer Quelle verfügbar ist). Die Informationen über die konfigurierten
+Quellen werden durch <command>apt-get update</command> (oder einem
+vergleichbaren Befehl einer anderen APT-Oberfläche) beschafft.
+   </para>
+ </refsect1>
+ 
+ <refsect1><title>sources.list.d</title>
+    <para>Das Verzeichnis <filename>/etc/apt/sources.list.d</filename> stellt eine
+Möglichkeit bereit, sources.list-Einträge in separaten Dateien
+hinzuzufügen. Zwei verschiedene Formate sind, wie in den beiden nächsten
+Abschnitten erklärt, erlaubt. Dateinamen müssen abhängig vom enthaltenen
+Format entweder eine <filename>.list</filename>- oder
+<filename>.sources</filename>-Endung haben. Die Dateinamen dürfen nur
+Buchstaben (a-z und A-Z), Ziffern (0-9), Unterstrich (_), Bindestrich (-)
+und Punkt (.) enthalten. Andernfalls wird APT einen Hinweis ausgeben, dass
+es eine Datei ignoriert hat, falls die Datei nicht auf ein Muster in der
+Konfigurationsliste <literal>Dir::Ignore-Files-Silently</literal> passt – in
+diesem Fall wird sie stillschweigend ignoriert.</para>
+ </refsect1>
+
+ <refsect1><title>Format mit einzeiligem Stil</title>
+    <para>
+       Dateien in diesem Format haben die Endung <filename>.list</filename>. Jede
+Zeile, die eine Quelle angibt, beginnt mit einem Typ
+(z.B. <literal>deb-src</literal>), gefolgt von Optionen und Argumenten für
+diesen Typ. Individuelle Einträge können nicht auf einer Folgezeile
+fortgesetzt werden. Leere Zeilen werden ignoriert und ein
+<literal>#</literal>-Zeichen irgendwo in einer Zeile kennzeichnet den Rest
+der Zeile als Kommentar. Ein Eintrag kann folglich durch Auskommentieren der
+ganzen Zeile deaktiviert werden. Falls Optionen bereitgestellt werden
+sollen, werden sie durch Leerräume getrennt und alle zusammen in
+quadratische Klammern (<literal>[]</literal>) eingeschlossen. Sie sind in
+der Zeile nach dem Typ enthalten und mit einem Leerraum von ihm
+getrennt. Falls eine Option mehrere Werte erlaubt, werden diese voneinander
+per Komma (<literal>,</literal>) getrennt. Ein Optionsname wird von seinem
+(seinen) Wert(en) durch ein Gleichheitszeichen (<literal>=</literal>)
+getrennt. Optionen mit mehreren Werten haben außerdem <literal>-=</literal>
+und <literal>+=</literal> als Trenner, die statt den vorgegebenen Wert durch
+den (die) angegebenen Wert(e) zu ersetzen, den vorgegebenen Wert ändern und
+den (die) übergebenen Wert(e) entfernen oder einschließen.
+   </para><para>
+       Dies ist das traditionelle, von allen APT-Versionen unterstützte
+Format. Beachten Sie, dass nicht alle unten beschriebenen Optionen von allen
+Versionen von APT unterstützt werden. Beachten Sie außerdem, dass einige
+ältere Anwendungen, die dieses Format selbst auswerten, möglicherweise nicht
+erwarten, dass Optionen auftauchen, da diese vor der Einführung der
+Unterstützung mehrerer Architekturen nicht üblich waren.
+    </para>
+ </refsect1>
+
+ <refsect1><title>Format im Deb822-Stil</title>
+    <para>
+       Dateien in diesem Format haben die Endung
+<filename>.sources</filename>. Dieses Format hat eine ähnliche Syntax wie
+andere von Debian und seinen Derivaten benutzte Dateien, wie
+Metadatendateien, die APT von den konfigurierten Quellen herunterlädt oder
+der Datei <filename>debian/control</filename> in einem
+Debian-Quellpaket. Individuelle Einträge werden durch eine leere Zeile
+getrennt: Zusätzliche leere Zeilen werden ignoriert und
+<literal>#</literal>-Zeichen am Anfang einer Zeile kennzeichnen die ganze
+Zeile als Kommentar. Ein Eintrag kann daher deaktiviert werden, indem jede
+Zeile, die zum Absatz gehört, auskommentiert wird. Es ist üblicherweise
+jedoch einfacher, dem Absatz das Feld »Enabled: no« hinzuzufügen, um den
+Eintrag zu deaktivieren. Durch Entfernen des Feldes oder indem es auf »yes«
+gesetzt wird, wird es wieder aktiviert. Optionen haben dieselbe Syntax wie
+jedes andere Feld: ein Feldname, durch einen Doppelpunkt
+(<literal>:</literal>) und optionale Leerräume von ihren (ihrem) Wert(en)
+getrennt. Beachten Sie insbesondere, dass mehrere Werte durch Leerräume (wie
+Leerzeichen, Tabulatoren und Zeilenumbrüche) getrennt werden, nicht durch
+Kommas, wie im einzeiligen Format. Felder mit mehreren Werten wie
+<literal>Architectures</literal> haben obendrein
+<literal>Architectures-Add</literal> und
+<literal>Architectures-Remove</literal>, um den Vorgabewert zu ändern, statt
+ihn zu ersetzen.
+   </para><para>
+       Dies ist ein neues Format, das von APT selbst seit Version 1.1. unterstützt
+wird. Ältere Versionen ignorieren solche Dateien, wie vorher beschrieben,
+mit einer Benachrichtigung. Es ist vorgesehen, dieses Format schrittweise
+zum Standardformat zu machen und das vorher beschriebene Format mit dem
+einzeiligen Stil zu missbilligen, da das neue für Menschen und Maschinen
+gleichermaßen einfacher zu erstellen, zu erweitern und zu ändern ist,
+insbesondere dann, wenn viele Quellen und/oder Optionen beteiligt
+sind. Entwickler, die mit APT-Quellen arbeiten und/oder sie auswerten, sind
+dringend ermutigt, dieses Format zu unterstützen und das APT-Team zu
+kontaktieren, um diese Arbeit zu koordinieren und weiterzugeben. Benutzer
+können dieses Format bereits übernehmen, es könnten jedoch Probleme mit
+Software auftreten, die dieses Format noch nicht unterstützen.
+    </para>
+ </refsect1>
+
+ <refsect1><title>Die Typen »deb« und »deb-src«: allgemeines Format</title>
+   <para>Der <literal>deb</literal>-Typ beschreibt ein typisches zweistufiges
+Debian-Archiv,
+<filename>Distribution/Bestandteil</filename>.
+<literal>Distribution</literal> ist typischerweise eine Programmsammlung wie
+<literal>stable</literal> oder <literal>testing</literal> oder ein Codename
+wie <literal>&debian-stable-codename;</literal> oder
+<literal>&debian-testing-codename;</literal> während Bestandteil entweder
+<literal>main</literal>, <literal>contrib</literal> oder
+<literal>non-free</literal> ist. Der <literal>deb-src</literal>-Typ
+beschreibt den Quellcode einer Debian-Distribution in der gleichen Form wie
+den <literal>deb</literal>-Typ. Eine <literal>deb-src</literal>-Zeile wird
+benötigt, um Quellindizes herunterzuladen.</para>
+
+   <para>Das Format für zwei Einträge im einzeiligen Stil, die die
+<literal>deb</literal>- und <literal>deb-src</literal>-Typen benutzen, ist:</para>
+
+   <literallayout>deb [ Option1=Wert1 Option2=Wert2 ] URI Suite [Bestandteil1] [Bestandteil2] […]
+deb-src [ Option1=Wert1 Option2=Wert2 ] URI Suite [Bestandteil1] [Bestandteil2] […]</literallayout>
+
+   <para>Der alternative Eintrag sieht im Format des Deb822-Stils etwa so aus:
+<literallayout>
+     Types: deb deb-src
+     URIs: URI
+     Suites: Suite
+     Components: [Bestandteil1] [Bestandteil2] […]
+     Option1: Wert1
+     Option2: Wert2
+   </literallayout>
+   </para>
+
+   <para>Der URI für den <literal>deb</literal>-Typ muss die Basis der
+Debian-Distribution angeben, wo APT die Informationen findet, die es
+benötigt. <literal>Suite</literal> kann einen genauen Pfad angeben. In
+diesem Fall müssen die Bestandteile weggelassen werden und
+<literal>Suite</literal> muss mit einem Schrägstrich (<literal>/</literal>)
+enden. Dies ist nützlich, wenn nur ein bestimmtes Unterverzeichnis des vom
+URI angegebenen Archivs von Interesse ist. Wenn <literal>Suite</literal>
+keinen genauen Pfad angibt, muss mindestens ein
+<literal>Bestandteil</literal> angegeben sein.</para>
+
+   <para><literal>Suite</literal> darf außerdem eine Variable,
+<literal>$(ARCH)</literal>, enthalten, die zur Debian-Architektur (wie
+<literal>amd64</literal> oder <literal>armel</literal>) expandiert wird, die
+auf dem System benutzt wird. Dies erlaubt es, architekturunabhängige
+<filename>sources.list</filename>-Dateien zu benutzen. Im Allgemeinen ist
+dies nur von Interesse, wenn ein genauer Pfad angegeben wird, andernfalls
+wird <literal>APT</literal> automatisch einen URI mit der aktuellen
+Architektur erstellen.</para>
+
+   <para>Insbesondere im Format im einzeiligen Stil könnte es nötig sein, da pro
+Zeile nur eine Distribution angegeben werden kann, mehrere Zeilen für den
+gleichen URI zu haben, falls eine Untermenge aller verfügbarer
+Distributionen oder Bestandteile von diesem Ort gewünscht wird. APT wird die
+URI-Liste sortieren, nachdem es intern eine komplette Zusammenstellung
+erstellt hat und es wird beispielsweise mehrere Bezüge zum gleichen
+Internet-Rechner zu einer einzigen Verbindung zusammenfassen, so dass es
+nicht ineffizient eine Verbindung herstellt, sie schließt, sonst etwas tut
+und dann erneut eine Verbindung zum gleichen Rechner herstellt. APT
+parallelisiert außerdem Verbindungen zu verschiedenen Rechnern, um
+effektiver mit Sites mit niedriger Bandbreite umzugehen.</para>
+
+   <para>Es ist wichtig, die Quellen in der Reihenfolge ihrer Bevorzugung
+aufzulisten, die bevorzugte Quelle zuerst. Typischerweise resultiert dies in
+einer Sortierung nach Geschwindigkeit, vom schnellsten zum langsamsten
+(CD-ROM, gefolgt von Rechnern im lokalen Netzwerk, gefolgt von
+Internet-Rechnern, zum Beispiel).</para>
+
+   <para>Die Quellen für Ihre Distribution könnten zum Beispiel im Format mit
+einzeiligem Stil so aussehen: <literallayout>&sourceslist-list-format;</literallayout>
+oder im Format mit Deb822-Stil so: <literallayout>&sourceslist-sources-format;</literallayout>.</para>
+ </refsect1>
+
+ <refsect1><title>Die Typen deb und deb-src: Optionen</title>
+    <para>Jeder Quelleneintrag kann Optionen haben, die angegeben wurden, um zu
+ändern, auf welche Quelle zugegriffen wird und wie Daten von ihr beschafft
+werden. Format, Syntax und Namen der Optionen weichen, wie beschrieben,
+zwischen dem Format mit einzeiligem Stil und dem Format mit Deb822-Stil
+voneinander ab, für beide sind jedoch dieselben Optionen verfügbar. Der
+Einfachheit halber wird der Deb822-Feldname aufgeführt und der einzeilige
+Name in Klammern bereitgestellt. Denken Sie daran, dass Sie ergänzend zum
+expliziten Setzen von Optionen mit mehreren Werten auch die Möglichkeit
+haben, sie basierend auf dem Vorgabewert zu ändern, aber diese Namen werden
+hier nicht explizit aufgeführt. Nicht unterstützte Optionen werden
+stillschweigend von allen APT-Versionen ignoriert.
+
+       <itemizedlist>
+	  <listitem><para><option>Architectures</option> (<option>arch</option>) ist eine Option mit
+mehreren Werten, die definiert, für welche Architekturen Informationen
+heruntergeladen werden sollen. Falls diese Option nicht gesetzt ist, ist die
+Voreinstellung alle durch die Konfigurationsoption
+<option>APT::Architectures</option> definierten Architekturen.
+	  </para></listitem>
+
+	  <listitem><para><option>Languages</option> (<option>lang</option>) ist eine Option mit
+mehreren Werten, die definiert, für welche Sprachen Informationen, wie etwa
+übersetzte Paketbeschreibungen, heruntergeladen werden sollen. Falls diese
+Option nicht gesetzt ist, werden sie für alle durch die Konfigurationsoption
+<option>Acquire::Languages</option> definierten Sprachen heruntergeladen.
+	  </para></listitem>
+
+	  <listitem><para><option>Targets</option> (<option>target</option>) ist eine Option mit
+mehreren Werten, die definiert, welche Herunterladeziele APT aus dieser
+Quelle versucht zu beschaffen. Ist sie nicht angegeben, wird die
+Voreinstellung durch den Konfigurationsbereich
+<option>Acquire::IndexTargets</option> spezifiziert (Ziele werden im Feld
+<literal>Created-By</literal> durch ihren Namen angegeben). Außerdem können
+Ziele mittels des Felds <literal>Identifier</literal> als Option mit einem
+Wahrheitswert aktiviert oder deaktiviert werden, anstatt diese Option mit
+mehreren Werten zu benutzen.
+	  </para></listitem>
+
+	  <listitem><para><option>PDiffs</option> (<option>pdiffs</option>) ist ein yes-/no-
+(Ja-/Nein-)Wert, der steuert, ob APT versuchen soll, PDiffs zum
+Aktualisieren alter Indexe zu benutzen, statt die ganzen neuen Indexe
+herunterzuladen. Der Wert dieser Option wird ignoriert, falls das Depot die
+Verfügbarkeit von PDiffs nicht ankündigt. Sie ist auf den Wert der Option
+mit demselben Namen für eine bestimmte Indexdatei voreingestellt, die im
+Gültigkeitsbereich <option>Acquire::IndexTargets</option> definiert ist und
+die ihrerseits wiederum auf den Wert der Konfigurationsoption
+<option>Acquire::PDiffs</option> voreingestellt ist, deren Vorgabe
+<literal>yes</literal> ist.
+	  </para></listitem>
+
+	  <listitem><para><option>By-Hash</option> (<option>by-hash</option>) kann die Werte
+<literal>yes</literal>, <literal>no</literal> oder <literal>force</literal>
+haben und steuert, ob APT versuchen soll, Indexe über einen URI zu
+beschaffen, der aus einer Hash-Summe der erwarteten Datei konstruiert wird,
+statt über einen gut bekannten stabilen Dateinamen. Damit können unpassende
+Hash-Summen vermieden werden, dies erfordert jedoch einen Spiegelserver, der
+dies unterstützt. Ein <literal>yes</literal>- oder
+<literal>no</literal>-Wert aktiviert/deaktiviert die Verwendung dieser
+Funktionalität, falls diese Quelle ihre Unterstützung anzeigt, während
+<literal>force</literal> die Funktionalität ungeachtet der Angabe der Quelle
+aktiviert. Sie ist auf den Wert der Option mit demselben Namen für eine
+bestimmte Indexdatei voreingestellt, die im Gültigkeitsbereich
+<option>Acquire::IndexTargets</option> definiert ist und die ihrerseits
+wiederum auf den Wert der Konfigurationsoption
+<option>Acquire::By-Hash</option> voreingestellt ist, deren Vorgabe
+<literal>yes</literal> ist.
+	  </para></listitem>
+
+       </itemizedlist>
+
+       Überdies gibt es Optionen, die, falls sie gesetzt sind,
+<emphasis>alle</emphasis> Quellen mit demselben URI und derselben Suite
+beeinflussen, daher müssen sie auf alle solchen Einträgen gesetzt werden und
+können nicht zwischen verschiedenen Bestandteilen unterschieden werden. APT
+wird versuchen, solche Anomalien aufzuspüren und Fehler auszugeben.
+
+       <itemizedlist>
+	  <listitem><para><option>Allow-Insecure</option> (<option>allow-insecure</option>),
+<option>Allow-Weak</option> (<option>allow-weak</option>) und
+<option>Allow-Downgrade-To-Insecure</option>
+(<option>allow-downgrade-to-insecure</option>) sind Wahrheitswerte, deren
+Voreinstellung <literal>no</literal> ist. Falls sie auf
+<literal>yes</literal> gesetzt sind, umgehen sie Teile von &apt-secure; und
+sollten daher nicht leichtfertig benutzt werden.
+	  </para></listitem>
+
+	  <listitem><para><option>Trusted</option> (<option>trusted</option>) ist ein Wert, der drei
+Status annehmen kann. APT entscheidet standardmäßig, ob ein Paket als
+vertrauenswürdig angesehen wird oder ob eine Warnung erscheinen soll, bevor
+z.B. Pakete aus dieser Quelle installiert werden. Diese Option kann benutzt
+werden, um diese Entscheidung außer Kraft zu setzen. Der Wert
+<literal>yes</literal> sagt APT, dass es diese Quelle immer als
+vertrauenswürdig ansehen soll, sogar dann, wenn sie die
+Authentifizierungsprüfungen nicht erfolgreich durchläuft. Sie deaktiviert
+Teile von &apt-secure; und sollte daher nur in einem lokalen und
+vertrauenswürdigen Umfeld (falls überhaupt) verwendet werden, da die
+Sicherheit andernfalls verletzt wird. Der Wert <literal>no</literal> tut das
+Gegenteil. Er sorgt dafür, dass die Quelle als nicht vertrauenswürdig
+behandelt wird, sogar dann, wenn sie die Authentifizierungsprüfungen
+erfolgreich durchläuft. Der Vorgabewert kann nicht explizit gesetzt werden.
+	  </para></listitem>
+
+	  <listitem><para><option>Signed-By</option> (<option>signed-by</option>)  is an option to
+require a repository to pass &apt-secure; verification with a certain set of
+keys rather than all trusted keys apt has configured.  It is specified as a
+list of absolute paths to keyring files (have to be accessible and readable
+for the <literal>_apt</literal> system user, so ensure everyone has
+read-permissions on the file) and fingerprints of keys to select from these
+keyrings. If no keyring files are specified the default is the
+<filename>trusted.gpg</filename> keyring and all keyrings in the
+<filename>trusted.gpg.d/</filename> directory (see <command>apt-key
+fingerprint</command>). If no fingerprint is specified all keys in the
+keyrings are selected. A fingerprint will accept also all signatures by a
+subkey of this key, if this isn't desired an exclamation mark
+(<literal>!</literal>) can be appended to the fingerprint to disable this
+behaviour.  The option defaults to the value of the option with the same
+name if set in the previously acquired <filename>Release</filename> file of
+this repository (only fingerprints can be specified there through).
+Otherwise all keys in the trusted keyrings are considered valid signers for
+this repository.
+	  </para></listitem>
+
+	  <listitem><para><option>Check-Valid-Until</option> (<option>check-valid-until</option>) ist
+ein yes-/no- (Ja-/Nein-)Wert, der steuert, ob APT versuchen soll,
+Wiederholungsangriffe zu erkennen. Ein Depotersteller kann eine Zeit
+festlegen, bis zu der die im Depot bereitgestellten Daten als gültig
+angesehen werden und, falls dieser Zeitpunkt erreicht ist, aber keine neuen
+Daten bereitgestellt wurden, die Daten als ungültig angesehen werden und ein
+Fehler ausgelöst wird. Neben einer Steigerung der Sicherheit, da ein
+böswilliger Angreifer nicht fortlaufend alte Daten senden kann, um einen
+Benutzer vom Upgrade auf eine neue Version abzuhalten, hilft dies Benutzern
+auch, Spiegelserver zu erkennen, die nicht länger aktualisiert
+werden. Einige Depots, wie die historischen Archive, werden jedoch
+absichtlich nicht mehr aktualisiert, daher kann diese Prüfung durch Setzen
+dieser Option auf <literal>no</literal> deaktiviert werden. Voreingestellt
+ist der Wert der Konfigurationsoption
+<option>Acquire::Check-Valid-Until</option>, die ihrerseits die
+Voreinstellung <literal>yes</literal> hat.
+	  </para></listitem>
+
+	  <listitem><para><option>Valid-Until-Min</option> (<option>valid-until-min</option>) und
+<option>Valid-Until-Max</option> (<option>valid-until-max</option>) können
+benutzt werden, um die Dauer in Sekunden zu verlängern oder zu verkürzen, in
+der die Daten des Depots als gültig angesehen werden. -Max kann insbesondere
+dann nützlich sein, wenn das Depot kein Valid-Until-Feld in seiner
+Release-Datei bereitstellt, indem Sie Ihren eigenen Wert setzen können,
+während -Min benutzt werden kann, um die Gültigkeitsdauer auf selten
+aktualisierten (lokalen) Spiegelservern für ein häufig aktualisiertes aber
+weniger oft erreichbares Archiv (das auch in der sources.list steht) zu
+erhöhen anstatt die Prüfung ganz zu deaktivieren. Voreingestellt sind die
+Werte der Konfigurationsoptionen <option>Acquire::Min-ValidTime</option> und
+<option>Acquire::Max-ValidTime</option>, die standardmäßig jeweils nicht
+gesetzt sind.
+	  </para></listitem>
+
+	  <listitem><para><option>Check-Date</option> (<option>check-date</option>) ist ein
+Ja-/Nein-Wert, der steuert, ob APT berücksichtigen soll, ob die Zeit auf der
+Maschine korrekt ist und deshalb zeitbezogene Prüfungen durchführen soll,
+wie die Prüfung, ob eine Release-Datei nicht aus der Zukunft stammt. Sie zu
+deaktivieren deaktiviert auch die oben erwähnte Option
+<option>Check-Valid-Until</option>.
+	  </para></listitem>
+
+	  <listitem><para><option>Date-Max-Future</option> (<option>date-max-future</option>) steuert,
+wie weit aus der Zukunft ein Depot liegen darf. Voreingestellt ist der Wert
+der Konfigurationsoption <option>Acquire::Max-FutureTime</option>, die
+standardmäßig zehn Sekunden beträgt.
+	  </para></listitem>
+
+	  <listitem><para><option>InRelease-Path</option> (<option>inrelease-path</option>) legt den
+Pfad zur InRelease-Datei relativ zur normalen Position einer
+<filename>InRelease</filename>-Datei fest. Standardmäßig ist diese Option
+nicht gesetzt und APT wird versuchen, eine
+<filename>InRelease</filename>-Datei zu holen oder, falls dies fehlschlägt,
+eine <filename>Release</filename>-Datei und die zugehörige
+<filename>Release.gpg</filename>-Datei. Durch das Setzen dieser Option wird
+der angegebene Pfad anstelle der InRelease-Datei probiert und der Rückgriff
+auf <filename>Release</filename>-Dateien wird deaktiviert.
+	  </para></listitem>
+
+       </itemizedlist>
+
+    </para>
+ </refsect1>
+
+ <refsect1><title>URI-Beschreibung</title>
+
+    <para>Die derzeit erkannten URI-Typen sind:
+   <variablelist>
+    <varlistentry><term><command>http</command> (&apt-transport-http;)</term>
+    <listitem><para>
+    Das Schema »http« gibt einen HTTP-Server für ein Archiv an und ist die am
+häufigsten verwendete Methode. Der URI kann Anmeldeinformationen direkt
+enthalten, falls das Archiv dies erfordert, vorzugsweise sollte jedoch
+&apt-authconf; benutzt werden. Die Methode unterstützt auch SOCKS5- und
+HTTP(S)-Proxys, die entweder über APT-spezifische Konfiguration eingerichtet
+werden oder durch die Umgebungsvariable <envar>http_proxy</envar>, die
+(unter der Annahme, dass ein HTTP-Proxy Authentifizierung verlangt) das
+Format <replaceable>http://Benutzer:Passwort@Server:Port/</replaceable>
+hat. Die Einzelheiten der Authentifizierung für Proxys können auch über
+&apt-authconf; bereitgestellt werden.</para>
+    <para>Beachten Sie, dass diese Formen der Authentifizierung unsicher sind, da die
+ganze Kommunikation mit dem fernen Server (oder Proxy) unverschlüsselt ist,
+so dass ein Angreifer mit ausreichenden Fähigkeiten die Anmeldung sowie alle
+anderen Interaktionen beobachten und aufzeichnen kann. Der Angreifer kann
+die Kommunikation <emphasis>nicht</emphasis> verändern, da das
+Datensicherheitsmodell von APT unabhängig von der gewählten Transportmethode
+ist. Einzelheiten finden Sie unter &apt-secure;.</para></listitem>
+    </varlistentry>
+
+    <varlistentry><term><command>https</command> (&apt-transport-https;)</term>
+    <listitem><para>
+    Das Schema »https« gibt einen HTTPS-Server für ein Archiv an und ist
+bezüglich Benutzung und verfügbaren Optionen dem HTTP-Schema sehr
+ähnlich. Der Hauptunterschied besteht darin, dass die Kommunikation zwischen
+APT und Server (oder Proxy) verschlüsselt abläuft. Beachten Sie, dass die
+Verschlüsselung nicht davor schützt, dass ein Angreifer erfährt, welcher
+Server (oder Proxy) mit APT kommuniziert. Eine tiefere Analyse kann
+möglicherweise noch offenbaren, welche Daten heruntergeladen wurden. Falls
+dies Sorge bereitet, könnten die nachfolgend genannten TOR-basierten
+Schemata eine geeignete Alternative sein.</para></listitem>
+    </varlistentry>
+
+    <varlistentry><term><command>mirror</command>, <command>mirror+<replaceable>Schema</replaceable></command> (&apt-transport-mirror;)</term>
+    <listitem><para>
+    Das Schema »mirror« gibt den Speicherort der Spiegelserverliste
+an. Standardmäßig wird für den Speicherort das Schema
+<literal>http</literal> benutzt, aber jedes andere Schema kann per
+<command>mirror+<replaceable>Schema</replaceable></command> verwendet
+werden. Die Spiegelserverliste selbst kann mehrere verschiedenen URIs für
+Spiegel enthalten, die der APT-Client transparent auswählt oder auf die er
+zurückgreift. Dies ist als Hilfe bei der Lastverteilung zwischen verfügbaren
+Spiegelservern gedacht und stellt zudem sicher, dass Clients sogar dann
+Daten beziehen können, wenn einige konfigurierte Spiegelserver nicht
+verfügbar sind.
+    </para></listitem>
+    </varlistentry>
+
+    <varlistentry><term><command>file</command></term>
+    <listitem><para>
+    Das file-Schema erlaubt es einem beliebigen Verzeichnis im Dateisystem, als
+Archiv betrachtet zu werden. Dies ist nützlich für eingehängtes NFS und
+lokale Spiegel oder Archive.</para></listitem>
+    </varlistentry>
+    
+    <varlistentry><term><command>cdrom</command></term>
+    <listitem><para>
+    Das Schema »cdrom« erlaubt APT ein lokales CD-ROM-, DVD- oder USB-Laufwerk
+mit Medienwechsel zu benutzen. Benutzen Sie das Programm &apt-cdrom;, um
+»cdrom«-Einträge in der Quellenliste zu erstellen.</para></listitem>
+    </varlistentry>
+
+    <varlistentry><term><command>ftp</command></term>
+    <listitem><para>
+    Das Schema »ftp« gibt einen FTP-Server für ein Archiv an. Die Verwendung von
+FTP geht zu Gunsten von <literal>http</literal> und <literal>https</literal>
+zurück und viele Archive haben entweder nie FTP-Zugriff geboten oder ziehen
+diesen zurück. Falls Sie diese Methode immer noch benötigen, sind dafür
+viele Konfigurationsoptionen im Bereich <literal>Acquire::ftp</literal>
+verfügbar und ausführlich in &apt-conf; erklärt.</para>
+    <para>Bitte beachten Sie, dass ein FTP-Proxy durch Benutzung der
+<envar>ftp_proxy</envar>-Umgebungsvariablen angegeben werden kann. Es ist
+mittels dieser Umgebungsvariable und <emphasis>nur</emphasis> dieser
+Umgebungsvariable möglich, einen HTTP-Proxy anzugeben (HTTP-Proxy-Server
+verstehen oft auch FTP-URLs). Proxys, die HTTP benutzen und in der
+Konfigurationsdatei festgelegt sind, werden ignoriert.</para></listitem>
+    </varlistentry>
+
+    <varlistentry><term><command>copy</command></term>
+    <listitem><para>
+    Das Schema »copy« ist identisch mit dem file-Schema, außer dass Pakete in
+das Zwischenspeicherverzeichnis kopiert werden, anstatt direkt von ihrem
+Herkunftsort benutzt zu werden. Dies ist für Leute nützlich, die
+Wechseldatenträger benutzen, um Dateien mit APT umherzukopieren.</para></listitem>
+    </varlistentry>
+    
+    <varlistentry><term><command>rsh</command></term><term><command>ssh</command></term>
+    <listitem><para>
+    Die Methode »rsh/ssh« ruft RSH/SSH auf, um sich mit einem Rechner in der
+Ferne zu verbinden und als angegebener Benutzer auf die Dateien
+zuzugreifen. Es wird empfohlen, vorher Rhosts oder RSA-Schlüssel zu
+konfigurieren. Für die Übertragung von Dateien aus der Ferne werden die
+Standardbefehle <command>find</command> und <command>dd</command> verwandt.
+    </para></listitem>
+    </varlistentry>
+
+    <varlistentry><term>weitere zulässige URI-Typen hinzufügen</term>
+    <listitem><para>
+    APT kann mit weiteren Methoden erweitert werden, die in anderen optionalen
+Paketen geliefert werden, die dem Namensschema
+<literal>apt-transport-<replaceable>Methode</replaceable></literal> folgen
+sollten. Das APT-Team betreut zum Beispiel außerdem das Paket
+<package>apt-transport-tor</package>, das Zugriffsmethoden für HTTP- und
+HTTPS-URIs bereitstellt, die über das TOR-Netzwerk geleitet werden.
+    </para></listitem>
+    </varlistentry>
+  </variablelist>
+ </para>
+ </refsect1>
+
+ <refsect1><title>Beispiele</title>
+   <para>benutzt die lokal gespeicherten (oder per NFS eingehängten) Archive in
+/home/apt/debian für stable/main, stable/contrib und stable/non-free.</para>
+   <literallayout>deb file:/home/apt/debian stable main contrib non-free</literallayout>
+   <literallayout>Types: deb
+URIs: file:/home/apt/debian
+Suites: stable
+Components: main contrib non-free</literallayout>
+
+   <para>wie oben, außer das dies die instabile (Entwicklungs-) Distribution benutzt.</para>
+   <literallayout>deb file:/home/apt/debian unstable main contrib non-free</literallayout>
+   <literallayout>Types: deb
+URIs: file:/home/apt/debian
+Suites: unstable
+Components: main contrib non-free</literallayout>
+
+   <para>Quellenangabe für Obiges</para>
+   <literallayout>deb-src file:/home/apt/debian unstable main contrib non-free</literallayout>
+   <literallayout>Types: deb-src
+URIs: file:/home/apt/debian
+Suites: unstable
+Components: main contrib non-free</literallayout>
+
+   <para>Die erste Zeile bekommt Paketinformationen für die Architekturen in
+<literal>APT::Architectures</literal>, während die zweite immer
+<literal>amd64</literal> und <literal>armel</literal> holt.</para>
+   <literallayout>deb http://deb.debian.org/debian &debian-stable-codename; main
+deb [ arch=amd64,armel ] http://deb.debian.org/debian &debian-stable-codename; main</literallayout>
+   <literallayout>Types: deb
+URIs: http://deb.debian.org/debian
+Suites: &debian-stable-codename;
+Components: main
+
+Types: deb
+URIs: http://deb.debian.org/debian
+Suites: &debian-stable-codename;
+Components: main
+Architectures: amd64 armel
+</literallayout>
+
+   <para>benutzt HTTP, um auf das Archiv auf archive.debian.org zuzugreifen und nur
+den hamm/main-Bereich zu benutzen.</para>
+   <literallayout>deb http://archive.debian.org/debian-archive hamm main</literallayout>
+   <literallayout>Types: deb
+URIs: http://archive.debian.org/debian-archive
+Suites: hamm
+Components: main</literallayout>
+
+   <para>benutzt FTP, um auf das Archiv auf archive.debian.org unter dem
+debian-Verzeichnis zuzugreifen und nur den
+&debian-stable-codename;/contrib-Bereich zu benutzen.</para>
+   <literallayout>deb ftp://ftp.debian.org/debian &debian-stable-codename; contrib</literallayout>
+   <literallayout>Types: deb
+URIs: ftp://ftp.debian.org/debian
+Suites: &debian-stable-codename;
+Components: contrib</literallayout>
+
+   <para>benutzt FTP, um auf das Archiv auf ftp.debian.org unter dem
+debian-Verzeichnis zuzugreifen und nur den unstable/contrib-Bereich zu
+benutzen. Falls diese Zeile zusammen mit der aus dem vorherigen Beispiel in
+der Datei <filename>sources.list</filename> auftaucht, wird eine einzelne
+FTP-Sitzung für beide Quellzeilen benutzt.</para>
+   <literallayout>deb ftp://ftp.debian.org/debian unstable contrib</literallayout>
+   <literallayout>Types: deb
+URIs: ftp://ftp.debian.org/debian
+Suites: unstable
+Components: contrib</literallayout>
+
+   <para>benutzt HTTP, um auf das Archiv auf ftp.tlh.debian.org unter dem
+universe-Verzeichnis zuzugreifen und benutzt nur Dateien, die unter
+<filename>unstable/binary-i386</filename> auf i386-Maschinen,
+<filename>unstable/binary-amd64</filename> auf amd64 und so weiter für
+andere unterstützte Architekturen, gefunden werden. [Beachten Sie, dass
+dieses Beispiel nur anschaulich macht, wie die Platzhaltervariable benutzt
+wird. Offizielle Debian-Archive sind nicht so strukturiert.] <literallayout>deb http://ftp.tlh.debian.org/universe unstable/binary-$(ARCH)/</literallayout> <literallayout>Types: deb
+URIs: http://ftp.tlh.debian.org/universe
+Suites: unstable/binary-$(ARCH)/</literallayout>
+   </para>
+
+   <para>benutzt HTTP, um sowohl Binärpakete als auch Quellen von den
+Programmsammlungen Stable, Testing, Unstable und den Bestandteilen Main und
+Contrib zu holen.</para>
+   <literallayout>deb http://deb.debian.org/debian stable main contrib
+deb-src http://deb.debian.org/debian stable main contrib
+deb http://deb.debian.org/debian testing main contrib
+deb-src http://deb.debian.org/debian testing main contrib
+deb http://deb.debian.org/debian unstable main contrib
+deb-src http://deb.debian.org/debian unstable main contrib</literallayout>
+   <literallayout>Types: deb deb-src
+URIs: http://deb.debian.org/debian
+Suites: stable testing unstable
+Components: main contrib
+</literallayout>
+
+ </refsect1>
+
+ <refsect1><title>Siehe auch</title>
+   <para>&apt-get;, &apt-conf;, &apt-acquire-additional-files;</para>
+ </refsect1>
+
+ &manbugs;
+
+ <refsect1><title>&translation-title;</title>
+   <para>&translation-holder;</para>
+   <para>&translation-english;</para>
+ </refsect1>
+</refentry>

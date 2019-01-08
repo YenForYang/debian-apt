@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Chapitre 1. Introduction</title>
+    <meta name="generator" content="DocBook XSL Stylesheets V1.79.1"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="home" href="index.html" title="Utilisation d'APT hors ligne"/>
+    <link rel="up" href="index.html" title="Utilisation d'APT hors ligne"/>
+    <link rel="prev" href="index.html" title="Utilisation d'APT hors ligne"/>
+    <link rel="next" href="ch2.html" title="Chapitre 2. Utilisation d'APT sur les deux machines"/>
+  </head>
+  <body>
+    <div class="navheader">
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Chapitre 1. Introduction</th>
+        </tr>
+        <tr>
+          <td align="left"><a accesskey="p" href="index.html">Précédent</a> </td>
+          <th width="60%" align="center"> </th>
+          <td align="right"> <a accesskey="n" href="ch2.html">Suivant</a></td>
+        </tr>
+      </table>
+      <hr/>
+    </div>
+    <div class="chapter">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h1 class="title"><a id="ch1"/>Chapitre 1. Introduction</h1>
+          </div>
+        </div>
+      </div>
+      <div class="toc">
+        <p>
+          <strong>Table des matières</strong>
+        </p>
+        <dl class="toc">
+          <dt>
+            <span class="section">
+              <a href="ch1.html#s1.1">1.1. Aperçu</a>
+            </span>
+          </dt>
+        </dl>
+      </div>
+      <div class="section">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h2 class="title"><a id="s1.1"/>1.1. Aperçu</h2>
+            </div>
+          </div>
+        </div>
+        <p>
+Normalement, APT a besoin d'avoir un accès direct à une archive Debian, soit
+sur un support local, soit via le réseau. Un autre cas intéressant à traiter
+est celui d'une machine dotée d'une liaison peu rapide (comme un modem) avec
+une autre possédant une connexion à haut débit mais située à distance.
+</p>
+        <p>
+Une solution est d'utiliser un support amovible de grande taille tel qu'un
+disque Zip ou un disque Superdisk (NdT : ce document est daté..:-)). Bien
+que ces supports ne disposent pas d'assez de place pour héberger une archive
+Debian complète, ils peuvent toutefois contenir un sous-ensemble de taille
+suffisante pour les besoins de nombreux utilisateurs. L'idée est alors
+d'utiliser APT pour créer une liste de paquets nécessaires, puis de les
+récupérer avec une machine disposant d'une bonne connectivité. Il est même
+possible d'utiliser soit une autre machine Debian avec APT soit un autre
+système d'exploitation et un outil de téléchargement tel que wget. Dans ce
+qui suit, <span class="emphasis"><em>machine distante</em></span> désignera la machine qui
+télécharge les paquets et <span class="emphasis"><em>machine cible</em></span>, celle qui a
+une connectivité limitée.
+</p>
+        <p>
+Il est nécessaire de manipuler le fichier de configuration d'APT de manière
+intelligente. Le préalable est d'indiquer à APT d'examiner le contenu d'un
+disque pour y trouver les fichiers d'archive. Ce disque doit utiliser un
+système de fichier autorisant les noms longs, par exemple ext2, fat32 ou
+vfat.
+</p>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr/>
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td align="left"><a accesskey="p" href="index.html">Précédent</a> </td>
+          <td align="center"> </td>
+          <td align="right"> <a accesskey="n" href="ch2.html">Suivant</a></td>
+        </tr>
+        <tr>
+          <td align="left" valign="top">Utilisation d'APT hors ligne </td>
+          <td align="center">
+            <a accesskey="h" href="index.html">Sommaire</a>
+          </td>
+          <td align="right" valign="top"> Chapitre 2. Utilisation d'APT sur les deux machines</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

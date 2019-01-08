@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+  "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % aptent SYSTEM "apt.ent"> %aptent;
+<!ENTITY % aptverbatiment SYSTEM "apt-verbatim.ent"> %aptverbatiment;
+<!ENTITY % aptvendor SYSTEM "apt-vendor.ent"> %aptvendor;
+]>
+
+<refentry>
+
+ <refentryinfo>
+   <!-- The last update date -->
+&apt-author.team;
+   &apt-email;
+   &apt-product;
+   
+   <date>2018-05-11T00:00:00Z</date>
+ </refentryinfo>
+
+ <refmeta>
+   <refentrytitle>apt-transport-https</refentrytitle>
+   <manvolnum>1</manvolnum>
+   <refmiscinfo class="manual">APT</refmiscinfo>
+ </refmeta>
+
+ 
+ <!-- Man page title -->
+<refnamediv>
+    <refname>apt-transport-https</refname>
+    <refpurpose>Transportmethode van APT voor het downloaden via het HTTP Secure protocol
+(HTTPS)</refpurpose>
+ </refnamediv>
+
+<refsect1><title>Omschrijving</title>
+<para>Deze transportmethode van APT laat toe om pakketbronnen te gebruiken die
+benaderd worden via het HTTP Secure protocol (HTTPS), ook wel aangeduid als
+HTTP over TLS. Ze is standaard beschikbaar sinds apt 1.5 en voordien in het
+pakket <package>apt-transport-https</package>. Merk op dat een
+transportmethode nooit rechtstreeks door een gebruiker aangesproken wordt,
+maar door APT-gereedschap gebruikt wordt op basis van de
+gebruikersconfiguratie.</para>
+<para>HTTP zelf is een niet-versleuteld transportprotocol (vergelijk
+&apt-transport-http;), dat zoals de toegevoegde S aangeeft, ingepakt wordt
+in een versleutelde laag, die bekend staat als Transport Layer Security
+(TLS), om te voorzien in versleuteling van punt naar punt. Een voldoende
+onderlegde aanvaller kan nog steeds de communicatiepartners gadeslaan en een
+grondige analyse van de versleutelde communicatie kan nog steeds belangrijke
+details aan het licht brengen. Een overzicht van beschikbare alternatieve
+transportmethodes wordt gegeven in &sources-list;.</para>
+</refsect1>
+
+<refsect1><title>Opties</title>
+<para>Het HTTPS-protocol is gebaseerd op het HTTP-protocol, en dus zijn alle
+opties die ondersteund worden door &apt-transport-http; ook beschikbaar via
+<literal>Acquire::https</literal>. Ze hebben standaard dezelfde waarden als
+vermeld bij <literal>Acquire::http</literal>. Deze man-pagina documenteert
+enkel de opties die <emphasis>specifiek zijn voor https</emphasis>.</para>
+
+<refsect2><title>Servergeloofsbrieven</title>
+<para>Standaard worden alle door het systeem vertrouwde certificaten (zie het
+pakket <package>ca-certificates</package>) gebruikt om het certificaat van
+de server te verifiëren. Een alternatieve certificaatautoriteit (CA) kan
+geconfigureerd worden met de optie <literal>Acquire::https::CAInfo</literal>
+en zijn computerspecifieke optie
+<literal>Acquire::https::CAInfo::<replaceable>computer</replaceable></literal>.
+De optie CAInfo specificeert een bestand dat bestaat uit CA-certificaten (in
+PEM-indeling), die samengevoegd worden om de keten te vormen die APT moet
+gebruiken voor het verifiëren van het pad vanaf het door uzelf ondertekend
+basiscertificaat. Indien de externe server tijdens de uitwisseling de hele
+keten verstrekt, dan moet het bestand enkel het basiscertificaat
+bevatten. Anders is de hele keten vereist. Indien u ondersteuning moet
+voorzien voor verschillende autoriteiten, bestaat de enige mogelijkheid erin
+alles samen te voegen.</para>
+<para>Er kan een aangepaste lijst van herroepen certificaten (certificate
+revocation list - CRL) geconfigureerd worden met de opties
+<literal>Acquire::https::CRLFile</literal> en
+<literal>Acquire::https::CRLFile::<replaceable>computer</replaceable></literal>.
+Zoals bij de vorige optie moet een bestand opgegeven worden in PEM-indeling.</para>
+</refsect2>
+
+<refsect2><title>Beveiliging uitschakelen</title>
+<para>Als tijdens het proces van serverauthenticatie de verificatie van het
+certificaat om een af andere reden (vervallen, herroepen, persoon in het
+midden, enz.) mislukt, mislukt het tot stand brengen van de verbinding. Dit
+is duidelijk wat u in alle gevallen wenst en wat voorzien wordt in de
+standaardwaarde (true) van de optie
+<literal>Acquire::https::Verify-Peer</literal> en diens computerspecifieke
+variant. Indien u <emphasis>precies</emphasis> weet wat u doet, kunt u door
+deze optie op "<literal>false</literal>" in te stellen, de wederzijdse
+verificatie van certificaten overslaan en ervoor zorgen dat de uitwisseling
+succesvol is. Nogmaals: deze optie is enkel bedoeld met het oog op
+foutopsporing en het uitvoeren van testen, aangezien ze alle beveiliging
+wegneemt die door het gebruik van HTTPS geboden wordt.</para>
+<para>Op dezelfde manier kan de optie
+<literal>Acquire::https::Verify-Host</literal> en zijn computerspecifieke
+variant gebruikt worden om een beveiligingsfunctie te deactiveren: het door
+de server geleverde certificaat bevat de identiteit van de server en die
+moet overeenkomen met de DNS-naam die gebruikt wordt om hem te
+benaderen. Zoals gevraagd wordt door RFC 2818 wordt de naam van de
+spiegelserver standaard getoetst aan de identiteit die in het certificaat
+gevonden wordt. Dit standaardgedrag is veilig en moet niet gewijzigd worden,
+maar indien u weet dat de server die u gebruikt, een DNS-naam heeft die niet
+overeenkomst met de identiteit in diens certificaat, kunt u de optie
+instellen op "<literal>false</literal>", hetgeen zal voorkomen dat de
+vergelijking uitgevoerd wordt.</para>
+</refsect2>
+
+<refsect2><title>Cliëntauthenticatie</title>
+<para>Behalve de geboden ondersteuning voor authenticatie via een wachtwoord (zie
+&apt-authconf;), ondersteunt HTTPS ook authenticatie op basis van
+cliëntcertificaten via <literal>Acquire::https::SSLCert</literal> en
+<literal>Acquire::https::SSLKey</literal>. Deze moeten respectievelijk
+ingesteld worden op de bestandsnaam van het X.509 cliëntcertificaat en de
+ermee verbonden (niet-versleutelde) private sleutel, beide in
+PEM-indeling. In de praktijk wordt de computerspecifieke variant van beide
+opties ten zeerste aanbevolen.</para>
+</refsect2>
+
+</refsect1>
+
+<refsect1><title>Voorbeelden</title>
+<literallayout>
+Acquire::https {
+	Proxy::example.org "DIRECT";
+	Proxy "socks5h://apt:pass@127.0.0.1:9050";
+	Proxy-Auto-Detect "/usr/local/bin/apt-https-proxy-auto-detect";
+	No-Cache "true";
+	Max-Age "3600";
+	No-Store "true";
+	Timeout "10";
+	Dl-Limit "42";
+	Pipeline-Depth "0";
+	AllowRedirect "false";
+	User-Agent "Mijn APT-HTTPS";
+	SendAccept "false";
+
+	CAInfo "/pad/naar/ca/certs.pem";
+	CRLFile "/pad/naar/all/crl.pem";
+	Verify-Peer "true";
+	Verify-Host::defecte.example.org "false";
+	SSLCert::example.org "/pad/naar/cliënt/cert.pem";
+	SSLKey::example.org "/pad/naar/cliënt/key.pem"
+};
+</literallayout>
+</refsect1>
+
+<refsect1>
+<title>Zie ook</title>
+<para>&apt-transport-http; &apt-conf; &apt-authconf; &sources-list;
+</para>
+</refsect1>
+
+ &manbugs;
+
+ <refsect1><title>&translation-title;</title>
+   <para>&translation-holder;</para>
+   <para>&translation-english;</para>
+ </refsect1>
+</refentry>

@@ -1,0 +1,544 @@
+'\" t
+.\"     Title: apt-cache
+.\"    Author: Jason Gunthorpe
+.\" Generator: DocBook XSL Stylesheets v1.79.1 <http://docbook.sf.net/>
+.\"      Date: 16\ \&ao\(^ut\ \&2016
+.\"    Manual: APT
+.\"    Source: APT 1.8.0~alpha3
+.\"  Language: French
+.\"
+.TH "APT\-CACHE" "8" "16\ \&ao\(^ut\ \&2016" "APT 1.8.0~alpha3" "APT"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NOM"
+apt-cache \- recherche dans le cache d\*(AqAPT
+.SH "SYNOPSIS"
+.HP \w'\fBapt\-cache\fR\ 'u
+\fBapt\-cache\fR [\fB\-agipns\fR] [\fB\-o=\fR\fB\fIcha\(^ine_de_configuration\fR\fR] [\fB\-c=\fR\fB\fIfichier_de_configuration\fR\fR] {gencaches | showpkg\ \fIpaquet\fR...  | showsrc\ \fIpaquet\fR...  | stats | dump | dumpavail | unmet | search\ \fIexpression_r\('eguli\(`ere\fR...  | show\ \fIpaquet\fR\ [{=\fInum\('ero_version_paquet\fR\ |\ /\fIpublication_cible\fR}]...  | depends\ \fIpaquet\fR\ [{=\fInum\('ero_version_paquet\fR\ |\ /\fIpublication_cible\fR}]...  | rdepends\ \fIpaquet\fR\ [{=\fInum\('ero_version_paquet\fR\ |\ /\fIpublication_cible\fR}]...  | pkgnames\ [\fIpr\('efixe\fR]  | dotty\ \fIpaquet\fR\ [{=\fInum\('ero_version_paquet\fR\ |\ /\fIpublication_cible\fR}]...  | xvcg\ \fIpaquet\fR\ [{=\fInum\('ero_version_paquet\fR\ |\ /\fIpublication_cible\fR}]...  | policy\ [\fIpaquet\fR...]  | madison\ \fIpaquet\fR...  | {\-v\ |\ \-\-version} | {\-h\ |\ \-\-help}}
+.SH "DESCRIPTION"
+.PP
+\fBapt\-cache\fR
+r\('ealise diff\('erentes op\('erations sur le cache de paquet d\*(AqAPT\&.
+\fBapt\-cache\fR
+ne manipule pas l\*(Aq\('etat du syst\(`eme mais fournit des moyens de recherche dans les m\('etadonn\('ees d\*(Aqun paquet desquelles il extrait les informations int\('eressantes\&. Les m\('etadonn\('ees sont obtenues et mises \(`a jour avec la commande update d\*(Aq\fBapt\-get\fR
+par exemple, et peuvent donc \(^etre p\('erim\('ees si la derni\(`ere mise \(`a jour est trop ancienne, mais en contrepartie
+\fBapt\-cache\fR
+fonctionne ind\('ependamment de la disponibilit\('e des sources configur\('ees (par exemple hors ligne)\&.
+.PP
+\(`A moins que l\*(Aqoption
+\fB\-h\fR
+ou
+\fB\-\-help\fR
+ne soit donn\('ee, l\*(Aqune des commandes suivantes doit \(^etre pr\('esente\&.
+.PP
+\fBgencaches\fR
+.RS 4
+gencaches
+cr\('ee le cache d\*(AqAPT\&. Cette action est faite implicitement par toute commande qui a besoin de ce cache s\*(Aqil est manquant ou obsol\(`ete\&.
+.RE
+.PP
+\fBshowpkg\fR \fB\fIpaquet\fR\fR\fB\&...\fR
+.RS 4
+La commande
+showpkg
+affiche des informations sur les paquets donn\('es en argument\&. Les arguments restants sont les noms de paquets\&. Les versions disponibles et les d\('ependances inverses de chaque paquet r\('epertori\('e sont list\('ees, ainsi que les d\('ependances normales pour chaque version\&. Les d\('ependances normales d\*(Aqun paquet sont constitu\('ees par les paquets dont il d\('epend\ \&; les d\('ependances inverses sont les paquets qui d\('ependent du paquet en question\&. Les d\('ependances normales doivent donc \(^etre satisfaites et les d\('ependances inverses n\*(Aqont pas besoin de l\*(Aq\(^etre\&. Ainsi, la commande
+\fBapt\-cache showpkg libreadline2\fR
+donnera ce r\('esultat\ \&:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+Package: libreadline2
+Versions: 2\&.1\-12(/var/state/apt/lists/foo_Packages),
+Reverse Depends: 
+  libreadlineg2,libreadline2
+  libreadline2\-altdev,libreadline2
+Dependencies:
+2\&.1\-12 \- libc5 (2 5\&.4\&.0\-0) ncurses3\&.0 (0 (null))
+Provides:
+2\&.1\-12 \- 
+Reverse Provides: 
+.fi
+.if n \{\
+.RE
+.\}
+On peut voir que libreadline2, version 2\&.1\-12, d\('epend de libc5 et ncurses3\&.0\ \&; ces paquets doivent \(^etre install\('es au pr\('ealable pour que libreadline2 fonctionne\&. \(`A leur tour, libreadlineg2 et libreadline2\-altdev d\('ependent de libreadline2\&. Si libreadline2 est install\('e, libc5 et ncurses3\&.0 doivent \(^etre install\('es\ \&; libreadlineg2 et libreadline2\-altdev n\*(Aqont pas \(`a l\*(Aq\(^etre\&. Pour conna\(^itre le sens de la fin de cha\(^ine, il est pr\('ef\('erable de consulter le code source d\*(AqAPT\&.
+.RE
+.PP
+\fBstats\fR
+.RS 4
+La commande
+stats
+affiche des statistiques \(`a propos du cache\&. Aucun autre argument n\*(Aqest attendu\&. Voici les informations rapport\('ees\ \&:
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Total package names
+est le nombre de paquets trouv\('es dans le cache\&.
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Normal packages
+est le nombre de paquets simples, ordinaires\ \&; ces paquets tol\(`erent une correspondance bijective entre leur nom et le nom utilis\('e par les autres paquets pour les qualifier comme d\('ependance\&. La majorit\('e des paquets appartient \(`a cette cat\('egorie\&.
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Pure virtual packages
+est le nombre de paquets qui n\*(Aqexistent que sous la forme d\*(Aqun nom repr\('esentant un paquet virtuel\ \&; ces paquets \(Fo\ \&fournissent\ \&\(Fc seulement un nom de paquet virtuel et aucun paquet n\*(Aqutilise v\('eritablement ce nom\&. Par exemple, au sein du syst\(`eme Debian GNU/Linux, le nom \(Fo\ \&mail\-transport\-agent\ \&\(Fc est un paquet virtuel pur\ \&; plusieurs paquets peuvent \(Fo\ \&fournir\ \&\(Fc ce nom \(Fo\ \&mail\-transport\-agent\ \&\(Fc, mais il n\*(Aqexiste aucun paquet nomm\('e \(Fo\ \&mail\-transport\-agent\ \&\(Fc\&.
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Single virtual packages
+est le nombre de paquets virtuels qui ne peuvent \(^etre remplis que par un seul paquet\&. Par exemple, au sein du syst\(`eme Debian, \(Fo\ \&X11\-text\-viewer\ \&\(Fc est un paquet virtuel\ \&; seul le paquet \(Fo\ \&xless\ \&\(Fc remplit \(Fo\ \&X11\-text\-viewer\ \&\(Fc\&.
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Mixed virtual packages
+est le nombre de paquets qui remplissent un paquet virtuel particulier ou dont le nom est un nom de paquet virtuel\&. Par exemple, au sein du syst\(`eme Debian, \(Fo\ \&debconf\ \&\(Fc est un paquet r\('eel et il est aussi fourni par \(Fo\ \&debconf\-tiny\ \&\(Fc\&.
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Missing
+est le nombre de paquets r\('ef\('erenc\('es dans une d\('ependance mais qui ne sont fournis par aucun paquet\&. Les paquets manquants peuvent \(^etre mis en \('evidence quand on n\*(Aqacc\(`ede pas \(`a une distribution compl\(`ete ou si un paquet (r\('eel ou virtuel) a \('et\('e sorti d\*(Aqune distribution\&. Habituellement on les trouve dans les champs \(Fo\ \&Conflicts\ \&\(Fc ou \(Fo\ \&Breaks\ \&\(Fc\&.
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Total distinct
+versions est le nombre de versions de paquets trouv\('ees dans le cache\&. Quand on acc\(`ede \(`a plus d\*(Aqune distribution (\(Fo\ \&stable\ \&\(Fc et \(Fo\ \&unstable\ \&\(Fc, par exemple), cette valeur peut \(^etre consid\('erablement plus grande que le nombre total de paquets\&.
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Total dependencies
+est le nombre de relations de d\('ependances d\('eclar\('ees par tous les paquets pr\('esents dans le cache\&.
+.RE
+.sp
+.RE
+.PP
+\fBshowsrc\fR \fB\fIpaquet\fR\fR\fB\&...\fR
+.RS 4
+showsrc
+affiche toutes les entr\('ees de paquets source qui correspondent aux noms donn\('es\&. Toutes les versions sont affich\('ees et toutes les entr\('ees qui d\('eclarent que ces noms correspondent \(`a des paquets binaires\&. Utilisez l\*(Aqoption
+\fB\-\-only\-source\fR
+pour n\*(Aqafficher que le nom des paquets source\&.
+.RE
+.PP
+\fBdump\fR
+.RS 4
+La commande
+dump
+affiche un court r\('esum\('e sur chaque paquet du cache\&. Elle est d\*(Aqabord destin\('ee au d\('ebogage\&.
+.RE
+.PP
+\fBdumpavail\fR
+.RS 4
+La commande
+dumpavail
+affiche sur la sortie standard la liste des paquets disponibles\&. Elle convient \(`a une utilisation avec
+\fBdpkg\fR(1)
+et la m\('ethode
+\fBdselect\fR(1)
+s\*(Aqen sert\&.
+.RE
+.PP
+\fBunmet\fR
+.RS 4
+La commande
+unmet
+affiche un r\('esum\('e concernant toutes les d\('ependances absentes dans le cache de paquets\&.
+.RE
+.PP
+\fBshow\fR \fB\fIpaquet\fR\fR\fB\&...\fR
+.RS 4
+La commande
+show
+est semblable \(`a
+\fBdpkg \-\-print\-avail\fR\ \&; elle affiche des informations sur les paquets donn\('es en argument\&.
+.RE
+.PP
+\fBsearch\fR \fB\fIexpression_r\('eguli\(`ere\fR\fR\fB\&...\fR
+.RS 4
+La commande
+search
+recherche l\*(Aqexpression rationnelle POSIX donn\('ee en param\(`etre sur tous les paquets disponibles, voir
+\fBregex\fR(7)\&. Elle cherche une occurrence de la cha\(^ine dans les noms de paquets et dans les descriptions puis elle affiche le nom du paquet et sa description courte\&. Quand l\*(Aqoption
+\fB\-\-full\fR
+est fournie, la sortie est identique \(`a
+show
+pour chaque paquet\ \&; quand l\*(Aqoption
+\fB\-\-names\-only\fR
+est fournie, la recherche ne porte pas sur les descriptions longues, mais seulement sur les noms de paquets et les paquets fournis\&.
+.sp
+On peut utiliser des arguments distincts pour indiquer des expressions rationnelles diff\('erentes sur lesquelles seront r\('ealis\('ees un \(Fo\ \&et\ \&\(Fc logique\&.
+.RE
+.PP
+\fBdepends\fR \fB\fIpaquet\fR\fR\fB\&...\fR
+.RS 4
+La commande
+depends
+affiche la liste de toutes les d\('ependances d\*(Aqun paquet et la liste de tous les paquets possibles qui satisfont ces d\('ependances\&.
+.RE
+.PP
+\fBrdepends\fR \fB\fIpaquet\fR\fR\fB\&...\fR
+.RS 4
+La commande
+rdepends
+affiche la liste de toutes les d\('ependances inverses d\*(Aqun paquet\&.
+.RE
+.PP
+\fBpkgnames\fR [\fIpr\('efixe\fR]
+.RS 4
+Cette commande affiche le nom de chaque paquet connu par APT\&. Un pr\('efixe pour filtrer la liste des noms peut \(^etre donn\('e en param\(`etre\&. La sortie est adapt\('ee \(`a une utilisation au sein d\*(Aqune fonction compl\(`ete de shell\ \&; elle est produite tr\(`es rapidement\&. On utilise au mieux cette commande avec l\*(Aqoption
+\fB\-\-generate\fR\&.
+.sp
+Veuillez noter qu\*(Aqun paquet connu par APT n\*(Aqest pas forc\('ement disponible, installable ou install\('e\&. Par exemple, les paquets virtuels sont \('egalement affich\('es dans la liste cr\('e\('ee\&.
+.RE
+.PP
+\fBdotty\fR \fB\fIpaquet\fR\fR\fB\&...\fR
+.RS 4
+La commande
+dotty
+prend une liste de paquets sur la ligne de commande et affiche une sortie appropri\('ee \(`a une utilisation par la commande dotty du paquet
+\m[blue]\fBGraphViz\fR\m[]\&\s-2\u[1]\d\s+2\&. Il en r\('esulte un ensemble de n\(oeuds et d\*(Aqarcs repr\('esentant les relations entre les paquets\&. Par d\('efaut les paquets donn\('es en argument suivent toutes leurs d\('ependances, ce qui peut produire un graphe tr\(`es volumineux\&. Pour limiter la sortie aux seuls paquets list\('es sur la ligne de commande, positionnez l\*(Aqoption
+APT::Cache::GivenOnly\&.
+.sp
+Les noeuds r\('esultants ont plusieurs formes\ \&; les paquets normaux sont des bo\(^ites, les \(Fo\ \&provides\ \&\(Fc purs sont des triangles, les \(Fo\ \&provides\ \&\(Fc mixtes sont des diamants et les paquets manquants sont des hexagones\&. Les bo\(^ites oranges expriment un arr\(^et de la r\('ecursivit\('e [paquet feuille], les lignes bleues repr\('esentent des pr\('ed\('ependances et les lignes vertes repr\('esentent des conflits\&.
+.sp
+Attention, dotty ne peut pas repr\('esenter des ensembles tr\(`es grands de paquets\&.
+.RE
+.PP
+\fBxvcg\fR \fB\fIpaquet\fR\fR\fB\&...\fR
+.RS 4
+Identique \(`a
+dotty, mais r\('eserv\('e \(`a xvcg fourni avec
+\m[blue]\fBVCG tool\fR\m[]\&\s-2\u[2]\d\s+2\&.
+.RE
+.PP
+\fBpolicy\fR [\fIpaquet\fR\&...]
+.RS 4
+policy
+sert \(`a d\('eboguer des probl\(`emes relatifs au fichier des pr\('ef\('erences\&. Sans argument, la commande affiche la priorit\('e de chaque source\&. Sinon, elle affiche des informations pr\('ecises sur la priorit\('e du paquet donn\('e en argument\&.
+.RE
+.PP
+\fBmadison\fR \fB\fIpaquet\fR\fR\fB\&...\fR
+.RS 4
+La commande
+madison
+d\*(Aqapt\-cache
+cherche \(`a mimer le format de sortie propre \(`a l\*(Aqoutil debian de gestion d\*(Aqarchives,
+madison, ainsi qu\*(Aqune partie de ses fonctionnalit\('es\&. Elle affiche les versions disponibles d\*(Aqun paquet dans un tableau\&. Contrairement au programme original
+madison, elle n\*(Aqaffiche que des informations concernant l\*(Aqarchitecture pour laquelle Apt a lu la liste des paquets disponibles (APT::Architecture)\&.
+.RE
+.SH "OPTIONS"
+.PP
+Toutes les options de la ligne de commande peuvent \(^etre d\('efinies dans le fichier de configuration, les descriptions indiquant l\*(Aqoption de configuration concern\('ee\&. Pour les options bool\('eennes, vous pouvez inverser les r\('eglages du fichiers de configuration avec
+\fB\-f\-\fR,\fB\-\-no\-f\fR,
+\fB\-f=no\fR
+et d\*(Aqautres variantes analogues\&.
+.PP
+\fB\-p\fR, \fB\-\-pkg\-cache\fR
+.RS 4
+Indique le fichier servant de cache des paquets\&. Le cache des paquets est le cache primaire utilis\('e par toutes les op\('erations\&. \('El\('ement de configuration\ \&:
+Dir::Cache::pkgcache\&.
+.RE
+.PP
+\fB\-s\fR, \fB\-\-src\-cache\fR
+.RS 4
+Indique le fichier servant de cache des sources\&. Ce cache n\*(Aqest utilis\('e que par
+gencaches\ \&; une version des informations sur les paquets, issue d\*(Aqune analyse de sources distantes, est conserv\('ee\&. Quand le cache des paquets est cr\('e\('e, le cache des sources est utilis\('e afin d\*(Aq\('eviter d\*(Aqanalyser \(`a nouveau tous les paquets\&. \('El\('ement de configuration\ \&:
+Dir::Cache::srcpkgcache\&.
+.RE
+.PP
+\fB\-q\fR, \fB\-\-quiet\fR
+.RS 4
+Mode silencieux\ \&; produit une sortie pertinente pour l\*(Aqenregistrement dans un fichier\-journal, sans afficher d\*(Aqindicateur de progression\&. Un plus grand nombre de q produira un plus grand silence, avec un maximum de 2\&. Vous pouvez aussi utiliser
+\fB\-q=#\fR
+pour positionner le niveau de silence, annulant le fichier de configuration\&. \('El\('ement de configuration\ \&:
+quiet\&.
+.RE
+.PP
+\fB\-i\fR, \fB\-\-important\fR
+.RS 4
+N\*(Aqaffiche que les d\('ependances importantes\ \&; \(`a utiliser avec les commandes
+unmet
+et
+depends
+pour n\*(Aqafficher que les relations Depends et Pre\-Depends\&. \('El\('ement de configuration\ \&:
+APT::Cache::Important\&.
+.RE
+.PP
+\fB\-\-no\-pre\-depends\fR, \fB\-\-no\-depends\fR, \fB\-\-no\-recommends\fR, \fB\-\-no\-suggests\fR, \fB\-\-no\-conflicts\fR, \fB\-\-no\-breaks\fR, \fB\-\-no\-replaces\fR, \fB\-\-no\-enhances\fR
+.RS 4
+Par d\('efaut,
+\fBdepends\fR
+et
+\fBrdepends\fR
+affichent toutes les d\('ependances\&. Ce comportement peut \(^etre modifi\('e avec ces r\('eglages qui omettront le type de d\('ependance indiqu\('e\&. \('El\('ement de configuration\ \&:
+APT::Cache::Show\fITypeD\('ependance\fR, p\&.\ \&ex\&.\ \&APT::Cache::ShowRecommends\&.
+.RE
+.PP
+\fB\-\-implicit\fR
+.RS 4
+Par d\('efaut,
+\fBdepends\fR
+et
+\fBrdepends\fR
+n\*(Aqaffichent que les d\('ependances indiqu\('ees explicitement dans les m\('etadonn\('ees\&. Avec ce marqueur, ils afficheront aussi les d\('ependances ajout\('ees de fa\(,con implicite bas\('ees sur les donn\('ees rencontr\('ees\&. Par exemple, un message
+Conflicts: foo
+exprime de fa\(,con implicite que ce paquet est aussi en conflit avec le paquet foo de n\*(Aqimporte quelle autre architecture\&. \('El\('ement de configuration\ \&:
+APT::Cache::ShowImplicit\&.
+.RE
+.PP
+\fB\-f\fR, \fB\-\-full\fR
+.RS 4
+Affiche la totalit\('e des champs d\*(Aqinformation sur le paquet lors d\*(Aqune recherche\&. \('El\('ement de configuration\ \&:
+APT::Cache::ShowFull\&.
+.RE
+.PP
+\fB\-a\fR, \fB\-\-all\-versions\fR
+.RS 4
+Affiche la totalit\('e des champs d\*(Aqinformation pour toutes les versions disponibles\ \&: c\*(Aqest la valeur par d\('efaut\&. Pour la d\('esactiver, utilisez l\*(Aqoption
+\fB\-\-no\-all\-versions\fR\&. Quand l\*(Aqoption
+\fB\-\-no\-all\-versions\fR
+est choisie, seuls les \('el\('ements de la version choisie (celle qui serait install\('ee) seront affich\('es\&. Cette option concerne seulement la commande
+show\&. \('El\('ement de configuration\ \&:
+APT::Cache::AllVersions\&.
+.RE
+.PP
+\fB\-g\fR, \fB\-\-generate\fR
+.RS 4
+R\('ealise une mise \(`a jour automatique du cache des paquets plut\(^ot que de se servir du cache tel qu\*(Aqil est\&. Pour d\('esactiver cette option (option par d\('efaut), utilisez l\*(Aqoption
+\fB\-\-no\-generate\fR\&. \('El\('ement de configuration\ \&:
+APT::Cache::Generate\&.
+.RE
+.PP
+\fB\-\-names\-only\fR, \fB\-n\fR
+.RS 4
+N\*(Aqeffectue une recherche que sur les noms de paquets et de paquets fournis, pas sur les descriptions longues\&. \('El\('ement de configuration\ \&:
+APT::Cache::NamesOnly\&.
+.RE
+.PP
+\fB\-\-all\-names\fR
+.RS 4
+Avec cette option,
+pkgnames
+affiche tous les noms, les noms des paquets virtuels et les d\('ependances manquantes\&. \('El\('ement de configuration\ \&:
+APT::Cache::AllNames\&.
+.RE
+.PP
+\fB\-\-recurse\fR
+.RS 4
+Avec cette option,
+depends
+et
+rdepends
+sont r\('ecursives de mani\(`ere \(`a n\*(Aqafficher qu\*(Aqune seule fois les paquets mentionn\('es\&. \('El\('ement de configuration\ \&:
+APT::Cache::RecurseDepends\&.
+.RE
+.PP
+\fB\-\-installed\fR
+.RS 4
+Cette option limite la sortie de
+depends
+et de
+rdepends
+aux paquets qui sont actuellement install\('es\&. \('El\('ement de configuration\ \&:
+APT::Cache::Installed\&.
+.RE
+.PP
+\fB\-\-with\-source\fR \fB\fInom_de_fichier\fR\fR
+.RS 4
+Ajoute le fichier donn\('e comme source de m\('etadonn\('ees\&. La commande peut \(^etre r\('ep\('et\('ee pour ajouter de multiples fichiers\&. Actuellement, les fichiers*\&.deb,
+*\&.dsc,
+*\&.changes,
+Sources
+et
+Packages, aussi bien que les r\('epertoires de paquets source sont pris en charge\&. Les correspondances de fichier sont bas\('ees sur leur nom seulement et non sur leur contenu\ \&!
+.sp
+Les
+Sources
+et
+Packages
+peuvent \(^etre compress\('es dans n\*(Aqimporte quel format qu\*(AqAPT prend en charge \(`a condition qu\*(Aqils portent la bonne extension\&. Si vous avez besoin de stocker plusieurs de ces fichiers dans un seul r\('epertoire, vous pouvez ajouter comme pr\('efixe le nom que vous voulez pourvu que le dernier caract\(`ere soit un tiret bas (\(Fo\ \&_\ \&\(Fc)\&. Exemple\ \&: mon\&.exemple_Packages\&.xz
+.sp
+Veuillez noter que ces sources sont trait\('ees comme fiables (voir
+\fBapt-secure\fR(8))\&. \('El\('ement de configuration\ \&:
+APT::Sources::With\&.
+.RE
+.PP
+\fB\-h\fR, \fB\-\-help\fR
+.RS 4
+Afficher un bref r\('esum\('e de l\*(Aqutilisation\&.
+.RE
+.PP
+\fB\-v\fR, \fB\-\-version\fR
+.RS 4
+Afficher la version du programme\&.
+.RE
+.PP
+\fB\-c\fR, \fB\-\-config\-file\fR
+.RS 4
+Fichier de configuration\ \&; indique le fichier de configuration \(`a utiliser\&. Le programme lira le fichier de configuration par d\('efaut puis le fichier indiqu\('e ici\&. Si les r\('eglages de configuration doivent \(^etre \('etablis avant l\*(Aqanalyse des fichiers de configuration par d\('efaut, un fichier peut \(^etre indiqu\('e avec la variable d\*(Aqenvironnement
+\fBAPT_CONFIG\fR\&. Veuillez consulter
+\fBapt.conf\fR(5)
+pour des informations sur la syntaxe d\*(Aqutilisation\&.
+.RE
+.PP
+\fB\-o\fR, \fB\-\-option\fR
+.RS 4
+D\('efinir une option de configuration\ \&; permet de r\('egler une option de configuration donn\('ee\&. La syntaxe est
+\fB\-o Foo::Bar=bar\fR\&.
+\fB\-o\fR
+et
+\fB\-\-option\fR
+peuvent \(^etre utilis\('ees plusieurs fois pour d\('efinir des options diff\('erentes\&.
+.RE
+.SH "FICHIERS"
+.PP
+/etc/apt/sources\&.list
+.RS 4
+Emplacement pour la r\('ecup\('eration des paquets\&. \('El\('ement de configuration\ \&:
+Dir::Etc::SourceList\&.
+.RE
+.PP
+/etc/apt/sources\&.list\&.d/
+.RS 4
+Fragments de fichiers d\('efinissant les emplacements de r\('ecup\('eration de paquets\&. \('El\('ement de configuration\ \&:
+Dir::Etc::SourceParts\&.
+.RE
+.PP
+/var/lib/apt/lists/
+.RS 4
+Zone de stockage pour les informations qui concernent chaque ressource de paquet sp\('ecifi\('ee dans
+\fBsources.list\fR(5)
+\('El\('ement de configuration\ \&:
+Dir::State::Lists\&.
+.RE
+.PP
+/var/lib/apt/lists/partial/
+.RS 4
+Zone de stockage pour les informations en transit\&. \('El\('ement de configuration\ \&:
+Dir::State::Lists
+(partial
+sera implicitement ajout\('e)\&.
+.RE
+.SH "VOIR AUSSI"
+.PP
+\fBapt.conf\fR(5),
+\fBsources.list\fR(5),
+\fBapt-get\fR(8)\&.
+.SH "DIAGNOSTICS"
+.PP
+\fBapt\-cache\fR
+retourne z\('ero apr\(`es un d\('eroulement normal et le nombre d\('ecimal 100 en cas d\*(Aqerreur\&.
+.SH "BOGUES"
+.PP
+\m[blue]\fBPage des bogues d\*(AqAPT\fR\m[]\&\s-2\u[3]\d\s+2\&. Si vous souhaitez signaler un bogue \(`a propos d\*(AqAPT, veuillez lire
+/usr/share/doc/debian/bug\-reporting\&.txt
+ou utiliser la commande
+\fBreportbug\fR(1)\&.
+.SH "TRADUCTEURS"
+.PP
+J\('er\(^ome Marant, Philippe Batailler, Christian Perrier
+<bubulle@debian\&.org>
+(2000, 2005, 2009, 2010), \('Equipe de traduction francophone de Debian
+<debian\-l10n\-french@lists\&.debian\&.org>
+.PP
+Veuillez noter que cette traduction peut contenir des parties non traduites\&. Cela est volontaire, pour \('eviter de perdre du contenu quand la traduction est l\('eg\(`erement en retard sur le contenu d\*(Aqorigine\&.
+.SH "AUTEURS"
+.PP
+\fBJason Gunthorpe\fR
+.RS 4
+.RE
+.PP
+\fB\('Equipe de d\('eveloppement d\*(AqAPT\fR
+.RS 4
+.RE
+.SH "NOTES"
+.IP " 1." 4
+GraphViz
+.RS 4
+\%http://www.research.att.com/sw/tools/graphviz/
+.RE
+.IP " 2." 4
+VCG tool
+.RS 4
+\%http://rw4.cs.uni-sb.de/users/sander/html/gsvcg1.html
+.RE
+.IP " 3." 4
+Page des bogues d'APT
+.RS 4
+\%http://bugs.debian.org/src:apt
+.RE

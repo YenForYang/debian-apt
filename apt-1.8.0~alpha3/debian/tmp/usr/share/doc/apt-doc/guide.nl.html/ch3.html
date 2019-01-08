@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Hoofdstuk 3. DSelect</title>
+    <meta name="generator" content="DocBook XSL Stylesheets V1.79.1"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="home" href="index.html" title="Gebruikershandleiding voor APT"/>
+    <link rel="up" href="index.html" title="Gebruikershandleiding voor APT"/>
+    <link rel="prev" href="ch2.html" title="Hoofdstuk 2. apt-get"/>
+    <link rel="next" href="ch4.html" title="Hoofdstuk 4. De interface"/>
+  </head>
+  <body>
+    <div class="navheader">
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Hoofdstuk 3. DSelect</th>
+        </tr>
+        <tr>
+          <td align="left"><a accesskey="p" href="ch2.html">Terug</a> </td>
+          <th width="60%" align="center"> </th>
+          <td align="right"> <a accesskey="n" href="ch4.html">Volgende</a></td>
+        </tr>
+      </table>
+      <hr/>
+    </div>
+    <div class="chapter">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h1 class="title"><a id="ch3"/>Hoofdstuk 3. DSelect</h1>
+          </div>
+        </div>
+      </div>
+      <p>
+De APT-methode <span class="command"><strong>dselect</strong></span> stelt aan het volledige APT
+systeem het GUI <span class="command"><strong>dselect</strong></span> ter beschikking voor de selectie
+van pakketten. <span class="command"><strong>dselect</strong></span> wordt gebruikt om de te
+installeren of te verwijderen pakketten te selecteren en APT voert de
+eigenlijke operatie uit.
+</p>
+      <p>
+Om de APT-methode te activeren moet u in <span class="command"><strong>dselect</strong></span>
+[T]oegang ([A]ccess) selecteren en dan voor de APT-methode kiezen. Er wordt
+dan om een stel <span class="emphasis"><em>Sources</em></span> (pakketbronnen) gevraagd. Dat
+zijn plaatsen waarvandaan archieven opgehaald kunnen worden. Dat kunnen
+externe internetsites zijn, lokale spiegelservers van Debian of CD's. Elke
+bron kan een fragment van het volledige archief van Debian aanbieden en APT
+zal ze automatisch combineren om een volledige set van pakketten samen te
+stellen. Indien u een CD gebruikt is het goed om die eerst te vermelden en
+daarna een spiegelserver waardoor u ook toegang krijgt tot de meest recente
+reparaties van bugs. APT zal automatisch eerst de pakketten van uw CD
+gebruiken vooraleer pakketten van het internet te downloaden.
+</p>
+      <pre class="screen">
+   Een lijst van locaties met pakketbronnen voor de distributie instellen
+
+ Voer het basis-URL van de debian distributie in.
+ Toegangsmethodes waarmee ik kan werken zijn: http file
+
+ Bijvoorbeeld:
+      file:/mnt/debian,
+      ftp://ftp.debian.org/debian,
+      http://ftp.de.debian.org/debian,
+
+
+ URL [http://llug.sep.bnl.gov/debian]:
+</pre>
+      <p>
+Het instellen van de <span class="emphasis"><em>Sources</em></span> (pakketbronnen) begint met
+een vraag naar de basis van het Debian archief, wat standaard een
+HTTP-spiegelserver is. Nadien wordt gevraagd welke distributie opgehaald
+moet worden.
+</p>
+      <pre class="screen">
+ Voer het label van de op te halen distributie in of een pad
+ naar het pakketbestand dat eindig op een /. Een label van een
+ distributie is typisch iets in de zin van : stable unstable testing non-US
+
+ Distributie [stable]:
+</pre>
+      <p>
+De distributie verwijst naar de versie van Debian in het
+archief. <span class="emphasis"><em>stable</em></span> verwijst naar de recentste uitgebrachte
+versie en <span class="emphasis"><em>unstable</em></span> verwijst naar de versie die
+ontwikkeld wordt. <span class="emphasis"><em>non-US</em></span> is enkel op sommige
+spiegelservers beschikbaar en verwijst naar pakketten die
+encryptietechnologie gebruiken of andere zaken waarvan de uitvoer uit de
+Verenigde Staten niet toegelaten is. Deze pakketten invoeren in de Verenigde
+Staten is echter wel legaal.
+</p>
+      <pre class="screen">
+ Voer de op te halen componenten in
+ Componenten zijn typisch iets zoals: main contrib non-free
+
+ Componenten [main contrib non-free]:
+</pre>
+      <p>
+De lijst met componenten verwijst naar een lijst van sub-distributies die
+opgehaald moeten worden. De distributie is onderverdeeld op basis van
+softwarelicenties. Daarbij bevat main pakketten die vrij zijn volgens de
+DFSG (vrije software richtlijnen van Debian), terwijl pakketten in contrib
+en non-free zaken bevatten met restricties op het vlak van gebruik of
+verspreiding.
+</p>
+      <p>
+Gelijk welk aantal pakketbronnen kan opgegeven worden. Het script dat het
+instellen ervan begeleidt, zal vragen blijven stellen totdat u alles wat u
+wenste ingegeven hebt.
+</p>
+      <p>
+Vooraleer met het gebruik van <span class="command"><strong>dselect</strong></span> te beginnen moet u
+de lijst van beschikbare pakketten bijwerken door in het menu te kiezen voor
+[B]ijwerken ([U]pdate). Dit is een uitbreiding van <code class="literal">apt-get
+update</code> die de opgehaalde informatie aan <span class="command"><strong>dselect</strong></span>
+doorgeeft. [B]ijwerken ([U]pdate) moet uitgevoerd worden, zelfs indien
+voordien <code class="literal">apt-get update</code> uitgevoerd werd.
+</p>
+      <p>
+U kunt dan voortdoen en uw selectie maken met [S]electeer ([S]elect) en
+vervolgens de installatie uitvoeren met [I]nstalleren ([I]nstall). Indien u
+de APT-methode gebruikt zijn de commando's [C]onfigureer ([C]onfig) en
+[V]erwijder ([R]emove) overbodig. Het commando [I]nstalleren ([I]nstall)
+voert ze allemaal samen uit.
+</p>
+      <p>
+Standaard verwijdert APT automatisch de opgehaalde pakketbestanden (.deb)
+nadat ze succesvol geïnstalleerd werden. Om dit gedrag aan te passen moet u
+<code class="literal">Dselect::clean "prompt";</code> plaatsen in /etc/apt/apt.conf.
+</p>
+    </div>
+    <div class="navfooter">
+      <hr/>
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td align="left"><a accesskey="p" href="ch2.html">Terug</a> </td>
+          <td align="center"> </td>
+          <td align="right"> <a accesskey="n" href="ch4.html">Volgende</a></td>
+        </tr>
+        <tr>
+          <td align="left" valign="top">Hoofdstuk 2. apt-get </td>
+          <td align="center">
+            <a accesskey="h" href="index.html">Begin</a>
+          </td>
+          <td align="right" valign="top"> Hoofdstuk 4. De interface</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

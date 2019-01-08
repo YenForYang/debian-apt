@@ -1,0 +1,252 @@
+<!ENTITY apt-author.team "
+   <author>
+    <othername>APT-team</othername>
+    <contrib></contrib>
+   </author>
+">
+
+<!ENTITY apt-qapage "
+	<para>
+		<ulink url='http://packages.qa.debian.org/a/apt.html'>QA-Pagina</ulink>
+	</para>
+">
+
+<!-- Boiler plate Bug reporting section -->
+<!ENTITY manbugs "
+ <refsect1><title>Bugs</title>
+   <para><ulink url='http://bugs.debian.org/src:apt'>APT bugpagina</ulink>.
+   Indien u een bug in APT wilt rapporteren, raadpleeg dan
+   <filename>/usr/share/doc/debian/bug-reporting.txt</filename> of het
+   &reportbug; commando.
+   </para>
+ </refsect1>
+">
+
+<!-- Boiler plate Author section -->
+<!ENTITY manauthor "
+ <refsect1><title>Auteur</title>
+   <para>APT werd geschreven door het APT-team <email>apt@packages.debian.org</email>.
+   </para>
+ </refsect1>
+">
+
+<!-- Should be used within the option section of the text to
+     put in the blurb about -h, -v, -c and -o -->
+<!ENTITY apt-commonoptions "
+     <varlistentry><term><option>-h</option></term>
+     <term><option>--help</option></term>
+     <listitem><para>Een korte samenvatting van het gebruik weergeven.
+     </para>
+     </listitem>
+     </varlistentry>
+     
+     <varlistentry>
+      <term><option>-v</option></term>
+      <term><option>--version</option></term>
+      <listitem><para>Het versienummer van het programma weergeven.
+     </para>
+     </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><option>-c</option></term>
+      <term><option>--config-file</option></term>
+     <listitem><para>Configuratiebestand; Een te gebruiken configuratiebestand opgeven. 
+     Het programma zal het standaard configuratiebestand inlezen en nadien
+     dit configuratiebestand. Als configuratie-instellingen opgegeven moeten
+     worden vooraleer de standaard configuratiebestanden verwerkt worden,
+     geef dan een bestand op met de omgevingsvariabele <envar>APT_CONFIG</envar>.
+     Raadpleeg &apt-conf; voor informatie over de syntaxis.
+     </para>
+     </listitem>
+     </varlistentry>
+     
+     <varlistentry>
+      <term><option>-o</option></term>
+      <term><option>--option</option></term>
+     <listitem><para>Een configuratieoptie instellen; Dit stelt een
+      willekeurige configuratieoptie in. De syntaxis is <option>-o Foo::Bar=bar</option>.
+      <option>-o</option> en <option>--option</option> kunnen meermaals
+      gebruikt worden om verschillende opties in te stellen.
+     </para>
+     </listitem>
+     </varlistentry>
+">
+
+<!-- Should be used within the option section of the text to
+     put in the blurb about -h, -v, -c and -o -->
+<!ENTITY apt-cmdblurb "
+   <para>Alle commandoregelopties kunnen via het configuratiebestand ingesteld
+   worden. de omschrijving geeft de in te stellen configuratieoptie
+   op. Bij booleaanse opties kunt u instellingen uit het 
+   configuratiebestand overschrijven door iets te gebruiken als <option>-f-</option>,
+   <option>--no-f</option>, <option>-f=no</option> en meerdere andere variaties.
+   </para>
+">
+
+<!ENTITY file-aptconf "
+     <varlistentry><term><filename>/etc/apt/apt.conf</filename></term>
+     <listitem><para>Configuratiebestand voor APT.
+     Configuratie-item: <literal>Dir::Etc::Main</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><filename>/etc/apt/apt.conf.d/</filename></term>
+     <listitem><para>Configuratiebestandsfragmenten voor APT.
+     Configuratie-item: <literal>Dir::Etc::Parts</literal>.</para></listitem>
+     </varlistentry>
+">
+
+<!ENTITY file-cachearchives "
+     <varlistentry><term><filename>&cachedir;/archives/</filename></term>
+     <listitem><para>Opslaggebied voor opgehaalde pakketbestanden.
+     Configuratie-item: <literal>Dir::Cache::Archives</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><filename>&cachedir;/archives/partial/</filename></term>
+     <listitem><para>Opslaggebied voor pakketbestanden tijdens het ophalen.
+     Configuratie-item: <literal>Dir::Cache::Archives</literal> (<filename>partial</filename> zal impliciet toegevoegd worden)</para></listitem>
+     </varlistentry>
+">
+
+<!ENTITY file-preferences "
+     <varlistentry><term><filename>/etc/apt/preferences</filename></term>
+     <listitem><para>Bestand met versievoorkeuren.
+     Dit is waar u &quot;pinning&quot; kunt opgeven.
+     Dit is een voorkeur voor het ophalen van bepaalde pakketten
+     uit een aparte pakketbron
+     of uit een andere versie van een distributie.
+     Configuratie-item: <literal>Dir::Etc::Preferences</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><filename>/etc/apt/preferences.d/</filename></term>
+     <listitem><para>Bestandsfragmenten met versievoorkeuren.
+     Configuratie-item: <literal>Dir::Etc::PreferencesParts</literal>.</para></listitem>
+     </varlistentry>
+">
+
+<!ENTITY file-sourceslist "
+     <varlistentry><term><filename>/etc/apt/sources.list</filename></term>
+     <listitem><para>Locaties waarvandaan pakketten opgehaald moeten worden.
+     Configuratie-item: <literal>Dir::Etc::SourceList</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><filename>/etc/apt/sources.list.d/</filename></term>
+     <listitem><para>Bestandsfragmenten met locaties
+     waarvandaan pakketten opgehaald moeten worden.
+     Configuratie-item: <literal>Dir::Etc::SourceParts</literal>.</para></listitem>
+     </varlistentry>
+">
+
+<!ENTITY file-statelists "
+     <varlistentry><term><filename>&statedir;/lists/</filename></term>
+     <listitem><para>Opslaggebied voor statusinformatie over elke pakketbron vermeld in
+     &sources-list;
+     Configuratie-item: <literal>Dir::State::Lists</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><filename>&statedir;/lists/partial/</filename></term>
+     <listitem><para>Opslaggebied voor statusinformatie tijdens het ophalen.
+     Configuratie-item: <literal>Dir::State::Lists</literal> (<filename>partial</filename> zal impliciet toegevoegd worden)</para></listitem>
+     </varlistentry>
+">
+
+<!ENTITY file-trustedgpg "
+     <varlistentry><term><filename>/etc/apt/trusted.gpg</filename></term>
+     <listitem><para>Sleutelbos met lokaal vertrouwde sleutels.
+     Nieuwe sleutels worden hier toegevoegd.
+     Configuratie-item: <literal>Dir::Etc::Trusted</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><filename>/etc/apt/trusted.gpg.d/</filename></term>
+     <listitem><para>Bestandsfragmenten met vertrouwde sleutels. 
+     Bijkomende sleutelbossen kunnen hier opgeslagen worden 
+     (door andere pakketten of de systeembeheerder).
+     Configuratie-item <literal>Dir::Etc::TrustedParts</literal>.</para></listitem>
+     </varlistentry>
+">
+
+<!ENTITY file-extended_states "
+      <varlistentry><term><filename>/var/lib/apt/extended_states</filename></term>
+      <listitem><para>Statuslijst van automatisch geïnstalleerde pakketten.
+      Configuratie-item: <literal>Dir::State::extended_states</literal>.
+      </para></listitem>
+      </varlistentry>
+">
+
+<!-- TRANSLATOR: This is the section header for the following paragraphs - comparable
+     to the other headers like NAME and DESCRIPTION and should therefore be uppercase. -->
+<!ENTITY translation-title "VERTALING">
+
+<!-- TRANSLATOR: This is a placeholder. You should write here who has contributed
+     to the translation in the past, who is responsible now and maybe further information
+     specially related to your translation. -->
+<!ENTITY translation-holder "
+     De Nederlandse vertaling werd in 2015 gemaakt door Frans Spiesschaert
+     <email>Frans.Spiesschaert@yucom.be</email>, in samenwerking met het
+     Debian Dutch l10n Team <email>debian-l10n-dutch@lists.debian.org</email>.
+">
+
+<!-- TRANSLATOR: As a translation is allowed to have 20% of untranslated/fuzzy strings
+     in a shipped manpage newer/modified paragraphs will maybe appear in english in
+     the generated manpage. This sentence is therefore here to tell the reader that this
+     is not a mistake by the translator - obviously the target is that at least for stable
+     releases this sentence is not needed. :) -->
+<!ENTITY translation-english "
+     Merk op dat de vertaling van dit document nog onvertaalde delen kan 
+     bevatten. Dit is intentioneel om te vermijden dat inhoud verloren zou 
+     gaan door een vertaling die achterop loopt op het origineel.
+">
+
+<!-- TRANSLATOR: used as in -o=config_string
+e.g. -o=Debug::pkgProblemResolver=1 --> <!ENTITY synopsis-config-string
+"configuratietekenreeks">
+
+<!-- TRANSLATOR: used as in -c=config_file e.g. -c=./apt.conf --> <!ENTITY
+synopsis-config-file "configuratiebestand">
+
+<!-- TRANSLATOR: used as in -t=target_release or pkg/target_release
+e.g. -t=squeeze apt/experimental --> <!ENTITY synopsis-target-release
+"doelrelease">
+
+<!-- TRANSLATOR: used as in -a=architecture e.g. -a=armel --> <!ENTITY
+synopsis-architecture "architectuur">
+
+<!-- TRANSLATOR: used as in apt-get install pkg e.g. apt-get install awesome
+--> <!ENTITY synopsis-pkg "pakket">
+
+<!-- TRANSLATOR: used as in pkg=pkg_version_number e.g. apt=0.8.15 -->
+<!ENTITY synopsis-pkg-ver-number "pakketversienummer">
+
+<!-- TRANSLATOR: used as in apt-cache pkgnames prefix e.g. apt-cache
+pkgnames apt --> <!ENTITY synopsis-prefix "prefix">
+
+<!-- TRANSLATOR: used as in apt-cache search regex e.g. apt-cache search
+awesome --> <!ENTITY synopsis-regex "reguliere_expressie">
+
+<!-- TRANSLATOR: used as in apt-cdrom -d=cdrom_mount_point e.g. apt-cdrom
+-d=/media/cdrom --> <!ENTITY synopsis-cdrom-mount "cd-aankoppelpunt">
+
+<!-- TRANSLATOR: used as in apt-extracttemplates -t=temporary_directory
+e.g. apt-extracttemplates -t=/tmp --> <!ENTITY synopsis-tmp-directory
+"tijdelijke_map">
+
+<!-- TRANSLATOR: used as in apt-extracttemplates filename --> <!ENTITY
+synopsis-filename "bestandsnaam">
+
+<!-- TRANSLATOR: used as parameter for apt-ftparchive e.g. apt-ftparchive
+packages path override-file pathprefix --> <!ENTITY synopsis-path "pad">
+
+<!-- TRANSLATOR: used as parameter for apt-ftparchive e.g. apt-ftparchive
+packages path override-file pathprefix --> <!ENTITY synopsis-override
+"override-bestand">
+
+<!-- TRANSLATOR: used as parameter for apt-ftparchive e.g. apt-ftparchive
+packages path override-file pathprefix --> <!ENTITY synopsis-pathprefix
+"padprefix">
+
+<!-- TRANSLATOR: used as parameter for apt-ftparchive e.g. apt-ftparchive
+generate section --> <!ENTITY synopsis-section "sectie">
+
+<!-- TRANSLATOR: used as in apt-key export keyid e.g. apt-key export
+473041FA --> <!ENTITY synopsis-keyid "sleutel-ID">
+

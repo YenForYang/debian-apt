@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Capitolo 2. apt-get</title>
+    <meta name="generator" content="DocBook XSL Stylesheets V1.79.1"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="home" href="index.html" title="Guida dell'utente di APT"/>
+    <link rel="up" href="index.html" title="Guida dell'utente di APT"/>
+    <link rel="prev" href="ch1.html" title="Capitolo 1. Descrizione generale"/>
+    <link rel="next" href="ch3.html" title="Capitolo 3. DSelect"/>
+  </head>
+  <body>
+    <div class="navheader">
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Capitolo 2. apt-get</th>
+        </tr>
+        <tr>
+          <td align="left"><a accesskey="p" href="ch1.html">Indietro</a> </td>
+          <th width="60%" align="center"> </th>
+          <td align="right"> <a accesskey="n" href="ch3.html">Avanti</a></td>
+        </tr>
+      </table>
+      <hr/>
+    </div>
+    <div class="chapter">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h1 class="title"><a id="ch2"/>Capitolo 2. apt-get</h1>
+          </div>
+        </div>
+      </div>
+      <p>
+<span class="command"><strong>apt-get</strong></span> fornisce un modo semplice di installare i
+pacchetti dalla riga di comando. Diversamente da <span class="command"><strong>dpkg</strong></span>,
+<span class="command"><strong>apt-get</strong></span> non tratta i file .deb, ma utilizza il vero nome
+dei pacchetti e può installare archivi .deb solo da una
+<span class="emphasis"><em>fonte</em></span>.
+</p>
+      <p>
+La prima <a href="#ftn.idm41" class="footnote" id="idm41"><sup class="footnote">[1]</sup></a> cosa da fare prima di usare
+<span class="command"><strong>apt-get</strong></span> è scaricare gli elenchi dei pacchetti dalle
+<span class="emphasis"><em>fonti</em></span> in modo che il programma sappia quali pacchetti
+sono disponibili. Lo si fa con <code class="literal">apt-get update</code>. Ad
+esempio,
+</p>
+      <pre class="screen">
+# apt-get update
+Scaricamento di: http://ftp.de.debian.org/debian-non-US/ stable/binary-i386/ Packages
+Scaricamento di: http://llug.sep.bnl.gov/debian/ testing/contrib Packages
+Lettura elenco dei pacchetti... Fatto
+Generazione albero delle dipendenze... Fatto
+</pre>
+      <p>
+Una volta aggiornato l'elenco, si possono usare svariati comandi:
+</p>
+      <div class="variablelist">
+        <dl class="variablelist">
+          <dt>
+            <span class="term">upgrade</span>
+          </dt>
+          <dd>
+            <p>
+Upgrade tenterà di fare un aggiornamento indolore del sistema completo,
+senza installare mai nuovi pacchetti o rimuoverne di esistenti, e senza mai
+aggiornare un pacchetto se ciò ne rende altri difettosi. Può essere usato
+quotidianamente per fare un aggiornamento relativamente sicuro del
+sistema. Upgrade elencherà tutti i pacchetti che non avrà potuto aggiornare,
+cosa che in genere significa che questi dipendono da nuovi pacchetti o che
+vanno in conflitto con altri. Per forzare la loro installazione si può usare
+<span class="command"><strong>dselect</strong></span> o <code class="literal">apt-get install</code>.
+</p>
+          </dd>
+          <dt>
+            <span class="term">install</span>
+          </dt>
+          <dd>
+            <p>
+Install viene usato per installare i pacchetti per nome. Il pacchetto viene
+automaticamente scaricato ed installato; questo può essere utile se già se
+ne conosce il nome e non si vuole entrare in un'interfaccia grafica per
+selezionarlo. Al comando si possono passare anche più pacchetti, che saranno
+tutti scaricati. Install cerca automaticamente di risolvere i problemi di
+dipendenze dei pacchetti elencati, stampa un riassunto e chiede conferma se
+devono essere modificati altri pacchetti che non siano quelli sulla riga di
+comando.
+</p>
+          </dd>
+          <dt>
+            <span class="term">dist-upgrade</span>
+          </dt>
+          <dd>
+            <p>
+Dist-upgrade fa un aggiornamento completo ed è progettato in modo da rendere
+semplici gli aggiornamenti tra i rilasci di Debian. Usa un algoritmo
+sofisticato per determinare il miglior insieme di pacchetti da installare,
+aggiornare e rimuovere per migrare alla versione più recente la maggior
+parte del sistema possibile. In alcune situazioni può essere vantaggioso
+usare dist-upgrade invece di dedicare tempo a risolvere manualmente le
+dipendenze con <span class="command"><strong>dselect</strong></span>. Una volta completato il lavoro di
+dist-upgrade, si può usare <span class="command"><strong>dselect</strong></span> per installare
+eventuali pacchetti che sono stati tralasciati.
+</p>
+            <p>
+È importante controllare attentamente cosa intende fare dist-upgrade, dato
+che le sue decisioni a volte possono essere abbastanza sorprendenti.
+</p>
+          </dd>
+        </dl>
+      </div>
+      <p>
+<span class="command"><strong>apt-get</strong></span> ha diverse opzioni per la riga di comando, che
+sono documentate dettagliatamente nella sua pagina di manuale,
+<span class="citerefentry"><span class="refentrytitle">apt-get</span>(8)</span>.
+L'opzione più utile è <code class="literal">-d</code>, che non installa i file
+scaricati; se il sistema deve scaricare un gran numero di pacchetti, non è
+bene iniziare ad installarli nel caso qualcosa dovesse andare storto. Quando
+si usa <code class="literal">-d</code>, gli archivi scaricati possono essere
+installati semplicemente eseguendo di nuovo lo stesso comando senza
+l'opzione <code class="literal">-d</code>.
+</p>
+      <div class="footnotes">
+        <br/>
+        <hr/>
+        <div id="ftn.idm41" class="footnote">
+          <p><a href="#idm41" class="para"><sup class="para">[1] </sup></a> Se si sta usando un server proxy http, si deve prima ancora impostare la
+variabile d'ambiente http_proxy; vedere sources.list(5). </p>
+        </div>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr/>
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td align="left"><a accesskey="p" href="ch1.html">Indietro</a> </td>
+          <td align="center"> </td>
+          <td align="right"> <a accesskey="n" href="ch3.html">Avanti</a></td>
+        </tr>
+        <tr>
+          <td align="left" valign="top">Capitolo 1. Descrizione generale </td>
+          <td align="center">
+            <a accesskey="h" href="index.html">Partenza</a>
+          </td>
+          <td align="right" valign="top"> Capitolo 3. DSelect</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

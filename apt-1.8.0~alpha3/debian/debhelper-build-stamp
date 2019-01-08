@@ -1,0 +1,8 @@
+apt
+libapt-pkg5.0
+libapt-inst2.0
+apt-doc
+libapt-pkg-dev
+libapt-pkg-doc
+apt-utils
+apt-transport-https

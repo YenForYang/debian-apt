@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Rozdział 2. apt-get</title>
+    <meta name="generator" content="DocBook XSL Stylesheets V1.79.1"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="home" href="index.html" title="Podręcznik użytkownika APT"/>
+    <link rel="up" href="index.html" title="Podręcznik użytkownika APT"/>
+    <link rel="prev" href="ch1.html" title="Rozdział 1. Ogólne"/>
+    <link rel="next" href="ch3.html" title="Rozdział 3. DSelect"/>
+  </head>
+  <body>
+    <div class="navheader">
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Rozdział 2. apt-get</th>
+        </tr>
+        <tr>
+          <td align="left"><a accesskey="p" href="ch1.html">Poprzedni</a> </td>
+          <th width="60%" align="center"> </th>
+          <td align="right"> <a accesskey="n" href="ch3.html">Następny</a></td>
+        </tr>
+      </table>
+      <hr/>
+    </div>
+    <div class="chapter">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h1 class="title"><a id="ch2"/>Rozdział 2. apt-get</h1>
+          </div>
+        </div>
+      </div>
+      <p>
+<span class="command"><strong>apt-get</strong></span> dostarcza prostego sposobu na zainstalowanie
+pakietów z linii poleceń. W przeciwieństwie do <span class="command"><strong>dpkg</strong></span>,
+<span class="command"><strong>apt-get</strong></span> nie posługuje się nazwami plików ".deb", lecz
+używa nazw pakietów i może zainstalować tylko archiwa ".deb" ze
+skonfigurowanych <span class="emphasis"><em>źródeł</em></span>.
+</p>
+      <p>
+Pierwszą rzeczą <a href="#ftn.idm41" class="footnote" id="idm41"><sup class="footnote">[1]</sup></a>, którą należy zrobić
+przed użyciem <span class="command"><strong>apt-get</strong></span> jest pobranie listy pakietów (ze
+<span class="emphasis"><em>źródeł</em></span> wymienionych w pliku sources.list(5)), tak żeby
+APT wiedział, jakie pakiety są dostępne. Robi się to za pomocą polecenia
+<code class="literal">apt-get update</code>. Na przykład:
+</p>
+      <pre class="screen">
+# apt-get update
+Pob: http://ftp.de.debian.org/debian-non-US/ stable/binary-i386/ Packages
+Pob: http://llug.sep.bnl.gov/debian/ testing/contrib Packages
+Czytanie list pakietów... Gotowe
+Budowanie drzewa zależności... Gotowe
+</pre>
+      <p>
+Po zaktualizowaniu można użyć następnych poleceń:
+</p>
+      <div class="variablelist">
+        <dl class="variablelist">
+          <dt>
+            <span class="term">upgrade</span>
+          </dt>
+          <dd>
+            <p>
+Upgrade spróbuje delikatnie zaktualizować cały system. Upgrade nigdy nie
+zainstaluje nowego pakietu ani nie usunie istniejącego pakiety, ani też nie
+zaktualizuje pakietu do wersji powodującej, że inny pakiet przestanie
+działać. Można używać tego polecenia codziennie do w miarę bezpiecznych
+aktualizacji systemu. Upgrade wypisze listę pakietów, których nie potrafił
+zaktualizować, co zazwyczaj oznacza, że zależą one od nowych pakietów lub są
+w konflikcie z innymi pakietami. Można wymusić instalację takich pakietów,
+używając do tego <span class="command"><strong>dselect</strong></span> lub <code class="literal">apt-get
+install</code>.
+</p>
+          </dd>
+          <dt>
+            <span class="term">install</span>
+          </dt>
+          <dd>
+            <p>
+Install jest używane do instalowania pakietów przez podanie ich
+nazwy. Pakiet jest automatycznie pobierany i instalowany. Może być to
+użyteczne, gdy już zna się nazwę pakietu do zainstalowania i nie chce się
+uruchamiać graficznego interfejsu wyboru pakietów. Można podać dowolną
+liczbę nazw pakietów do zainstalowania - wszystkie będą pobrane. Install
+próbuje automatycznie rozwiązać problemy z zależnościami w podanych
+pakietach, wypisze podsumowanie i poprosi o potwierdzenie, jeśli zamierza
+zmienić cokolwiek innego niż pakiety podane jako jego argumenty.
+</p>
+          </dd>
+          <dt>
+            <span class="term">dist-upgrade</span>
+          </dt>
+          <dd>
+            <p>
+Dist-upgrade powoduje całkowitą aktualizację systemu i jest zaprojektowany
+do uproszczenia aktualizacji z jednego wydania Debiana do kolejnego. Używa
+wyrafinowanych algorytmów do określenia najlepszego zbioru pakietów do
+zainstalowania, aktualizacji lub usunięcia, tak aby zaktualizować jak
+najwięcej pakietów w systemie do nowszego wydania. W niektórych sytuacjach,
+może być prościej użyć dist-upgrade niż ręcznie rozwiązywać zależności w
+programie <span class="command"><strong>dselect</strong></span>. Kiedy dist-upgrade zakończy działanie,
+można użyć programu <span class="command"><strong>dselect</strong></span> do zainstalowania pominiętych
+pakietów.
+</p>
+            <p>
+Jest ważne, aby dokładnie przyjrzeć się temu, co dist-upgrade zamierza
+zrobić, gdyż jego decyzje mogą czasami zdumiewać.
+</p>
+          </dd>
+        </dl>
+      </div>
+      <p>
+Zachowanie programu <span class="command"><strong>apt-get</strong></span> można kontrolować za pomocą
+opcji linii poleceń szczegółowo opisanych w stronie podręcznika ekranowego
+<span class="citerefentry"><span class="refentrytitle">apt-get</span>(8)</span>.
+Najbardziej użyteczną z nich jest <code class="literal">-d</code>, która nie instaluje
+pobranych plików. Jeśli system musi pobrać dużą liczbę pakietów,
+instalowanie ich może być niepożądane, jeśli coś pójdzie nie tak. Jeśli
+użyto <code class="literal">-d</code>, to pobrane archiwa można zainstalować, ponownie
+uruchamiając polecenie, które spowodowało ich pobranie, tym razem bez opcji
+<code class="literal">-d</code>.
+</p>
+      <div class="footnotes">
+        <br/>
+        <hr/>
+        <div id="ftn.idm41" class="footnote">
+          <p><a href="#idm41" class="para"><sup class="para">[1] </sup></a> Aby używać serwera proxy, należy najpierw ustawić zmienną środowiskową
+http_proxy, proszę przeczytać sources.list(5) </p>
+        </div>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr/>
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td align="left"><a accesskey="p" href="ch1.html">Poprzedni</a> </td>
+          <td align="center"> </td>
+          <td align="right"> <a accesskey="n" href="ch3.html">Następny</a></td>
+        </tr>
+        <tr>
+          <td align="left" valign="top">Rozdział 1. Ogólne </td>
+          <td align="center">
+            <a accesskey="h" href="index.html">Spis treści</a>
+          </td>
+          <td align="right" valign="top"> Rozdział 3. DSelect</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

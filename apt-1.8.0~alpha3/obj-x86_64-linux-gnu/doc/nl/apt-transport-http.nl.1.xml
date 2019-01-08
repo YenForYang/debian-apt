@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+  "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % aptent SYSTEM "apt.ent"> %aptent;
+<!ENTITY % aptverbatiment SYSTEM "apt-verbatim.ent"> %aptverbatiment;
+<!ENTITY % aptvendor SYSTEM "apt-vendor.ent"> %aptvendor;
+]>
+
+<refentry>
+
+ <refentryinfo>
+   <!-- The last update date -->
+&apt-author.team;
+   &apt-email;
+   &apt-product;
+   
+   <date>2018-05-11T00:00:00Z</date>
+ </refentryinfo>
+
+ <refmeta>
+   <refentrytitle>apt-transport-http</refentrytitle>
+   <manvolnum>1</manvolnum>
+   <refmiscinfo class="manual">APT</refmiscinfo>
+ </refmeta>
+
+ 
+ <!-- Man page title -->
+<refnamediv>
+    <refname>apt-transport-http</refname>
+    <refpurpose>Transportmethode van APT voor het downloaden via het Hypertext Transfer
+Protocol (HTTP)</refpurpose>
+ </refnamediv>
+
+<refsect1><title>Omschrijving</title>
+<para>Deze transportmethode van APT laat toe pakketbronnen te gebruiken die
+benaderd worden via het Hypertext Transfer Protocol (HTTP). Ze is standaard
+beschikbaar en wellicht de meest gebruikte van alle transportmethodes. Merk
+op dat een transportmethode nooit rechtstreeks door een gebruiker
+aangesproken wordt, maar door APT-gereedschap gebruikt wordt op basis van de
+gebruikersconfiguratie.</para>
+<para>HTTP is een niet-versleuteld transportprotocol, hetgeen betekent dat de
+volledige communicatie met de externe server (of de proxy) kan bekeken
+worden door een voldoende onderlegde aanvaller, die men gewoonlijk aanduidt
+met "man in the middle" (MITM - persoon in het midden). De aanvaller kan
+evenwel de communicatie <emphasis>niet</emphasis> beïnvloeden om de
+beveiliging van uw systeem aan te tasten, vermits het databeveiligingsmodel
+dat toegepast wordt door APT, onafhankelijk van de gekozen transportmethode
+functioneert. Dit wordt gedetailleerd uitgelegd in &apt-secure;. Een
+overzicht van beschikbare transportmethodes wordt in &sources-list; gegeven.</para>
+</refsect1>
+
+<refsect1><title>Opties</title>
+<para>In een &apt-conf;-bestand kunnen verschillende opties ingesteld worden om de
+werking aan te passen, gaande van proxy-configuratie tot het omzeilen van
+specifieke serverbeperkingen.</para>
+
+<refsect2><title>Proxyconfiguratie</title>
+<para>De omgevingsvariabele <envar>http_proxy</envar> wordt gebruikt voor de
+configuratie die op het hele systeem van toepassing is. Proxy's die
+specifiek zijn voor APT kunnen via de optie
+<literal>Acquire::http::Proxy</literal> geconfigureerd worden. Proxy's die
+enkel voor bepaalde computers gebruikt moeten worden, kunnen via
+<literal>Acquire::http::Proxy::<replaceable>host</replaceable></literal>
+opgegeven worden. Er kan zelfs nog een meer fijnmazige regeling bekomen
+worden via de automatische proxydetectie die verderop behandeld wordt. Al
+deze opties maken gebruik van de URI-indeling
+<literal><replaceable>methode</replaceable>://[[<replaceable>gebruiker</replaceable>][:<replaceable>wachtwoord</replaceable>]@]<replaceable>computer</replaceable>[:<replaceable>poort</replaceable>]/</literal>.
+Ondersteunde URI-methodes zijn <literal>socks5h</literal> (SOCKS5 met
+externe DNS-opzoeking), <literal>http</literal> en
+<literal>https</literal>. Authenticatie-informatie kan verstrekt worden via
+&apt-authconf; in plaats van ze rechtstreeks op te nemen in de URI.</para>
+<para>De onderscheiden configuratieopties van APT ondersteunen de bijzondere
+waarde <literal>DIRECT</literal>, hetgeen betekent dat geen proxy gebruikt
+mag worden. Voor hetzelfde doel wordt ook de omgevingsvariabele
+<envar>no_proxy</envar> ondersteund.</para>
+<para>Daarenboven worden drie instellingen voorzien om HTTP/1.1-compatibele
+proxy-caches te beheren: <literal>Acquire::http::No-Cache</literal> zegt de
+proxy om in geen geval gebruik te maken van het in zijn cache beschikbare
+antwoord. <literal>Acquire::http::Max-Age</literal> stelt de maximaal
+toegelaten ouderdom (in seconden) in van een indexbestand in de cache van de
+proxy. <literal>Acquire::http::No-Store</literal> geeft aan dat de proxy de
+opgevraagde archiefbestanden niet in zijn cache moet opslaan. Zo kan men
+voorkomen dat de cache van de proxy vervuild raakt met (grote)
+.deb-bestanden.</para>
+</refsect2>
+
+<refsect2><title>Automatische Proxyconfiguratie</title>
+<para><literal>Acquire::http::Proxy-Auto-Detect</literal> kan gebruikt worden om
+een extern commando op te geven voor het vinden van de te gebruiken
+HTTP-proxy. De eerste en enige parameter is een URI die aangeeft met welke
+computer contact gemaakt moet worden om computerspecifieke configuratie in
+aanmerking te nemen. APT verwacht dat het commando de proxy op de
+standaarduitvoer op één enkele regel weergeeft volgens de eerder
+gespecificeerde URI-indeling of anders het woord <literal>DIRECT</literal>
+in geval geen proxy gebruikt moet worden. Geen uitvoer geeft aan dat de
+generieke proxy-instellingen gebruikt moeten worden.</para>
+<para>Merk op dat geen autodetectie gebruikt zal worden voor een computer indien
+reeds een computerspecifieke proxyconfiguratie ingesteld werd via
+<literal>Acquire::http::Proxy::<replaceable>computer</replaceable></literal>.</para>
+<para>Raadpleeg de pakketten &squid-deb-proxy-client; en &auto-apt-proxy; voor
+voorbeeldtoepassinggen.</para>
+<para>Deze optie heeft voorrang op de verouderde optienaam
+<literal>Acquire::http::ProxyAutoDetect</literal>.</para>
+</refsect2>
+
+<refsect2><title>Verbindingsconfiguratie</title>
+<para>De optie <literal>Acquire::http::Timeout</literal> stelt de tijdslimiet in
+die gehanteerd moet worden door de timer die door de methode gebruikt
+wordt. Deze waarde is zowel van toepassing op de tijdslimiet van de
+verbinding als op die van de data-overdracht.</para>
+<para>De gebruikte bandbreedte kan beperkt worden via
+<literal>Acquire::http::Dl-Limit</literal> dat in gehele getallen
+uitgedrukte waarden in kilobytes per seconde accepteert. De standaardwaarde
+is 0 waardoor de limiet gedeactiveerd wordt en er geprobeerd wordt om alle
+beschikbare bandbreedte te gebruiken. Merk op dat deze optie impliciet het
+gelijktijdig downloaden vanaf meerdere servers uitschakelt.</para>
+<para>De instelling <literal>Acquire::http::Pipeline-Depth</literal> kan gebruikt
+worden om de pijplijnmethode van HTTP (RFC 2616 sectie 8.1.2.2) toe te
+passen. Die kan bijvoorbeeld nuttig zijn bij verbindingen met een hoge
+vertraging (high-latency connections). Ze definieert hoeveel verzoeken er in
+een pijplijn verzonden worden. APT tracht tijdens het uitvoeren van de
+bewerking webservers en proxy's die zich niet correct gedragen, te ontdekken
+en te omzeilen, maar als u weet dat de uwe niet conform de HTTP/1.1
+specificatie is, kan het werken met een pijplijn uitgeschakeld worden door
+de waarde op 0 te zetten. Standaard is dit geactiveerd met de waarde 10.</para>
+<para><literal>Acquire::http::AllowRedirect</literal> regelt of APT eventuele
+omleidingen volgt. Standaard staat dit aan.</para>
+<para><literal>Acquire::http::User-Agent</literal> kan gebruikt worden om voor
+User-Agent een andere waarde in te stellen om bij de http-downloadmethode te
+gebruiken. Sommige proxy's verlenen een cliënt enkel toegang als die een
+gekende identificatie gebruikt.</para>
+<para><literal>Acquire::http::SendAccept</literal> is standaard geactiveerd en
+zendt een kopveld <literal>Accept: text/*</literal> naar de server voor
+verzoeken zonder bestandsextensie om te voorkomen dat de server content
+negotiation (inhoudsonderhandeling) zou proberen toe te passen.</para>
+</refsect2>
+</refsect1>
+
+<refsect1><title>Voorbeelden</title>
+<literallayout>
+Acquire::http {
+	Proxy::example.org "DIRECT";
+	Proxy "socks5h://apt:pass@127.0.0.1:9050";
+	Proxy-Auto-Detect "/usr/local/bin/apt-http-proxy-auto-detect";
+	No-Cache "true";
+	Max-Age "3600";
+	No-Store "true";
+	Timeout "10";
+	Dl-Limit "42";
+	Pipeline-Depth "0";
+	AllowRedirect "false";
+	User-Agent "Mijn APT-HTTP";
+	SendAccept "false";
+};
+</literallayout>
+</refsect1>
+
+<refsect1>
+<title>Zie ook</title>
+<para>&apt-conf; &apt-authconf; &sources-list;
+</para>
+</refsect1>
+
+ &manbugs;
+
+ <refsect1><title>&translation-title;</title>
+   <para>&translation-holder;</para>
+   <para>&translation-english;</para>
+ </refsect1>
+</refentry>

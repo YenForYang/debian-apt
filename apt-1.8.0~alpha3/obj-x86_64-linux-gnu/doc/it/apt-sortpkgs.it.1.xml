@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+  "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % aptent SYSTEM "apt.ent"> %aptent;
+<!ENTITY % aptverbatiment SYSTEM "apt-verbatim.ent"> %aptverbatiment;
+<!ENTITY % aptvendor SYSTEM "apt-vendor.ent"> %aptvendor;
+]>
+
+<refentry>
+
+ <refentryinfo>
+   <!-- The last update date -->
+&apt-author.jgunthorpe;
+   &apt-author.team;
+   &apt-email;
+   &apt-product;
+   
+   <date>2013-11-30T00:00:00Z</date>
+ </refentryinfo>
+ 
+ <refmeta>
+   <refentrytitle>apt-sortpkgs</refentrytitle>
+   <manvolnum>1</manvolnum>
+   <refmiscinfo class="manual">APT</refmiscinfo>
+ </refmeta>
+ 
+ 
+ <!-- Man page title -->
+<refnamediv>
+    <refname>apt-sortpkgs</refname>
+    <refpurpose>utilità per ordinare i file indice dei pacchetti</refpurpose>
+ </refnamediv>
+
+ &synopsis-command-apt-sortpkgs;
+
+ <refsect1><title>Descrizione</title>
+   <para><command>apt-sortpkgs</command> accetta un file indice (indice di sorgenti o
+di pacchetti) e ordina i record in base al nome del pacchetto. Ordina anche
+i campi interni ad ogni record in base alle regole di ordinamento interne.</para>
+
+   <para>
+   Tutto l'output viene inviato sullo standard output; l'input deve essere un
+file leggibile con seek.</para>
+ </refsect1>
+ 
+ <refsect1><title>opzioni</title>
+   &apt-cmdblurb;
+   
+   <variablelist>
+     <varlistentry><term><option>-s</option></term><term><option>--source</option></term>
+     <listitem><para>
+     Usa l'ordinamento dei campi dell'indice dei sorgenti. Voce di
+configurazione: <literal>APT::SortPkgs::Source</literal>.</para></listitem>
+     </varlistentry>
+   
+     &apt-commonoptions;
+     
+   </variablelist>
+ </refsect1>
+
+ <refsect1><title>Vedere anche</title>
+   <para>&apt-conf;</para>
+ </refsect1>
+
+ <refsect1><title>Diagnostica</title>
+   <para><command>apt-sortpkgs</command> restituisce zero in caso di funzionamento
+normale e il valore decimale 100 in caso di errore.</para>
+ </refsect1>
+
+ &manbugs;
+ 
+ <refsect1><title>&translation-title;</title>
+   <para>&translation-holder;</para>
+   <para>&translation-english;</para>
+ </refsect1>
+</refentry>

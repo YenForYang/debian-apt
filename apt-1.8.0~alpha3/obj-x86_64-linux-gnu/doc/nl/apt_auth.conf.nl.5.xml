@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+  "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % aptent SYSTEM "apt.ent"> %aptent;
+<!ENTITY % aptverbatiment SYSTEM "apt-verbatim.ent"> %aptverbatiment;
+<!ENTITY % aptvendor SYSTEM "apt-vendor.ent"> %aptvendor;
+]>
+
+<refentry>
+
+ <refentryinfo>
+   <!-- The last update date -->
+&apt-author.team;
+   &apt-email;
+   &apt-product;
+   
+   <date>2018-12-03T00:00:00Z</date>
+ </refentryinfo>
+
+ <refmeta>
+   <refentrytitle>apt_auth.conf</refentrytitle>
+   <manvolnum>5</manvolnum>
+   <refmiscinfo class="manual">APT</refmiscinfo>
+ </refmeta>
+
+ 
+ <!-- Man page title -->
+<refnamediv>
+    <refname>apt_auth.conf</refname>
+    <refpurpose>Login-configuratiebestand voor APT-bronnen en -proxy's</refpurpose>
+ </refnamediv>
+
+<refsect1><title>Omschrijving</title>
+<para>Configuratiebestanden van APT, zoals &sources-list; of &apt-conf;, moeten
+toegankelijk zijn voor iedereen die apt-gereedschap gebruikt op het systeem
+om toegang te hebben tot alle informatie in verband met pakketten, zoals de
+in een pakketbron beschikbare pakketten. Daarentegen mag login-informatie
+die nodig is om verbinding te maken met een proxy of om gegevens op te halen
+van een pakketbron, niet steeds voor iedereen toegankelijk zijn. Om die
+reden kan ze niet ondergebracht worden in een bestand met permissies die
+iedereen leestoegang geven.</para>
+
+<para>The APT auth.conf file <filename>/etc/apt/auth.conf</filename>, and .conf
+files inside <filename>/etc/apt/auth.conf.d</filename> can be used to store
+login information in a netrc-like format with restrictive file permissions.</para>
+</refsect1>
+
+<refsect1><title>netrc-achtige indeling</title>
+<para>De hier gedefinieerde indeling is vergelijkbaar met de indeling van het
+<filename>~/.netrc</filename>-bestand dat gebruikt wordt door
+<citerefentry><refentrytitle><command>ftp</command></refentrytitle><manvolnum>1</manvolnum></citerefentry>
+en vergelijkbare programma's in interactie met servers. Het is een
+eenvoudige trefwoord-gebaseerde indeling, waarbij de volgende trefwoorden
+herkend worden. Niet-herkende trefwoorden worden genegeerd. Trefwoorden
+kunnen van elkaar gescheiden worden door spaties, tabs en regeleindes.</para>
+
+<variablelist>
+<varlistentry>
+<term><literal>machine</literal>
+<replaceable>computernaam</replaceable>[:<replaceable>poort</replaceable>][/<replaceable>pad</replaceable>]</term>
+<listitem><para>Een element wordt opgezocht door bij het trefwoord
+<emphasis><literal>machine</literal></emphasis> naar de computernaam te
+zoeken die overeenkomt met die van de URI waarvoor apt inloggegevens nodig
+heeft. Als uitbreiding bij de netrc-indeling kan ook een poortnummer
+opgegeven worden. Indien geen poortnummer opgegeven werd, geven alle poorten
+een overeenkomst. Net zo is ook het pad facultatief en enkel nodig als op
+dezelfde server meerdere pakketbronnen aanwezig zijn met verschillende
+inloggegevens. Als bij het trefwoord machine een pad opgegeven werd, is er
+een overeenkomst als het pad in de URI begint met het bij het trefwoord
+opgegeven pad. Eens er een overeenkomst vastgesteld werd, worden de
+daaropvolgende trefwoorden verwerkt tot het einde van het bestand bereikt
+wordt of tot een ander trefwoord
+<emphasis><literal>machine</literal></emphasis> gevonden wordt.</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term><literal>login</literal> <replaceable>naam</replaceable></term>
+<listitem><para>De te gebruiken gebruikersnaam.</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term><literal>password</literal> <replaceable>tekenreeks</replaceable></term>
+<listitem><para>Het te gebruiken wachtwoord.</para></listitem>
+</varlistentry>
+
+</variablelist>
+
+</refsect1>
+
+<refsect1><title>Voorbeeld</title>
+<para>Voor een gebruiker met als naam <literal>apt</literal> en met het wachtwoord
+<literal>debian</literal> inloginformatie verstrekken voor het element
+&sources-list; <literallayout>deb http://example.org/debian &debian-stable-codename; main</literallayout> zou rechtstreeks
+in het element kunnen gedaan worden: <literallayout>deb http://apt:debian@example.org/debian &debian-stable-codename; main</literallayout> Als alternatief zou in het bestand auth.conf een element als het
+volgende gebruikt kunnen worden: <literallayout>machine example.org
+login apt
+password debian</literallayout>
+Of anders in één enkele regel: <literallayout>machine example.org login apt password debian</literallayout>
+Indien u meer moet specificeren, zullen al deze regels ook op het element
+example van toepassing zijn: <literallayout>machine example.org/deb login apt password debian
+machine example.org/debian login apt password debian
+machine example.org/debian/ login apt password debian
+</literallayout>
+Daarentegen zijn geen van de volgende regels van toepassing: <literallayout>machine example.org:80 login apt password debian
+machine example.org/deb/ login apt password debian
+machine example.org/ubuntu login apt password debian
+machine example.orga login apt password debian
+machine example.net login apt password debian
+</literallayout>
+</para>
+</refsect1>
+
+<refsect1><title>Noten</title>
+<para>Basale ondersteuning voor deze functionaliteit was aanwezig sinds versie
+0.7.25 maar bleef jarenlang ongedocumenteerd. De documentatie werd in versie
+1.5 toegevoegd met tevens een lichtjes gewijzigde toepassing. Voor maximale
+neerwaartse compatibiliteit zou u meerdere
+<literal>machine</literal>-trefwoorden met dezelfde computernaam moeten
+vermijden, maar indien u er meerdere nodig heeft, moet er bij alle in het
+trefwoord <literal>machine</literal> een pad opgegeven worden.</para>
+</refsect1>
+
+<refsect1>
+<title>Bestanden</title>
+  <variablelist>
+     <varlistentry><term><filename>/etc/apt/auth.conf</filename></term>
+	<listitem><para>Inloginformatie voor APT-bronnen en -proxy's in a netrc-achtige indeling.
+Configuratie-item: <literal>Dir::Etc::netrc</literal>.</para></listitem>
+     </varlistentry>
+     <varlistentry><term><filename>/etc/apt/auth.conf.d/*.conf</filename></term>
+	<listitem><para>Login information for APT sources and proxies in a netrc-like format.
+Configuration Item: <literal>Dir::Etc::netrcparts</literal>.</para></listitem>
+     </varlistentry>
+  </variablelist>
+</refsect1>
+
+<refsect1>
+<title>Zie ook</title>
+<para>&apt-conf; &sources-list;
+</para>
+</refsect1>
+
+ &manbugs;
+
+ <refsect1><title>&translation-title;</title>
+   <para>&translation-holder;</para>
+   <para>&translation-english;</para>
+ </refsect1>
+</refentry>

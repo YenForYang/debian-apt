@@ -1,0 +1,9 @@
+<map id="pkgCacheListParser" name="pkgCacheListParser">
+<area shape="rect" id="node2" href="$classdebListParser.xhtml" title="debListParser" alt="" coords="275,80,385,107"/>
+<area shape="rect" id="node3" href="$classdebDebFileParser.xhtml" title="debDebFileParser" alt="" coords="5,155,140,181"/>
+<area shape="rect" id="node4" href="$classdebStatusListParser.xhtml" title="debStatusListParser" alt="" coords="164,155,315,181"/>
+<area shape="rect" id="node5" href="$classdebTranslationsParser.xhtml" title="debTranslationsParser" alt="" coords="339,155,503,181"/>
+<area shape="rect" id="node6" href="$classedspLikeListParser.xhtml" title="edspLikeListParser" alt="" coords="527,155,669,181"/>
+<area shape="rect" id="node7" href="$classedspListParser.xhtml" title="edspListParser" alt="" coords="471,229,587,256"/>
+<area shape="rect" id="node8" href="$classeippListParser.xhtml" title="eippListParser" alt="" coords="611,229,724,256"/>
+</map>

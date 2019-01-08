@@ -1,0 +1,10 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" href="$classpkgCacheListParser.xhtml" title="pkgCacheListParser" alt="" coords="5,81,155,108"/>
+<area shape="rect" id="node2" href="$classdebListParser.xhtml" title="debListParser" alt="" coords="203,81,312,108"/>
+<area shape="rect" id="node3" href="$classdebDebFileParser.xhtml" title="debDebFileParser" alt="" coords="375,5,509,32"/>
+<area shape="rect" id="node4" href="$classdebStatusListParser.xhtml" title="debStatusListParser" alt="" coords="367,56,517,83"/>
+<area shape="rect" id="node5" href="$classdebTranslationsParser.xhtml" title="debTranslationsParser" alt="" coords="360,107,524,133"/>
+<area shape="rect" id="node6" href="$classedspLikeListParser.xhtml" title="edspLikeListParser" alt="" coords="371,157,513,184"/>
+<area shape="rect" id="node7" href="$classedspListParser.xhtml" title="edspListParser" alt="" coords="572,132,688,159"/>
+<area shape="rect" id="node8" href="$classeippListParser.xhtml" title="eippListParser" alt="" coords="573,183,687,209"/>
+</map>

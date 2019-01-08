@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+  "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % aptent SYSTEM "apt.ent"> %aptent;
+<!ENTITY % aptverbatiment SYSTEM "apt-verbatim.ent"> %aptverbatiment;
+<!ENTITY % aptvendor SYSTEM "apt-vendor.ent"> %aptvendor;
+]>
+
+<refentry>
+
+ <refentryinfo>
+   <!-- The last update date -->
+&apt-author.team;
+   &apt-email;
+   &apt-product;
+   
+   <date>2018-05-11T00:00:00Z</date>
+ </refentryinfo>
+
+ <refmeta>
+   <refentrytitle>apt-transport-http</refentrytitle>
+   <manvolnum>1</manvolnum>
+   <refmiscinfo class="manual">APT</refmiscinfo>
+ </refmeta>
+
+ 
+ <!-- Man page title -->
+<refnamediv>
+    <refname>apt-transport-http</refname>
+    <refpurpose>Transport d'APT pour téléchargement par HTTP (protocole de transfert
+hypertexte)</refpurpose>
+ </refnamediv>
+
+<refsect1><title>Description</title>
+<para>Ce transport d'APT permet d'utiliser les dépôts auxquels on accède au moyen
+de HTTP (Hypertext Transfer Protocol). Il est disponible par défaut et il
+est probablement le transport le plus utilisé de tous. Veuillez noter qu'un
+transport n'est jamais appelé directement par l'utilisateur, mais utilisé
+par les outils d'APT s'appuyant sur la configuration de l'utilisateur.</para>
+<para>HTTP est un protocole de transport non chiffré ce qui veut dire que toutes
+les communications avec le serveur distant (ou le mandataire) peuvent être
+observées par un attaquant suffisamment compétent appelé couramment « homme
+du milieu » (MITM). Cependant, un tel attaquant ne peut
+<emphasis>pas</emphasis> modifier la communication pour compromettre la
+sécurité du système dans la mesure où le modèle de sécurité des données
+d'APT est indépendant de la méthode de transport choisie. Cela est expliqué
+en détail dans &apt-secure;. Un aperçu des méthodes de transport disponibles
+est donné dans &sources-list;.</para>
+</refsect1>
+
+<refsect1><title>Options</title>
+<para>Diverses options peuvent être réglées dans un fichier &apt-conf; pour
+modifier son comportement depuis la configuration d'un mandataire à des
+contournements pour les limites d'un serveur particulier.</para>
+
+<refsect2><title>Configuration du mandataire</title>
+<para>La variable d'environnement <envar>http_proxy</envar> est prise en charge
+pour une configuration au niveau du système. Les mandataires particuliers à
+APT peuvent être configurés grâce à l'option
+<literal>Acquire::http::Proxy</literal>. Les mandataires qui devraient être
+utilisés seulement pour certains hôtes peuvent être spécifiés avec
+<literal>Acquire::http::Proxy::<replaceable>hôte</replaceable></literal>. Un
+contrôle encore plus fin peut être obtenu avec l'autodétection du
+mandataire, détaillée ci-dessous. Toutes ces options utilisent le format
+d'URI
+<literal><replaceable>schéma</replaceable>://[[<replaceable>utilisateur</replaceable>][:<replaceable>mot_de_passe</replaceable>]@]<replaceable>hôte</replaceable>[:<replaceable>port</replaceable>]/</literal>.
+Les schémas d'URI pris en charge sont <literal> socks5h</literal> (SOCKS5
+avec résolution distante de DNS), <literal>http</literal> et
+<literal>https</literal>. Les détails d'authentification peuvent être
+fournis avec &apt-authconf; plutôt que de les inclure directement dans
+l'URI.</para>
+<para>Les diverses options de configuration d'APT prennent en charge la valeur
+particulière <literal>DIRECT</literal> signifiant qu'aucun mandataire ne
+doit être utilisé. La variable d'environnement <envar>no_proxy</envar> est
+aussi prise en charge dans le même but.</para>
+<para>De plus, il y a trois options de configuration fournies pour le contrôle des
+caches mandataire compatibles avec HTTP/1.1 :
+<literal>Acquire::http::No-Cache</literal> dit au mandataire de ne jamais
+utiliser les réponses qu'il a
+stockées. <literal>Acquire::http::Max-Age</literal> établit l'ancienneté
+maximale (en secondes) d'un fichier d'index dans le cache du
+mandataire. <literal>Acquire::http::No-Store</literal> indique que le
+mandataire ne doit pas mettre en cache les fichiers d'archive, ce qui peut
+éviter de polluer un cache mandataire avec des fichiers .deb très grands.</para>
+</refsect2>
+
+<refsect2><title>Configuration automatique du mandataire</title>
+<para>L'option <literal>Acquire::http::Proxy-Auto-Detect</literal> peut être
+utilisée pour indiquer une commande externe pour découvrir le mandataire
+HTTP à utiliser. Le premier et seul paramètre est un URI indiquant l'hôte à
+contacter pour permettre une configuration propre à l'hôte. Apt s'attend à
+ce que la commande indique le mandataire sur la sortie standard sur une
+seule ligne dans le format d'URI précédemment défini ou le mot
+<literal>DIRECT</literal> si aucun mandataire ne doit être utilisé. Aucune
+sortie indique que le mandataire générique doit être utilisé.</para>
+<para>Notez que l'auto-détection ne sera pas exécutée si une configuration
+spécifique de mandataire hôte a déjà été établie par
+<literal>Acquire::http::Proxy::<replaceable>hôte</replaceable></literal>.</para>
+<para>Voir les paquets &squid-deb-proxy-client; et &auto-apt-proxy; pour des
+exemples d'implémentation.</para>
+<para>Cette option prend le pas sur l'ancien nom d'option
+<literal>Acquire::http::ProxyAutoDetect</literal>.</para>
+</refsect2>
+
+<refsect2><title>Configuration de connexion</title>
+<para>L'option <literal>Acquire::http::Timeout</literal> positionne le compteur
+d'expiration du délai (timeout) utilisé par la méthode. Cela s'applique
+aussi bien à la connexion qu'aux données.</para>
+<para>La bande passante utilisée peut être limitée avec
+<literal>Acquire::http::Dl-Limit</literal> qui peut prendre une valeur
+entière, l'unité utilisée étant le kilo-octet par seconde. La valeur par
+défaut est 0, ce qui correspond à aucune limitation de bande
+passante. Veuillez noter que cette option désactive implicitement le
+téléchargement simultané depuis plusieurs serveurs.</para>
+<para>Le réglage <literal>Acquire::http::Pipeline-Depth</literal> permet
+d'utiliser l'enchaînement HTTP (« HTTP pipelining », RFC 2616
+section 8.1.2.2) ce qui peut être utile par exemple avec des connexions à
+latence élevée. Il indique le nombre de requêtes envoyées dans le tuyau. APT
+tente de détecter et de contourner les serveurs web et les mandataires qui
+se comportent mal à l'exécution, mais si vous savez que vos serveurs ne
+respectent pas la norme HTTP/1.1, l'enchaînement peut être désactivé en
+définissant cette valeur à 0. Il est activé par défaut avec une valeur
+de 10.</para>
+<para><literal>Acquire::http::AllowRedirect</literal> contrôle le fait qu'APT
+suive les redirections. Ce réglage est activé par défaut.</para>
+<para>L'option <literal>Acquire::http::User-Agent</literal> peut être utilisée
+pour envoyer une valeur User-Agent modifiée pour les téléchargements HTTP,
+ce qui peut par exemple être utile avec certains mandataires HTTP qui
+n'autorisent l'accès qu'aux clients s'identifiant de manière spécifique.</para>
+<para><literal>Acquire::http::SendAccept</literal> est activé par défaut et envoie
+un champ d'en-tête <literal>Accept: text/*</literal> au serveur pourles
+requêtes sans extension de fichier pour éviter que le serveur ne tente une
+négociation de contenu.</para>
+</refsect2>
+</refsect1>
+
+<refsect1><title>Exemples</title>
+<literallayout>
+Acquire::http {
+	Proxy::example.org "DIRECT";
+	Proxy "socks5h://apt:pass@127.0.0.1:9050";
+	Proxy-Auto-Detect "/usr/local/bin/apt-http-proxy-auto-detect";
+	No-Cache "true";
+	Max-Age "3600";
+	No-Store "true";
+	Timeout "10";
+	Dl-Limit "42";
+	Pipeline-Depth "0";
+	AllowRedirect "false";
+	User-Agent "My APT-HTTP";
+	SendAccept "false";
+};
+</literallayout>
+</refsect1>
+
+<refsect1>
+<title>Voir aussi</title>
+<para>&apt-conf; &apt-authconf; &sources-list;
+</para>
+</refsect1>
+
+ &manbugs;
+
+ <refsect1><title>&translation-title;</title>
+   <para>&translation-holder;</para>
+   <para>&translation-english;</para>
+ </refsect1>
+</refentry>

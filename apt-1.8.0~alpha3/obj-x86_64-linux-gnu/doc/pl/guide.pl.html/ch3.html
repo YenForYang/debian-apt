@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Rozdział 3. DSelect</title>
+    <meta name="generator" content="DocBook XSL Stylesheets V1.79.1"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="home" href="index.html" title="Podręcznik użytkownika APT"/>
+    <link rel="up" href="index.html" title="Podręcznik użytkownika APT"/>
+    <link rel="prev" href="ch2.html" title="Rozdział 2. apt-get"/>
+    <link rel="next" href="ch4.html" title="Rozdział 4. Interfejs"/>
+  </head>
+  <body>
+    <div class="navheader">
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Rozdział 3. DSelect</th>
+        </tr>
+        <tr>
+          <td align="left"><a accesskey="p" href="ch2.html">Poprzedni</a> </td>
+          <th width="60%" align="center"> </th>
+          <td align="right"> <a accesskey="n" href="ch4.html">Następny</a></td>
+        </tr>
+      </table>
+      <hr/>
+    </div>
+    <div class="chapter">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h1 class="title"><a id="ch3"/>Rozdział 3. DSelect</h1>
+          </div>
+        </div>
+      </div>
+      <p>
+Metoda APT <span class="command"><strong>dselect</strong></span> dostarcza kompletnego systemu APT w
+interfejsie użytkownika programu wyboru pakietów
+<span class="command"><strong>dselect</strong></span>. <span class="command"><strong>dselect</strong></span> może być użyty do
+wybrania pakietów przeznaczonych do zainstalowania lub usunięcia, a APT
+zainstaluje lub usunie te pakiety.
+</p>
+      <p>
+Aby włączyć metodę APT należy wybrać opcję "[A] Dostęp" w programie
+<span class="command"><strong>dselect</strong></span> , a następnie wybrać metodę APT. Użytkownik
+zostanie poproszony o skonfigurowanie listy <span class="emphasis"><em>źródeł</em></span>,
+będących lokalizacjami, z których będą pobierane pakiety. Mogą być to strony
+internetowe, lokalne serwery lustrzane Debiana lub CD-ROM-y. Każde źródło
+może dostarczać tylko fragmentu pełnego archiwum Debiana, a APT
+automatycznie połączy je w kompletny zbiór pakietów. Jeśli używany jest
+CD-ROM, to dobrym pomysłem jest podanie najpierw jego, a potem podanie
+mirrorów umożliwiających dostęp do najnowszych wersji pakietów zawierających
+poprawki błędów. APT automatycznie użyje pakietów z CD-ROM-u zanim zacznie
+pobierać pakiety z Internetu.
+</p>
+      <pre class="screen">
+  Ustawianie listy źródłowych lokalizacji dystrybucji
+
+ Proszę podać bazowy URL dystrybucji Debiana.
+ Obsługiwane schematy połączeń to: http ftp file
+
+ Przykłady:
+      file:/mnt/debian,
+      ftp://ftp.debian.org/debian,
+      http://ftp.pl.debian.org/debian,
+
+
+ URL [http://llug.sep.bnl.gov/debian]:
+</pre>
+      <p>
+Ustawianie źródeł zaczyna się od pytania o bazową lokalizację
+Debiana. Domyślną wartością jest mirror HTTP. Następnie użytkownik jest
+pytany o dystrybucję do pobrania.
+</p>
+      <pre class="screen">
+ Proszę podać znacznik dystrybucji do pobrania lub ścieżkę do pliku
+ pakietów kończącą się znakiem "/". Zazwyczaj znacznikiem dystrybucji
+ jest coś w rodzaju: stable unstable testing non-US
+
+ Dystrybucja [stable]:
+</pre>
+      <p>
+Dystrybucja odnosi się do wersji Debiana:
+<span class="emphasis"><em>stable</em></span>(stabilna) to najnowsza wydana wersja, a
+<span class="emphasis"><em>unstable</em></span> (niestabilna) to wersja
+rozwojowa. <span class="emphasis"><em>non-US</em></span> jest dostępna tylko na wybranych
+serwerach lustrzanych i zawiera pakiety, które wykorzystują technologie
+szyfrowania danych lub inne rzeczy, które nie mogą być eksportowane z
+serwerów umieszczonych w Stanach Zjednoczonych. Importowanie tych pakietów
+do Stanów Zjednoczonych jest jednakże legalne.
+</p>
+      <pre class="screen">
+ Proszę podać komponenty do pobrania
+ Zazwyczaj komponentem jest coś w rodzaju: main contrib non-free
+
+ Komponenty [main contrib non-free]:
+</pre>
+      <p>
+Lista komponentów jest listą pod-dystrybucji do pobrania. Dystrybucja jest
+podzielona ze względu na licencje oprogramowania: main (główna) zawiera
+pakiety zgodne z DFSG ("Wytycznymi Debiana w sprawie Wolnego
+Oprogramowania"),contrib i non-free zawierają pakiety, które zawierają
+restrykcje związane z ich używaniem lub rozpowszechnianiem.
+</p>
+      <p>
+Można dodać dowolną liczbę źródeł. Skrypt konfigurujący będzie kontynuował
+odpytywanie użytkownika dopóty, dopóki nie poda wszystkich źródeł, które
+chciał skonfigurować.
+</p>
+      <p>
+Przed rozpoczęciem używania programu <span class="command"><strong>dselect</strong></span> należy w
+menu tego programu wybrać "[U] Aktualizacja", abyzaktualizować listę
+dostępnych pakietów. To polecenie jest nadzbiorem polecenia <code class="literal">apt-get
+update</code>, zapewniającym programowi <span class="command"><strong>dselect</strong></span> dostęp
+do pobranych informacji o pakietach. "[U] Aktualizacja" musi być wykonana,
+nawet jeśli wcześniej uruchomiono <code class="literal">apt-get update</code>.
+</p>
+      <p>
+Następnie można wybrać pakiety do zainstalowania, używając opcji "[S]
+Wybór", a potem zainstalować te pakiety opcją "[I] Instalacja". Używanie
+metody APT czyni opcje "[C] Konfiguracja" i "[R] Usuwanie" bezużytecznymi,
+gdyż "[I] Instalacja" przeprowadza również te dwie operacje.
+</p>
+      <p>
+Domyślnie APT automatycznie usunie pliki pakietów (.deb), gdy tylko zostaną
+zainstalowane. Aby zmienić to zachowanie, proszę umieścić
+<code class="literal">Dselect::clean "prompt";</code> w /etc/apt/apt.conf.
+</p>
+    </div>
+    <div class="navfooter">
+      <hr/>
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td align="left"><a accesskey="p" href="ch2.html">Poprzedni</a> </td>
+          <td align="center"> </td>
+          <td align="right"> <a accesskey="n" href="ch4.html">Następny</a></td>
+        </tr>
+        <tr>
+          <td align="left" valign="top">Rozdział 2. apt-get </td>
+          <td align="center">
+            <a accesskey="h" href="index.html">Spis treści</a>
+          </td>
+          <td align="right" valign="top"> Rozdział 4. Interfejs</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

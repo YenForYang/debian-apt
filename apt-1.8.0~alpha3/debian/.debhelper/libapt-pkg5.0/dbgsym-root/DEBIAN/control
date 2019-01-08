@@ -1,0 +1,13 @@
+Package: libapt-pkg5.0-dbgsym
+Source: apt
+Version: 1.8.0~alpha3
+Auto-Built-Package: debug-symbols
+Architecture: amd64
+Maintainer: APT Development Team <deity@lists.debian.org>
+Installed-Size: 10459
+Depends: libapt-pkg5.0 (= 1.8.0~alpha3)
+Section: debug
+Priority: optional
+Multi-Arch: same
+Description: debug symbols for libapt-pkg5.0
+Build-Ids: b1d3f1f2cc3bc3a38bff1078f8ac19d6da7a78bb

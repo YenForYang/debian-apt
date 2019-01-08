@@ -1,0 +1,580 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+  "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % aptent SYSTEM "apt.ent"> %aptent;
+<!ENTITY % aptverbatiment SYSTEM "apt-verbatim.ent"> %aptverbatiment;
+<!ENTITY % aptvendor SYSTEM "apt-vendor.ent"> %aptvendor;
+]>
+
+<book lang="pt">
+
+<title>Guia de Utilizador do APT</title>
+
+<bookinfo>
+
+<authorgroup>
+  <author>
+    <personname>Jason Gunthorpe</personname><email>jgg@debian.org</email>
+  </author>
+</authorgroup>
+
+<releaseinfo>Versão &apt-product-version;</releaseinfo>
+
+<abstract>
+<para>
+Este documento disponibiliza uma visão geral de como usar o gestor de
+pacotes APT.
+</para>
+</abstract>
+
+<copyright><year>1998</year><holder>Jason Gunthorpe</holder></copyright>
+
+<legalnotice>
+<title>Aviso de Licença</title>
+<para>
+"APT" e este documento são software livre; você pode distribuí-lo e/ou
+modificá-lo sob os termos da GNU General Public License como publicada pela
+Free Software Foundation; seja na versão 2 da Licença, ou (por sua opção)
+qualquer versão posterior.
+</para>
+</legalnotice>
+
+<legalnotice>
+<para>
+Para mais detalhes em sistemas Debian, veja o ficheiro
+/usr/share/common-licenses/GPL para a licença completa.
+</para>
+</legalnotice>
+
+</bookinfo>
+
+<chapter id="ch1"><title>Geral</title>
+<para>
+O pacote APT contém actualmente duas secções, o método
+<command>dselect</command> do APT e a interface de utilizador de linha de
+comandos <command>apt-get</command>. Ambos disponibilizam uma maneira de
+instalar e remover pacotes assim como descarregar novos pacotes da Internet.
+</para>
+
+<section id="s1.1"><title>Anatomia do Sistema de Pacotes</title>
+<para>
+O sistema de pacotes Debian tem uma grande quantidade de informação
+associada a cada pacote para ajudar a assegurar que este se integra de modo
+limpo e fácil no sistema. A mais proeminente das suas funcionalidades é o
+sistema de dependências.
+</para>
+<para>
+O sistema de dependências permite a programas individuais fazerem uso de
+elementos partilhados no sistema tais como as bibliotecas. Facilita a
+colocação de porções de um programa usadas raramente em pacotes separados
+para reduzir o número de coisas que é necessário instalar ao utilizador
+médio. Também permite opções em agentes de transporte de mail, servidores X
+e mais.
+</para>
+<para>
+O primeiro passo para compreender o sistema de dependências é pegar no
+conceito de uma dependência simples. O significado de uma dependência
+simples é que um pacote requer outro pacote seja instalado ao mesmo tempo
+para funcionar correctamente.
+</para>
+<para>
+Por exemplo, mailcrypt é uma extensão do emacs que ajuda a encriptar mail
+com GPG. Sem o GPGP instalado o mailcrypt é inútil, então o mailcrypt tem
+uma dependência simples do GPG. Também, porque é uma extensão do emacs, tem
+uma dependência simples do emacs, e sem o emacs é completamente inútil.
+</para>
+<para>
+A outra dependência importante a compreender é a dependência de
+conflito. Significa que um pacote, quando instalado com outro pacote, não
+irá funcionar e pode ser extremamente prejudicial para o sistema. Como
+exemplo considere um agente de transporte de mail como o sendmail, exim ou
+qmail. Não é possível ter dois agentes de transporte de mail instalados
+porque ambos precisam de escutar na rede para receberem mail. Tentar
+instalar dois irá danificar seriamente o sistema, por isso todos os agentes
+de transporte de mail têm uma dependência de conflito com todos os outros
+agentes de transporte de mail.
+</para>
+<para>
+Como uma complicação adicional existe a possibilidade de um pacote fingir
+ser outro pacote. Considere que exim e sendmail para muitas intenções são
+idênticos, ambos entregam mail e compreendem uma interface comum. Por isso,
+o sistema de pacotes tem um modo para eles declararem que são ambos
+mail-transport-agents. Portanto, ambos exim e sendmail declaram que
+disponibilizam um mail-transport-agent e outros pacotes que precisam de um
+agente de transporte de mail dependem de um mail-transport-agent. Isto pode
+adicionar uma grande confusão quando se tenta corrigir pacotes manualmente.
+</para>
+<para>
+Em qualquer altura uma única dependência pode ser satisfeita por pacotes que
+já estão instalados ou podem não estar. O APT tenta ajudar a resolver
+problemas com dependências ao disponibilizar um número de algoritmos
+automáticos que ajudam a seleccionar os pacotes para instalação.
+</para>
+</section>
+
+</chapter>
+
+<chapter id="ch2"><title>apt-get</title>
+<para>
+<command>apt-get</command> fornece uma maneira simples de instalar pacotes a
+partir da linha de comandos. Ao contrário do <command>dpkg</command>, o
+<command>apt-get</command> não compreende os ficheiros .deb, funciona com o
+nome próprio do pacote e apenas pode instalar arquivos .deb a partir de uma
+<emphasis>Source</emphasis>.
+</para>
+<para>
+O primeira <footnote><para> se você está a usar um servidor proxy http você tem que definir a variável
+de ambiente http_proxy primeiro, veja sources.list(5) </para>
+</footnote> coisa que deve ser feita
+antes de usar <command>apt-get</command> é obter as listas de pacotes a
+partir das <emphasis>Sources</emphasis> para que ele saiba que pacotes estão
+disponíveis. Isto é feito com <literal>apt-get update</literal>. Por
+exemplo,
+</para>
+<screen>
+# apt-get update
+Get http://ftp.de.debian.org/debian-non-US/ stable/binary-i386/ Packages
+Get http://llug.sep.bnl.gov/debian/ testing/contrib Packages
+Reading Package Lists... Done
+Building Dependency Tree... Done
+</screen>
+<para>
+Uma vez actualizado existem vários comandos que podem ser usados:
+</para>
+<variablelist>
+<varlistentry>
+<term>upgrade</term>
+<listitem>
+<para>
+Upgrade irá tentar actualizar gentilmente todo o sistema. Upgrade nunca irá
+instalar um pacote novo ou remover um pacote existente, nem nunca irá
+actualizar um pacote que possa causar a quebra de outro pacote. Isto pode
+ser usado diariamente para actualizar o sistema com relativa
+segurança. Upgrade ira listar todos os pacotes que não pode actualizar, isto
+geralmente significa que eles dependem de novos pacotes ou entram em
+conflito com algum outro pacote. <command>dselect</command> ou
+<literal>apt-get install</literal> podem ser usados para forçar estes
+pacotes a instalar.
+</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>install</term>
+<listitem>
+<para>
+Install é usado para instalar pacotes pelo nome. O pacote é obtido
+automaticamente e instalado. Isto pode ser útil se você já conhecer o nome
+do pacote a instalar e não quer ir para uma GUI para o seleccionar. Podem
+ser passados qualquer número de pacotes para instalar, todos eles serão
+obtidos. Install tenta automaticamente resolver problemas de dependências
+com os pacotes listados e irá escrever um sumário e pedir confirmação se
+algo mais que os seus argumentos serão alterados.
+</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>dist-upgrade</term>
+<listitem>
+<para>
+Dist-upgrade é um actualizador completo desenhado para simplificar a
+actualização entre lançamentos da Debian. Usa um algoritmo sofisticado para
+determinar o melhor conjunto de pacotes a instalar, actualizar ou remover
+para obter o máximo do sistema para o novo lançamento. Em algumas situações
+pode ser desejável usar o dist-upgrade em vez de passar o tempo a resolver
+dependências manualmente no <command>dselect</command>. Assim que o
+dist-upgrade tiver terminado então pode ser usado o
+<command>dselect</command> para instalar quaisquer pacotes que tenham ficado
+de fora.
+</para>
+<para>
+É importante observar de perto o que o dist-upgrade vai fazer, as suas
+decisões podem por vezes ser bastante surpreendentes.
+</para>
+</listitem>
+</varlistentry>
+</variablelist>
+<para>
+<command>apt-get</command> tem várias opções de linha de comandos que estão
+detalhados no seu manual,
+<citerefentry><refentrytitle>apt-get</refentrytitle><manvolnum>8</manvolnum></citerefentry>.
+A opção mais útil é <literal>-d</literal> que não instala os pacotes
+obtidos, Se o sistema tiver que descarregar um grande número de pacotes
+seria indesejável começar a instalá-los no caso de algo correr mal. Quando
+se usa <literal>-d</literal> os arquivos descarregados podem ser instalados
+simplesmente ao correr de novo comando que s descarregou mas sem o
+<literal>-d</literal>.
+</para>
+</chapter>
+
+<chapter id="ch3"><title>DSelect</title>
+<para>
+O método <command>dselect</command> do APT disponibiliza o sistema APT
+completo com a GUI de selecção de pacotes <command>dselect</command>. O
+<command>dselect</command> é usado para seleccionar os pacotes a serem
+instalados ou removidos e o APT instala-os.
+</para>
+<para>
+Para activar o método APT você precisa de seleccionar [A]ccess no
+<command>dselect</command> e depois escolher o método APT. Ser-lhe-à
+perguntado por um conjunto de <emphasis>Sources</emphasis> que são os
+lugares de onde obter os arquivos. Estes podem ser sites remotos da
+Internet, mirrors Debian locais ou CD-ROMs. Cada source pode disponibilizar
+um fragmento do arquivo Debian total. O APT irá automaticamente combiná-los
+para formar um conjunto completo de pacotes. Se tem um CD-ROM, então é boa
+ideia especificá-lo em primeiro lugar e depois especificar um mirror para
+ter acesso às correcções de bugs mais recentes. O APT irá automaticamente
+usar os pacotes no seu CD-ROM antes de descarregar da Internet.
+</para>
+<screen>
+   Configurar uma lista de localizações fonte da distribuição
+
+ Por favor forneça o URL base da distribuição Debian.
+ Os esquemas de acesso que conheço são: http file
+
+ Por exemplo:
+      file:/mnt/debian,
+      ftp://ftp.debian.org/debian,
+      http://ftp.de.debian.org/debian,
+
+
+ URL [http://llug.sep.bnl.gov/debian]:
+</screen>
+<para>
+A configuração de <emphasis>Sources</emphasis> começa por perguntar pela
+base do arquivo Debian, usando por predefinição um mirror HTTP. Depois
+pergunta qual a distribuição a obter.
+</para>
+<screen>
+ Por favor forneça a etiqueta da distribuição a obter ou um caminho para o
+ ficheiro package terminando com um /. As etiquetas da
+ distribuição são tipicamente algo como: stable unstable testing non-US
+
+ Distribution [stable]:
+</screen>
+<para>
+A distribuição refere-se à versão Debian no arquivo,
+<emphasis>stable</emphasis> refere-se à última versão lançada e
+<emphasis>unstable</emphasis> refere-se à versão de
+desenvolvimento. <emphasis>non-US</emphasis> apenas está disponível em
+alguns mirrors e refere-se a pacotes que contém tecnologia de encriptação ou
+outras coisas que não podem ser exportadas dos Estados Unidos. No entanto
+importar estes pacotes para os US é legal.
+</para>
+<screen>
+ Por favor forneça os componentes a obter
+ Tipicamente os componentes são algo como: main contrib non-free
+
+ Componentes [main contrib non-free]:
+</screen>
+<para>
+A lista de componentes refere-se à lista das sub-distribuições a obter. A
+distribuição é dividida baseando-se nas licenças do software, sendo main
+pacotes livres DFSG enquanto contrib e non-free contêm coisas que têm várias
+restrições colocadas no seu uso e distribuição.
+</para>
+<para>
+Pode ser adicionado qualquer número de fontes, o script de configuração irá
+continuar a perguntar-lhe até que tenha especificado todas as que deseja.
+</para>
+<para>
+Antes de começar a usar o <command>dselect</command> é necessário actualizar
+a lista disponível ao seleccionar [U]pdate no menu. Isto é um super-conjunto
+do <literal>apt-get update</literal> que torna a informação obtida
+disponível ao <command>dselect</command>. Deve ser executado o [U]pdate
+mesmo que tenha sido feito <literal>apt-get update</literal> antes.
+</para>
+<para>
+Você pode depois fazer as suas selecções usando [S]elect e depois executar a
+instalação usando [I]nstall. Quando se usa o método APT os comandos [C]onfig
+e [R]emove não fazem sentido, o comando [I]nstall executa ambos juntamente.
+</para>
+<para>
+Por predefinição o APT irá automaticamente remover o ficheiro de pacote
+(.deb) assim que ele tenha sido instalado com sucesso. Para alterar este
+comportamento coloque <literal>Dselect::clean "prompt";</literal> em
+/etc/apt/apt.conf.
+</para>
+</chapter>
+
+<chapter id="ch4"><title>A Interface</title>
+<para>
+Ambos método <command>dselect</command> do APT e <command>apt-get</command>
+partilham a mesma interface. É um sistema simples que geralmente lhe diz o
+que vai fazer e depois fá-lo. <footnote><para> O método <command>dselect</command> na verdade é um conjunto de scripts
+wrapper para o <command>apt-get</command>. O método disponibiliza mais
+funcionalidades que aquelas presentes no <command>apt-get</command> sozinho. </para> </footnote> Após
+escrever um sumário do que vai acontecer, o APT depois irá escrever algumas
+mensagens de estado informativo para que você possa estimar o progresso e
+quanto falta fazer.
+</para>
+
+<section id="s4.1"><title>Arranque</title>
+<para>
+Antes de todas as operações, excepto a update, o APT executa um número de
+acções para preparar o seu estado interno. Também faz algumas verificações
+do estado do sistema. A qualquer altura estas operações pode ser executadas
+correndo <literal>apt-get check</literal>.
+</para>
+<screen>
+# apt-get check
+Reading Package Lists... Done
+Building Dependency Tree... Done
+</screen>
+<para>
+A primeira coisa que faz é ler todos os ficheiros de pacotes para a
+memória. O APT usa um esquema de cache para que esta operação seja mais
+rápida na segunda vez que é executada. Se alguns dos ficheiros de pacotes
+não forem encontrados serão ignorados e será mostrado um aviso quando o
+apt-get terminar.
+</para>
+<para>
+A operação final executa uma análise detalhada das dependências do
+sistema. Verifica cada dependência de cada pacote instalado ou desempacotado
+e considera se está OK. Caso isto encontre um problema, então é escrito um
+relatório e o <command>apt-get</command> recusa-se a funcionar.
+</para>
+<screen>
+# apt-get check
+Reading Package Lists... Done
+Building Dependency Tree... Done
+You might want to run 'apt --fix-broken install' to correct these.
+Sorry, but the following packages have unmet dependencies:
+  9fonts: Depends: xlib6g but it is not installed
+  uucp: Depends: mailx but it is not installed
+  blast: Depends: xlib6g (&gt;= 3.3-5) but it is not installed
+  adduser: Depends: perl-base but it is not installed
+  aumix: Depends: libgpmg1 but it is not installed
+  debiandoc-sgml: Depends: sgml-base but it is not installed
+  bash-builtins: Depends: bash (&gt;= 2.01) but 2.0-3 is installed
+  cthugha: Depends: svgalibg1 but it is not installed
+           Depends: xlib6g (&gt;= 3.3-5) but it is not installed
+  libreadlineg2: Conflicts:libreadline2 (&lt;&lt; 2.1-2.1)
+</screen>
+<para>
+Neste exemplo o sistema tem muitos problemas, incluindo um sério problema
+com libreadlineg2. Para cada pacote que tem dependências não satisfeitas, é
+escrita uma linha indicando o pacote com o problema e as dependências que
+não estão satisfeitas. É também incluída uma explicação curta de porquê o
+pacote tem um problema de dependência.
+</para>
+<para>
+Existem duas maneiras de um sistema entrar num estado de quebra como este. A
+primeira é causada pelo <command>dpkg</command> que não vê algumas relações
+subtis entre pacotes quando executa actualizações. <footnote><para> No entanto o APT considera todas as dependências conhecidas e tenta prevenir
+pacotes quebrados </para> </footnote>. A segunda é se uma instalação de pacote falha
+durante uma operação. Nesta situação um pacote pode ter sido desempacotado
+sem que as suas dependências tenham sido instaladas.
+</para>
+<para>
+A segunda situação é muito menos séria que a primeira porque o APT coloca
+certos constrangimentos na ordem que os pacotes são instalados. Em ambos os
+casos, fornecer a opção <literal>-f</literal> ao <command>apt-get</command>
+irá fazer com que o APT deduza uma solução possível para o problema e depois
+continue. O método <command>dselect</command> do APT fornece sempre a opção
+<literal>-f</literal> para permitir uma continuação fácil de scripts do
+responsável com falhas.
+</para>
+<para>
+No entanto, se for usada a opção <literal>-f</literal> para corrigir um
+sistema seriamente quebrado causado pelo primeiro caso, então é possível que
+ou falhe imediatamente ou falhe na sequência de instalação. Em qualquer dos
+casos é necessário usar o dpkg manualmente (possivelmente com opções de
+forçar) para corrigir a situação o suficiente para permitir ao APT
+continuar.
+</para>
+</section>
+
+<section id="s4.2"><title>O Relatório de Estado</title>
+<para>
+Antes de prosseguir, o <command>apt-get</command> irá apresentar um
+relatório do que irá acontecer. Geralmente o relatório reflecte o tipo de
+operações a ser executadas mas há vários elementos comuns. Em todos os casos
+a lista reflecte o estado final das coisas, tendo em conta a opção
+<literal>-f</literal> e quaisquer outras actividades relevantes ao comando
+que vai ser executado.
+</para>
+
+<section id="s4.2.1"><title>A lista de Pacotes Extra</title>
+<screen>
+Os seguinte pacotes extra serão instalados:
+  libdbd-mysql-perl xlib6 zlib1 xzx libreadline2 libdbd-msql-perl
+  mailpgp xdpkg fileutils pinepgp zlib1g xlib6g perl-base
+  bin86 libgdbm1 libgdbmg1 quake-lib gmp2 bcc xbuffy
+  squake pgp-i python-base debmake ldso perl libreadlineg2
+  ssh
+</screen>
+<para>
+A lista de Pacotes Extra mostra todos os pacotes que irão ser instalados ou
+actualizados em excesso daqueles mencionados na linha de comandos. É apenas
+gerada para um comando <literal>install</literal>. Os pacotes listados são
+geralmente o resultado de uma Auto instalação.
+</para>
+</section>
+
+<section id="s4.2.2"><title>Os Pacotes para Remover</title>
+<screen>
+Os seguintes pacotes irão ser REMOVIDOS:
+  xlib6-dev xpat2 tk40-dev xkeycaps xbattle xonix
+  xdaliclock tk40 tk41 xforms0.86 ghostview xloadimage xcolorsel
+  xadmin xboard perl-debug tkined xtetris libreadline2-dev perl-suid
+  nas xpilot xfig
+</screen>
+<para>
+A lista Pacotes para Remover mostra todos os pacotes que irão ser removidos
+do sistema. Pode ser mostrada para qualquer das operações e deve ser-lhe
+dada uma inspecção cuidadosa para assegurar que nada de importante vai ser
+removido. A opção <literal>-f</literal> é especialmente boa a gerar pacotes
+para remover, portanto neste caso deve-se usar cuidados extremos. A lista
+pode conter pacotes que vão ser removidos porque estão apenas parcialmente
+instalados, possivelmente devido a uma instalação abortada.
+</para>
+</section>
+
+<section id="s4.2.3"><title>A lista de Novos Pacotes</title>
+<screen>
+Os seguintes pacotes NOVOS irão ser instalados:
+  zlib1g xlib6g perl-base libgdbmg1 quake-lib gmp2 pgp-i python-base
+</screen>
+<para>
+A lista de Novos Pacotes é simplesmente um lembrete do que vai acontecer. Os
+pacotes listados não estão instalados presentemente no sistema mas irão
+estar quando o APT terminar.
+</para>
+</section>
+
+<section id="s4.2.4"><title>A lista Kept Back</title>
+<screen>
+Os seguintes pacotes formam mantidos na versão antiga
+  compface man-db tetex-base msql libpaper svgalib1
+  gs snmp arena lynx xpat2 groff xscreensaver
+</screen>
+<para>
+Sempre que todo o sistema é actualizado existe a possibilidade que novas
+versões de pacotes não possam ser instaladas porque requerem coisas novas ou
+entram em conflito com coisas já instaladas. Nestes casos o pacote irá
+aparecer na lista Kept Back. A melhor maneira de convencer os pacotes
+listados aqui a instalarem é com o  <literal>apt-get install</literal> ou
+usando o <command>dselect</command> para resolver os seus problemas.
+</para>
+</section>
+
+<section id="s4.2.5"><title>Aviso de Pacotes Mantidos</title>
+<screen>
+Os seguintes pacotes mantidos irão ser alterados:
+  cvs
+</screen>
+<para>
+Por vezes você pode pedir ao APT para instalar um pacote que está retido,
+nestes casos ele mostra um aviso que o pacote retido vai ser alterado. Isto
+apenas deve acontecer durante um dist-upgrade ou install.
+</para>
+</section>
+
+<section id="s4.2.6"><title>Sumário final</title>
+<para>
+Finalmente, o APT irá escrever um sumário de todas as alterações que irão
+acontecer.
+</para>
+<screen>
+206 pacotes actualizados, 8 instalados de novo, 23 para remover e 51 não actualizados.
+12 pacotes não totalmente instalados ou removidos.
+É necessário obter 65.7M/66.7M de arquivos. Após desempacotamento será usado 26.5M.
+</screen>
+<para>
+A primeira linha do sumário é simplesmente uma versão reduzida de todas as
+listas e inclui o número de actualizações - que é os pacotes já instalados
+que têm novas versões disponíveis. A segunda linha indica o número de
+pacotes mal configurados, possivelmente o resultado de uma instalação
+abortada. A linha final mostra os requisitos de espaço que a instalação
+precisa. O primeiro par de número refere-se ao tamanho dos ficheiros de
+arquivos. O primeiro número indica o número de bytes que precisam ser
+obtidos a partir das localizações remotas e o segundo indica o tamanho total
+do todos os arquivos necessários. O número seguinte indica a diferença de
+tamanho entre os pacotes presentemente instalados e os pacotes instalados de
+fresco. É aproximadamente equivalente ao espaço requerido em /usr após tudo
+estar feito. Se forem removidos um grande número de pacotes então o valor
+pode indicar a quantidade de espaço que irá ser libertado.
+</para>
+<para>
+Outros relatórios podem ser gerados ao usar a opção -u para mostrar os
+pacotes a actualizar, e são semelhantes aos exemplos prévios.
+</para>
+</section>
+
+</section>
+
+<section id="s4.3"><title>O Mostrador de Estado</title>
+<para>
+Durante a descarga dos arquivos e ficheiros de pacotes, o APT escreve uma
+série de mensagens de estado.
+</para>
+<screen>
+# apt-get update
+Get:1 http://ftp.de.debian.org/debian-non-US/ stable/non-US/ Packages
+Get:2 http://llug.sep.bnl.gov/debian/ testing/contrib Packages
+Hit http://llug.sep.bnl.gov/debian/ testing/main Packages
+Get:4 http://ftp.de.debian.org/debian-non-US/ unstable/binary-i386/ Packages
+Get:5 http://llug.sep.bnl.gov/debian/ testing/non-free Packages
+11% [5 testing/non-free `Waiting for file' 0/32.1k 0%] 2203b/s 1m52s
+</screen>
+<para>
+A linhas iniciadas com <emphasis>Get</emphasis> são escritas quando o APT
+começa a obter um ficheiro enquanto a última linha indica o progresso da
+descarga. O primeiro valor percentual na linha de progresso indica a
+percentagem total completa de todos os ficheiros. Infelizmente como o
+tamanho dos ficheiros de Pacotes é desconhecido o <literal>apt-get
+update</literal> estima a percentagem de pronto o que causa algumas
+imprecisões.
+</para>
+<para>
+A secção seguinte da linha de estado é repetida para cada processo de
+descarga e indica a operação a ser executada e alguma informação útil acerca
+do que está a acontecer. Por vezes esta secção irá simplesmente ler
+<emphasis>Forking</emphasis> o que representa que o SO está a carregar o
+módulo de download. A primeira palavra após o [ é o número de obtenção como
+mostrado nas linhas de histórico. A palavra seguinte é o nome em formato
+curto do objecto a ser descarregado. Para os arquivos irá conter o nome do
+pacote que está a ser descarregado.
+</para>
+<para>
+Dentro da única citação está uma string de informação que indica o progresso
+da fase de negociação do download. Progride tipicamente de <emphasis>A
+Ligar</emphasis> para <emphasis>À espera do ficheiro</emphasis> para
+<emphasis>A descarregar</emphasis> ou <emphasis>A resumir</emphasis>. O
+valor final é o número de bytes descarregados a partir do site remoto. Uma
+vez começado a descarga isto é representado como
+<literal>102/10.2k</literal> indicando que 102 bytes foram obtidos e são
+esperados 10.2kilobytes. O tamanho total é sempre representado numa anotação
+de 4 figuras para preservar espaço. Após a amostragem do tamanho está um
+medidor de percentagem para o próprio ficheiro. O segundo último elemento é
+a velocidade média instantânea. Estes valores são actualizados a cada 5
+segundos e reflectem a taxa de dados transferidos para esse
+período. Finalmente é mostrado o tempo estimado de transferência. Isto é
+actualizado regularmente e reflecte o tempo para completar tudo ao ritmo de
+transferência mostrado.
+</para>
+<para>
+O mostrador de estado actualiza-se a cada meio segundo para disponibilizar
+uma informação de retorno constante do progresso de descarga enquanto as
+linhas Get deslocam-se para trás sempre que uma nova linha é iniciada. Como
+o mostrador de estado é constantemente actualizado não é apropriado para
+registar num ficheiro, use a opção <literal>-q</literal> para remover o
+mostrador de estado.
+</para>
+</section>
+
+<section id="s4.4"><title>Dpkg</title>
+<para>
+O APT usa o <command>dpkg</command> para instalar os arquivos e irá mudar
+para a interface do <command>dpkg</command> assim que a descarga estiver
+completa. O <command>dpkg</command> irá também fazer um número de perguntas
+conforme vai processando os pacotes e os próprios pacotes podem também fazer
+várias questões. Antes de cada pergunta há geralmente uma descrição do que
+se está a perguntar e as perguntas são demasiado variadas para serem
+discutidas aqui.
+</para>
+</section>
+
+</chapter>
+
+</book>

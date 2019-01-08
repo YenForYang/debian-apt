@@ -1,0 +1,303 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+  "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % aptent SYSTEM "apt.ent"> %aptent;
+<!ENTITY % aptverbatiment SYSTEM "apt-verbatim.ent"> %aptverbatiment;
+<!ENTITY % aptvendor SYSTEM "apt-vendor.ent"> %aptvendor;
+]>
+
+<refentry>
+ <refentryinfo>
+   <!-- The last update date -->
+&apt-author.jgunthorpe;
+   &apt-author.team;
+   &apt-email;
+   &apt-product;
+   
+   <date>2016-08-06T00:00:00Z</date>
+ </refentryinfo>
+
+ <refmeta>
+   <refentrytitle>apt-secure</refentrytitle>
+   <manvolnum>8</manvolnum>
+   <refmiscinfo class="manual">APT</refmiscinfo>
+ </refmeta>
+
+
+ 
+
+ 
+ 
+ <!-- NOTE: This manpage has been written based on the
+     Securing Debian Manual ("Debian Security
+     Infrastructure" chapter) and on documentation
+     available at the following sites:
+     http://wiki.debian.net/?apt06
+     http://www.syntaxpolice.org/apt-secure/
+     http://www.enyo.de/fw/software/apt-secure/
+-->
+<!-- TODO: write a more verbose example of how it works with 
+     a sample similar to 
+     http://www.debian-administration.org/articles/174
+     ?
+-->
+<!-- Man page title -->
+<refnamediv>
+    <refname>apt-secure</refname>
+    <refpurpose>Ondersteuning in APT voor de authenticatie van archieven</refpurpose>
+ </refnamediv>
+
+ <refsect1><title>Omschrijving</title>
+   <para>
+   Met ingang van versie 0.6 bevat <command>APT</command> code die voor alle
+pakketbronnen de ondertekening controleert van het bestand Release. Dit
+geeft de garantie dat gegevens uit het archief, zoals pakketten, niet
+gewijzigd kunnen worden door mensen die geen toegang hebben tot de sleutel
+waarmee het bestand Release ondertekend wordt. Met ingang van versie 1.1
+vereist <command>APT</command> dat pakketbronnen recente
+authenticatie-informatie verstrekken om die pakketbron ongehinderd te kunnen
+gebruiken. Met ingang van versie 1.5 moet gewijzigde informatie over de
+pakketbron in het bestand Release bevestigd worden, vooraleer APT voortgaat
+met het toepassen van updates die uit die pakketbron afkomstig zijn.
+   </para>
+
+   <para>
+   Opmerking: Alle op APT gebaseerde front-ends voor pakketbeheer, zoals
+&apt-get;, &aptitude; en &synaptic;, ondersteunen deze
+authenticatiefunctionaliteit. Het is enkel om het eenvoudig te houden dat
+deze man-pagina van <literal>APT</literal> gebruikt wordt om die
+functionaliteit aan ze allemaal toe te schrijven.
+   </para>
+</refsect1>
+
+ <refsect1><title>Niet-ondertekende pakketbronnen</title>
+   <para>
+   Indien een archief een niet-ondertekend Release-bestand of helemaal geen
+Release-bestand heeft, zullen alle hedendaagse versies van APT bij
+<command>update</command>-operaties standaard weigeren om er gegevens van op
+te halen. En zelfs als ze tot ophalen verplicht worden, zullen frontends,
+zoals &apt-get;, om een expliciete bevestiging vragen als bij een
+installatieverzoek een pakket uit een dergelijk niet-geauthenticeerd archief
+betrokken is.
+   </para>
+
+   <para>
+   U kunt alle APT-clients verplichten om enkel waarschuwingen te geven door de
+configuratie-optie <option>Acquire::AllowInsecureRepositories</option> op
+<literal>true</literal> in te stellen. U kunt ook individuele pakketbronnen
+toelaten om onveilig te zijn via de optie
+<literal>allow-insecure=yes</literal> in &sources-list;. Merk op dat
+onveilige pakketbronnen ten stelligste afgeraden worden en dat alle opties
+die apt verplichten om deze te blijven ondersteunen, uiteindelijk verwijderd
+zullen worden. Gebruikers beschikken ook over de optie
+<option>Trusted</option>, waardoor zelfs de waarschuwingen onderdrukt
+worden, maar u moet zeker zijn dat u de implicaties ervan begrijpt die
+uitgelegd worden in &sources-list;.
+   </para>
+
+   <para>
+   Een pakketbron die zijn eerdere authenticatie-status zou kwijt spelen zal in
+geval van een <command>update</command>-operatie bij alle APT-clients een
+foutmelding opleveren, ongeacht het feit of een optie het gebruik van
+onveilige pakketbronnen toestaat of verbiedt. Een dergelijke fout kan
+voorkomen worden door bijkomend de optie
+<option>Acquire::AllowDowngradeToInsecureRepositories</option> op
+<literal>true</literal> in te stellen of voor individuele pakketbronnen door
+de optie <literal>allow-downgrade-to-insecure=yes</literal> te gebruiken in
+&sources-list;.
+   </para>
+</refsect1>
+
+ <refsect1><title>Ondertekende pakketbronnen</title>
+   <para>
+   De vertrouwensketen vanaf een APT-archief tot de eindgebruiker, bestaat uit
+verschillende schakels. <command>apt-secure</command> is de laatste schakel
+in die keten. Een archief vertrouwen betekent niet dat u er op vertrouwt dat
+zijn pakketten geen kwaadwillige code bevatten, maar betekent wel dat u de
+beheerder van het archief vertrouwt. Het behoort tot de verantwoordelijkheid
+van de archiefbeheerder om er voor te zorgen dat de integriteit van het
+archief gevrijwaard blijft.
+   </para>
+
+   <para>apt-secure controleert geen handtekeningen op pakketniveau. Indien u
+gereedschap nodig heeft om dit te doen, moet u uitkijken naar
+<command>debsig-verify</command> en <command>debsign</command> (die
+respectievelijk in de pakketten debsig-verify en devscripts te vinden zijn).</para>
+
+   <para>
+   De vertrouwensketen in Debian begint (bijvoorbeeld) wanneer een
+pakketonderhouder een nieuw pakket of een nieuwe versie ervan naar het
+Debian archief uploadt. Om effectief te worden moet deze upload ondertekend
+worden met een sleutel uit de sleutelbos van de pakketonderhouders van
+Debian (te vinden in het pakket debian-keyring). De sleutels van
+onderhouders worden door andere onderhouders ondertekend. Daarbij worden
+vaststaande procedures gevolgd om de identiteit van de sleuteleigenaar te
+kunnen garanderen. Vergelijkbare procedures worden in alle op Debian
+gebaseerde distributies gehanteerd.
+   </para>
+
+   <para>
+   Nadat het geüpload pakket geverifieerd werd en toegevoegd aan het archief,
+wordt de handtekening van de onderhouder verwijderd en wordt de controlesom
+voor dat pakket berekend en in het bestand Packages opgeslagen. Daarna wordt
+voor alle Packages-bestanden de controlesom berekend en opgeslagen in het
+bestand Release. Daarna wordt het bestand Release ondertekend door de
+archiefsleutel voor deze &keyring-distro; release en verdeeld met de
+pakketten en de Packages-bestanden naar de
+&keyring-distro;-spiegelservers. De sleutels bevinden zich in de sleutelbos
+van het &keyring-distro;-archief die te vinden is in het pakket
+&keyring-package;.
+   </para>
+
+   <para>
+   Eindgebruikers kunnen de ondertekening van het bestand Release controleren,
+er de controlesom voor een pakket uithalen en die vergelijken met de
+controlesom van het pakket dat ze handmatig gedownload hebben - of
+vertrouwen op APT die dit automatisch doet.
+   </para>
+
+   <para>Merk op dat dit niet hetzelfde is als een controle van handtekeningen op het
+niveau van individuele pakketten. Deze werkwijze is ontworpen om twee
+mogelijke aanvallen te voorkomen:
+   </para>
+
+    <itemizedlist>
+       <listitem><para><literal>Netwerkaanval van het type "man-in-the-middle"</literal>. Zonder de
+controle van de ondertekening kunnen kwaadwillige personen binnendringen in
+het proces van het downloaden van pakketten en kwaadaardige software
+verspreiden. Dit kunnen ze doen via het verwerven van controle over een
+element van het netwerk (router, switch, enz.) of via het omleiden van
+trafiek naar een kwaadaardige server (via ARP of aanvallen van
+DNS-spoofing).</para></listitem>
+ 
+       <listitem><para><literal>Gecompromitteerd spiegelservernetwerk</literal>. Zonder de controle
+van handtekeningen kan een kwaadwillige persoon een spiegelserver
+binnendringen en de bestanden die er zich op bevinden wijzigen, om op die
+manier kwaadaardige software te verspreiden naar alle gebruikers die
+pakketten van die server downloaden.</para></listitem>
+    </itemizedlist>
+
+   <para>Ze biedt evenwel geen bescherming tegen een aanval gericht tegen de
+hoofdserver van Debian (die de pakketten ondertekent) of tegen een aanval
+gericht tegen de sleutel die gebruikt wordt om de Release-bestanden te
+ondertekenen. In elk geval biedt dit mechanisme wel een aanvulling op een
+ondertekening op pakketniveau.</para>
+</refsect1>
+
+<refsect1><title>Informatiewijzigingen</title>
+   <para>
+   Het bestand Release bevat behalve de checksums voor de bestanden uit de
+pakketbron, ook algemene informatie over de pakketbron, zoals origine,
+codenaam en versienummer van de release.
+   </para><para>
+   Deze informatie wordt op verschillende plaatsen weergegeven en dus zou de
+eigenaar van een pakketbron altijd de juistheid ervan moeten
+garanderen. Daarenboven kan gebruikersconfiguratie, zoals &apt-preferences;,
+van deze informatie gebruik maken en er afhankelijk van zijn. Daarom moet de
+gebruiker met ingang van versie 1.5 wijzigingen expliciet bevestigen, om te
+signaleren dat deze voldoende voorbereid is op bijvoorbeeld de nieuwe
+hoofdrelease van de distributie (bijvoorbeeld aangeduid met de codenaam) die
+door de pakketbron verdeeld wordt.
+   </para>
+</refsect1>
+
+<refsect1><title>Configuratie op gebruikersniveau</title>
+   <para>
+   <command>apt-key</command> is het programma dat de sleutelcatalogus beheert
+die door APT gebruikt wordt om pakketbronnen te vertrouwen. Het kan gebruikt
+worden om sleutels toe te voegen en te verwijderen en de lijst met
+vertrouwde sleutels weer te geven. Het is mogelijk om te begrenzen welke
+sleutel(s) welk archief kunnen ondertekenen via de optie
+<option>Signed-By</option> in &sources-list;.
+   </para><para>
+   Merk op dat een standaardinstallatie reeds alle nodige sleutels bevat om op
+een veilige manier pakketten op te halen uit de standaard pakketbronnen. Met
+<command>apt-key</command> knoeien is dus enkel nodig als pakketbronnen van
+derden toegevoegd worden.
+   </para><para>
+   Om een nieuwe sleutel toe te voegen, moet u hem eerst downloaden (u moet
+zich ervan vergewissen dat u bij het ophalen ervan gebruik maakt van een
+betrouwbaar communicatiekanaal). Daarna voegt u hem toe met
+<command>apt-key</command> en vervolgens voert u de opdracht
+<command>apt-get update</command> uit, zodat apt het bestand
+<filename>InRelease</filename> of <filename>Release.gpg</filename> uit de
+door u geconfigureerde archieven kan ophalen en verifiëren.
+   </para>
+</refsect1>
+
+<refsect1><title>Configuratie van de pakketbron</title>
+   <para>
+   Indien u voor een door u onderhouden archief in een ondertekening van het
+archief wilt voorzien, moet u het volgende doen:
+   </para>
+
+     <itemizedlist>
+       <listitem><para><emphasis>Maak een Release-bestand aan voor het hoofdniveau</emphasis> als
+dit nog niet bestaat. U kunt dit doen met de opdracht
+<command>apt-ftparchive release</command> (uit het pakket apt-utils).</para></listitem>
+   
+      <listitem><para><emphasis>Onderteken het</emphasis>. U doet dit door het uitvoeren van de
+commando's <command>gpg --clearsign -o InRelease Release</command> en
+<command>gpg -abs -o Release.gpg Release</command>.</para></listitem>
+
+      <listitem><para>
+      <emphasis>Maak de vingerafdruk van de sleutel openbaar</emphasis>, zodat uw
+gebruikers weten welke sleutel ze moeten importeren om de bestanden uit het
+archief te authenticeren. U doet er best aan uw sleutel te verspreiden via
+een eigen sleutelbospakket, zoals &keyring-distro; doet met
+&keyring-package;. Op die manier kunnen later updates en transities van
+sleutels automatisch gedistribueerd worden.
+      </para></listitem>
+
+      <listitem><para>
+      <emphasis>Geef de nodige instructies voor het toevoegen van uw archief en uw
+sleutel</emphasis>. Indien uw gebruikers niet op een veilige manier uw
+sleutel kunnen bekomen, wordt de hierboven beschreven vertrouwensketen
+verbroken. Hoe u gebruikers kunt helpen om uw sleutel toe te voegen, hangt
+af van uw archief en het doelpubliek. Dit kan gaan van het toevoegen van uw
+sleutelbospakket aan een ander archief dat de gebruikers reeds
+geconfigureerd hebben (zoals de standaard pakketbronnen van hun distributie)
+tot het gebruik maken van het web van vertrouwen.
+      </para></listitem>
+
+    </itemizedlist>
+
+    <para>Telkens de inhoud van het archief wijzigt (als nieuwe pakketten toegevoegd
+of verwijderd worden) moet de archiefverantwoordelijke de hierboven
+beschreven eerste twee stappen hernemen.</para>
+
+</refsect1>
+
+<refsect1><title>Zie ook</title> 
+<para> 
+&apt-conf;, &apt-get;, &sources-list;, &apt-key;, &apt-ftparchive;,
+&debsign;, &debsig-verify;, &gpg;
+</para>
+
+<para>Voor bijkomende achtergrondinformatie kunt u het hoofdstuk raadplegen over
+de beveiligingsinfrastructuur van Debian, <ulink
+url="https://www.debian.org/doc/manuals/securing-debian-howto/ch7">Debian
+Security Infrastructure</ulink>, uit de Securing Debian Manual (ook te
+vinden in het pakket harden-doc), alsook de <ulink
+url="http://www.cryptnet.net/fdp/crypto/strong_distro.html" >Strong
+Distribution HOWTO</ulink> door V. Alex Brennen.  </para>
+
+</refsect1>
+
+ &manbugs;
+ &manauthor;
+
+<refsect1><title>Auteurs van de man-pagina</title> 
+
+<para>Deze man-pagina is gebaseerd op het werk van Javier Fernández-Sanguino Peña,
+Isaac Jones, Colin Walters, Florian Weimer en Michael Vogt.
+</para>
+
+</refsect1>
+ 
+
+ <refsect1><title>&translation-title;</title>
+   <para>&translation-holder;</para>
+   <para>&translation-english;</para>
+ </refsect1>
+</refentry>

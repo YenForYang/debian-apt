@@ -1,0 +1,797 @@
+'\" t
+.\"     Title: sources.list
+.\"    Author: Jason Gunthorpe
+.\" Generator: DocBook XSL Stylesheets v1.79.1 <http://docbook.sf.net/>
+.\"      Date: 17\ \&agosto\ \&2018
+.\"    Manual: APT
+.\"    Source: APT 1.8.0~alpha3
+.\"  Language: Italian
+.\"
+.TH "SOURCES\&.LIST" "5" "17\ \&agosto\ \&2018" "APT 1.8.0~alpha3" "APT"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NOME"
+sources.list \- elenco delle fonti di dati configurate per APT
+.SH "DESCRIZIONE"
+.PP
+L\*(Aqelenco delle fonti
+/etc/apt/sources\&.list
+e i file contenuti in
+/etc/apt/sources\&.list\&.d/
+sono progettati per supportare qualsiasi numero di fonti attive e svariati supporti\&. I file elencano una fonte per riga (stile a una riga) o contengono sezioni multiriga che definiscono una o pi\(`u fonti per sezione (stile deb822), con la fonte preferita elencata per prima (nel caso in cui una singola versione sia disponibile da pi\(`u di una fonte)\&. Le informazioni disponibili dalle fonti configurate sono acquisite con
+\fBapt\-get update\fR
+(o con un comando equivalente in un\*(Aqaltra interfaccia per APT)\&.
+.SH "SOURCES\&.LIST\&.D"
+.PP
+La directory
+/etc/apt/sources\&.list\&.d
+permette di aggiungere voci per sources\&.list in file separati\&. Sono permessi due formati di file differenti, come descritto nelle due sezioni seguenti\&. I nomi dei file devono terminare con l\*(Aqestensione
+\&.list
+o
+\&.sources
+a seconda del formato contenuto\&. I nomi di file possono contenere solamente lettere (a\-z e A\-Z), cifre (0\-9), trattini bassi (_), trattini (\-) e punti (\&.)\&. In caso contrario APT stampa un messaggio che notifica che un file \(`e stato ignorato, a meno che il file non corrisponda ad un modello nell\*(Aqelenco di configurazione
+Dir::Ignore\-Files\-Silently, nel qual caso viene ignorato in modo silenzioso\&.
+.SH "FORMATO CON STILE A UNA RIGA"
+.PP
+I file in questo formato hanno l\*(Aqestensione
+\&.list\&. Ogni riga che specifica una fonte inizia con un tipo (es\&.
+deb\-src
+seguito da opzioni e argomenti per questo tipo\&. Voci singole non possono proseguire su una riga successiva\&. Le righe vuote sono ignorate e un carattere
+#
+in qualunque punto di una riga contrassegna il resto di tale riga come commento\&. Di conseguenza una voce pu\(`o essere disabilitata commentando l\*(Aqintera riga\&. Se devono essere fornite opzioni, esse sono separate da spazi e tutte insieme sono racchiuse tra parentesi quadre ([]), incluse nella riga dopo il tipo e separate da esso con uno spazio\&. Se un\*(Aqopzione permette pi\(`u valori, questi sono separati con una virgola (,)\&. Un nome di opzione \(`e separato dal suo o dai suoi valori da un segno di uguale (=)\&. Opzioni con pi\(`u valori usano come separatori anche
+\-=
+e
++=
+che, invece di sostituire i valori predefiniti con quelli specificati, modificano i valori predefiniti per rimuovere o includere i valori specificati\&.
+.PP
+Questo \(`e il formato tradizionale ed \(`e supportato da tutte le versioni di apt\&. Notare che non tutte le opzioni come descritte in seguito sono supportate da tutte le versioni di apt\&. Notare anche che alcune applicazioni pi\(`u vecchie che analizzano questo formato da sole possono non aspettarsi di incontrare opzioni, dato che erano non comuni prima dell\*(Aqintroduzione del supporto multiarchitettura\&.
+.SH "FORMATO IN STILE DEB822"
+.PP
+Files in this format have the extension
+\&.sources\&. The format is similar in syntax to other files used by Debian and its derivatives, such as the metadata files that apt will download from the configured sources or the
+debian/control
+file in a Debian source package\&. Individual entries are separated by an empty line; additional empty lines are ignored, and a
+#
+character at the start of the line marks the entire line as a comment\&. An entry can hence be disabled by commenting out each line belonging to the stanza, but it is usually easier to add the field "Enabled: no" to the stanza to disable the entry\&. Removing the field or setting it to yes re\-enables it\&. Options have the same syntax as every other field: A fieldname separated by a colon (:) and optionally spaces from its value(s)\&. Note especially that multiple values are separated by whitespaces (like spaces, tabs and newlines), not by commas as in the one\-line format\&. Multivalue fields like
+Architectures
+also have
+Architectures\-Add
+and
+Architectures\-Remove
+to modify the default value rather than replacing it\&.
+.PP
+Questo \(`e un nuovo formato supportato da apt stesso a partire dalla versione 1\&.1\&. Le versioni precedenti ignorano questo tipo di file con un messaggio di notifica come descritto in precedenza\&. L\*(Aqintenzione \(`e di rendere in modo graduale questo formato il formato predefinito, rendendo deprecato il formato con lo stile a singola riga descritto prima, dato che \(`e pi\(`u facile da creare, estendere e modificare sia per le persone sia per le macchine, specialmente se sono coinvolte molte fonti e opzioni\&. Gli sviluppatori che lavorano o analizzano fonti di apt sono caldamente incoraggiati ad aggiungere il supporto per questo formato e a contattare il team di APT per coordinare e condividere il lavoro\&. Gli utenti possono gi\(`a adottare liberamente questo formato, ma potrebbero incontrare problemi con il software che non supporta ancora il formato\&.
+.SH "I TIPI DEB E DEB\-SRC: FORMATO GENERICO"
+.PP
+Il tipo
+deb
+\(`e un riferimento a un tipico archivio Debian a due livelli,
+distribuzione/componente\&.
+distribuzione
+\(`e tipicamente un nome di suite come
+stable
+o
+testing, oppure un nome in codice come
+stretch
+o
+buster; componente \(`e uno tra
+main,
+contrib
+o
+non\-free\&. Il tipo
+deb\-src
+\(`e un riferimento al codice sorgente di una distribuzione Debian nella stessa forma di quella del tipo
+deb\&. Per recuperare gli indici dei pacchetti sorgente \(`e necessaria una riga
+deb\-src\&.
+.PP
+Il formato per due voci in stile a singola riga che usano il tipo
+deb
+e
+deb\-src
+\(`e:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+deb [ opzione1=valore1 opzione2=valore2 ] uri suite [componente1] [componente2] [\&.\&.\&.]
+deb\-src [ opzione1=valore1 opzione2=valore2 ] uri suite [componente1] [componente2] [\&.\&.\&.]
+.fi
+.if n \{\
+.RE
+.\}
+.PP
+In alternativa la voce equivalente in stile deb822 \(`e simile a questa:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+     Types: deb deb\-src
+     URIs: uri
+     Suites: suite
+     Components: [componente1] [componente2] [\&.\&.\&.]
+     opzione1: valore1
+     opzione2: valore2
+   
+.fi
+.if n \{\
+.RE
+.\}
+.PP
+L\*(AqURI per il tipo
+deb
+deve specificare la base della distribuzione Debian, dalla quale APT trover\(`a le informazioni di cui ha bisogno\&.
+suite
+pu\(`o specificare un percorso esatto, nel qual caso le componenti devono essere omesse e
+suite
+deve terminare con una sbarra (/)\&. Questo \(`e utile nel caso in cui si \(`e interessati solo a una particolare sottodirectory dell\*(Aqarchivio indicato dall\*(AqURI\&. Se
+suite
+non specifica un percorso esatto, deve essere presente almeno una
+componente\&.
+.PP
+suite
+pu\(`o anche contenere una variabile
+$(ARCH)
+che viene espansa nell\*(Aqarchitettura Debian (come
+amd64
+o
+armel) usata nel sistema\&. Ci\(`o consente di utilizzare file
+sources\&.list
+indipendenti dall\*(Aqarchitettura\&. In generale questo \(`e interessante solo quando viene specificato un percorso esatto, altrimenti
+APT
+genera automaticamente un URI con l\*(Aqarchitettura corrente\&.
+.PP
+Specialmente nel formato in stile a singola riga, dato che pu\(`o essere specificata solo una distribuzione per riga, pu\(`o essere necessario avere pi\(`u righe per lo stesso URI, se si desidera un sottoinsieme di tutte le distribuzioni o componenti disponibili in quella posizione\&. APT ordiner\(`a la lista degli URI dopo aver generato internamente un insieme completo, e riunir\(`a i riferimenti multipli, per esempio al medesimo host Internet in una singola connessione; in questo modo non stabilisce in modo inefficiente una connessione per poi chiuderla, fare qualcos\*(Aqaltro e quindi ristabilire una connessione con il medesimo host\&. APT inoltre parallelizza le connessioni a host differenti, per gestire in maniera pi\(`u efficiente i siti con scarsa larghezza di banda\&.
+.PP
+\(`E importante elencare le fonti in ordine di preferenza con la fonte preferita elencata per prima\&. Tipicamente ci\(`o viene fatto ordinando per velocit\(`a dalla pi\(`u veloce alla pi\(`u lenta (per esempio CD\-ROM seguiti da host in una rete locale, seguiti da host Internet distanti)\&.
+.PP
+Come esempio, le fonti per la propria distribuzione potrebbero essere simili a queste in formato in stile a singola riga:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+deb http://deb\&.debian\&.org/debian stretch main contrib non\-free
+deb http://security\&.debian\&.org stretch/updates main contrib non\-free
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+o a queste in formato in stile deb822:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+Types: deb
+URIs: http://deb\&.debian\&.org/debian
+Suites: stretch
+Components: main contrib non\-free
+
+Types: deb
+URIs: http://security\&.debian\&.org
+Suites: stretch/updates
+Components: main contrib non\-free
+.fi
+.if n \{\
+.RE
+.\}
+.SH "I TIPI DEB E DEB\-SRC: OPZIONI"
+.PP
+Ogni voce di fonte pu\(`o avere specificate delle opzioni per modificare a quale fonte venga fatto l\*(Aqaccesso e come vengano acquisiti i dati da essa\&. Il formato, la sintassi e i nomi delle opzioni variano, come descritto, tra i formati in stile a singola riga e in stile deb822, ma entrambi hanno disponibili le stesse opzioni\&. Per semplicit\(`a viene elencato il nome del campo deb822 e viene fornito in nome per la singola riga tra parentesi\&. Ricordarsi che oltre a impostare esplicitamente le opzioni multivalore, \(`e anche possibile modificarle sulla base del loro valore predefinito, ma qui non vengono esplicitamente elencati questi nomi\&. Le opzioni non supportate vengono ignorate silenziosamente da tutte le versioni di APT\&.
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+\fBArchitectures\fR
+(\fBarch\fR) \(`e un\*(Aqopzione multivalore che definisce le architetture per le quali scaricare le informazioni\&. Se questa opzione non \(`e impostata il valore predefinito \(`e tutte le architetture come definite dall\*(Aqopzione di configurazione
+\fBAPT::Architectures\fR\&.
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+\fBLanguages\fR
+(\fBlang\fR) \(`e un\*(Aqopzione multivalore che definisce le lingue per cui scaricare informazioni quali le traduzioni delle descrizioni dei pacchetti\&. Se questa opzione non \(`e impostata il valore predefinito \(`e tutte le lingue come definite dall\*(Aqopzione di configurazione
+\fBAcquire::Languages\fR\&.
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+\fBTargets\fR
+(\fBtarget\fR) \(`e un\*(Aqopzione multivalore che definisce quali rilasci obiettivo di scaricamento apt cercher\(`a di acquisire da questa fonte\&. Se non specificata, l\*(Aqinsieme predefinito \(`e definito dall\*(Aqambito di configurazione
+\fBAcquire::IndexTargets\fR
+(i rilasci obiettivo sono specificati con il loro nome nel campo
+Created\-By)\&. In aggiunta target specifici possono essere abilitati o disabilitati usando il campo
+Identifier
+come opzione con un valore booleano invece di usare questa opzione multivalore\&.
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+\fBPDiffs\fR
+(\fBpdiffs\fR) \(`e un valore \(Foyes\(Fc/\(Fono\(Fc che controlla se APT deve cercare di usare i PDiff per aggiornare i vecchi indici invece di scaricare interamente i nuovi indici\&. Il valore di questa opzione viene ignorato se il repository non annuncia la disponibilit\(`a dei Pdiff\&. In modo predefinito assume il valore dell\*(Aqopzione omonima per uno specifico file indice definito nell\*(Aqambito
+\fBAcquire::IndexTargets\fR, che a sua volta assume in modo predefinito il valore dell\*(Aqopzione di configurazione
+\fBAcquire::PDiffs\fR
+che assume in modo predefinito il valore
+yes\&.
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+\fBBy\-Hash\fR
+(\fBby\-hash\fR) pu\(`o avere il valore
+yes,
+no
+o
+force
+edetermina se APT debba cercare di acquisire gli indici attraverso un URI costruito a partire da una somma hash del file atteso, invece di usare il ben noto nome file stabile dell\*(Aqindice\&. Il suo uso pu\(`o evitare mancate corrispondenze delle somme hash, ma richiede un mirror che la supporti\&. Un valore
+yes
+o
+no
+attiva o disattiva l\*(Aquso di questa funzionalit\(`a se la fonte indica che la supporta, mentre
+force
+abilita la funzionalit\(`a indipendentemente da ci\(`o che viene indicato dalla fonte\&. Assume in modo predefinito il valore dell\*(Aqopzione omonima per uno specifico file indice definito nell\*(Aqambito
+\fBAcquire::IndexTargets\fR, che a sua volta assume in modo predefinito il valore dell\*(Aqopzione di configurazione
+\fBAcquire::By\-Hash\fR
+che assume in modo predefinito il valore
+yes\&.
+.RE
+.sp
+Inoltre ci sono opzioni che, se impostate, hanno effetto su
+\fItutte\fR
+le fonti con gli stessi URI e suite, perci\(`o devono essere impostate su tutte queste voci e non possono essere cambiate tra le diverse componenti\&. APT cerca di rilevare queste anomalie e risolverle\&.
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+\fBAllow\-Insecure\fR
+(\fBallow\-insecure\fR),
+\fBAllow\-Weak\fR
+(\fBallow\-weak\fR) e
+\fBAllow\-Downgrade\-To\-Insecure\fR
+(\fBallow\-downgrade\-to\-insecure\fR) sono valori booleani che hanno tutti il valore predefinito
+no\&. Se impostati a
+yes
+aggirano parti di
+\fBapt-secure\fR(8)
+e perci\(`o non devono essere usati con leggerezza!
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+\fBTrusted\fR
+(\fBtrusted\fR) \(`e un valore con tre stati che in modo predefinito lascia che sia APT a decidere se una fonte \(`e considerata fidata o se debbano essere prodotti degli avvertimenti prima, ad esempio, che vengano installati pacchetti da questa fonte\&. Questa opzione pu\(`o essere usata per scavalcare tale decisione\&. Il valore
+yes
+dice ad APT di considerare sempre questa fonte come fidata, anche se non supera i controlli di autenticazione\&. Disabilita parti di
+\fBapt-secure\fR(8)
+e dovrebbe perci\(`o essere usata (se proprio si deve) solamente in un contesto locale e fidato, dato che altrimenti la sicurezza \(`e compromessa\&. Il valore
+no
+fa l\*(Aqopposto, facendo s\(`i che la fonte venga gestita come non fidata anche se i controlli di autenticazione sono stati superati con successo\&. Il valore predefinito non pu\(`o essere impostato esplicitamente\&.
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+\fBSigned\-By\fR
+(\fBsigned\-by\fR) is an option to require a repository to pass
+\fBapt-secure\fR(8)
+verification with a certain set of keys rather than all trusted keys apt has configured\&. It is specified as a list of absolute paths to keyring files (have to be accessible and readable for the
+_apt
+system user, so ensure everyone has read\-permissions on the file) and fingerprints of keys to select from these keyrings\&. If no keyring files are specified the default is the
+trusted\&.gpg
+keyring and all keyrings in the
+trusted\&.gpg\&.d/
+directory (see
+\fBapt\-key fingerprint\fR)\&. If no fingerprint is specified all keys in the keyrings are selected\&. A fingerprint will accept also all signatures by a subkey of this key, if this isn\*(Aqt desired an exclamation mark (!) can be appended to the fingerprint to disable this behaviour\&. The option defaults to the value of the option with the same name if set in the previously acquired
+Release
+file of this repository (only fingerprints can be specified there through)\&. Otherwise all keys in the trusted keyrings are considered valid signers for this repository\&.
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+\fBCheck\-Valid\-Until\fR
+(\fBcheck\-valid\-until\fR) \(`e un valore \(Foyes\(Fc/\(Fono\(Fc che determina se APT debba cercare di rilevare attacchi di tipo replay\&. Un creatore di un repository pu\(`o dichiarare una data fino alla quale i dati forniti nel repository devono essere considerati validi e, se viene raggiunta questa data ma non sono stati forniti nuovi dati, i dati sono considerati scaduti e viene generato un errore\&. Oltre ad aumentare la sicurezza, dato che un autore di attacchi malintenzionato non pu\(`o inviare vecchi dati per sempre per evitare che un utente aggiorni ad una nuova versione, questo aiuta anche gli utenti ad identificare i mirror che non vengono pi\(`u aggiornati\&. Alcuni repository, tuttavia, come gli archivi storici non vengono pi\(`u aggiornati appositamente, perci\(`o questo controllo pu\(`o essere disabilitato impostando questa opzione a
+no\&. Assume in modo predefinito il valore dell\*(Aqopzione di configurazione
+\fBAcquire::Check\-Valid\-Until\fR
+che a sua volta ha come valore predefinito
+yes\&.
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+\fBValid\-Until\-Min\fR
+(\fBvalid\-until\-min\fR) e
+\fBValid\-Until\-Max\fR
+(\fBvalid\-until\-max\fR) possono essere usate per aumentare o diminuire il periodo di tempo in secondi per il quale sono considerati validi i dati da questo repository\&. \-Max pu\(`o essere particolarmente utile per impostare un proprio valore se il repository non fornisce un campo Valid\-Until nel suo file Release, mentre \-Min pu\(`o essere usato per aumentare il tempo di validit\(`a di mirror (locali) aggiornati raramente di un archivio aggiornato pi\(`u frequentemente ma meno raggiungibile (che \(`e anch\*(Aqesso nel sources\&.list) invece di disabilitare completamente il controllo\&. I valori assunti in modo predefinito sono quelli delle opzioni di configurazione
+\fBAcquire::Min\-ValidTime\fR
+e
+\fBAcquire::Max\-ValidTime\fR
+che sono entrambe non impostate in modo predefinito\&.
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+\fBCheck\-Date\fR
+(\fBcheck\-date\fR) is a yes/no value which controls if APT should consider the machine\*(Aqs time correct and hence perform time related checks, such as verifying that a Release file is not from the future\&. Disabling it also disables the
+\fBCheck\-Valid\-Until\fR
+option mentioned above\&.
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+\fBDate\-Max\-Future\fR
+(\fBdate\-max\-future\fR) controls how far from the future a repository may be\&. Default to the value of the configuration option
+\fBAcquire::Max\-FutureTime\fR
+which is 10 seconds by default\&.
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+\fBInRelease\-Path\fR
+(\fBinrelease\-path\fR) determines the path to the InRelease file, relative to the normal position of an
+InRelease
+file\&. By default, this option is unset and APT will try to fetch an
+InRelease
+or, if that fails, a
+Release
+file and its associated
+Release\&.gpg
+file\&. By setting this option, the specified path will be tried instead of the InRelease file, and the fallback to
+Release
+files will be disabled\&.
+.RE
+.sp
+.SH "SPECIFICARE URI"
+.PP
+I tipi di URI attualmente riconosciuti sono:
+.PP
+\fBhttp\fR (\fBapt-transport-http\fR(1))
+.RS 4
+The http scheme specifies an HTTP server for an archive and is the most commonly used method\&. The URI can directly include login information if the archive requires it, but the use of
+\fBapt_auth.conf\fR(5)
+should be preferred\&. The method also supports SOCKS5 and HTTP(S) proxies either configured via apt\-specific configuration or specified by the environment variable
+\fBhttp_proxy\fR
+in the format (assuming an HTTP proxy requiring authentication)
+\fIhttp://user:pass@server:port/\fR\&. The authentication details for proxies can also be supplied via
+\fBapt_auth.conf\fR(5)\&.
+.sp
+Note that these forms of authentication are insecure as the whole communication with the remote server (or proxy) is not encrypted so a sufficiently capable attacker can observe and record login as well as all other interactions\&. The attacker can
+\fInot\fR
+modify the communication through as APTs data security model is independent of the chosen transport method\&. See
+\fBapt-secure\fR(8)
+for details\&.
+.RE
+.PP
+\fBhttps\fR (\fBapt-transport-https\fR(1))
+.RS 4
+The https scheme specifies an HTTPS server for an archive and is very similar in use and available options to the http scheme\&. The main difference is that the communication between apt and server (or proxy) is encrypted\&. Note that the encryption does not prevent an attacker from knowing which server (or proxy) apt is communicating with and deeper analysis can potentially still reveal which data was downloaded\&. If this is a concern the Tor\-based schemes mentioned further below might be a suitable alternative\&.
+.RE
+.PP
+\fBmirror\fR, \fBmirror+\fR\fB\fIscheme\fR\fR (\fBapt-transport-mirror\fR(1))
+.RS 4
+The mirror scheme specifies the location of a mirrorlist\&. By default the scheme used for the location is
+http, but any other scheme can be used via
+\fBmirror+\fR\fB\fIscheme\fR\fR\&. The mirrorlist itself can contain many different URIs for mirrors the APT client can transparently pick, choose and fallback between intended to help both with distributing the load over the available mirrors and ensuring that clients can acquire data even if some configured mirrors are not available\&.
+.RE
+.PP
+\fBfile\fR
+.RS 4
+Il tipo file permette di considerare come un archivio una directory arbitraria nel file system\&. \(`E utile per file system NFS montati e mirror o archivi locali\&.
+.RE
+.PP
+\fBcdrom\fR
+.RS 4
+The cdrom scheme allows APT to use a local CD\-ROM, DVD or USB drive with media swapping\&. Use the
+\fBapt-cdrom\fR(8)
+program to create cdrom entries in the source list\&.
+.RE
+.PP
+\fBftp\fR
+.RS 4
+The ftp scheme specifies an FTP server for an archive\&. Use of FTP is on the decline in favour of
+http
+and
+https
+and many archives either never offered or are retiring FTP access\&. If you still need this method many configuration options for it are available in the
+Acquire::ftp
+scope and detailed in
+\fBapt.conf\fR(5)\&.
+.sp
+Please note that an FTP proxy can be specified by using the
+\fBftp_proxy\fR
+environment variable\&. It is possible to specify an HTTP proxy (HTTP proxy servers often understand FTP URLs) using this environment variable and
+\fIonly\fR
+this environment variable\&. Proxies using HTTP specified in the configuration file will be ignored\&.
+.RE
+.PP
+\fBcopy\fR
+.RS 4
+Il tipo copy \(`e identico al tipo file tranne per il fatto che i pacchetti vengono copiati nella directory della cache invece di essere usati direttamente dalla loro posizione\&. Ci\(`o \(`e utile per coloro che usano supporti rimovibili, per copiare i file nelle varie posizioni con APT\&.
+.RE
+.PP
+\fBrsh\fR, \fBssh\fR
+.RS 4
+Il metodo rsh/ssh invoca RSH/SSH per connettersi ad un host remoto e accedere ai file come un determinato utente\&. \(`E raccomandato configurare precedentemente le chiavi RSA o rhosts\&. Per effettuare i trasferimenti di file dall\*(Aqhost remoto vengono usati i comandi standard
+\fBfind\fR
+e
+\fBdd\fR\&.
+.RE
+.PP
+aggiungere ulteriori tipi di URI riconoscibili
+.RS 4
+APT can be extended with more methods shipped in other optional packages, which should follow the naming scheme
+apt\-transport\-\fImethod\fR\&. For instance, the APT team also maintains the package
+apt\-transport\-tor, which provides access methods for HTTP and HTTPS URIs routed via the Tor network\&.
+.RE
+.SH "ESEMPI"
+.PP
+Usa l\*(Aqarchivio memorizzato in locale (o montato via NFS) in /home/apt/debian per stable/main, stable/contrib e stable/non\-free\&.
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+deb file:/home/apt/debian stable main contrib non\-free
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+Types: deb
+URIs: file:/home/apt/debian
+Suites: stable
+Components: main contrib non\-free
+.fi
+.if n \{\
+.RE
+.\}
+.PP
+Come sopra, tranne per il fatto che usa la distribuzione unstable (di sviluppo)
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+deb file:/home/apt/debian unstable main contrib non\-free
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+Types: deb
+URIs: file:/home/apt/debian
+Suites: unstable
+Components: main contrib non\-free
+.fi
+.if n \{\
+.RE
+.\}
+.PP
+Indicazione per i sorgenti corrispondente alla precedente\&.
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+deb\-src file:/home/apt/debian unstable main contrib non\-free
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+Types: deb\-src
+URIs: file:/home/apt/debian
+Suites: unstable
+Components: main contrib non\-free
+.fi
+.if n \{\
+.RE
+.\}
+.PP
+La prima riga ottiene le informazioni sui pacchetti per le architetture in
+APT::Architectures, mentre la seconda scarica sempre
+amd64
+e
+armel\&.
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+deb http://deb\&.debian\&.org/debian stretch main
+deb [ arch=amd64,armel ] http://deb\&.debian\&.org/debian stretch main
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+Types: deb
+URIs: http://deb\&.debian\&.org/debian
+Suites: stretch
+Components: main
+
+Types: deb
+URIs: http://deb\&.debian\&.org/debian
+Suites: stretch
+Components: main
+Architectures: amd64 armel
+.fi
+.if n \{\
+.RE
+.\}
+.PP
+Usa HTTP per accedere all\*(Aqarchivio in archive\&.debian\&.org e usa solo l\*(Aqarea hamm/main\&.
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+deb http://archive\&.debian\&.org/debian\-archive hamm main
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+Types: deb
+URIs: http://archive\&.debian\&.org/debian\-archive
+Suites: hamm
+Components: main
+.fi
+.if n \{\
+.RE
+.\}
+.PP
+Usa FTP per accedere all\*(Aqarchivio in ftp\&.debian\&.org, nella directory debian e usa solo l\*(Aqarea stretch/contrib\&.
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+deb ftp://ftp\&.debian\&.org/debian stretch contrib
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+deb ftp://ftp\&.debian\&.org/debian stretch contrib
+.fi
+.if n \{\
+.RE
+.\}
+.PP
+Usa FTP per accedere all\*(Aqarchivio in ftp\&.debian\&.org nella directory debian e usa solo l\*(Aqarea unstable/contrib\&. Se in
+sources\&.list
+sono presenti sia questa riga sia quella nell\*(Aqesempio precedente, verr\(`a usata una sola sessione FTP per entrambe le righe\&.
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+deb ftp://ftp\&.debian\&.org/debian unstable contrib
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+Types: deb
+URIs: ftp://ftp\&.debian\&.org/debian
+Suites: unstable
+Components: contrib
+.fi
+.if n \{\
+.RE
+.\}
+.PP
+Usa HTTP per accedere all\*(Aqarchivio in ftp\&.tlh\&.debian\&.org nella directory universe e usa solo i file che si trovano in
+unstable/binary\-i386
+sulle macchine i386,
+unstable/binary\-amd64
+su quelle amd64 e cos\(`i via per le altre architetture supportate\&. [Notare che questo esempio illustra solamente come usare la variabile per la sostituzione; gli archivi Debian ufficiali non sono strutturati in questo modo\&.]
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+deb http://ftp\&.tlh\&.debian\&.org/universe unstable/binary\-$(ARCH)/
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+Types: deb
+URIs: http://ftp\&.tlh\&.debian\&.org/universe
+Suites: unstable/binary\-$(ARCH)/
+.fi
+.if n \{\
+.RE
+.\}
+.PP
+Usa HTTP per ottenere i pacchetti binari, cos\(`i come quelli sorgenti, dalle suite stable, testing e unstable e le componenti main e contrib\&.
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+deb http://deb\&.debian\&.org/debian stable main contrib
+deb\-src http://deb\&.debian\&.org/debian stable main contrib
+deb http://deb\&.debian\&.org/debian testing main contrib
+deb\-src http://deb\&.debian\&.org/debian testing main contrib
+deb http://deb\&.debian\&.org/debian unstable main contrib
+deb\-src http://deb\&.debian\&.org/debian unstable main contrib
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+Types: deb deb\-src
+URIs: http://deb\&.debian\&.org/debian
+Suites: stable testing unstable
+Components: main contrib
+.fi
+.if n \{\
+.RE
+.\}
+.SH "VEDERE ANCHE"
+.PP
+\fBapt-get\fR(8),
+\fBapt.conf\fR(5),
+/usr/share/doc/apt\-doc/acquire\-additional\-files\&.md\&.gz
+.SH "BUG"
+.PP
+\m[blue]\fBPagina dei bug di APT\fR\m[]\&\s-2\u[1]\d\s+2\&. Se si desidera segnalare un bug in APT, vedere
+/usr/share/doc/debian/bug\-reporting\&.txt
+o il comando
+\fBreportbug\fR(1)\&.
+.SH "TRADUZIONE"
+.PP
+Traduzione in italiano a cura del Team italiano di localizzazione di Debian
+<debian\-l10n\-italian@lists\&.debian\&.org>\&. In particolare hanno contribuito Eugenia Franzoni (2000), Hugh Hartmann (2000\-2012), Gabriele Stilli (2012), Beatrice Torracca (2012, 2014, 2015)\&.
+.PP
+Notare che questa versione tradotta del documento pu\(`o contenere parti non tradotte\&. Ci\(`o \(`e voluto, per evitare di perdere contenuti quando la traduzione non \(`e aggiornata rispetto all\*(Aqoriginale\&.
+.SH "AUTORI"
+.PP
+\fBJason Gunthorpe\fR
+.RS 4
+.RE
+.PP
+\fBTeam APT\fR
+.RS 4
+.RE
+.SH "NOTE"
+.IP " 1." 4
+Pagina dei bug di APT
+.RS 4
+\%http://bugs.debian.org/src:apt
+.RE

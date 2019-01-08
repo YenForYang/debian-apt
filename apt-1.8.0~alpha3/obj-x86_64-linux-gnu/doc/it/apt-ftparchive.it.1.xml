@@ -1,0 +1,658 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+  "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % aptent SYSTEM "apt.ent"> %aptent;
+<!ENTITY % aptverbatiment SYSTEM "apt-verbatim.ent"> %aptverbatiment;
+<!ENTITY % aptvendor SYSTEM "apt-vendor.ent"> %aptvendor;
+]>
+
+<refentry>
+
+ <refentryinfo>
+   <!-- The last update date -->
+&apt-author.jgunthorpe;
+   &apt-author.team;
+   &apt-email;
+   &apt-product;
+   
+   <date>2016-11-11T00:00:00Z</date>
+ </refentryinfo>
+ 
+ <refmeta>
+   <refentrytitle>apt-ftparchive</refentrytitle>
+   <manvolnum>1</manvolnum>
+   <refmiscinfo class="manual">APT</refmiscinfo>
+ </refmeta>
+ 
+ 
+ <!-- Man page title -->
+<refnamediv>
+    <refname>apt-ftparchive</refname>
+    <refpurpose>strumento per generare file indice</refpurpose>
+ </refnamediv>
+
+ &synopsis-command-apt-ftparchive;
+
+ <refsect1><title>Descrizione</title>
+   <para><command>apt-ftparchive</command> è lo strumento a riga di comando che
+genera i file indice usati da APT per accedere a una fonte di
+distribuzione. I file indice devono essere generati sul sito origine in base
+al contenuto di tale sito.</para>
+
+   <para><command>apt-ftparchive</command> è un sovrainsieme del programma
+&dpkg-scanpackages; e incorpora tutte le sue funzionalità tramite il comando
+<literal>packages</literal>. Inoltre contiene un generatore di file dei
+contenuti, <literal>contents</literal>, e un modo elaborato per gestire
+tramite script il processo di generazione per un archivio completo.</para>
+
+   <para>Internamente <command>apt-ftparchive</command> può far uso di database
+binari per tenere in cache il contenuto di un file .deb e non si basa su
+programmi esterni all'infuori di &gzip;. Quando genera un archivio completo,
+esegue automaticamente un controllo sui file modificati e crea i file
+compressi desiderati in uscita.</para>
+   
+   <para>A meno che non venga fornita l'opzione <option>-h</option> o
+<option>--help</option>, deve essere presente uno dei comandi seguenti.</para>
+   
+   <variablelist>
+     <varlistentry><term><option>packages</option></term>
+     <listitem><para>
+     Il comando packages genera un file dell'indice di pacchetti da un albero di
+directory. Prende la directory data e vi ricerca i file .deb ricorsivamente,
+emettendo per ciascuno un record sullo stdout. Questo comando è più o meno
+equivalente a &dpkg-scanpackages;.</para>
+
+     <para>L'opzione <option>--db</option> può essere usata per specificare un database
+binario da usare come cache.</para></listitem>
+     </varlistentry>
+     
+     <varlistentry><term><option>sources</option></term>
+     <listitem><para>
+     Il comando <literal>sources</literal> genera un file indice dei sorgenti da
+un albero di directory. Prende la directory data e vi ricerca i file .dsc
+ricorsivamente, emettendo per ciascuno un record sullo stdout. Questo
+comando è più o meno equivalente a &dpkg-scansources;.</para>
+     <para>
+     Se si specifica un file override, allora verrà cercato un file override
+sorgente con estensione .src. L'opzione --source-override può essere usata
+per cambiare il file override sorgente da usare.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>contents</option></term>
+     <listitem><para>
+     Il comando <literal>contents</literal> genera un file di contenuti da un
+albero di directory. Prende la directory data e vi ricerca i file .deb
+ricorsivamente, leggendo l'elenco dei file da ciascun file. Quindi ordina e
+scrive sullo stdout l'elenco di file con i corrispondenti pacchetti. Le
+directory non vengono scritte sull'output. Se più pacchetti contengono lo
+stesso file, ciascun pacchetto è separato da una virgola nell'output.</para>
+     <para>
+     L'opzione <option>--db</option> può essere usata per specificare un database
+binario da usare come cache.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>release</option></term>
+     <listitem><para>
+     Il comando <literal>release</literal> genera un file Release da un albero di
+directory. In modo predefinito cerca ricorsivamente nella directory data i
+file <filename>Packages</filename>, <filename>Sources</filename>,
+<filename>Contents</filename>, <filename>Components</filename> e
+<filename>icons</filename> compressi e non compressi, come anche i file
+<filename>Release</filename>, <filename>Index</filename> e
+<filename>md5sum.txt</filename>
+(<literal>APT::FTPArchive::Release::Default-Patterns</literal>). Si possono
+aggiungere ulteriori modelli per i nomi di file elencandoli in
+<literal>APT::FTPArchive::Release::Patterns</literal>. Scrive poi sullo
+stdout un file <filename>Release</filename> contenente (in modo predefinito)
+per ogni file un digest MD5, SHA1, SHA256 e SHA512.</para>
+     <para>
+     I valori dei campi di metadati aggiuntivi nel file Release sono presi dalle
+variabili corrispondenti sotto <literal>APT::FTPArchive::Release</literal>,
+ad esempio <literal>APT::FTPArchive::Release::Origin</literal>. I campi
+supportati sono: <literal>Origin</literal>, <literal>Label</literal>,
+<literal>Suite</literal>, <literal>Version</literal>,
+<literal>Codename</literal>, <literal>Date</literal>,
+<literal>NotAutomatic</literal>, <literal>ButAutomaticUpgrades</literal>,
+<literal>Acquire-By-Hash</literal>, <literal>Valid-Until</literal>,
+<literal>Signed-By</literal>, <literal>Architectures</literal>,
+<literal>Components</literal>, <literal>Description</literal>.</para></listitem>
+
+     </varlistentry>
+
+     <varlistentry><term><option>generate</option></term>
+     <listitem><para>
+     Il comando <literal>generate</literal> è pensato per essere eseguibile da
+uno script di cron e costruisce gli indici in base al file di configurazione
+fornito. Il linguaggio di configurazione fornisce un mezzo flessibile per
+specificare quali file di indice vengano costruiti a partire da quali
+directory, oltre a fornire un mezzo semplice per amministrare le
+impostazioni desiderate.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>clean</option></term>
+     <listitem><para>
+     Il comando <literal>clean</literal> pulisce i database usati dal file di
+configurazione dato, rimuovendo tutti i record non più necessari.</para></listitem>
+     </varlistentry>     
+   </variablelist>  
+ </refsect1>
+
+ <refsect1><title>La configurazione di generate</title>
+   <para>
+   Il comando <literal>generate</literal> usa un file di configurazione per
+descrivere gli archivi da generare. Segue il tipico formato di
+configurazione ISC come usato negli strumenti ISC come bind 8 e
+dhcpd. &apt-conf; contiene una descrizione della sintassi. Notare che la
+configurazione di generate viene letta per sezioni, ma &apt-conf; viene
+letto ad albero. Ciò ha effetto soltanto sulla gestione del tag di ambito.</para>
+
+   <para>
+   La configurazione di generate ha quattro sezioni separate, ciascuna delle
+quali è descritta in seguito.</para>
+
+     <refsect2><title>Sezione <literal>Dir</literal></title>
+     <para>
+     La sezione <literal>Dir</literal> definisce le directory standard necessarie
+per localizzare i file richiesti durante il processo di generazione. Queste
+directory vengono fatte precedere da alcuni percorsi relativi definiti nelle
+sezioni successive, per produrre un percorso assoluto completo.</para>
+     <variablelist>     
+      <varlistentry><term><option>ArchiveDir</option></term>
+      <listitem><para>
+      Specifica la radice dell'archivio FTP; in una configurazione Debian standard
+questa è la directory che contiene i nodi <filename>ls-LR</filename> e dist.</para></listitem>
+      </varlistentry>
+
+      <varlistentry><term><option>OverrideDir</option></term>
+      <listitem><para>
+      Specifica la posizione dei file override.</para></listitem>
+      </varlistentry>
+      
+      <varlistentry><term><option>CacheDir</option></term>
+      <listitem><para>
+      Specifica la posizione dei file cache.</para></listitem>
+      </varlistentry>
+      
+      <varlistentry><term><option>FileListDir</option></term>
+      <listitem><para>
+      Specifica la posizione dei file con gli elenchi dei file, se viene usata
+l'impostazione <literal>FileList</literal> sotto.</para></listitem>
+      </varlistentry>
+     </variablelist>
+   </refsect2>
+   
+   <refsect2><title>Sezione <literal>Default</literal></title>
+     <para>
+     La sezione <literal>Default</literal> specifica i valori predefiniti e le
+impostazioni che controllano il funzionamento del generatore. Altre sezioni
+possono scavalcare questi valori tramite impostazioni definite per sezione.</para>
+     <variablelist>     
+      <varlistentry><term><option>Packages::Compress</option></term>
+      <listitem><para>
+      Imposta gli schemi di compressione predefiniti da usare per i file indice
+dei pacchetti. È una stringa che contiene una lista separata da spazi con
+almeno uno dei compressori configurati con l'ambito di configurazione
+<option>APT::Compressor</option>. Il valore predefinito per tutti gli schemi
+di compressione è «. gzip».</para></listitem>
+      </varlistentry>
+
+      <varlistentry><term><option>Packages::Extensions</option></term>
+      <listitem><para>
+      Imposta la lista predefinita di estensioni di file che contraddistinguono i
+file dei pacchetti. Il valore predefinito è «.deb».</para></listitem>
+      </varlistentry>
+      
+      <varlistentry><term><option>Sources::Compress</option></term>
+      <listitem><para>
+      Simile a <literal>Packages::Compress</literal>, tranne per il fatto che
+controlla la compressione dei file Sources.</para></listitem>
+      </varlistentry>
+      
+      <varlistentry><term><option>Sources::Extensions</option></term>
+      <listitem><para>
+      Imposta la lista predefinita di estensioni che contraddistinguono i file dei
+sorgenti. Il valore predefinito è «.dsc».</para></listitem>
+      </varlistentry>
+      
+      <varlistentry><term><option>Contents::Compress</option></term>
+      <listitem><para>
+      Simile a <literal>Packages::Compress</literal>, tranne per il fatto che
+controlla la compressione dei file Contents.</para></listitem>
+      </varlistentry>
+
+      <varlistentry><term><option>Translation::Compress</option></term>
+      <listitem><para>
+      Simile a <literal>Packages::Compress</literal>, tranne per il fatto che
+controlla la compressione del file principale Translation-en.</para></listitem>
+      </varlistentry>
+
+      <varlistentry><term><option>DeLinkLimit</option></term>
+      <listitem><para>
+      Specifica il numero dei kilobyte da scollegare (e sostituire con
+collegamenti fisici) per esecuzione. Viene usato insieme all'impostazione
+per sezione <literal>External-Links</literal>.</para></listitem>
+      </varlistentry>
+      
+      <varlistentry><term><option>FileMode</option></term>
+      <listitem><para>
+      Specifica la modalità di tutti i file indice creati. Il valore predefinito è
+0644. Tutti i file di indice sono impostati a questa modalità a prescindere
+dall'umask.</para></listitem>
+      </varlistentry>
+
+      <varlistentry><term><option>LongDescription</option></term>
+      <listitem><para>
+      Specifica se le descrizioni lunghe debbano essere incluse nel file
+<filename>Packages</filename> o separate in un file
+<filename>Translation-en</filename> principale.</para></listitem>
+      </varlistentry>
+     </variablelist>
+   </refsect2>
+   
+   <refsect2><title>Sezione <literal>TreeDefault</literal></title>
+     <para>
+     Imposta valori predefiniti specifici per le sezioni
+<literal>Tree</literal>. Tutte queste variabili sono variabili di
+sostituzione in cui le stringhe $(DIST), $(SECTION) e $(ARCH) verranno
+sostituite dai loro rispettivi valori.</para>
+     
+     <variablelist>     
+      <varlistentry><term><option>MaxContentsChange</option></term>
+      <listitem><para>
+      Imposta il numero di kilobyte di file Contents che vengono generati ogni
+giorno. I file Contents sono ruotati a turno in modo da venire rigenerati
+tutti nel giro di alcuni giorni.</para></listitem>
+      </varlistentry>
+      
+      <varlistentry><term><option>ContentsAge</option></term>
+      <listitem><para>
+      Controlla il numero di giorni durante i quali un file Contents può essere
+controllato senza modifiche. Al superamento di questo limite, l'orario mtime
+del file Contents viene aggiornato. Questo può succedere se il file Packages
+viene modificato in un modo che non ha come risultato un nuovo file Contents
+[ad esempio una modifica di override]. È consentito un certo ritardo, nella
+speranza che vengano installati nuovi pacchetti .deb, il che richiederebbe
+comunque la creazione di un nuovo file. Il valore predefinito è 10, i valori
+sono espressi in giorni.</para></listitem>
+      </varlistentry>
+      
+      <varlistentry><term><option>Directory</option></term>
+      <listitem><para>
+      Imposta la radice dell'albero della directory dei .deb. Il valore
+predefinito è <filename>$(DIST)/$(SECTION)/binary-$(ARCH)/</filename>.</para></listitem>
+      </varlistentry>
+      
+      <varlistentry><term><option>SrcDirectory</option></term>
+      <listitem><para>
+      Imposta la radice dell'albero della directory dei pacchetti sorgente. Il
+valore predefinito è <filename>$(DIST)/$(SECTION)/source/</filename>.</para></listitem>
+      </varlistentry>
+      
+      <varlistentry><term><option>Packages</option></term>
+      <listitem><para>
+      Imposta il file Packages di uscita. Il valore predefinito è
+<filename>$(DIST)/$(SECTION)/binary-$(ARCH)/Packages</filename>.</para></listitem>
+      </varlistentry>
+      
+      <varlistentry><term><option>Sources</option></term>
+      <listitem><para>
+      Imposta il file Sources di uscita. Il valore predefinito è
+<filename>$(DIST)/$(SECTION)/source/Sources</filename>.</para></listitem>
+      </varlistentry>
+
+      <varlistentry><term><option>Translation</option></term>
+      <listitem><para>
+      Imposta il file Translation-en principale di uscita contenente le
+descrizioni lunghe se non devono essere incluse nel file Packages. Il valore
+predefinito è <filename>$(DIST)/$(SECTION)/i18n/Translation-en</filename>.</para></listitem>
+      </varlistentry>
+
+      <varlistentry><term><option>InternalPrefix</option></term>
+      <listitem><para>
+      Imposta il prefisso del percorso che fa sì che un collegamento simbolico sia
+considerato un collegamento interno invece che esterno. Il valore
+predefinito è <filename>$(DIST)/$(SECTION)/</filename>.</para></listitem>
+      </varlistentry>
+      
+      <varlistentry><term><option>Contents</option></term>
+      <listitem><para>
+      Imposta il file Contents di uscita. Il valore predefinito è
+<filename>$(DIST)/$(SECTION)/Contents-$(ARCH)</filename>. Se questa
+impostazione fa sì che più file Packages corrispondano a un solo file
+Contents (come avviene con il valore predefinito), allora
+<command>apt-ftparchive</command> unirà automaticamente insieme questi file
+dei pacchetti.</para></listitem>
+      </varlistentry>
+      
+      <varlistentry><term><option>Contents::Header</option></term>
+      <listitem><para>
+      Imposta il file di intestazione da anteporre all'output dei contenuti.</para></listitem>
+      </varlistentry>
+
+      <varlistentry><term><option>BinCacheDB</option></term>
+      <listitem><para>
+      Imposta il database per la cache binaria da usare per questa sezione. Lo
+stesso database può essere condiviso da più sezioni.</para></listitem>
+      </varlistentry>
+      
+      <varlistentry><term><option>FileList</option></term>
+      <listitem><para>
+      Specifica che invece di percorrere l'albero delle directory,
+<command>apt-ftparchive</command> deve leggere la lista dei file dal file
+dato. I nomi relativi dei file vengono fatti precedere dalla directory
+archivio.</para></listitem>
+      </varlistentry>
+      
+      <varlistentry><term><option>SourceFileList</option></term>
+      <listitem><para>
+      Specifica che invece di percorrere l'albero delle directory,
+<command>apt-ftparchive</command> deve leggere la lista dei file dal file
+dato. I nomi di file relativi vengono fatti precedere dalla directory
+archivio. Questa opzione viene usata quando si elaborano gli indici dei
+sorgenti.</para></listitem>
+      </varlistentry>
+     </variablelist>     
+   </refsect2>
+   
+   <refsect2><title>Sezione <literal>Tree</literal></title>
+     <para>
+     La sezione <literal>Tree</literal> definisce un albero di file standard
+Debian che consiste in una directory di base, quindi più sezioni in quella
+directory di base e infine più architetture in ogni sezione. Gli esatti
+percorsi usati sono definiti dalla variabile di sostituzione
+<literal>Directory</literal>.</para> 
+     <para>
+     La sezione <literal>Tree</literal> accetta un tag di ambito che imposta la
+variabile <literal>$(DIST)</literal> e definisce la radice dell'albero (il
+percorso viene fatto precedere da <literal>ArchiveDir</literal>). Di solito
+è un'impostazione simile a
+<filename>dists/&debian-stable-codename;</filename>.</para>
+     <para>
+     Tutte le impostazioni definite nella sezione <literal>TreeDefault</literal>
+possono essere usate in una sezione <literal>Tree</literal>, oltre a tre
+nuove variabili.</para>
+     <para>
+     Quando elabora una sezione <literal>Tree</literal>,
+<command>apt-ftparchive</command> esegue un'operazione simile a:
+<programlisting>
+for i in Sections do 
+   for j in Architectures do
+      Genera per DIST=ambito SECTION=i ARCH=j
+     </programlisting></para>
+
+     <variablelist>     
+      <varlistentry><term><option>Sections</option></term>
+      <listitem><para>
+      Questa è una lista di sezioni che appaiono sotto la distribuzione, separate
+da spazi; tipicamente è simile a <literal>main contrib non-free</literal>.</para></listitem>
+      </varlistentry>
+      
+      <varlistentry><term><option>Architectures</option></term>
+      <listitem><para>
+      Questa è una lista separata da spazi di tutte le architetture che sono
+presenti nella sezione ricerca. L'architettura speciale «source» viene usata
+per indicare che questo albero ha un archivio sorgente. L'architettura «all»
+indica che i file specifici per un'architettura come
+<filename>Packages</filename> non dovrebbero includere informazioni sui
+pacchetti con architettura <literal>all</literal> in tutti i file, dato che
+saranno disponibili in un file dedicato.
+      </para></listitem>
+      </varlistentry>
+
+      <varlistentry><term><option>LongDescription</option></term>
+      <listitem><para>
+      Specifica se le descrizioni lunghe debbano essere incluse nel file
+<filename>Packages</filename> o separate in un file
+<filename>Translation-en</filename> principale.</para></listitem>
+      </varlistentry>
+
+      <varlistentry><term><option>BinOverride</option></term>
+      <listitem><para>
+      Imposta il file override binario. Il file override contiene informazioni
+sulla sezione, la priorità e l'indirizzo del manutentore.</para></listitem>
+      </varlistentry>
+
+      <varlistentry><term><option>SrcOverride</option></term>
+      <listitem><para>
+      Imposta il file override sorgente. Il file override contiene informazioni
+sulla sezione.</para></listitem>
+      </varlistentry>
+      
+      <varlistentry><term><option>ExtraOverride</option></term>
+      <listitem><para>
+      Imposta il file override binario extra.</para></listitem>
+      </varlistentry>
+      
+      <varlistentry><term><option>SrcExtraOverride</option></term>
+      <listitem><para>
+      Imposta il file override sorgente extra.</para></listitem> 
+      </varlistentry>
+     </variablelist>
+   </refsect2>
+   
+   <refsect2><title>Sezione <literal>BinDirectory</literal></title>
+     <para>
+     La sezione <literal>bindirectory</literal> definisce un albero di directory
+dei binari senza una struttura speciale. Il tag di ambito specifica la
+posizione della directory dei binari e le impostazioni sono simili a quelle
+della sezione <literal>Tree</literal> senza variabili di sostituzione o
+impostazioni <literal>Section</literal><literal>Architecture</literal>.</para>
+     <variablelist>
+      <varlistentry><term><option>Packages</option></term>
+      <listitem><para>
+      Imposta l'output del file Packages.</para></listitem>
+      </varlistentry>
+      
+      <varlistentry><term><option>Sources</option></term>
+      <listitem><para>
+      Imposta l'output del file Sources. È obbligatorio almeno uno fra
+<literal>Packages</literal> e <literal>Sources</literal>.</para></listitem>
+      </varlistentry>
+      
+      <varlistentry><term><option>Contents</option></term>
+      <listitem><para>
+      Imposta l'output del file Contents (opzionale).</para></listitem>
+      </varlistentry>
+      
+      <varlistentry><term><option>BinOverride</option></term>
+      <listitem><para>
+      Imposta il file override binario.</para></listitem>
+      </varlistentry>
+      
+      <varlistentry><term><option>SrcOverride</option></term>
+      <listitem><para>
+      Imposta il file override sorgente.</para></listitem>
+      </varlistentry>
+      
+      <varlistentry><term><option>ExtraOverride</option></term>
+      <listitem><para>
+      Imposta il file override binario extra.</para></listitem>
+      </varlistentry>
+      
+      <varlistentry><term><option>SrcExtraOverride</option></term>
+      <listitem><para>
+      Imposta il file override sorgente extra.</para></listitem>
+      </varlistentry>
+      
+      <varlistentry><term><option>BinCacheDB</option></term>
+      <listitem><para>
+      Imposta il DB della cache.</para></listitem>
+      </varlistentry>
+      
+      <varlistentry><term><option>PathPrefix</option></term>
+      <listitem><para>
+      Aggiunge un percorso a tutti i percorsi di uscita.</para></listitem>
+      </varlistentry>
+      
+      <varlistentry><term><option>FileList</option></term><term><option>SourceFileList</option></term>
+      <listitem><para>
+      Specifica il file con l'elenco dei file.</para></listitem>
+      </varlistentry>
+     </variablelist>
+   </refsect2>
+ </refsect1>
+
+
+ <refsect1><title>Il file override binario</title>
+   <para>Il file override binario è completamente compatibile con
+&dpkg-scanpackages;. Contiene quattro campi separati da spazi. Il primo
+campo è il nome del pacchetto, il secondo è la priorità a cui forzare quel
+pacchetto, il terzo è la sezione in cui forzare quel pacchetto e l'ultimo
+campo è il campo di permutazione del manutentore.</para>
+   <para>La forma generale del campo manutentore è: <literallayout>vecchio [// vecchio...]* => nuovo</literallayout> o semplicemente <literallayout>nuovo</literallayout>. La
+prima forma consente di specificare una lista di vecchi indirizzi di posta
+elettronica separati da una doppia sbarra. Se qualcuno di essi viene
+trovato, allora il campo manutentore viene sostituito con «nuovo». La
+seconda forma sostituisce invariabilmente il campo manutentore.</para>
+ </refsect1>
+
+ 
+ <refsect1><title>Il file override sorgente</title>
+   <para>
+   Il file override sorgente è completamente compatibile con
+&dpkg-scansources;. Contiene due campi separati da spazi. Il primo campo è
+il nome del pacchetto sorgente, il secondo è la sezione a cui assegnarlo.</para>
+ </refsect1>   
+
+ <refsect1><title>Il file override extra</title>
+   <para>
+   Il file override extra permette di aggiungere o sostituire nell'output un
+tag arbitrario. Ha tre colonne: la prima per il pacchetto, la seconda per il
+tag e il resto della riga è il nuovo valore.</para>
+ </refsect1>   
+
+ <refsect1><title>opzioni</title>
+   &apt-cmdblurb;
+   
+   <variablelist>
+      <varlistentry>
+	 <term><option>--md5</option></term>
+	 <term><option>--sha1</option></term>
+	 <term><option>--sha256</option></term>
+	 <term><option>--sha512</option></term>
+     <listitem><para>
+     Genera i codici di controllo specificati. Queste opzioni sono abilitate in
+modo predefinito; quando vengono disabilitate i file indice non hanno,
+quando ciò è possibile, i campi dei codici di controllo. Voci di
+configurazione:
+<literal>APT::FTPArchive::<replaceable>Codice-di-controllo</replaceable></literal>
+e
+<literal>APT::FTPArchive::<replaceable>Indice</replaceable>::<replaceable>Codice-di-controllo</replaceable></literal>
+dove <literal><replaceable>Indice</replaceable></literal> può essere
+<literal>Packages</literal>, <literal>Sources</literal> o
+<literal>Release</literal> e
+<literal><replaceable>Codice-di-controllo</replaceable></literal> può essere
+<literal>MD5</literal>, <literal>SHA1</literal>, <literal>SHA256</literal> o
+<literal>SHA512</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>-d</option></term><term><option>--db</option></term>
+     <listitem><para>
+     Usa un DB per la cache binaria. Questo non ha effetto sul comando
+generate. Voce di configurazione: <literal>APT::FTPArchive::DB</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>-q</option></term><term><option>--quiet</option></term>
+     <listitem><para>
+     Silenzioso; produce un output adatto per un file di registro, omettendo gli
+indicatori di avanzamento. Ulteriori q produrranno un risultato ancor più
+silenzioso, fino a un massimo di 2. È anche possibile usare
+<option>-q=n</option> per impostare il livello di silenziosità, scavalcando
+il file di configurazione. Voce di configurazione: <literal>quiet</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>--delink</option></term>
+     <listitem><para>
+     Effettua il de-collegamento. Se viene usata l'impostazione
+<literal>External-Links</literal> allora questa opzione abilita di fatto il
+de-collegamento dei file. È attiva in modo predefinito e può essere
+disabilitata con <option>--no-delink</option>. Voce di configurazione:
+<literal>APT::FTPArchive::DeLinkAct</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>--contents</option></term>
+     <listitem><para>
+     Effettua la generazione dei Contents. Se viene impostata questa opzione e
+gli indici dei pacchetti sono generati con un DB della cache, allora anche
+l'elenco dei file verrà estratto e memorizzato nel DB per gli usi
+futuri. Quando si usa il comando generate questa opzione permette anche la
+creazione di qualsiasi file Contents. È attiva in modo predefinito. Voce di
+configurazione: <literal>APT::FTPArchive::Contents</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>-s</option></term><term><option>--source-override</option></term>
+     <listitem><para>
+     Seleziona il file override sorgente da usare con il comando
+<literal>sources</literal>. Voce di configurazione
+<literal>APT::FTPArchive::SourceOverride</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>--readonly</option></term>
+     <listitem><para>
+     Rende i database delle cache in sola lettura. Voce di configurazione:
+<literal>APT::FTPArchive::ReadOnlyDB</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>-a</option></term><term><option>--arch</option></term>
+     <listitem><para>Accetta per i comandi <literal>packages</literal> e
+<literal>contents</literal> solo i file di pacchetto che corrispondono a
+<literal>*_arch.deb</literal> o <literal>*_all.deb</literal> invece di tutti
+i file di pacchetto nel percorso specificato. Voce di configurazione:
+<literal>APT::FTPArchive::Architecture</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>APT::FTPArchive::AlwaysStat</option></term>
+     <listitem><para>
+     &apt-ftparchive; memorizza in un database cache il maggior numero possibile
+di metadati. Se i pacchetti sono ricompilati o ripubblicati nuovamente con
+la stessa versione, questo causa problemi dato che verranno usati dei
+metadati in cache, come la dimensione e i codici di controllo, non più
+aggiornati. Notare che questa opzione è impostata in modo predefinito a
+«<literal>false</literal>» dato che non è raccomandabile caricare più
+versioni/compilazioni di un pacchetto con lo stesso numero di versione,
+perciò in teoria nessuno dovrebbe avere di questi problemi e di conseguenza
+tutti questi controlli aggiuntivi sono inutili.
+     </para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>APT::FTPArchive::LongDescription</option></term>
+     <listitem><para>
+     Questa opzione di configurazione è impostata a «<literal>true</literal>» in
+modo predefinito e dovrebbe essere impostata a <literal>«false»</literal>
+solamente se l'archivio generato con &apt-ftparchive; fornisce anche file
+<filename>Translation</filename>. Notare che il file principale
+<filename>Translation-en</filename> può essere creato solamente con il
+comando generate.
+     </para></listitem>
+     </varlistentry>
+
+     &apt-commonoptions;
+
+   </variablelist>
+ </refsect1>
+
+<refsect1><title>Esempi</title>
+
+<para>Per creare un file Packages compresso per una directory contenente pacchetti
+binari (.deb): <programlisting>
+<command>apt-ftparchive</command> packages <replaceable>directory</replaceable> | <command>gzip</command> > <filename>Packages.gz</filename>
+</programlisting></para>
+
+</refsect1>
+
+ <refsect1><title>Vedere anche</title>
+   <para>&apt-conf;</para>
+ </refsect1>
+
+ <refsect1><title>Diagnostica</title>
+   <para><command>apt-ftparchive</command> restituisce zero in caso di funzionamento
+normale e il valore decimale 100 in caso di errore.</para>
+ </refsect1>
+
+ &manbugs;
+ 
+ <refsect1><title>&translation-title;</title>
+   <para>&translation-holder;</para>
+   <para>&translation-english;</para>
+ </refsect1>
+</refentry>

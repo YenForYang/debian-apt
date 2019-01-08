@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Chapter 1. General</title>
+    <meta name="generator" content="DocBook XSL Stylesheets V1.79.1"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="home" href="index.html" title="APT User's Guide"/>
+    <link rel="up" href="index.html" title="APT User's Guide"/>
+    <link rel="prev" href="index.html" title="APT User's Guide"/>
+    <link rel="next" href="ch2.html" title="Chapter 2. apt-get"/>
+  </head>
+  <body>
+    <div class="navheader">
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Chapter 1. General</th>
+        </tr>
+        <tr>
+          <td align="left"><a accesskey="p" href="index.html">Prev</a> </td>
+          <th width="60%" align="center"> </th>
+          <td align="right"> <a accesskey="n" href="ch2.html">Next</a></td>
+        </tr>
+      </table>
+      <hr/>
+    </div>
+    <div class="chapter">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h1 class="title"><a id="ch1"/>Chapter 1. General</h1>
+          </div>
+        </div>
+      </div>
+      <div class="toc">
+        <p>
+          <strong>Table of Contents</strong>
+        </p>
+        <dl class="toc">
+          <dt>
+            <span class="section">
+              <a href="ch1.html#s1.1">1.1. Anatomy of the Package System</a>
+            </span>
+          </dt>
+        </dl>
+      </div>
+      <p>
+The APT package currently contains two sections, the APT
+<span class="command"><strong>dselect</strong></span> method and the <span class="command"><strong>apt-get</strong></span> command
+line user interface. Both provide a way to install and remove packages as well
+as download new packages from the Internet.
+</p>
+      <div class="section">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h2 class="title"><a id="s1.1"/>1.1. Anatomy of the Package System</h2>
+            </div>
+          </div>
+        </div>
+        <p>
+The Debian packaging system has a large amount of information associated with
+each package to help assure that it integrates cleanly and easily into the
+system. The most prominent of its features is the dependency system.
+</p>
+        <p>
+The dependency system allows individual programs to make use of shared elements
+in the system such as libraries. It simplifies placing infrequently used
+portions of a program in separate packages to reduce the number of things the
+average user is required to install. Also, it allows for choices in mail
+transport agents, X servers and so on.
+</p>
+        <p>
+The first step to understanding the dependency system is to grasp the concept
+of a simple dependency. The meaning of a simple dependency is that a package
+requires another package to be installed at the same time to work properly.
+</p>
+        <p>
+For instance, mailcrypt is an emacs extension that aids in encrypting email
+with GPG. Without GPGP installed mailcrypt is useless, so mailcrypt has a
+simple dependency on GPG. Also, because it is an emacs extension it has a
+simple dependency on emacs, without emacs it is completely useless.
+</p>
+        <p>
+The other important dependency to understand is a conflicting dependency. It
+means that a package, when installed with another package, will not work and
+may possibly be extremely harmful to the system. As an example consider a mail
+transport agent such as sendmail, exim or qmail. It is not possible to have
+two mail transport agents installed because both need to listen to the network
+to receive mail. Attempting to install two will seriously damage the system so
+all mail transport agents have a conflicting dependency with all other mail
+transport agents.
+</p>
+        <p>
+As an added complication there is the possibility for a package to pretend to
+be another package. Consider that exim and sendmail for many intents are
+identical, they both deliver mail and understand a common interface. Hence,
+the package system has a way for them to declare that they are both
+mail-transport-agents. So, exim and sendmail both declare that they provide a
+mail-transport-agent and other packages that need a mail transport agent depend
+on mail-transport-agent. This can add a great deal of confusion when trying to
+manually fix packages.
+</p>
+        <p>
+At any given time a single dependency may be met by packages that are already
+installed or it may not be. APT attempts to help resolve dependency issues by
+providing a number of automatic algorithms that help in selecting packages for
+installation.
+</p>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr/>
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td align="left"><a accesskey="p" href="index.html">Prev</a> </td>
+          <td align="center"> </td>
+          <td align="right"> <a accesskey="n" href="ch2.html">Next</a></td>
+        </tr>
+        <tr>
+          <td align="left" valign="top">APT User's Guide </td>
+          <td align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td align="right" valign="top"> Chapter 2. apt-get</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,187 @@
+'\" t
+.\"     Title: apt-cdrom
+.\"    Author: Jason Gunthorpe
+.\" Generator: DocBook XSL Stylesheets v1.79.1 <http://docbook.sf.net/>
+.\"      Date: 30\ \&novembre\ \&2013
+.\"    Manual: APT
+.\"    Source: APT 1.8.0~alpha3
+.\"  Language: Italian
+.\"
+.TH "APT\-CDROM" "8" "30\ \&novembre\ \&2013" "APT 1.8.0~alpha3" "APT"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NOME"
+apt-cdrom \- strumento APT per la gestione dei CD\-ROM
+.SH "SINOSSI"
+.HP \w'\fBapt\-cdrom\fR\ 'u
+\fBapt\-cdrom\fR [\fB\-rmfan\fR] [\fB\-d=\fR\fB\fIpunto_mount_cdrom\fR\fR] [\fB\-o=\fR\fB\fIstringa_config\fR\fR] [\fB\-c=\fR\fB\fIfile_config\fR\fR] {add | ident | {\-v\ |\ \-\-version} | {\-h\ |\ \-\-help}}
+.SH "DESCRIZIONE"
+.PP
+\fBapt\-cdrom\fR
+\(`e usato per aggiungere un nuovo CD\-ROM alla lista delle fonti disponibili per APT\&.
+\fBapt\-cdrom\fR
+si prende cura di determinare la struttura del disco e anche di correggere possibili errori di masterizzazione e di verificare i file indice\&.
+.PP
+Per aggiungere dei CD al sistema APT \(`e necessario usare
+\fBapt\-cdrom\fR, in quanto ci\(`o non pu\(`o essere fatto manualmente\&. Inoltre ogni disco in un insieme di pi\(`u CD deve essere inserito e scansionato separatamente per tenere conto di possibili errori di masterizzazione\&.
+.PP
+A meno che non venga fornita l\*(Aqopzione
+\fB\-h\fR
+o
+\fB\-\-help\fR, deve essere presente uno dei comandi seguenti\&.
+.PP
+\fBadd\fR
+.RS 4
+add
+\(`e usato per aggiungere un nuovo disco alla lista delle fonti\&. Smonter\(`a il device del CD\-ROM, chieder\(`a di inserire un disco e poi proceder\(`a alla sua scansione e copier\(`a i file indice\&. Se il disco non ha una directory
+\&.disk/
+corretta, verr\(`a chiesto un titolo descrittivo\&.
+.sp
+APT usa un identificativo per i CD\-ROM per tenere traccia di quale disco \(`e attualmente nel lettore e mantiene un database di questi identificativi nel file
+/var/lib/apt/cdroms\&.list\&.
+.RE
+.PP
+\fBident\fR
+.RS 4
+Uno strumento di debug per riportare l\*(Aqidentit\(`a del disco corrente cos\(`i come il nome dei file memorizzato\&.
+.RE
+.SH "OPZIONI"
+.PP
+Tutte le opzioni a riga di comando si possono impostare usando il file di configurazione; le descrizioni indicano l\*(Aqopzione da impostare\&. Per le opzioni booleane si pu\(`o scavalcare il file di configurazione usando qualcosa come
+\fB\-f\-\fR,
+\fB\-\-no\-f\fR,
+\fB\-f=no\fR
+o diverse altre varianti\&.
+.PP
+\fB\-\-no\-auto\-detect\fR, \fB\-\-cdrom\fR
+.RS 4
+Non cercare di rilevare automaticamente il percorso del CD\-ROM\&. Solitamente usato insieme all\*(Aqopzione
+\fB\-\-cdrom\fR\&. Voce di configurazione:
+Acquire::cdrom::AutoDetect\&.
+.RE
+.PP
+\fB\-d\fR, \fB\-\-cdrom\fR
+.RS 4
+Punto di mount; specifica la posizione in cui montare il CD\-ROM\&. Questo punto di mount deve essere elencato nel file
+/etc/fstab
+e configurato correttamente\&. Voce di configurazione:
+Acquire::cdrom::mount\&.
+.RE
+.PP
+\fB\-r\fR, \fB\-\-rename\fR
+.RS 4
+Rinomina un disco; cambia l\*(Aqetichetta di un disco o soppianta l\*(Aqetichetta originale del disco\&. Questa opzione far\(`a s\(`i che
+\fBapt\-cdrom\fR
+chieda una nuova etichetta\&. Voce di configurazione:
+APT::CDROM::Rename\&.
+.RE
+.PP
+\fB\-m\fR, \fB\-\-no\-mount\fR
+.RS 4
+Non montare; impedisce ad
+\fBapt\-cdrom\fR
+di montare e smontare il punto di mount\&. Voce di configurazione:
+APT::CDROM::NoMount\&.
+.RE
+.PP
+\fB\-f\fR, \fB\-\-fast\fR
+.RS 4
+Copia rapida; assume che i file dei pacchetti siano validi e non verifica ogni pacchetto\&. Questa opzione dovrebbe essere usata solo se
+\fBapt\-cdrom\fR
+\(`e stato gi\(`a eseguito sul disco e non ha rilevato alcun errore\&. Voce di configurazione:
+APT::CDROM::Fast\&.
+.RE
+.PP
+\fB\-a\fR, \fB\-\-thorough\fR
+.RS 4
+Scansione approfondita dei file Package; questa opzione pu\(`o essere necessaria con alcuni dischi delle vecchie Debian 1\&.1/1\&.2 in cui i file Package si trovano in posti inconsueti\&. La scansione dei CD richieder\(`a molto pi\(`u tempo, ma trover\(`a tutti i file\&.
+.RE
+.PP
+\fB\-n\fR, \fB\-\-just\-print\fR, \fB\-\-recon\fR, \fB\-\-no\-act\fR
+.RS 4
+Nessun cambiamento; non cambia il file
+\fBsources.list\fR(5)
+e non scrive i file indice\&. Tuttavia ogni cosa \(`e comunque verificata\&. Voce di configurazione:
+APT::CDROM::NoAct\&.
+.RE
+.PP
+\fB\-h\fR, \fB\-\-help\fR
+.RS 4
+Mostra un breve riassunto sull\*(Aquso\&.
+.RE
+.PP
+\fB\-v\fR, \fB\-\-version\fR
+.RS 4
+Mostra la versione del programma\&.
+.RE
+.PP
+\fB\-c\fR, \fB\-\-config\-file\fR
+.RS 4
+File di configurazione; specifica un file di configurazione da usare\&. Il programma legge il file di configurazione predefinito e poi questo file di configurazione\&. Se \(`e necessario modificare le impostazioni di configurazione prima che vengano analizzati i file di configurazione predefiniti, specificare un file con la variabile d\*(Aqambiente
+\fBAPT_CONFIG\fR\&. Vedere
+\fBapt.conf\fR(5)
+per informazioni sulla sintassi\&.
+.RE
+.PP
+\fB\-o\fR, \fB\-\-option\fR
+.RS 4
+Imposta un\*(Aqopzione di configurazione; imposter\(`a una qualunque opzione di configurazione\&. La sintassi \(`e
+\fB\-o Pinco::Pallo=pallo\fR\&.
+\fB\-o\fR
+e
+\fB\-\-option\fR
+si possono usare pi\(`u volte per impostare opzioni diverse\&.
+.RE
+.SH "VEDERE ANCHE"
+.PP
+\fBapt.conf\fR(5),
+\fBapt-get\fR(8),
+\fBsources.list\fR(5)
+.SH "DIAGNOSTICA"
+.PP
+\fBapt\-cdrom\fR
+restituisce zero in caso di funzionamento normale e il valore decimale 100 in caso di errore\&.
+.SH "BUG"
+.PP
+\m[blue]\fBPagina dei bug di APT\fR\m[]\&\s-2\u[1]\d\s+2\&. Se si desidera segnalare un bug in APT, vedere
+/usr/share/doc/debian/bug\-reporting\&.txt
+o il comando
+\fBreportbug\fR(1)\&.
+.SH "TRADUZIONE"
+.PP
+Traduzione in italiano a cura del Team italiano di localizzazione di Debian
+<debian\-l10n\-italian@lists\&.debian\&.org>\&. In particolare hanno contribuito Eugenia Franzoni (2000), Hugh Hartmann (2000\-2012), Gabriele Stilli (2012), Beatrice Torracca (2012, 2014, 2015)\&.
+.PP
+Notare che questa versione tradotta del documento pu\(`o contenere parti non tradotte\&. Ci\(`o \(`e voluto, per evitare di perdere contenuti quando la traduzione non \(`e aggiornata rispetto all\*(Aqoriginale\&.
+.SH "AUTORI"
+.PP
+\fBJason Gunthorpe\fR
+.RS 4
+.RE
+.PP
+\fBTeam APT\fR
+.RS 4
+.RE
+.SH "NOTE"
+.IP " 1." 4
+Pagina dei bug di APT
+.RS 4
+\%http://bugs.debian.org/src:apt
+.RE

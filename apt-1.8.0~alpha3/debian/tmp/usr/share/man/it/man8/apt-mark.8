@@ -1,0 +1,192 @@
+'\" t
+.\"     Title: apt-mark
+.\"    Author: Mike O\*(AqConnor
+.\" Generator: DocBook XSL Stylesheets v1.79.1 <http://docbook.sf.net/>
+.\"      Date: 25\ \&settembre\ \&2015
+.\"    Manual: APT
+.\"    Source: APT 1.8.0~alpha3
+.\"  Language: Italian
+.\"
+.TH "APT\-MARK" "8" "25\ \&settembre\ \&2015" "APT 1.8.0~alpha3" "APT"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NOME"
+apt-mark \- mostra, imposta e deconfigura varie impostazioni per un pacchetto
+.SH "SINOSSI"
+.HP \w'\fBapt\-mark\fR\ 'u
+\fBapt\-mark\fR {\fB\-f=\fR\fB\fInomefile\fR\fR | {auto\ |\ manual}\ \fIpacch\fR...  | {showauto\ |\ showmanual}\ [\fIpacch\fR...] } | {\-v\ |\ \-\-version} | {\-h\ |\ \-\-help} 
+.HP \w'\fBapt\-mark\fR\ 'u
+\fBapt\-mark\fR {hold\ |\ unhold\ |\ install\ |\ remove\ |\ purge}\ \fIpacch\fR...  | {showhold\ |\ showinstall\ |\ showremove\ |\ showpurge}\ [\fIpacch\fR...]  
+.SH "DESCRIZIONE"
+.PP
+\fBapt\-mark\fR
+pu\(`o essere usato come fronted unificato per configurare varie impostazioni per un pacchetto, come contrassegnarlo come installato automaticamente/manualmente, oppure per cambiare selezioni di
+\fBdpkg\fR
+come blocco, installazione, rimozione ed eliminazione completa, che vengono onorate, ad esempio, da
+\fBapt\-get dselect\-upgrade\fR
+o
+\fBaptitude\fR\&.
+.SH "PACCHETTI INSTALLATI AUTOMATICAMENTE E MANUALMENTE"
+.PP
+Quando viene richiesta l\*(Aqinstallazione di un pacchetto e ci\(`o fa s\(`i che altri pacchetti vengano installati per soddisfare le sue dipendenze, queste ultime sono contrassegnate come installate automaticamente, mentre i pacchetti che vengono installati esplicitamente sono contrassegnati come installati manualmente\&. Una volta che non c\*(Aq\(`e pi\(`u alcun pacchetto installato manualmente che dipende da un dato pacchetto installato automaticamente, quest\*(Aqultimo viene considerato come non pi\(`u necessario e, ad esempio,
+\fBapt\-get\fR
+o
+\fBaptitude\fR
+come minimo suggeriscono di rimuoverlo\&.
+.PP
+\fBauto\fR
+.RS 4
+auto
+viene usato per contrassegnare un pacchetto come installato automaticamente, il che fa s\(`i che il pacchetto venga rimosso quando non c\*(Aq\(`e pi\(`u alcun pacchetto installato manualmente che dipende da esso\&.
+.RE
+.PP
+\fBmanual\fR
+.RS 4
+manual
+viene usato per contrassegnare un pacchetto come installato manualmente, il che impedisce che un pacchetto venga rimosso automaticamente se nessun altro dipende da esso\&.
+.RE
+.PP
+\fBshowauto\fR
+.RS 4
+showauto
+viene usato per stampare un elenco di pacchetti installati automaticamente, ciascuno su una riga\&. Se non viene specificato alcun pacchetto, vengono elencati tutti i pacchetti installati automaticamente\&. Se vengono specificati dei pacchetti, verranno mostrati solo quelli automaticamente installati\&.
+.RE
+.PP
+\fBshowmanual\fR
+.RS 4
+showmanual
+pu\(`o essere usato nello stesso modo di
+showauto, tranne per il fatto che stampa invece un elenco dei pacchetti installati manualmente
+.RE
+.SS "Opzioni"
+.PP
+\fB\-f=\fR\fB\fInomefile\fR\fR, \fB\-\-file=\fR\fB\fInomefile\fR\fR
+.RS 4
+Legge/Scrive le statistiche sui pacchetti dal file specificato con il parametro
+\fInomefile\fR
+invece che dalla posizione predefinita che \(`e
+extended_status
+nella directory definita dalla voce di configurazione
+Dir::State\&.
+.RE
+.SH "EVITARE MODIFICHE AD UN PACCHETTO"
+.PP
+\fBhold\fR
+.RS 4
+hold
+viene usato per contrassegnare un pacchetto come bloccato, il che impedisce che un pacchetto venga installato, aggiornato o rimosso automaticamente\&.
+.RE
+.PP
+\fBunhold\fR
+.RS 4
+unhold
+viene usato per annullare un blocco impostato in precedenza, per permettere nuovamente tutte le azioni\&.
+.RE
+.PP
+\fBshowhold\fR
+.RS 4
+showhold
+viene usato per stampare un elenco di pacchetti bloccati in modo uguale a ci\(`o che fanno gli altri comandi \(Foshow\(Fc\&.
+.RE
+.SH "PIANIFICARE L\*(AQINSTALLAZIONE, RIMOZIONE ED ELIMINAZIONE DI PACCHETTI"
+.PP
+Alcuni frontend, come
+\fBapt\-get dselect\-upgrade\fR
+possono essere usati per applicare modifiche allo stato di installazione dei pacchetti precedentemente pianificate\&. Queste modifiche possono essere pianificate usando i comandi
+\fBinstall\fR,
+\fBremove\fR
+(noto anche come
+\fBdeinstall\fR) e
+\fBpurge\fR\&. I pacchetti con una selezione specifica possono essere visualizzati rispettivamente con
+\fBshowinstall\fR,
+\fBshowremove\fR
+e
+\fBshowpurge\fR\&. Ulteriori informazioni su queste cosiddette selezioni di dpkg possono essere trovate in
+\fBdpkg\fR(1)\&.
+.SH "OPZIONI"
+.PP
+\fB\-h\fR, \fB\-\-help\fR
+.RS 4
+Mostra un breve riassunto sull\*(Aquso\&.
+.RE
+.PP
+\fB\-v\fR, \fB\-\-version\fR
+.RS 4
+Mostra la versione del programma\&.
+.RE
+.PP
+\fB\-c\fR, \fB\-\-config\-file\fR
+.RS 4
+File di configurazione; specifica un file di configurazione da usare\&. Il programma legge il file di configurazione predefinito e poi questo file di configurazione\&. Se \(`e necessario modificare le impostazioni di configurazione prima che vengano analizzati i file di configurazione predefiniti, specificare un file con la variabile d\*(Aqambiente
+\fBAPT_CONFIG\fR\&. Vedere
+\fBapt.conf\fR(5)
+per informazioni sulla sintassi\&.
+.RE
+.PP
+\fB\-o\fR, \fB\-\-option\fR
+.RS 4
+Imposta un\*(Aqopzione di configurazione; imposter\(`a una qualunque opzione di configurazione\&. La sintassi \(`e
+\fB\-o Pinco::Pallo=pallo\fR\&.
+\fB\-o\fR
+e
+\fB\-\-option\fR
+si possono usare pi\(`u volte per impostare opzioni diverse\&.
+.RE
+.SH "FILE"
+.PP
+/var/lib/apt/extended_states
+.RS 4
+Elenco degli stati dei pacchetti installati automaticamente\&. Voce di configurazione:
+Dir::State::extended_states\&.
+.RE
+.SH "VEDERE ANCHE"
+.PP
+\fBapt-get\fR(8),\fBaptitude\fR(8),\fBapt.conf\fR(5)
+.SH "DIAGNOSTICA"
+.PP
+\fBapt\-mark\fR
+restituisce zero in caso di funzionamento normale e un valore diverso da zero in caso di errore\&.
+.SH "BUG"
+.PP
+\m[blue]\fBPagina dei bug di APT\fR\m[]\&\s-2\u[1]\d\s+2\&. Se si desidera segnalare un bug in APT, vedere
+/usr/share/doc/debian/bug\-reporting\&.txt
+o il comando
+\fBreportbug\fR(1)\&.
+.SH "TRADUZIONE"
+.PP
+Traduzione in italiano a cura del Team italiano di localizzazione di Debian
+<debian\-l10n\-italian@lists\&.debian\&.org>\&. In particolare hanno contribuito Eugenia Franzoni (2000), Hugh Hartmann (2000\-2012), Gabriele Stilli (2012), Beatrice Torracca (2012, 2014, 2015)\&.
+.PP
+Notare che questa versione tradotta del documento pu\(`o contenere parti non tradotte\&. Ci\(`o \(`e voluto, per evitare di perdere contenuti quando la traduzione non \(`e aggiornata rispetto all\*(Aqoriginale\&.
+.SH "AUTORI"
+.PP
+\fBMike O\*(AqConnor\fR
+.RS 4
+.RE
+.PP
+\fBTeam APT\fR
+.RS 4
+.RE
+.SH "NOTE"
+.IP " 1." 4
+Pagina dei bug di APT
+.RS 4
+\%http://bugs.debian.org/src:apt
+.RE

@@ -1,0 +1,196 @@
+'\" t
+.\"     Title: apt-mark
+.\"    Author: O\*(AqConnor Mike[FAMILY Given]
+.\" Generator: DocBook XSL Stylesheets v1.79.1 <http://docbook.sf.net/>
+.\"      Date: 25\ \&9 月\ \&2015
+.\"    Manual: APT
+.\"    Source: APT 1.8.0~alpha3
+.\"  Language: Japanese
+.\"
+.TH "APT\-MARK" "8" "25\ \&9 月\ \&2015" "APT 1.8.0~alpha3" "APT"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "名前"
+apt-mark \- パッケージの各種設定の表示、設定、設定解除
+.SH "概要"
+.HP \w'\fBapt\-mark\fR\ 'u
+\fBapt\-mark\fR {\fB\-f=\fR\fB\fIファイル名\fR\fR | {auto\ |\ manual}\ \fIパッケージ\fR...  | {showauto\ |\ showmanual}\ [\fIパッケージ\fR...] } | {\-v\ |\ \-\-version} | {\-h\ |\ \-\-help} 
+.HP \w'\fBapt\-mark\fR\ 'u
+\fBapt\-mark\fR {hold\ |\ unhold\ |\ install\ |\ remove\ |\ purge}\ \fIパッケージ\fR...  | {showhold\ |\ showinstall\ |\ showremove\ |\ showpurge}\ [\fIパッケージ\fR...]  
+.SH "説明"
+.PP
+統合フロントエンドとして使用することができます。例えば、パッケージを自動/手動インストール済みとマークしたり、\fBdpkg\fR
+の選択を保留、インストール、削除や完全削除に変更できます。例えば
+\fBapt\-get dselect\-upgrade\fR
+や
+\fBaptitude\fR
+によりリスペクトされています。
+.SH "自動および手動インストール済みパッケージ"
+.PP
+パッケージをインストールすると要求し、その結果、別のパッケージが依存関係を満たすためにインストールされた場合、依存関係に自動インストール済みとマークされます。いったん自動的にインストールされたパッケージは、手動でインストールしたパッケージに依存されなくなると、そのパッケージは、例えば
+\fBapt\-get\fR
+や
+\fBaptitude\fR
+により削除が提案されます。
+.PP
+\fBauto\fR
+.RS 4
+auto
+は、パッケージを自動インストール済みとマークします。このパッケージに依存する手動でインストールされたパッケージがなくなると、このパッケージを削除します。
+.RE
+.PP
+\fBmanual\fR
+.RS 4
+manual
+は、パッケージを手動インストール済みとマークします。このパッケージに依存するほかのパッケージがなくなっても、このパッケージを自動的に削除するのを防ぎます。
+.RE
+.PP
+\fBshowauto\fR
+.RS 4
+showauto
+は、自動的にインストールされたパッケージを、パッケージごとに改行して表示します。パッケージを与えなければ、自動的にインストールされたパッケージをすべて一覧表示します。パッケージを与えた場合は、そのパッケージが自動的にインストールされている場合にのみ、表示します。
+.RE
+.PP
+\fBshowmanual\fR
+.RS 4
+showmanual
+は
+showauto
+と同様に使用できますが、手動でインストールされたパッケージの一覧を表示します。
+.RE
+.SS "オプション"
+.PP
+\fB\-f=\fR\fB\fIファイル名\fR\fR, \fB\-\-file=\fR\fB\fIファイル名\fR\fR
+.RS 4
+デフォルトの場所 (設定項目:
+Dir::State
+で定義したディレクトリの
+extended_status) ではなく、パラメータ
+\fIファイル名\fR
+からパッケージの状態を読み書きします。
+.RE
+.SH "パッケージの変更を防ぐ"
+.PP
+\fBhold\fR
+.RS 4
+hold
+は、パッケージを保留としてマークします。パッケージを自動的なインストール、アップグレード、削除から防ぎます。
+.RE
+.PP
+\fBunhold\fR
+.RS 4
+unhold
+は、以前保留したパッケージを、また操作できるようキャンセルするのに使用します。
+.RE
+.PP
+\fBshowhold\fR
+.RS 4
+showhold
+は、他の show コマンドと同様に、保留されているパッケージを出力します。
+.RE
+.SH "パッケージのインストール、削除、完全削除をスケジュールする"
+.PP
+\fBapt\-get dselect\-upgrade\fR
+のようないくつかのフロントエンドは、パッケージのインストール状態の事前のスケジュール変更を適用するために使用することができます。このような変更は、\fBinstall\fR、\fBremove\fR
+(\fBdeinstall\fR
+としても知られています) および
+\fBpurge\fR
+オプションでスケジュールすることができます。特定のパッケージの選択は、それぞれ
+\fBshowinstall\fR、\fBshowremove\fR
+および
+\fBshowpurge\fR
+で表示することができます。dpkg 選択とも呼ぶこれらの詳細については、dpkg で見つけることができます。
+.SH "オプション"
+.PP
+\fB\-h\fR, \fB\-\-help\fR
+.RS 4
+使い方の短い要約を表示します。
+.RE
+.PP
+\fB\-v\fR, \fB\-\-version\fR
+.RS 4
+プログラムのバージョンを表示します。
+.RE
+.PP
+\fB\-c\fR, \fB\-\-config\-file\fR
+.RS 4
+設定ファイル。 使用する設定ファイルを指定します。 このプログラムは、デフォルト設定ファイルを読んでから、この設定ファイルを読みます。 この設定をデフォルト設定ファイルよりも前に読む必要がある場合、
+\fBAPT_CONFIG\fR
+環境変数に指定してください。構文については
+\fBapt.conf\fR(5)
+をご覧ください。
+.RE
+.PP
+\fB\-o\fR, \fB\-\-option\fR
+.RS 4
+設定オプションのセット。任意の設定オプションをセットします。 構文
+\fB\-o Foo::Bar=bar\fR
+となります。 異なるオプションを設定するため、\fB\-o\fR
+と
+\fB\-\-option\fR
+は、 複数回使用できます。
+.RE
+.SH "ファイル"
+.PP
+/var/lib/apt/extended_states
+.RS 4
+自動インストールされたパッケージの状態一覧です。 設定項目:
+Dir::State::extended_states
+.RE
+.SH "関連項目"
+.PP
+\fBapt-get\fR(8),\fBaptitude\fR(8),\fBapt.conf\fR(5)
+.SH "診断メッセージ"
+.PP
+\fBapt\-mark\fR
+は正常終了時に 0 を返します。エラー時には 0 以外を返します。
+.SH "バグ"
+.PP
+\m[blue]\fBAPT バグページ\fR\m[]\&\s-2\u[1]\d\s+2
+をご覧ください。 APT のバグを報告する場合は、
+/usr/share/doc/debian/bug\-reporting\&.txt
+や
+\fBreportbug\fR(1)
+コマンドをご覧ください。
+.SH "翻訳"
+.PP
+倉澤 望
+<nabetaro@debian\&.or\&.jp>
+(2003\-2006,2009\-2012), Takuma Yamada
+<tyamada@takumayamada\&.com>
+(2016), Debian JP Documentation ML
+<debian\-doc@debian\&.or\&.jp>
+.PP
+この翻訳文書には未訳部分が含まれている可能性があることに 注意してください。 翻訳がオリジナルに追従できていない場合、 内容を失わないようにこのようにしています。
+.SH "著者"
+.PP
+\fBO\*(AqConnor Mike[FAMILY Given]\fR
+.RS 4
+.RE
+.PP
+\fB[FAMILY Given]\fR
+.RS 4
+.RE
+.SH "注記"
+.IP " 1." 4
+APT バグページ
+.RS 4
+\%http://bugs.debian.org/src:apt
+.RE

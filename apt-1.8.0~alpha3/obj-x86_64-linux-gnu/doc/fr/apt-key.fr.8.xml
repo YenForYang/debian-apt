@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+  "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % aptent SYSTEM "apt.ent"> %aptent;
+<!ENTITY % aptverbatiment SYSTEM "apt-verbatim.ent"> %aptverbatiment;
+<!ENTITY % aptvendor SYSTEM "apt-vendor.ent"> %aptvendor;
+]>
+
+<refentry>
+ <refentryinfo>
+   <!-- The last update date -->
+&apt-author.jgunthorpe;
+   &apt-author.team;
+   &apt-email;
+   &apt-product;
+   
+   <date>2016-11-22T00:00:00Z</date>
+ </refentryinfo>
+
+ <refmeta>
+   <refentrytitle>apt-key</refentrytitle>
+   <manvolnum>8</manvolnum>
+   <refmiscinfo class="manual">APT</refmiscinfo>
+ </refmeta>
+ 
+ 
+ <!-- Man page title -->
+<refnamediv>
+    <refname>apt-key</refname>
+    <refpurpose>Utilitaire de gestion des clés d'APT</refpurpose>
+ </refnamediv>
+
+ &synopsis-command-apt-key;
+
+ <refsect1><title>Description</title>
+   <para>
+   <command>apt-key</command> gère les clés dont se sert apt pour authentifier
+les paquets. Les paquets authentifiés par ces clés seront réputés fiables.
+   </para>
+   <para>
+   Notez que si vous souhaitez utiliser <command>apt-key</command>,
+l'installation complémentaire de la suite GNU Privacy Guard (paquet
+<package>gnupg</package>) est requise. Pour cette raison uniquement,
+l'utilisation programmée (en particulier dans les scripts des responsables
+des paquets !) est fortement déconseillée. En outre, le format de sortie de
+toutes les commandes est indéfini et de plus il peut changer, et il change
+réellement chaque fois que les commandes sous-jacentes
+changent. <command>apt-key</command> essaiera de détecter un tel usage et,
+dans ces cas, enverra des alertes sur l'erreur standard.
+   </para>
+</refsect1>
+
+<refsect1><title>Trousseaux de clés pris en charge</title>
+<para>apt-key ne prend en charge que le format binaire OpenPGP (connu aussi sous
+le nom de « trousseau de clés public GPG ») dans les fichiers avec
+l'extension « <literal>gpg</literal> », et pas le format de base de données
+Keybox, introduit comme format par défaut pour les fichiers de trousseau de
+clés dans les versions les plus récentes de &gpg;. Les fichiers binaires de
+trousseau de clés destinés à être utilisés dans toutes les versions d'apt
+devraient donc toujours être créés avec la commande <command>gpg
+--export</command>.
+</para>
+<para>Autrement, si tous les systèmes susceptibles d'utiliser le trousseau de clés
+créé disposent d'une version d'apt >= 1.4, il est possible d'utiliser plutôt
+le format ASCII-Armored, avec l'extension « <literal>asc</literal> », qui
+peut être créé par la commande <command>gpg --armor --export</command>.
+</para>
+</refsect1>
+
+<refsect1><title>Commandes</title>
+   <variablelist>
+     <varlistentry><term><option>add</option> <option>&synopsis-param-filename;</option></term>
+     <listitem>
+     <para>
+       Ajouter une clé à la liste des clés fiables. La clé est lue dans le fichier
+indiqué avec le paramètre &synopsis-param-filename; ou sur l'entrée standard
+si le nom de fichier est <literal>-</literal>.
+     </para>
+     <para>
+     Il est primordial de vérifier que les clés ajoutées manuellement avec
+<command>apt-key</command> appartiennent bien au propriétaire des dépôts
+comme elles le prétendent, sinon l'infrastructure de  &apt-secure; est
+complètement compromise.
+     </para>
+     <para>
+       <emphasis>Attention</emphasis> : plutôt que d'utiliser cette commande, un
+trousseau de clés peut être placé directement dans le répertoire
+<filename>/etc/apt/trusted.gpg.d/</filename> avec un nom descriptif et soit
+« <literal>gpg</literal> » soit « <literal>asc</literal> » comme extension
+de fichier.
+     </para>
+     </listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>del</option> <option>&synopsis-param-keyid;</option></term>
+     <listitem>
+     <para>
+
+       Supprimer une clé de la liste des clés fiables.
+
+     </para>
+
+     </listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>export</option> <option>&synopsis-param-keyid;</option></term>
+     <listitem>
+     <para>
+
+        Afficher la clé &synopsis-param-keyid; sur la sortie standard.
+
+     </para>
+
+     </listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>exportall</option></term>
+     <listitem>
+     <para>
+
+        Afficher toutes les clés fiables sur la sortie standard.
+
+     </para>
+
+     </listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>list</option>, <option>finger</option></term>
+     <listitem>
+     <para>
+
+       Afficher la liste des clés fiables avec leurs empreintes.
+
+     </para>
+
+     </listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>adv</option></term>
+     <listitem>
+     <para>
+     Passer des options avancées à gpg. Avec <command>adv --recv-key</command>,
+il est possible par exemple de télécharger une clé directement d'un serveur
+de clé dans l'ensemble de clés fiables. Veuillez noter qu'il n'y a
+<emphasis>aucune</emphasis> vérification réalisée, aussi, il peut être
+facile de compromettre complètement l'infrastructure  &apt-secure;, si la
+commande est utilisée sans précaution.
+     </para>
+
+     </listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>update</option> (obsolète)</term>
+     <listitem>
+     <para>
+       Mettre à jour le trousseau de clés local avec le trousseau de clés de
+l'archive et y supprimer les clés qui ne sont plus valables. Le trousseau de
+clés de l'archive est fourni dans le paquet
+<literal>archive-keyring</literal> de la distribution, par exemple le paquet
+&keyring-package; dans &keyring-distro;.
+     </para>
+     <para>
+       Veuillez noter qu'une distribution n'a pas besoin et, en fait, ne devrait
+plus utiliser cette commande et plutôt charger directement les fichiers de
+trousseau de clés dans le répertoire
+<filename>/etc/apt/trusted.gpg.d/</filename> parce que cela évite une
+dépendance à <package>gnupg</package> et qu'il est plus facile pour les
+responsables et les utilisateurs de gérer les clés en ajoutant ou en
+retirant simplement des fichiers.
+     </para>
+     </listitem>
+     </varlistentry>
+     
+     <varlistentry><term><option>net-update</option></term>
+     <listitem>
+     <para>
+
+       Effectuer une mise à jour analogue à celle de la commande
+<command>update</command> mais avec récupération du trousseau de clés de
+l'archive depuis une URI et la valide avec une clé maître. Cette commande
+nécessite que &wget; soit installé, qu'APT soit construit pour le récupérer
+sur un serveur et enfin une clé maître pour effectuer la validation. Cette
+commande n'est pas gérée par APT dans Debian où <command>update</command>
+est utilisé à la place. Par contre, la version d'Ubuntu permet de
+l'utiliser.
+
+     </para>
+
+     </listitem>
+     </varlistentry>
+   </variablelist>
+</refsect1>
+
+ <refsect1><title>Options</title>
+<para>Veuillez noter que les options doivent être utilisées avant les commandes
+décrites dans la section suivante.</para>
+   <variablelist>
+      <varlistentry><term><option>--keyring</option> <option>&synopsis-param-filename;</option></term>
+      <listitem><para>Cette option permet d'indiquer le fichier porte-clés sur lequel la commande
+doit agir. Par défaut, une commande sera exécutée sur le fichier
+<filename>trusted.gpg</filename> ainsi que sur tous les fichiers du
+répertoire <filename>trusted.gpg.d</filename>. Le fichier
+<filename>trusted.gpg</filename> reste le fichier principal pour les clés
+donc, par exemple, les nouvelles clés y seront ajoutées.
+      </para></listitem>
+      </varlistentry>
+   </variablelist>
+ </refsect1>
+
+ <refsect1><title>Fichiers</title>
+   <variablelist>
+
+     &file-trustedgpg;
+
+   </variablelist>
+
+</refsect1>
+
+<refsect1><title>Voir aussi</title>
+<para>
+&apt-get;, &apt-secure;
+</para>
+</refsect1>
+
+ &manbugs;
+ &manauthor;
+
+ <refsect1><title>&translation-title;</title>
+   <para>&translation-holder;</para>
+   <para>&translation-english;</para>
+ </refsect1>
+</refentry>
+

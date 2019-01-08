@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>第3章 APT と wget の使用</title>
+    <meta name="generator" content="DocBook XSL Stylesheets V1.79.1"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="home" href="index.html" title="オフラインでの APT の使用法"/>
+    <link rel="up" href="index.html" title="オフラインでの APT の使用法"/>
+    <link rel="prev" href="ch2.html" title="第2章 両方のマシンでの APT の使用法"/>
+  </head>
+  <body>
+    <div class="navheader">
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">第3章 APT と wget の使用</th>
+        </tr>
+        <tr>
+          <td align="left"><a accesskey="p" href="ch2.html">戻る</a> </td>
+          <th width="60%" align="center"> </th>
+          <td align="right"> </td>
+        </tr>
+      </table>
+      <hr/>
+    </div>
+    <div class="chapter">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h1 class="title"><a id="ch3"/>第3章 APT と wget の使用</h1>
+          </div>
+        </div>
+      </div>
+      <div class="toc">
+        <p>
+          <strong>目次</strong>
+        </p>
+        <dl class="toc">
+          <dt>
+            <span class="section">
+              <a href="ch3.html#s3.1">3.1. 概要</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="section">
+              <a href="ch3.html#s3.2">3.2. 操作</a>
+            </span>
+          </dt>
+        </dl>
+      </div>
+      <div class="section">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h2 class="title"><a id="s3.1"/>3.1. 概要</h2>
+            </div>
+          </div>
+        </div>
+        <p>
+<span class="emphasis"><em>wget</em></span>
+は人気のある移植性の高いダウンロードツールで、ほぼあらゆるマシンで実行できます。上記の方法とは異なり、これには利用可能なパッケージの一覧を Debian
+マシンで用意しておく必要があります。
+</p>
+        <p>
+基本的な考え方は、リモートサイトからダウンロードしたアーカイブファイルだけを収録したディスクを作成するということです。これは apt-get に
+--print-uris オプションを使って行い、それから wget スクリプトを準備して実際にパッケージを取得します。
+</p>
+      </div>
+      <div class="section">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h2 class="title"><a id="s3.2"/>3.2. 操作</h2>
+            </div>
+          </div>
+        </div>
+        <p>
+前の技とは異なり、特別な設定ファイルを必要としません。標準的な APT コマンドを単純に使ってファイル一覧を生成します。
+</p>
+        <pre class="screen">
+ # apt-get dist-upgrade
+ [ 問い合わせには no を回答し、意図しない動作を起こすことのないように ]
+ # apt-get -qq --print-uris dist-upgrade &gt; uris
+ # awk '{print "wget -O " $2 " " $1}' &lt; uris &gt; /disc/wget-script
+</pre>
+        <p>
+dselect-upgrade を含め、ここでは dist-upgrade 以外の任意のコマンドを使えます。
+</p>
+        <p>
+/disc/wget-script ファイルには、必要なアーカイブを取得するために実行する wget
+コマンドの一覧を収録するようになっています。ディスク上の出力を減らすため、このスクリプトは現在のディレクトリをそのディスクのマウントポイントとして実行するようにしてください。
+</p>
+        <p>
+リモートマシンでは以下のようにします。
+</p>
+        <pre class="screen">
+  # cd /disc
+  # sh -x ./wget-script
+  [ お待ちください... ]
+</pre>
+        <p>
+アーカイブのダウンロードが終わってディスクが Debian マシンに返ってくるとインストールを続けられるようになります。
+</p>
+        <pre class="screen">
+  # apt-get -o dir::cache::archives="/disc/" dist-upgrade
+</pre>
+        <p>
+これで、ディスクにある取得済みのアーカイブを使用するようになります。
+</p>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr/>
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td align="left"><a accesskey="p" href="ch2.html">戻る</a> </td>
+          <td align="center"> </td>
+          <td align="right"> </td>
+        </tr>
+        <tr>
+          <td align="left" valign="top">第2章 両方のマシンでの APT の使用法 </td>
+          <td align="center">
+            <a accesskey="h" href="index.html">ホーム</a>
+          </td>
+          <td align="right" valign="top"> </td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

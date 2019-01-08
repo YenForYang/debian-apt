@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+  "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % aptent SYSTEM "apt.ent"> %aptent;
+<!ENTITY % aptverbatiment SYSTEM "apt-verbatim.ent"> %aptverbatiment;
+<!ENTITY % aptvendor SYSTEM "apt-vendor.ent"> %aptvendor;
+]>
+
+<refentry>
+
+ <refentryinfo>
+   <!-- The last update date -->
+&apt-author.team;
+   &apt-email;
+   &apt-product;
+   
+   <date>2018-12-03T00:00:00Z</date>
+ </refentryinfo>
+
+ <refmeta>
+   <refentrytitle>apt_auth.conf</refentrytitle>
+   <manvolnum>5</manvolnum>
+   <refmiscinfo class="manual">APT</refmiscinfo>
+ </refmeta>
+
+ 
+ <!-- Man page title -->
+<refnamediv>
+    <refname>apt_auth.conf</refname>
+    <refpurpose>Fichier de configuration de connexion pour les sources et les mandataires
+d'APT</refpurpose>
+ </refnamediv>
+
+<refsect1><title>Description</title>
+<para>Les fichiers de configuration d'APT tels que &sources-list; ou &apt-conf;
+doivent pouvoir être accessibles à tous ceux qui utilisent les outils d'APT
+sur le système pour accéder à toutes les informations relatives aux paquets
+telles que les paquets disponibles dans un dépôt. Les informations de
+connexion nécessaires pour se connecter à un mandataire ou pour télécharger
+des données à partir d'un dépôt, d'un autre côté, ne devraient pas toujours
+être accessibles à tous et ne peuvent donc pas être mises dans un fichier
+doté de droits de lecture universels.</para>
+
+<para>The APT auth.conf file <filename>/etc/apt/auth.conf</filename>, and .conf
+files inside <filename>/etc/apt/auth.conf.d</filename> can be used to store
+login information in a netrc-like format with restrictive file permissions.</para>
+</refsect1>
+
+<refsect1><title>format de type netrc</title>
+<para>Le format défini ici est analogue au format du fichier
+<filename>~/.netrc</filename> utilisé par
+<citerefentry><refentrytitle><command>ftp</command></refentrytitle><manvolnum>1</manvolnum></citerefentry>
+et des programmes similaires interagissant avec des serveurs. C'est un
+format simple basé sur les jetons qui reconnaît les jetons suivants ; les
+jetons inconnus seront ignorés. Les jetons peuvent être séparés par des
+espaces, des tabulations ou des changements de ligne.</para>
+
+<variablelist>
+<varlistentry>
+<term><literal>machine</literal> <replaceable>nom
+d'hôte</replaceable>[:<replaceable>port</replaceable>][/<replaceable>chemin</replaceable>]</term>
+<listitem><para>Les entrées sont trouvées en recherchant le jeton de
+<emphasis><literal>machine</literal></emphasis> correspondant au nom d'hôte
+de l'URI qui fournit les informations de connexion dont APT a besoin. Comme
+extension du format netrc, un numéro de port peut être défini. Si ce n'est
+pas le cas, le jeton est valide pour tous les ports. De la même manière, le
+chemin est facultatif et seulement nécessaire et utile si plusieurs dépôts,
+avec des informations de connexion différentes, sont hébergées sur le même
+serveur. Un jeton de machine avec un chemin correspond si le chemin dans
+l'URI débute par le chemin donné dans le jeton. Une fois qu'une
+correspondance est établie, les jetons suivants sont traités, s'arrêtant
+lorsque la fin du fichier est atteinte ou qu'un autre jeton de
+<emphasis><literal>machine</literal></emphasis> est rencontré.</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term><literal>login</literal> <replaceable>nom</replaceable></term>
+<listitem><para>L'identifiant à utiliser</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term><literal>password</literal> <replaceable>chaîne</replaceable></term>
+<listitem><para>Le mot de passe à utiliser.</para></listitem>
+</varlistentry>
+
+</variablelist>
+
+</refsect1>
+
+<refsect1><title>Exemple</title>
+<para>La fourniture d'informations de connexion pour un utilisateur nommé
+<literal>apt</literal> avec le mot de passe <literal>debian</literal> pour
+l'entrée de &sources-list; <literallayout>deb http://example.org/debian &debian-stable-codename; main</literallayout> peut
+se faire directement dans l'entrée : <literallayout>deb http://apt:debian@example.org/debian &debian-stable-codename; main</literallayout> Autrement, une entrée dans le fichier auth.conf telle que la
+suivante peut être utilisée : <literallayout>machine example.org
+login apt
+password debian</literallayout> Ou
+enfin, en une seule ligne : <literallayout>machine example.org login apt password debian</literallayout>. Si
+vous avez besoin d'être plus précis, tout le contenu de ces lignes
+s'appliquera également à l'entrée d'exemple : <literallayout>machine example.org/deb login apt password debian
+machine example.org/debian login apt password debian
+machine example.org/debian/ login apt password debian
+</literallayout> En revanche, aucune des lignes suivantes ne
+s'applique : <literallayout>machine example.org:80 login apt password debian
+machine example.org/deb/ login apt password debian
+machine example.org/ubuntu login apt password debian
+machine example.orga login apt password debian
+machine example.net login apt password debian
+</literallayout>
+</para>
+</refsect1>
+
+<refsect1><title>Remarque</title>
+<para>Une prise en charge basique de cette fonctionnalité est présente depuis la
+version 0.7.25, mais n'était pas documentée depuis des années. La
+documentation a été ajoutée dans la version 1.5, modifiant aussi légèrement
+l'implémentation. Pour une compatibilité ascendante maximale, vous devriez
+éviter d'avoir plusieurs jetons de <literal>machine</literal> avec le même
+nom d'hôte, mais si vous devez en avoir plusieurs, il faudrait qu'un chemin
+soit précisé dans le jeton de <literal>machine</literal>.</para>
+</refsect1>
+
+<refsect1>
+<title>Fichiers</title>
+  <variablelist>
+     <varlistentry><term><filename>/etc/apt/auth.conf</filename></term>
+	<listitem><para>Informations de connexion pour les sources et les mandataires d'APT dans un
+format de type netrc. Élément de configuration :
+<literal>Dir::Etc::netrc</literal>.</para></listitem>
+     </varlistentry>
+     <varlistentry><term><filename>/etc/apt/auth.conf.d/*.conf</filename></term>
+	<listitem><para>Login information for APT sources and proxies in a netrc-like format.
+Configuration Item: <literal>Dir::Etc::netrcparts</literal>.</para></listitem>
+     </varlistentry>
+  </variablelist>
+</refsect1>
+
+<refsect1>
+<title>Voir aussi</title>
+<para>&apt-conf; &sources-list;
+</para>
+</refsect1>
+
+ &manbugs;
+
+ <refsect1><title>&translation-title;</title>
+   <para>&translation-holder;</para>
+   <para>&translation-english;</para>
+ </refsect1>
+</refentry>

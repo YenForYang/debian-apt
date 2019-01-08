@@ -1,0 +1,430 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Rozdział 4. Interfejs</title>
+    <meta name="generator" content="DocBook XSL Stylesheets V1.79.1"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="home" href="index.html" title="Podręcznik użytkownika APT"/>
+    <link rel="up" href="index.html" title="Podręcznik użytkownika APT"/>
+    <link rel="prev" href="ch3.html" title="Rozdział 3. DSelect"/>
+  </head>
+  <body>
+    <div class="navheader">
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Rozdział 4. Interfejs</th>
+        </tr>
+        <tr>
+          <td align="left"><a accesskey="p" href="ch3.html">Poprzedni</a> </td>
+          <th width="60%" align="center"> </th>
+          <td align="right"> </td>
+        </tr>
+      </table>
+      <hr/>
+    </div>
+    <div class="chapter">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h1 class="title"><a id="ch4"/>Rozdział 4. Interfejs</h1>
+          </div>
+        </div>
+      </div>
+      <div class="toc">
+        <p>
+          <strong>Spis treści</strong>
+        </p>
+        <dl class="toc">
+          <dt>
+            <span class="section">
+              <a href="ch4.html#s4.1">4.1. Uruchamianie</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="section">
+              <a href="ch4.html#s4.2">4.2. Raport stanu</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="section">
+              <a href="ch4.html#s4.3">4.3. Wyświetlanie stanu przetwarzania</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="section">
+              <a href="ch4.html#s4.4">4.4. Dpkg</a>
+            </span>
+          </dt>
+        </dl>
+      </div>
+      <p>
+Metoda APT programu <span class="command"><strong>dselect</strong></span> i program
+<span class="command"><strong>apt-get</strong></span> dzielą wspólny interfejs. Jest to prosty system,
+który najpierw informuje użytkownika, co będzie zrobione, a następnie to
+robi. <a href="#ftn.idm106" class="footnote" id="idm106"><sup class="footnote">[2]</sup></a> Po wyświetleniu podsumowania
+informującego o tym, co będzie zrobione, APT wyświetla komunikaty dotyczące
+postępu przeprowadzanych operacji, tak żeby można było oszacować czas
+pozostały do ich zakończenia.
+</p>
+      <div class="section">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h2 class="title"><a id="s4.1"/>4.1. Uruchamianie</h2>
+            </div>
+          </div>
+        </div>
+        <p>
+Przed każdą operacją, z wyjątkiem update, APT przeprowadza pewne akcje
+przygotowujące wewnętrzny stan. Sprawdza również stan systemu. Te same
+operacje można przeprowadzić w dowolnej chwili, uruchamiając
+<code class="literal">apt-get check</code>.
+</p>
+        <pre class="screen">
+# apt-get check
+Czytanie list pakietów... Gotowe
+Budowanie drzewa zależności... Gotowe
+</pre>
+        <p>
+Pierwszą rzeczą, którą robi, jest wczytanie wszystkich plików pakietów do
+pamięci. APT używa  buforowania, tak żeby przyspieszyć tę operację przy
+następnym uruchomieniu. Jeśli nie znajdzie niektórych plików pakietów, to
+wypisze ostrzeżenie, a te pakiety zignoruje.
+</p>
+        <p>
+Końcową operacją jest szczegółowa analiza zależności w systemie. Sprawdzana
+jest każda zależność każdego pakietu zainstalowanego lub rozpakowanego. W
+razie wykrycia problemów z zależnościami <span class="command"><strong>apt-get</strong></span> wypisze
+odpowiedni komunikat i odmówi dalszego działania.
+</p>
+        <pre class="screen">
+# apt-get check
+Czytanie list pakietów... Gotowe
+Budowanie drzewa zależności... Gotowe
+Należy uruchomić "apt --fix-broken install", aby je naprawić.
+Następujące pakiety mają niespełnione zależności:
+  9fonts: Wymaga: xlib6g ale nie jest zainstalowany
+  uucp: Wymaga: mailx ale nie jest zainstalowany
+  blast: Wymaga: xlib6g (&gt;= 3.3-5) ale nie jest zainstalowany
+  adduser: Wymaga: perl-base ale nie jest zainstalowany
+  aumix: Wymaga: libgpmg1 but ale nie jest zainstalowany
+  debiandoc-sgml: Wymaga: sgml-base ale nie jest zainstalowany
+  bash-builtins: Wymaga: bash (&gt;= 2.01) but 2.0-3 is installed
+  cthugha: Wymaga: svgalibg1 but it is not installed
+           Wymaga: xlib6g (&gt;= 3.3-5) ale nie jest zainstalowany
+  libreadlineg2: Jest w konflikcie z: libreadline2 (&lt;&lt; 2.1-2.1)
+</pre>
+        <p>
+Powyższy przykład przedstawia system mający wiele problemów, włączając to
+poważny problem z libreadlineg2. Każdy pakiet mający niespełnione zależności
+jest wypisywany w osobnej linii razem z niespełnionymi zależnościami. Podane
+jest również krótkie wyjaśnienie dotyczące przyczyny problemu.
+</p>
+        <p>
+Są dwie przyczyny, z których powodu system może być zepsuty w powyższy
+sposób. Pierwszą jest to, że <span class="command"><strong>dpkg</strong></span> podczas aktualizacji
+systemu nie zauważył jakiejś subtelnej relacji między pakietami<a href="#ftn.idm123" class="footnote" id="idm123"><sup class="footnote">[3]</sup></a>. Drugą przyczyną jest wystąpienie błędu w czasie
+instalowania pakietu. W takim przypadku pakiet może być rozpakowany, mimo że
+pakiety od niego zależące nie są zainstalowane.
+</p>
+        <p>
+Druga przyczyna jest o wiele mniej poważna niż pierwsza, ponieważ APT
+wymusza pewne więzy integralności dotyczące kolejności instalowania
+pakietów. W obu przypadkach przekazanie programowi
+<span class="command"><strong>apt-get</strong></span> opcji <code class="literal">-f</code> wymusi na APT
+znalezienie rozwiązania umożliwiającego mu kontynuowanie działania. Metoda
+APT programu <span class="command"><strong>dselect</strong></span> zawsze przekazuje opcję
+<code class="literal">-f</code>, aby móc kontynuować po wystąpieniu błędu w skryptach
+opiekunów pakietów.
+</p>
+        <p>
+Jednak gdy opcja <code class="literal">-f</code> jest używana do poprawienia
+zależności w poważnie uszkodzonym systemie (pierwsza z opisanych wyżej
+przyczyn), możliwe jest że albo od razu zwróci błąd, albo nie powiedzie się
+sekwencja instalowania pakietów. W obu przypadkach należy poprawić
+zależności ręcznie, używając do tego dpkg (być może przekazując mu opcje
+wymuszające "--force-..."), w takim stopniu, aby umożliwić działanie
+systemowi APT.
+</p>
+      </div>
+      <div class="section">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h2 class="title"><a id="s4.2"/>4.2. Raport stanu</h2>
+            </div>
+          </div>
+        </div>
+        <p>
+Przed rozpoczęciem przetwarzania <span class="command"><strong>apt-get</strong></span> wyświetli raport
+zawierający informacje o tym, co będzie zrobione. W ogólności raport ten
+zależy od typu wykonywanej operacji, jednakże występuje w nim kilka
+elementów wspólnych dla wszystkich typów. We wszystkich wypadkach
+wyświetlane są informacje o końcowym stanie, brana jest pod uwagę opcja
+<code class="literal">-f</code>, a także wszystkie istotne działania wykonywanego
+polecenia.
+</p>
+        <div class="section">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h3 class="title"><a id="s4.2.1"/>4.2.1. Lista dodatkowych pakietów</h3>
+              </div>
+            </div>
+          </div>
+          <pre class="screen">
+Zostaną zainstalowane następujące dodatkowe pakiety:
+  libdbd-mysql-perl xlib6 zlib1 xzx libreadline2 libdbd-msql-perl
+  mailpgp xdpkg fileutils pinepgp zlib1g xlib6g perl-base
+  bin86 libgdbm1 libgdbmg1 quake-lib gmp2 bcc xbuffy
+  squake pgp-i python-base debmake ldso perl libreadlineg2
+  ssh
+</pre>
+          <p>
+Lista dodatkowych pakietów wyświetla wszystkie pakiety, które będą
+zainstalowane lub zaktualizowane oprócz tych wymienionych w linii
+poleceń. Jest generowana tylko dla polecenia
+<code class="literal">install</code>. Wymienione pakiety są najczęściej wynikiem
+automatycznej instalacji.
+</p>
+        </div>
+        <div class="section">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h3 class="title"><a id="s4.2.2"/>4.2.2. Pakiety przeznaczone do usunięcia</h3>
+              </div>
+            </div>
+          </div>
+          <pre class="screen">
+Następujące pakiety zostaną USUNIĘTE:
+  xlib6-dev xpat2 tk40-dev xkeycaps xbattle xonix
+  xdaliclock tk40 tk41 xforms0.86 ghostview xloadimage xcolorsel
+  xadmin xboard perl-debug tkined xtetris libreadline2-dev perl-suid
+  nas xpilot xfig
+</pre>
+          <p>
+Lista pakietów przeznaczonych do usunięcia wyświetla wszystkie pakiety,
+które zostaną usunięte z systemu. Może być pokazana dla każdej operacji i
+powinna być szczegółowo przeanalizowana, aby zapewnić, że żaden istotny
+pakiet nie będzie usunięty. W szczególności opcja <code class="literal">-f</code> może
+wygenerować sporo pakietów do usunięcia, także w przypadku jej użycia należy
+szczególnie dokładnie przeanalizować wyświetlany raport. Lista może zawierać
+pakiety usuwane z powodu ich tylko częściowego zainstalowania, wynikającego
+być może z przerwania wcześniejszej instalacji.
+</p>
+        </div>
+        <div class="section">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h3 class="title"><a id="s4.2.3"/>4.2.3. Lista nowych pakietów</h3>
+              </div>
+            </div>
+          </div>
+          <pre class="screen">
+Zostaną zainstalowane następujące NOWE pakiety:
+  zlib1g xlib6g perl-base libgdbmg1 quake-lib gmp2 pgp-i python-base
+</pre>
+          <p>
+Lista nowych pakietów to proste przypomnienie o tym, co się stanie. Wypisane
+pakiety nie są obecnie zainstalowane w systemie, ale będą, kiedy APT skończy
+działanie.
+</p>
+        </div>
+        <div class="section">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h3 class="title"><a id="s4.2.4"/>4.2.4. Lista zatrzymanych pakietów</h3>
+              </div>
+            </div>
+          </div>
+          <pre class="screen">
+Następujące pakiety zostały zatrzymane:
+  compface man-db tetex-base msql libpaper svgalib1
+  gs snmp arena lynx xpat2 groff xscreensaver
+</pre>
+          <p>
+Jeśli aktualizowany jest cały system, to jest możliwe, że nowe wersje
+pakietów nie będą mogły być zainstalowane, ponieważ wymagają nowych pakietów
+lub są w konflikcie z już zainstalowanymi pakietami. W takim wypadku pakiet
+pojawi się na liście pakietów zatrzymanych. Najlepszym sposobem na
+zainstalowanie takich pakietów jest użycie <code class="literal">apt-get
+install</code> lub rozwiązanie problemów z zależnościami za pomocą
+programu <span class="command"><strong>dselect</strong></span>.
+</p>
+        </div>
+        <div class="section">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h3 class="title"><a id="s4.2.5"/>4.2.5. Ostrzeżenie o zmianie zatrzymanych pakietów</h3>
+              </div>
+            </div>
+          </div>
+          <pre class="screen">
+Zostaną zmienione następujące zatrzymane pakiety:
+  cvs
+</pre>
+          <p>
+Czasami można poprosić APT o zainstalowanie pakietu, który jest
+zatrzymany. W takim przypadku wypisywane jest ostrzeżenie o zmianie
+zatrzymanego pakietu. Może się to zdarzyć tylko podczas dist-upgrade lub
+install.
+</p>
+        </div>
+        <div class="section">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h3 class="title"><a id="s4.2.6"/>4.2.6. Podsumowanie</h3>
+              </div>
+            </div>
+          </div>
+          <p>
+APT zakończy raport podsumowaniem wszystkich zmian, które przeprowadzi.
+</p>
+          <pre class="screen">
+206 aktualizowanych, 8 nowo instalowanych, 25 usuwanych i 51 nieaktualizowanych.
+12 nie w pełni zainstalowanych lub usuniętych.
+Konieczne pobranie 65.7M/66.7M archiwów. Po rozpakowaniu zostanie użyte 26.5M.
+</pre>
+          <p>
+Pierwsza linia podsumowania jest uproszczoną wersją powyższych list i
+zawiera liczbę aktualizacji  - to jest pakietów już zainstalowanych, których
+nowsze wersje są dostępne. W drugiej linii wyświetlono liczbę nie do końca
+skonfigurowanych pakietów, prawdopodobnie w wyniku przerwania poprzedniej
+instalacji. Ostatnia linia zawiera dane dotyczące miejsca na dysku. Pierwsza
+para liczb odnosi się do rozmiaru plików archiwum: pierwsza liczba oznacza
+liczbę bajtów, które muszą zostać pobrane ze zdalnych serwerów, a druga -
+całkowity rozmiar wszystkich żądanych archiwów. Kolejna liczba oznacza
+różnicę rozmiarów pomiędzy obecnie zainstalowanymi pakietami, a nowo
+instalowanymi pakietami. W przybliżeniu odpowiada przestrzeni dysku, która
+będzie zajęta w /usr po zakończeniu instalacji. Wartość ta może wskazywać na
+zwolnienie miejsca na dysku, jeśli usuwana jest duża liczba pakietów.
+</p>
+          <p>
+Używając opcji -u, można wygenerować raport pokazujący pakiety przeznaczone
+do aktualizacji, podobny do tego pokazanego w poprzednim przykładzie.
+</p>
+        </div>
+      </div>
+      <div class="section">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h2 class="title"><a id="s4.3"/>4.3. Wyświetlanie stanu przetwarzania</h2>
+            </div>
+          </div>
+        </div>
+        <p>
+Podczas pobierania archiwów i plików pakietów APT wyświetla serię
+komunikatów o stanie.
+</p>
+        <pre class="screen">
+# apt-get update
+Pob:1 http://ftp.de.debian.org/debian-non-US/ stable/non-US/ Packages
+Pob:2 http://llug.sep.bnl.gov/debian/ testing/contrib Packages
+Traf http://llug.sep.bnl.gov/debian/ testing/main Packages
+Pob:4 http://ftp.de.debian.org/debian-non-US/ unstable/binary-i386/ Packages
+Pob:5 http://llug.sep.bnl.gov/debian/ testing/non-free Packages
+11% [5 testing/non-free `Oczekiwane na nagłówki' 0/32.1k 0%] 2203b/s 1m52s
+</pre>
+        <p>
+Linie zaczynające się od <span class="emphasis"><em>Pob:</em></span> są wypisywane, kiedy APT
+zaczyna pobierać plik, a ostatnia linia oznacza postęp pobierania. Pierwsza
+wartość podana w procentach określa całkowity procent pobierania wszystkich
+plików. Niestety rozmiar plików Package nie jest znany, tak więc
+<code class="literal">apt-get update</code> estymuje procent wykonanego pobierania, co
+powoduje pewne nieścisłości.
+</p>
+        <p>
+Następna sekcja linii statusu powtarza się dla każdego wątku pobierania,
+oznacza przeprowadzanie operacji i podaje kilka użytecznych informacji na
+temat tego, co się dzieje. Czasem sekcja ta zawiera komunikat
+<span class="emphasis"><em>Tworzenie procesu potomnego</em></span>, co oznacza, że system
+operacyjny ładuje moduł pobierania. Pierwszym słowem po znaku "[" jest
+liczba pobrań, dokładnie taka jaka jest pokazana liczba linii historii
+pobrań. Następnie w skróconej formie wyświetlana jest nazwa pobieranego
+obiektu. W przypadku archiwów nazwa ta będzie zawierać nazwę pobieranego
+pakietu.
+</p>
+        <p>
+W pojedynczych cudzysłowach podawany jest komunikat wskazujący na postęp
+tworzenia połączenia pobierania danych. Zazwyczaj postęp ten jest sekwencją
+zdarzeń od <span class="emphasis"><em>Podłączanie</em></span> przez <span class="emphasis"><em>Oczekiwanie na
+nagłówki</em></span> do <span class="emphasis"><em>Pobieranie</em></span> lub
+<span class="emphasis"><em>Wznawianie</em></span>. Końcową wartością jest liczba bajtów
+pobranych ze zdalnego serwera. Kiedy tylko pobieranie się rozpocznie,
+wartość ta jest wyświetlana jw formacie typu <code class="literal">102/10.2k</code>,
+co oznacza, że pobrano 102 bajty, a oczekuje się jeszcze pobrania 10.2
+kilobajtów. Aby zaoszczędzić miejsce, całkowity rozmiar jest zawsze
+wyświetlany jako w postaci 4-znakowej. Po rozmiarze następuje procentowy
+wskaźnik postępu pobierania danego pliku. Przedostatnim elementem jest
+bieżąca średnia prędkość pobierania, która jest aktualizowane co każde 5
+sekund i odzwierciedla tempo pobierania w tym okresie. W końcu wyświetlany
+jest estymowany czas pobierania, regularnie aktualizowany i
+odzwierciedlający czas pozostały do zakończenia pobierania przy założeniu
+utrzymania się pokazanego tempa pobierania.
+</p>
+        <p>
+Linia stanu jest aktualizowana co każde pół sekundy, aby na bieżąco
+informować użytkownika o postępie pobierania, podczas gdy linie "Pob:" są
+przesuwane w dół, gdy tylko zacznie się pobieranie nowego pliku. Ponieważ
+linia stanu jest ciągle zmieniana, wyjście programu nie jest odpowiednie do
+przekierowania do pliku. Aby usunąć linie stanu, należy użyć opcji
+<code class="literal">-q</code>.
+</p>
+      </div>
+      <div class="section">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h2 class="title"><a id="s4.4"/>4.4. Dpkg</h2>
+            </div>
+          </div>
+        </div>
+        <p>
+APT używa programu <span class="command"><strong>dpkg</strong></span> do instalowania archiwów i
+przełączy się do interfejsu <span class="command"><strong>dpkg</strong></span>, gdy tylko zakończy
+pobieranie plików. <span class="command"><strong>dpkg</strong></span> może również zadawać pytania
+podczas przetwarzania pakietów, a same pakiety także mogą zadawać
+pytania. Każde pytanie zazwyczaj jest poprzedzone opisem, a same pytania są
+zbyt zróżnicowane, by je tutaj opisać.
+</p>
+      </div>
+      <div class="footnotes">
+        <br/>
+        <hr/>
+        <div id="ftn.idm106" class="footnote">
+          <p><a href="#idm106" class="para"><sup class="para">[2] </sup></a> Metoda programu <span class="command"><strong>dselect</strong></span> jest tak naprawdę zbiorem
+skryptów wywołujących <span class="command"><strong>apt-get</strong></span>. Metoda ta ma jednakże
+większą funkcjonalność niż sam program <span class="command"><strong>apt-get</strong></span>. </p>
+        </div>
+        <div id="ftn.idm123" class="footnote">
+          <p><a href="#idm123" class="para"><sup class="para">[3] </sup></a> APT rozważa wszystkie znane zależności i próbuje nie dopuścić do zepsucia
+pakietów. </p>
+        </div>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr/>
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td align="left"><a accesskey="p" href="ch3.html">Poprzedni</a> </td>
+          <td align="center"> </td>
+          <td align="right"> </td>
+        </tr>
+        <tr>
+          <td align="left" valign="top">Rozdział 3. DSelect </td>
+          <td align="center">
+            <a accesskey="h" href="index.html">Spis treści</a>
+          </td>
+          <td align="right" valign="top"> </td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

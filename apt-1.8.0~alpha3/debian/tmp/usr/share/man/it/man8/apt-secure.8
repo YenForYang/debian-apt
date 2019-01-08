@@ -1,0 +1,259 @@
+'\" t
+.\"     Title: apt-secure
+.\"    Author: Jason Gunthorpe
+.\" Generator: DocBook XSL Stylesheets v1.79.1 <http://docbook.sf.net/>
+.\"      Date: 06\ \&agosto\ \&2016
+.\"    Manual: APT
+.\"    Source: APT 1.8.0~alpha3
+.\"  Language: Italian
+.\"
+.TH "APT\-SECURE" "8" "06\ \&agosto\ \&2016" "APT 1.8.0~alpha3" "APT"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NOME"
+apt-secure \- supporto per l\*(Aqautenticazione degli archivi per APT
+.SH "DESCRIZIONE"
+.PP
+Starting with version 0\&.6,
+\fBAPT\fR
+contains code that does signature checking of the Release file for all repositories\&. This ensures that data like packages in the archive can\*(Aqt be modified by people who have no access to the Release file signing key\&. Starting with version 1\&.1
+\fBAPT\fR
+requires repositories to provide recent authentication information for unimpeded usage of the repository\&. Since version 1\&.5 changes in the information contained in the Release file about the repository need to be confirmed before APT continues to apply updates from this repository\&.
+.PP
+Nota: tutti i front\-end di gestione dei pacchetti basati su APT, come
+\fBapt-get\fR(8),
+\fBaptitude\fR(8)
+e
+\fBsynaptic\fR(8), supportano questa funzionalit\(`a di autenticazione, perci\(`o questa pagina di manuale usa
+APT
+per fare riferimento a tutti loro solo per ragioni di semplicit\(`a\&.
+.SH "UNSIGNED REPOSITORIES"
+.PP
+Se un archivio ha un file Release non firmato o non ha per nulla un file Release, tutte le versioni attuali di APT si rifiutano in modo predefinito di scaricare dati da esso durante le operazioni di
+\fBupdate\fR, e i frontend come
+\fBapt\-get\fR, anche se forzati a scaricare, richiedono una conferma esplicita se una richiesta di installazione include un pacchetto da un archivio non autenticato di questo tipo\&.
+.PP
+Si possono forzare tutti i client APT a dare solo avvertimenti impostando l\*(Aqopzione di configurazione
+\fBAcquire::AllowInsecureRepositories\fR
+a
+true\&. \(`E anche possibile abilitare singoli repository non sicuri attraverso l\*(Aqopzione per
+\fBsources.list\fR(5)
+allow\-insecure=yes\&. Notare che l\*(Aquso di repository non sicuri \(`e fortemente sconsigliato e tutte le opzioni per forzare apt a continuare a supportarli verranno da ultimo rimosse\&. Gli utenti hanno a disposizione anche l\*(Aqopzione
+\fBTrusted\fR
+per disabilitare anche gli avvertimenti, ma assicurarsi di avere compreso le implicazioni, come spiegato in dettaglio in
+\fBsources.list\fR(5)\&.
+.PP
+Un repository che in precedenza era autenticato ma che perde il proprio stato in un\*(Aqoperazione di
+\fBupdate\fR
+genera un errore in tutti i client APT indipendentemente dall\*(Aqopzione per permettere o proibire l\*(Aquso di repository non sicuri\&. L\*(Aqerrore pu\(`o essere scavalcato impostando in aggiunta
+\fBAcquire::AllowDowngradeToInsecureRepositories\fR
+a
+true
+o, per repository individuali, con l\*(Aqopzione
+allow\-downgrade\-to\-insecure=yes
+per
+\fBsources.list\fR(5)\&.
+.SH "SIGNED REPOSITORIES"
+.PP
+La catena di fiducia da un archivio APT all\*(Aqutente finale \(`e composta di vari passaggi intermedi\&.
+\fBapt\-secure\fR
+\(`e l\*(Aqultimo della catena; il fatto che si abbia fiducia in un archivio non significa che si abbia fiducia che i suoi pacchetti non contengano codice malevolo, ma significa che si ha fiducia nel manutentore dell\*(Aqarchivio\&. \(`E responsabilit\(`a del manutentore dell\*(Aqarchivio assicurare che sia preservata l\*(Aqintegrit\(`a dell\*(Aqarchivio\&.
+.PP
+apt\-secure non controlla le firme a livello di pacchetto\&. Se si desiderano strumenti per farlo, si possono guardare
+\fBdebsig\-verify\fR
+e
+\fBdebsign\fR
+(forniti rispettivamente nei pacchetti debsig\-verify e devscripts)\&.
+.PP
+La catena di fiducia in Debian ha inizio (ad esempio) quando un manutentore carica un nuovo pacchetto o una nuova versione di un pacchetto nell\*(Aqarchivio Debian\&. Per poter diventare effettivo, questo caricamento deve essere firmato con una chiave contenuta in uno dei portachiavi dei manutentori Debian (disponibili nel pacchetto debian\-keyring)\&. Le chiavi dei manutentori sono firmate da altri manutentori seguendo delle procedure prestabilite, per assicurare l\*(Aqidentit\(`a del proprietario della chiave\&. Procedure simili esistono in tutte le distribuzioni basate su Debian\&.
+.PP
+Una volta che il pacchetto caricato \(`e verificato e incluso nell\*(Aqarchivio, la firma del manutentore viene rimossa e i codici di controllo del pacchetto vengono calcolati e messi nel file Packages\&. Vengono quindi calcolati i codici di controllo di tutti i file Packages e vengono messi nel file Release\&. Il file Release viene poi firmato con la chiave dell\*(Aqarchivio per questo rilascio di Debian e viene distribuito insieme ai pacchetti e ai file Packages nei mirror Debian\&. Le chiavi sono nel portachiavi degli archivi Debian, disponibile nel pacchetto
+debian\-archive\-keyring\&.
+.PP
+Gli utenti finali possono controllare la firma del file Release, estrarre da esso il codice di controllo di un pacchetto e confrontarlo con il codice di controllo del pacchetto che hanno scaricato a mano, oppure possono affidarsi ad APT che lo fa automaticamente\&.
+.PP
+Notare che questo \(`e diverso dal controllare le firme per ciascun pacchetto\&. \(`E progettato per prevenire due possibili attacchi:
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Attacchi di rete \(Foman in the middle\(Fc\&. Senza il controllo delle firme, soggetti malevoli possono introdursi nel processo di scaricamento dei pacchetti e fornire software pericoloso controllando un elemento di rete (router, switch, ecc\&.) oppure ridirigendo il traffico ad un server cattivo (attraverso attacchi di falsificazione di DNS e ARP)\&.
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Compromissione della rete dei mirror\&. Senza il controllo delle firme, soggetti malevoli possono compromettere un host mirror e modificare i file su di esso per propagare il software pericoloso a tutti gli utenti che scaricano i pacchetti da quell\*(Aqhost\&.
+.RE
+.PP
+Tuttavia non difende dalle compromissioni del server principale stesso (che firma i pacchetti) o dalla compromissione della chiave usata per firmare i file Release\&. In ogni caso, questo meccanismo pu\(`o complementare le firme a livello di singolo pacchetto\&.
+.SH "INFORMATION CHANGES"
+.PP
+A Release file contains beside the checksums for the files in the repository also general information about the repository like the origin, codename or version number of the release\&.
+.PP
+This information is shown in various places so a repository owner should always ensure correctness\&. Further more user configuration like
+\fBapt_preferences\fR(5)
+can depend and make use of this information\&. Since version 1\&.5 the user must therefore explicitly confirm changes to signal that the user is sufficiently prepared e\&.g\&. for the new major release of the distribution shipped in the repository (as e\&.g\&. indicated by the codename)\&.
+.SH "CONFIGURAZIONE UTENTE"
+.PP
+\fBapt\-key\fR
+\(`e il programma che gestisce l\*(Aqelenco delle chiavi usate da APT per fidarsi dei repository\&. Pu\(`o essere usato per aggiungere o rimuovere chiavi, oltre che per elencare le chiavi fidate\&. \(`E possibile limitare quali chiavi possono firmare determinati archivi usando
+\fBSigned\-By\fR
+in
+\fBsources.list\fR(5)\&.
+.PP
+Notare che un\*(Aqinstallazione predefinita contiene gi\(`a tutte le chiavi per acquisire in modo sicuro i pacchetti dai repository predefiniti, perci\(`o le modifiche fatte a mano con
+\fBapt\-key\fR
+sono necessarie solo se vengono aggiunti repository di terze parti\&.
+.PP
+Per aggiungere una nuova chiave, \(`e necessario prima scaricarla (ci si dovrebbe assicurare di usare un canale di comunicazione fidato quando la si recupera), aggiungerla con
+\fBapt\-key\fR
+e poi eseguire
+\fBapt\-get update\fR, in modo che apt possa scaricare e verificare i file
+InRelease
+o
+Release\&.gpg
+dagli archivi che sono configurati\&.
+.SH "REPOSITORY CONFIGURATION"
+.PP
+Se si desiderano fornire firme per un archivio di cui si \(`e il manutentore, si deve:
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+\fICreare un file Release di livello pi\(`u alto\fR, se non esiste gi\(`a\&. Lo si pu\(`o fare eseguendo
+\fBapt\-ftparchive release\fR
+(fornito in apt\-utils)\&.
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+\fIFirmarlo\fR\&. Lo si pu\(`o fare eseguendo
+\fBgpg \-\-clearsign \-o InRelease Release\fR
+e
+\fBgpg \-abs \-o Release\&.gpg Release\fR\&.
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+\fIPubblicare l\*(Aqimpronta digitale della chiave\fR, in modo che i propri utenti sappiano quale chiave devono importare per poter autenticare i file nell\*(Aqarchivio\&. \(`E meglio distribuire la propria chiave in un proprio pacchetto portachiavi, come Debian fa con
+debian\-archive\-keyring
+per essere in grado in futuro di distribuire aggiornamenti e transizioni di chiave in modo automatico\&.
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+\fIFornire istruzioni su come aggiungere il proprio archivio e la propria chiave\fR\&. Se i propri utenti non possono acquisire la chiave in maniera sicura, la catena di fiducia descritta sopra viene interrotta\&. Il modo in cui si pu\(`o aiutare gli utenti ad aggiungere la propria chiave dipende dal proprio archivio e dalla propria utenza e va da avere un proprio pacchetto portachiavi incluso in un altro archivio che gli utenti hanno gi\(`a configurato (come i repository predefiniti della loro distribuzione) a sfruttare la rete di fiducia\&.
+.RE
+.PP
+Ogni volta che i contenuti dell\*(Aqarchivio cambiano (sono aggiunti o rimossi nuovi pacchetti), il manutentore dell\*(Aqarchivio deve compiere nuovamente i primi due passi descritti sopra\&.
+.SH "VEDERE ANCHE"
+.PP
+\fBapt.conf\fR(5),
+\fBapt-get\fR(8),
+\fBsources.list\fR(5),
+\fBapt-key\fR(8),
+\fBapt-ftparchive\fR(1),
+\fBdebsign\fR(1),
+\fBdebsig-verify\fR(1),
+\fBgpg\fR(1)
+.PP
+Per maggiori informazioni sui concetti alla base di questo sistema, si pu\(`o leggere il capitolo
+\m[blue]\fBDebian Security Infrastructure\fR\m[]\&\s-2\u[1]\d\s+2
+del manuale Securing Debian (disponibile anche nel pacchetto harden\-doc) e il
+\m[blue]\fBStrong Distribution HOWTO\fR\m[]\&\s-2\u[2]\d\s+2
+di V\&. Alex Brennen\&.
+.SH "BUG"
+.PP
+\m[blue]\fBPagina dei bug di APT\fR\m[]\&\s-2\u[3]\d\s+2\&. Se si desidera segnalare un bug in APT, vedere
+/usr/share/doc/debian/bug\-reporting\&.txt
+o il comando
+\fBreportbug\fR(1)\&.
+.SH "AUTORE"
+.PP
+APT \(`e stato scritto dal Team APT
+<apt@packages\&.debian\&.org>\&.
+.SH "AUTORI DELLA PAGINA DI MANUALE"
+.PP
+Questa pagina di manuale \(`e basata sul lavoro di Javier Fern\('andez\-Sanguino Pe\(~na, Isaac Jones, Colin Walters, Florian Weimer e Michael Vogt\&.
+.SH "TRADUZIONE"
+.PP
+Traduzione in italiano a cura del Team italiano di localizzazione di Debian
+<debian\-l10n\-italian@lists\&.debian\&.org>\&. In particolare hanno contribuito Eugenia Franzoni (2000), Hugh Hartmann (2000\-2012), Gabriele Stilli (2012), Beatrice Torracca (2012, 2014, 2015)\&.
+.PP
+Notare che questa versione tradotta del documento pu\(`o contenere parti non tradotte\&. Ci\(`o \(`e voluto, per evitare di perdere contenuti quando la traduzione non \(`e aggiornata rispetto all\*(Aqoriginale\&.
+.SH "AUTORI"
+.PP
+\fBJason Gunthorpe\fR
+.RS 4
+.RE
+.PP
+\fBTeam APT\fR
+.RS 4
+.RE
+.SH "NOTE"
+.IP " 1." 4
+Debian Security Infrastructure
+.RS 4
+\%https://www.debian.org/doc/manuals/securing-debian-howto/ch7
+.RE
+.IP " 2." 4
+Strong Distribution HOWTO
+.RS 4
+\%http://www.cryptnet.net/fdp/crypto/strong_distro.html
+.RE
+.IP " 3." 4
+Pagina dei bug di APT
+.RS 4
+\%http://bugs.debian.org/src:apt
+.RE

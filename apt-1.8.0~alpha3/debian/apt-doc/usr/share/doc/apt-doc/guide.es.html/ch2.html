@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Capítulo 2. apt-get</title>
+    <meta name="generator" content="DocBook XSL Stylesheets V1.79.1"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="home" href="index.html" title="Guía de usuario de APT"/>
+    <link rel="up" href="index.html" title="Guía de usuario de APT"/>
+    <link rel="prev" href="ch1.html" title="Capítulo 1. General"/>
+    <link rel="next" href="ch3.html" title="Capítulo 3. DSelect"/>
+  </head>
+  <body>
+    <div class="navheader">
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Capítulo 2. apt-get</th>
+        </tr>
+        <tr>
+          <td align="left"><a accesskey="p" href="ch1.html">Anterior</a> </td>
+          <th width="60%" align="center"> </th>
+          <td align="right"> <a accesskey="n" href="ch3.html">Siguiente</a></td>
+        </tr>
+      </table>
+      <hr/>
+    </div>
+    <div class="chapter">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h1 class="title"><a id="ch2"/>Capítulo 2. apt-get</h1>
+          </div>
+        </div>
+      </div>
+      <p>
+<span class="command"><strong>apt-get</strong></span> ofrece una forma sencilla de instalar paquetes
+desde la línea de órdenes. A diferencia de <span class="command"><strong>dpkg</strong></span>,
+<span class="command"><strong>apt-get</strong></span> no intenta comprender los ficheros «.deb», sino
+que funciona con el nombre real del paquete y sólo puede instalar ficheros
+«.deb» desde una <span class="emphasis"><em>fuente</em></span>.
+</p>
+      <p>
+La primera <a href="#ftn.idm41" class="footnote" id="idm41"><sup class="footnote">[1]</sup></a> cosa que debería hacer
+antes de usar <span class="command"><strong>apt-get</strong></span> es obtener las listas de paquetes
+desde las <span class="emphasis"><em>fuentes</em></span> para así conocer los paquetes
+disponibles. Puede hacer esto mediante <code class="literal">apt-get
+update</code>. Por ejemplo,
+</p>
+      <pre class="screen">
+# apt-get update
+Des http://ftp.de.debian.org/debian-non-US/ stable/binary-i386/ Packages
+Des http://llug.sep.bnl.gov/debian/ testing/contrib Packages
+Leyendo lista de paquetes... Hecho
+Creando árbol de dependencias... Hecho
+</pre>
+      <p>
+Puede usar varias órdenes después de actualizar:
+</p>
+      <div class="variablelist">
+        <dl class="variablelist">
+          <dt>
+            <span class="term">upgrade</span>
+          </dt>
+          <dd>
+            <p>
+«upgrade» intentará actualizar con cuidado todo el sistema. «upgrade» nunca
+intentará instalar un paquete nuevo o eliminar un paquete existente, y en
+ningún caso actualizará un paquete que pueda causar un problema de
+dependencias rotas a otro paquete. «upgrade» mostrará todos los paquetes que
+no pudo actualizar, lo cual generalmente significa que dependen de paquetes
+nuevos o que entran en conflicto con otro paquete. Puede usar
+<span class="command"><strong>dselect</strong></span> o <code class="literal">apt-get install</code> para forzar
+la instalación de tales paquetes.
+</p>
+          </dd>
+          <dt>
+            <span class="term">install</span>
+          </dt>
+          <dd>
+            <p>
+«install» se usa para instalar paquetes por nombre. El paquete se obtendrá e
+instalará automáticamente. Es de utilidad si ya conoce el nombre del paquete
+a instalar y no desea ejecutar una interfaz gráfica para
+seleccionarlo. Puede introducir cualquier número de paquetes para su
+instalación y todos se obtendrán. La instalación automática intenta resolver
+problemas de dependencias con los paquetes listados, y mostrará un resumen
+al pedir una confirmación en caso de modificar cualquiera de los argumentos
+introducidos.
+</p>
+          </dd>
+          <dt>
+            <span class="term">dist-upgrade</span>
+          </dt>
+          <dd>
+            <p>
+«dist-upgrade» es una actualizador completo diseñado para simplificar la
+actualización entre publicaciones de Debian. Utiliza un sofisticado
+algoritmo para diseñar el mejor conjunto de paquetes a instalar, actualizar
+y eliminar para así obtener cuanto sea posible de la última
+publicación. Puede que en algunas situaciones desee usar «dist-upgrade» en
+lugar de pasar tiempo resolviendo dependencias con
+<span class="command"><strong>dselect</strong></span>. Puede usar <span class="command"><strong>dselect</strong></span> para
+instalar cualquier paquete que se haya quedado atrás.
+</p>
+            <p>
+Es importante revisar lo que «dist-upgrade» planea hacer, ya que sus
+decisiones a veces pueden resultar sorprendentes.
+</p>
+          </dd>
+        </dl>
+      </div>
+      <p>
+<span class="command"><strong>apt-get</strong></span> ofrece varias opciones de línea de órdenes
+detalladas en su página de manual,
+<span class="citerefentry"><span class="refentrytitle">apt-get</span>(8)</span>.
+La opción más útil es <code class="literal">-d</code>, que no instala los ficheros
+obtenidos. Puede que no desee instalar los paquetes de inicio si el sistema
+se tiene que descargar un gran número de éstos, en caso de que algo vaya
+mal. Cuando usa <code class="literal">-d</code> puede instalar los ficheros
+descargados simplemente ejecutando la orden que provocó su descarga, sin
+<code class="literal">-d</code>.
+</p>
+      <div class="footnotes">
+        <br/>
+        <hr/>
+        <div id="ftn.idm41" class="footnote">
+          <p><a href="#idm41" class="para"><sup class="para">[1] </sup></a> Si está usando un servidor proxy primero debe definir la variable de entorno
+http_proxy, consulte sources.list (5). </p>
+        </div>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr/>
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td align="left"><a accesskey="p" href="ch1.html">Anterior</a> </td>
+          <td align="center"> </td>
+          <td align="right"> <a accesskey="n" href="ch3.html">Siguiente</a></td>
+        </tr>
+        <tr>
+          <td align="left" valign="top">Capítulo 1. General </td>
+          <td align="center">
+            <a accesskey="h" href="index.html">Inicio</a>
+          </td>
+          <td align="right" valign="top"> Capítulo 3. DSelect</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

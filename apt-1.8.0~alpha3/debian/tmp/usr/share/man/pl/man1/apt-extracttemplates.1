@@ -1,0 +1,126 @@
+'\" t
+.\"     Title: apt-extracttemplates
+.\"    Author: Jason Gunthorpe
+.\" Generator: DocBook XSL Stylesheets v1.79.1 <http://docbook.sf.net/>
+.\"      Date: 27\ \&marzec\ \&2014
+.\"    Manual: APT
+.\"    Source: APT 1.8.0~alpha3
+.\"  Language: Polish
+.\"
+.TH "APT\-EXTRACTTEMPLATE" "1" "27\ \&marzec\ \&2014" "APT 1.8.0~alpha3" "APT"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAZWA"
+apt-extracttemplates \- Narzędzie wyciągające z pakiet\('ow Debiana skrypty konfiguracyjne i szablony \fBdebconf\fR
+.SH "STRESZCZENIE"
+.HP \w'\fBapt\-extracttemplates\fR\ 'u
+\fBapt\-extracttemplates\fR [\fB\-t=\fR\fB\fIkatalog_tymczasowy\fR\fR] \fInazwa_pliku\fR... {\-v\ |\ \-\-version} {\-h\ |\ \-\-help}
+.SH "OPIS"
+.PP
+\fBapt\-extracttemplates\fR
+pobiera jeden lub więcej pakiet\('ow Debiana i zapisuje (w katalogu tymczasowym) wszystkie skojarzone z nimi skrypty konfiguracyjne i pliki szablon\('ow\&. Dla każdego pakietu zawierającego te skrypty i szablony, zostanie wypisana linia w następującym formacie:
+.PP
+pakiet wersja plik\-template skrypt\-config
+.PP
+plik\-template i skrypt\-config są zapisywane w katalogu tymczasowym podanym jako argument opcji
+\fB\-t\fR
+lub
+\fB\-\-tempdir\fR
+(APT::ExtractTemplates::TempDir)\&. Nazwy tych plik\('ow są w postaci
+pakiet\&.template\&.XXXXXX
+oraz
+pakiet\&.config\&.XXXXXX\&.
+.SH "OPCJE"
+.PP
+Wszystkie opcje linii poleceń mogą być ustawione w pliku konfiguracyjnym\&. Poniższe opisy wskazują, kt\('orą opcję w pliku konfiguracyjnym należy ustawić\&. W przypadku opcji logicznych, można unieważnić ustawienia pliku konfiguracyjnego, używając
+\fB\-f\-\fR,
+\fB\-\-no\-f\fR,
+\fB\-f=no\fR
+albo czegoś podobnego\&.
+.PP
+\fB\-t\fR, \fB\-\-tempdir\fR
+.RS 4
+Katalog tymczasowy, w kt\('orym zapisywane będą wyciągnięte szablony
+\fBdebconf\fR
+i pliki konfiguracyjne\&. Pozycja w pliku konfiguracyjnym:
+APT::ExtractTemplates::TempDir\&.
+.RE
+.PP
+\fB\-h\fR, \fB\-\-help\fR
+.RS 4
+Wyświetla kr\('otkie informacje o użyciu\&.
+.RE
+.PP
+\fB\-v\fR, \fB\-\-version\fR
+.RS 4
+Wyświetla wersję programu\&.
+.RE
+.PP
+\fB\-c\fR, \fB\-\-config\-file\fR
+.RS 4
+Plik konfiguracyjny\&. Podaje plik konfiguracyjny do użycia\&. Program najpierw przeczyta sw\('oj domyślny plik konfiguracyjny, a następnie plik podany jako argument tej opcji\&. Jeśli jest potrzeba ustawienia opcji konfiguracji zanim domyślny plik konfiguracyjny zostanie przetworzony, należy podać plik do użycia w zmiennej środowiskowej
+\fBAPT_CONFIG\fR\&. Informacje o sk\(/ladni pliku można znaleźć w
+\fBapt.conf\fR(5)\&.
+.RE
+.PP
+\fB\-o\fR, \fB\-\-option\fR
+.RS 4
+Ustawia opcję konfiguracji\&. Pozwala ustawić dowolną opcję konfiguracji\&. Sk\(/ladnia jest następująca:
+\fB\-o Foo::Bar=bar\fR\&.
+\fB\-o\fR
+i
+\fB\-\-option\fR
+można podać wielokrotnie \- do ustawiania r\('ożnych opcji\&.
+.RE
+.SH "ZOBACZ TAKŻE"
+.PP
+\fBapt.conf\fR(5)
+.SH "DIAGNOSTYKA"
+.PP
+\fBapt\-extracttemplates\fR
+zwraca zero, gdy zakończy\(/lo się pomyślnie, 100 \- w przypadku b\(/lędu\&.
+.SH "BUGS"
+.PP
+\m[blue]\fBStrona b\(/lęd\('ow APT\fR\m[]\&\s-2\u[1]\d\s+2\&. Aby zg\(/losić b\(/ląd w APT, proszę przeczytać
+/usr/share/doc/debian/bug\-reporting\&.txt
+lub opis polecenia
+\fBreportbug\fR(1)\&.
+.SH "T\(/LUMACZENIE"
+.PP
+T\(/lumaczenie stron podręcznika: Robert Luberda
+<robert@debian\&.org>, 2000\-2012\&. T\(/lumaczenie przewodnika offline: Krzysztof Fiertek
+<akfedux@megapolis\&.pl>, 2004
+.PP
+Proszę zauważyć, że przet\(/lumaczony dokument może zawierać fragmenty nieprzet\(/lumaczone\&. Ma to na celu uniknięcie utracenia istotnych informacji, w przypadkach gdy orygina\(/l zostanie zaktualizowany, a t\(/lumaczenie \- nie\&.
+.SH "AUTORZY"
+.PP
+\fBJason Gunthorpe\fR
+.RS 4
+.RE
+.PP
+\fBzesp\('o\(/l APT\fR
+.RS 4
+.RE
+.SH "PRZYPISY"
+.IP " 1." 4
+Strona b\(/lęd\('ow APT
+.RS 4
+\%http://bugs.debian.org/src:apt
+.RE

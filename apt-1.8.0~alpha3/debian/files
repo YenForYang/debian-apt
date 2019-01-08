@@ -1,0 +1,13 @@
+apt-dbgsym_1.8.0~alpha3_amd64.deb debug optional automatic=yes
+apt-doc_1.8.0~alpha3_all.deb doc optional
+apt-transport-https_1.8.0~alpha3_all.deb oldlibs optional
+apt-utils-dbgsym_1.8.0~alpha3_amd64.deb debug optional automatic=yes
+apt-utils_1.8.0~alpha3_amd64.deb admin important
+apt_1.8.0~alpha3_amd64.buildinfo admin important
+apt_1.8.0~alpha3_amd64.deb admin important
+libapt-inst2.0-dbgsym_1.8.0~alpha3_amd64.deb debug optional automatic=yes
+libapt-inst2.0_1.8.0~alpha3_amd64.deb libs optional
+libapt-pkg-dev_1.8.0~alpha3_amd64.deb libdevel optional
+libapt-pkg-doc_1.8.0~alpha3_all.deb doc optional
+libapt-pkg5.0-dbgsym_1.8.0~alpha3_amd64.deb debug optional automatic=yes
+libapt-pkg5.0_1.8.0~alpha3_amd64.deb libs optional

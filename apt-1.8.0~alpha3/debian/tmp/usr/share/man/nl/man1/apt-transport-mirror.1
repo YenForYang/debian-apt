@@ -1,0 +1,174 @@
+'\" t
+.\"     Title: apt-transport-mirror
+.\"    Author: APT-team
+.\" Generator: DocBook XSL Stylesheets v1.79.1 <http://docbook.sf.net/>
+.\"      Date: 09\ \&december\ \&2017
+.\"    Manual: APT
+.\"    Source: APT 1.8.0~alpha3
+.\"  Language: Dutch
+.\"
+.TH "APT\-TRANSPORT\-MIRR" "1" "09\ \&december\ \&2017" "APT 1.8.0~alpha3" "APT"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+apt-transport-mirror \- Transportmethode van APT voor een meer geautomatiseerde siegelserverselectie
+.SH "OMSCHRIJVING"
+.PP
+Deze transportmethode van APT past zelf geen protocol toe om lokale of externe pakketbronnen te benaderen, maar haalt een spiegelserverlijst op en leidt alle verzoeken om naar de spiegelserver(s) die uit de lijst uitgekozen wordt/worden\&. Deze wordt/worden benaderd via overige transportmethodes, zoals
+\fBapt-transport-http\fR(1)\&. De basale functionaliteit hiervan was reeds beschikbaar vanaf apt 0\&.7\&.24, maar bleef ongedocumenteerd tot apt 1\&.6, waarin een volledige herwerking van de transportmethode en de erdoor ondersteunde functies plaats vond\&. Merk op dat een transportmethode nooit rechtstreeks door een gebruiker aangesproken wordt, maar door APT\-gereedschap gebruikt wordt op basis van de gebruikersconfiguratie\&.
+.PP
+Indien het verkrijgen van een bestand via een spiegelserver mislukt, zorgt de methode ervoor dat automatisch een andere mogelijke spiegelserver uit de lijst geprobeerd wordt, totdat ofwel het bestand opgehaald is of er in de lijst geen spiegelservers meer overblijven\&. Op die manier wordt op een transparante manier omgegaan met storingen bij servers en vergelijkbare problemen\&.
+.PP
+De implicaties van de methode voor de beveiliging zijn afhankelijk van de gemaakte keuzes inzake beveiliging voor de transportmethode die gebruikt wordt om de lijst met spiegelservers op te halen en de transportmethodes die betrokken zijn bij het benaderen van de gekozen spiegelserver(s) door de transportmethode\&.
+.SH "OPTIES"
+.PP
+Voor deze transportmethode bestaan momenteel geen configuratieopties\&. De selectie van de spiegelserver hangt volledig af van de spiegelservers die in de spiegelserverlijst aangeboden worden en de bestanden die APT moet verkrijgen\&.
+.SS "Indeling van de spiegelserverlijst"
+.PP
+Een spiegelserverlijst bestaat uit \('e\('en of meer regels met een URI van een spiegelserver\&. Lege regels en regels die beginnen met een hekje (#) worden genegeerd\&. Een URI begint steeds meet een URI\-methode die de transportmethode vaststelt die voor die spiegelserver gebruikt wordt\&. Indien de URI bijvoorbeeld met
+http:
+begint, is de bevoegde transportmethode
+\fBapt-transport-http\fR(1), welke specifieke eisen kan stellen aan de indeling van het resterende deel van de URI\&.
+.PP
+Metadata over een spiegelserver kunnen op dezelfde regel opgegeven worden, gescheiden van de URI met een tab\&. Verschillende metadata\-elementen kunnen onderling gescheiden worden door tabs of spaties\&. (Dit is een gespecialiseerde functionaliteit die enkel beschikbaar is in apt >= 1\&.6\&. Eerdere versies van apt zullen er niet in slagen spiegelserverlijsten met deze functionaliteit te ontleden\&.)
+.PP
+Vanaf apt 1\&.6 wordt ook het gebruik van gecomprimeerde spiegelserverlijsten ondersteund\&. Merk op dat de bestandsnaam van de spiegelserverlijst moet aangeven welk compressiealgoritme gebruikt wordt\&. Er gebeurt geen autodetectie op basis van de inhoud van het bestand\&.
+.SS "Spiegelserverselectie op basis van metadata"
+.PP
+Zoals aangegeven bij de indeling, kunnen metadata toegevoegd worden aan een spiegelserver om te voorkomen dat een spiegelserver geselecteerd zou worden voor het bekomen van een bestand dat niet overeenkomt met deze metadata\&. Daardoor kan de spiegelserverlijst bijvoorbeeld parti\(:ele spiegelservers bevatten die enkel bepaalde architecturen bedienen en zal APT automatisch een andere spiegelserver kiezen voor bestanden die voor een niet vermelde architectuur bedoeld zijn\&. Worden ondersteund: beperkingen op het gebied van architectuur (arch), de codenaam van de release (codename), de component van de pakketbron waarin het bestand zich bevindt (component), de taal waarvoor het bestand moet dienen (lang), de suitenaam van de release (suite) en het bestandstype (type)\&.
+.SS "Volgorde waarin het teruggevallen op spiegelservers gebeurt"
+.PP
+Indien voor een spiegelserver geen volgorde opgegeven is via de metadatasleutel
+priority, is de volgorde waarin spiegelservers gecontacteerd worden toevallig\&. Indien een bepaalde groep spiegelservers eerst uitgeprobeerd moet worden vooraleer eventuele andere groepen aangesproken worden, kan expliciet een prioriteit ingesteld worden\&. De spiegelservers met het laagste getal worden eerst uitgeprobeerd\&. Spiegelservers waarvoor geen uitdrukkelijke prioriteit ingesteld werd, hebben standaard het hoogst mogelijke getal en worden daardoor laatst uitgeprobeerd\&. De keuze tussen spiegelservers met dezelfde prioriteit gebeurt opnieuw op basis van toeval\&.
+.SS "Toegestane transportmethodes in een spiegelserverlijst"
+.PP
+De beschikbaarheid en de keuzemogelijkheden van transportmethodes in een spiegelserverlijst wordt beperkt door hoe de APT\-cli\(:ent de spiegelserverlijst benadert\&. Indien een lokale transportmethode, zoals
+file
+of
+copy
+gebruikt wordt, kan de spiegelserverlijst ook lokale bronnen bevatten, terwijl een spiegelserverlijst die benaderd wordt via
+http
+dat niet kan\&. Bovendien kan een spiegelserverlijst niet zelf een spiegelserverlijst bevatten of geen andere transportmethodewikkels (zoals
+apt\-transport\-tor)\&. Zie de documentatie bij deze transportmethodes over hoe u ze met de spiegelservermethode kunt gebruiken\&.
+.PP
+Merk op dat versies van apt voorafgaand aan 1\&.6 geen enkele andere transportmethode dan
+http
+ondersteunen\&.
+.SH "VOORBEELDEN"
+.SS "Basaal voorbeeld"
+.PP
+Een basaal voorbeeld van een spiegelserverlijst die door alle versies van apt met een spiegelservermethode (>= 0\&.7\&.24) ondersteund wordt, waarbij de cli\(:ent om het even welke van de drie spiegelservers zal kiezen:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+http://ftp\&.de\&.debian\&.org/debian/
+http://ftp\&.us\&.debian\&.org/debian/
+http://deb\&.debian\&.org/debian/
+.fi
+.if n \{\
+.RE
+.\}
+.PP
+In de veronderstelling dat een bestand met deze inhoud op uw computer opgeslagen werd als
+/etc/apt/mirrorlist\&.txt, kan het op de volgende manier gebruikt worden in
+\fBsources.list\fR(5)
+(sinds apt 1\&.6):
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+deb mirror+file:/etc/apt/mirrorlist\&.txt stretch main
+.fi
+.if n \{\
+.RE
+.\}
+.PP
+Alle versies van de spiegelservermethode ondersteunen een spiegelserverlijst die via HTTP benaderd kan worden\&. In de veronderstelling dat het beschikbaar is op
+http://apt\&.example\&.org/mirror\&.lst, kan het element uit de bovenstaande sources\&.list ook als volgt geschreven worden:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+deb mirror://apt\&.example\&.org/mirror\&.lst stretch main
+.fi
+.if n \{\
+.RE
+.\}
+.PP
+Merk op dat met het oog op uniformiteit vanaf apt 1\&.6 het gebruik van
+mirror+http
+de voorkeur zou moeten genieten boven
+mirror\&. De functionaliteit blijft dezelfde\&.
+.SS "Voorbeeld van een met metadata verrijkte spiegelserverselectie"
+.PP
+Zoals bij de defini\(:ering van de indeling uitgelegd werd, ondersteunen versies van apt voorafgaand aan 1\&.6 dit niet\&. Ze zullen dus de spiegelserverlijst niet kunnen ontleden\&. De voorbeeldspiegelserverlijst is met opzet gecompliceerd gemaakt om een aantal aspecten van het selectieproces te illustreren\&. Er wordt uitgegaan van de volgende opstelling: de eerste spiegelserver is een lokale spiegelserver die via de methode file kan benaderd worden, maar mogelijk is deze onvolledig\&. De tweede spiegelserver heeft een zeer goede verbinding, maar het is een gedeeltelijke spiegelserver in die zin dat hij enkel bestanden bevat bedoeld voor de architecturen
+amd64
+en
+all\&. De overige spiegelservers zijn doorsneespiegelservers die enkel gecontacteerd moeten worden als de voorgaande niet werken\&.
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+file:/srv/local/debian/mirror/	priority:1 type:index
+http://partial\&.example\&.org/mirror/	priority:2 arch:amd64 arch:all type:deb
+http://ftp\&.us\&.debian\&.org/debian/	type:deb
+http://ftp\&.de\&.debian\&.org/debian/	type:deb
+https://deb\&.debian\&.org/debian/
+.fi
+.if n \{\
+.RE
+.\}
+.PP
+In deze opstelling met deze spiegelserverlijst, zal de eerste spiegelserver gebruikt worden om alle indexbestanden te downloaden, in de veronderstelling dat de spiegelserverlijst zelf benaderd wordt via een lokale transportmethode zoals
+file\&. Indien dit niet het geval is, of indien de spiegelserver om een andere reden niet bereikbaar is, of indien hij het gevraagde bestand niet ter beschikking heeft, zal een andere spiegelserver gebruikt worden om het bestand te bekomen, en die zal gekozen worden op basis van het type bestand: een indexbestand zal door de laatste server uit de lijst aangeleverd worden, terwijl een pakket voor de architectuur
+amd64
+aangeleverd wordt door de tweede en die voor bijv\&. de architectuur
+i386
+door een van de drie laatste\&.
+.SH "BUGS"
+.PP
+\m[blue]\fBAPT bugpagina\fR\m[]\&\s-2\u[1]\d\s+2\&. Indien u een bug in APT wilt rapporteren, raadpleeg dan
+/usr/share/doc/debian/bug\-reporting\&.txt
+of het
+\fBreportbug\fR(1)
+commando\&.
+.SH "VERTALING"
+.PP
+De Nederlandse vertaling werd in 2015 gemaakt door Frans Spiesschaert
+<Frans\&.Spiesschaert@yucom\&.be>, in samenwerking met het Debian Dutch l10n Team
+<debian\-l10n\-dutch@lists\&.debian\&.org>\&.
+.PP
+Merk op dat de vertaling van dit document nog onvertaalde delen kan bevatten\&. Dit is intentioneel om te vermijden dat inhoud verloren zou gaan door een vertaling die achterop loopt op het origineel\&.
+.SH "AUTEUR"
+.PP
+\fBAPT\-team\fR
+.RS 4
+.RE
+.SH "OPMERKINGEN"
+.IP " 1." 4
+APT bugpagina
+.RS 4
+\%http://bugs.debian.org/src:apt
+.RE

@@ -1,0 +1,150 @@
+'\" t
+.\"     Title: apt-config
+.\"    Author: Jason Gunthorpe
+.\" Generator: DocBook XSL Stylesheets v1.79.1 <http://docbook.sf.net/>
+.\"      Date: 30\ \&novembre\ \&2013
+.\"    Manual: APT
+.\"    Source: APT 1.8.0~alpha3
+.\"  Language: Italian
+.\"
+.TH "APT\-CONFIG" "8" "30\ \&novembre\ \&2013" "APT 1.8.0~alpha3" "APT"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NOME"
+apt-config \- programma di interrogazione della configurazione di APT
+.SH "SINOSSI"
+.HP \w'\fBapt\-config\fR\ 'u
+\fBapt\-config\fR [\fB\-\-empty\fR] [\fB\-\-format\ \*(Aq\fR\fB\fI%f\ "%v";%n\fR\fR\fB\*(Aq\fR] [\fB\-o=\fR\fB\fIstringa_config\fR\fR] [\fB\-c=\fR\fB\fIfile_config\fR\fR] {shell | dump | {\-v\ |\ \-\-version} | {\-h\ |\ \-\-help}}
+.SH "DESCRIZIONE"
+.PP
+\fBapt\-config\fR
+\(`e un programma interno usato da varie parti della suite APT per fornire una configurabilit\(`a coerente\&. Accede al file principale di configurazione
+/etc/apt/apt\&.conf
+in un modo facile da usare da parte di applicazioni che usano script\&.
+.PP
+A meno che non venga fornita l\*(Aqopzione
+\fB\-h\fR
+o
+\fB\-\-help\fR, deve essere presente uno dei comandi seguenti\&.
+.PP
+\fBshell\fR
+.RS 4
+shell viene usato per accedere alle informazioni di configurazione da parte di uno script di shell\&. Riceve coppie di argomenti, il primo dei quali \(`e una variabile di shell e il secondo \(`e il valore di configurazione da interrogare\&. Come risultato elenca il comando shell di assegnazione per ciascun valore presente\&. In uno script di shell dovrebbe essere usato in modo simile a:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+OPZIONI="\-f"
+RES=`apt\-config shell OPZIONI MiaApp::opzioni`
+eval $RES
+.fi
+.if n \{\
+.RE
+.\}
+In questo modo la variabile d\*(Aqambiente $OPZIONI della shell verr\(`a impostata al valore di MiaApp::opzioni con un valore predefinito di
+\fB\-f\fR\&.
+.sp
+La voce di configurazione pu\(`o essere seguita da /[fdbi]\&. f restituisce nomi di file, d restituisce directory, b restituisce vero o falso e i restituisce un intero\&. Ogni valore restituito \(`e normalizzato e verificato internamente\&.
+.RE
+.PP
+\fBdump\fR
+.RS 4
+Mostra soltanto i contenuti dello spazio di configurazione\&.
+.RE
+.SH "OPZIONI"
+.PP
+Tutte le opzioni a riga di comando si possono impostare usando il file di configurazione; le descrizioni indicano l\*(Aqopzione da impostare\&. Per le opzioni booleane si pu\(`o scavalcare il file di configurazione usando qualcosa come
+\fB\-f\-\fR,
+\fB\-\-no\-f\fR,
+\fB\-f=no\fR
+o diverse altre varianti\&.
+.PP
+\fB\-\-empty\fR
+.RS 4
+Include le opzioni che hanno un valore vuoto\&. Questo \(`e il comportamento predefinito, perci\(`o usare \-\-no\-empty per rimuoverle dall\*(Aqoutput\&.
+.RE
+.PP
+\fB\-\-format \*(Aq\fR\fB\fI%f "%v";%n\fR\fR\fB\*(Aq\fR
+.RS 4
+Definisce l\*(Aqoutput per ciascuna opzione di configurazione\&. %t verr\(`a sostituito dal suo nome, %f dal suo nome gerarchico completo e %v dal suo valore\&. Usa le lettere maiuscole e i caratteri speciali nel valore verranno codificati per assicurare che possano essere usati senza problemi in una stringa tra virgolette, come definito nella RFC822\&. In aggiunta %n verr\(`a sostituito da un ritorno a capo e %N da una tabulazione\&. Un carattere % pu\(`o essere prodotto usando %%\&.
+.RE
+.PP
+\fB\-h\fR, \fB\-\-help\fR
+.RS 4
+Mostra un breve riassunto sull\*(Aquso\&.
+.RE
+.PP
+\fB\-v\fR, \fB\-\-version\fR
+.RS 4
+Mostra la versione del programma\&.
+.RE
+.PP
+\fB\-c\fR, \fB\-\-config\-file\fR
+.RS 4
+File di configurazione; specifica un file di configurazione da usare\&. Il programma legge il file di configurazione predefinito e poi questo file di configurazione\&. Se \(`e necessario modificare le impostazioni di configurazione prima che vengano analizzati i file di configurazione predefiniti, specificare un file con la variabile d\*(Aqambiente
+\fBAPT_CONFIG\fR\&. Vedere
+\fBapt.conf\fR(5)
+per informazioni sulla sintassi\&.
+.RE
+.PP
+\fB\-o\fR, \fB\-\-option\fR
+.RS 4
+Imposta un\*(Aqopzione di configurazione; imposter\(`a una qualunque opzione di configurazione\&. La sintassi \(`e
+\fB\-o Pinco::Pallo=pallo\fR\&.
+\fB\-o\fR
+e
+\fB\-\-option\fR
+si possono usare pi\(`u volte per impostare opzioni diverse\&.
+.RE
+.SH "VEDERE ANCHE"
+.PP
+\fBapt.conf\fR(5)
+.SH "DIAGNOSTICA"
+.PP
+\fBapt\-config\fR
+restituisce zero in caso di funzionamento normale e il valore decimale 100 in caso di errore\&.
+.SH "BUG"
+.PP
+\m[blue]\fBPagina dei bug di APT\fR\m[]\&\s-2\u[1]\d\s+2\&. Se si desidera segnalare un bug in APT, vedere
+/usr/share/doc/debian/bug\-reporting\&.txt
+o il comando
+\fBreportbug\fR(1)\&.
+.SH "TRADUZIONE"
+.PP
+Traduzione in italiano a cura del Team italiano di localizzazione di Debian
+<debian\-l10n\-italian@lists\&.debian\&.org>\&. In particolare hanno contribuito Eugenia Franzoni (2000), Hugh Hartmann (2000\-2012), Gabriele Stilli (2012), Beatrice Torracca (2012, 2014, 2015)\&.
+.PP
+Notare che questa versione tradotta del documento pu\(`o contenere parti non tradotte\&. Ci\(`o \(`e voluto, per evitare di perdere contenuti quando la traduzione non \(`e aggiornata rispetto all\*(Aqoriginale\&.
+.SH "AUTORI"
+.PP
+\fBJason Gunthorpe\fR
+.RS 4
+.RE
+.PP
+\fBTeam APT\fR
+.RS 4
+.RE
+.SH "NOTE"
+.IP " 1." 4
+Pagina dei bug di APT
+.RS 4
+\%http://bugs.debian.org/src:apt
+.RE

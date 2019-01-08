@@ -1,0 +1,149 @@
+'\" t
+.\"     Title: apt-config
+.\"    Author: Jason Gunthorpe
+.\" Generator: DocBook XSL Stylesheets v1.79.1 <http://docbook.sf.net/>
+.\"      Date: 30\ \&Noviembre\ \&2013
+.\"    Manual: APT
+.\"    Source: APT 1.8.0~alpha3
+.\"  Language: Spanish
+.\"
+.TH "APT\-CONFIG" "8" "30\ \&Noviembre\ \&2013" "APT 1.8.0~alpha3" "APT"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NOMBRE"
+apt-config \- Programa para consultar la configuraci\('on de APT
+.SH "SINOPSIS"
+.HP \w'\fBapt\-config\fR\ 'u
+\fBapt\-config\fR [\fB\-\-empty\fR] [\fB\-\-format\ \*(Aq\fR\fB\fI%f\ "%v";%n\fR\fR\fB\*(Aq\fR] [\fB\-o=\fR\fB\fIconfig_string\fR\fR] [\fB\-c=\fR\fB\fIconfig_file\fR\fR] {shell | dump | {\-v\ |\ \-\-version} | {\-h\ |\ \-\-help}}
+.SH "DESCRIPCI\('ON"
+.PP
+\fBapt\-config\fR
+es un programa interno que usan varios programas del conjunto de herramientas de APT para ofrecer un m\('etodo de configuraci\('on s\('olido\&. Este programa accede al fichero principal de configuraci\('on
+/etc/apt/apt\&.conf
+de forma que resulta sencillo de usar por aplicaciones con scripts\&.
+.PP
+A menos que se use la opci\('on
+\fB\-h\fR
+o
+\fB\-\-help\fR, una de las siguientes \('ordenes debe estar presente\&.
+.PP
+\fBshell\fR
+.RS 4
+Se utiliza para acceder a la informaci\('on de la configuraci\('on mediante un script\&. Se proporcionan parejas de argumentos, el primero es una variable del int\('erprete de \('ordenes y el segundo el valor de la configuraci\('on que consultar\&. Como salida muestra una serie de \('ordenes asignadas al int\('erprete de \('ordenes para cada valor presente\&. Esto se deber\('ia usar de la siguiente manera en un script de int\('erprete de \('ordenes:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+OPTS="\-f"
+RES=`apt\-config shell OPTS MiAplicaci\('on::opciones`
+eval $RES
+.fi
+.if n \{\
+.RE
+.\}
+Esto define la variable de entorno del int\('erprete de \('ordenes $OPTS con el valor de MyApp::Opciones, y con
+\fB\-f\fR
+por omisi\('on\&.
+.sp
+La opci\('on de configuraci\('on se puede corregir posteriormente con un \(Fo/[fdbi]\(Fc\&. El par\('ametro \(Fof\(Fc devuelve nombres de fichero, \(Fod\(Fc devuelve los directorios, \(Fob\(Fc devuelve verdadero o falso, e \(Foi\(Fc devuelve un n\('umero entero\&. Cada uno de los valores devueltos se normaliza y se verifica internamente\&.
+.RE
+.PP
+\fBdump\fR
+.RS 4
+S\('olo muestra el contenido del espacio de configuraci\('on\&.
+.RE
+.SH "OPCIONES"
+.PP
+Todas las opciones de la l\('inea de \('ordenes se pueden definir mediante el fichero de configuraci\('on, las descripciones indican la opci\('on de la configuraci\('on a definir\&. Para opciones de tipo \(Foboolean\(Fc puede invalidar el fichero de configuraci\('on utilizando algo como
+\fB\-f\-\fR,\fB\-\-no\-f\fR,
+\fB\-f=no\fR
+u otras muchas variaciones\&.
+.PP
+\fB\-\-empty\fR
+.RS 4
+Incluye opciones con un valor vac\('io\&. Este es el comportamiento predeterminado, utilice \(Fo\-\-no\-empty\(Fc para eliminarlos de la salida\&.
+.RE
+.PP
+\fB\-\-format \*(Aq\fR\fB\fI%f "%v";%n\fR\fR\fB\*(Aq\fR
+.RS 4
+Define la salida de cada opci\('on de configuraci\('on\&. %t se sustituye con el nombre individual, %f con el nombre jer\('arquico completo, y %v con su valor\&. Si utiliza letras may\('usculas, los caracteres especiales del valor se codificaran para garantizar su uso seguro en una cadena delimitada por comillas, como define RFC822\&. Adem\('as, %n se sustituye con una l\('inea nueva, y %N con una tabulaci\('on\&. Se puede mostrar un % utilizando %%\&.
+.RE
+.PP
+\fB\-h\fR, \fB\-\-help\fR
+.RS 4
+Muestra un mensaje corto sobre el uso\&.
+.RE
+.PP
+\fB\-v\fR, \fB\-\-version\fR
+.RS 4
+Muestra la versi\('on del programa\&.
+.RE
+.PP
+\fB\-c\fR, \fB\-\-config\-file\fR
+.RS 4
+Fichero de configuraci\('on: Especifica el fichero de configuraci\('on a usar\&. El programa leer\('a el fichero de configuraci\('on predeterminado y, despu\('es, este fichero de configuraci\('on\&. Si necesita que ciertas opciones de configuraci\('on se definan antes que el an\('alisis de los de los ficheros de configuraci\('on predeterminados, defina un fichero con la variable de entorno
+\fBAPT_CONFIG\fR\&. Consulte
+\fBapt.conf\fR(5)
+para informaci\('on sobre la sintaxis\&.
+.RE
+.PP
+\fB\-o\fR, \fB\-\-option\fR
+.RS 4
+Define una opci\('on de configuraci\('on: Esto definir\('a una opci\('on arbitraria de configuraci\('on\&. La sintaxis es
+\fB\-o Algo::Cosa=cosa\fR\&.
+\fB\-o\fR
+y
+\fB\-\-option\fR
+se pueden usar varias veces para definir diferentes opciones\&.
+.RE
+.SH "V\('EASE TAMBI\('EN"
+.PP
+\fBapt.conf\fR(5)
+.SH "DIAGN\('OSTICOS"
+.PP
+\fBapt\-config\fR
+devuelve cero si no hay ning\('un error, y el valor 100 en caso de error\&.
+.SH "BUGS"
+.PP
+\m[blue]\fBP\('agina de errores de APT\fR\m[]\&\s-2\u[1]\d\s+2\&. Si quiere informar de un error en APT, consulte
+/usr/share/doc/debian/bug\-reporting\&.txt
+o use la orden
+\fBreportbug\fR(1)\&.
+.SH "TRADUCCI\('ON"
+.PP
+La traducci\('on al espa\(~nol la realizaron Ismael Fanlo, Carlos Mestre, Rudy Godoy, Gustavo Saldumbide, Javier Fern\('andez\-Sanguino y Rub\('en Porras Campo entre los a\(~nos 2003 y 2004\&. La traducci\('on fue actualizada por Francisco Javier Cuadrado y Omar Campagne Polaino entre los a\(~nos 2009 y 2012 \&.
+.PP
+Tenga en cuenta que este documento puede contener secciones sin traducir\&. Esto es intencionado para evitar perder contenido cuando la traducci\('on no est\('a actualizada con respecto al documento original\&.
+.SH "AUTORES"
+.PP
+\fBJason Gunthorpe\fR
+.RS 4
+.RE
+.PP
+\fBEquipo de APT\fR
+.RS 4
+.RE
+.SH "NOTAS"
+.IP " 1." 4
+P\('agina de errores de APT
+.RS 4
+\%http://bugs.debian.org/src:apt
+.RE

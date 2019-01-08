@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+  "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % aptent SYSTEM "apt.ent"> %aptent;
+<!ENTITY % aptverbatiment SYSTEM "apt-verbatim.ent"> %aptverbatiment;
+<!ENTITY % aptvendor SYSTEM "apt-vendor.ent"> %aptvendor;
+]>
+
+<refentry>
+
+ <refentryinfo>
+   &apt-author.jgunthorpe;
+   &apt-author.team;
+   &apt-email;
+   &apt-product;
+   <date>2013-11-30T00:00:00Z</date>
+ </refentryinfo>
+
+ <refmeta>
+   <refentrytitle>apt-cdrom</refentrytitle>
+   <manvolnum>8</manvolnum>
+   <refmiscinfo class="manual">APT</refmiscinfo>
+ </refmeta>
+ 
+ 
+ <!-- Man page title -->
+<refnamediv>
+    <refname>apt-cdrom</refname>
+    <refpurpose>Hulpprogramma van APT voor CD-beheer</refpurpose>
+ </refnamediv>
+
+ &synopsis-command-apt-cdrom;
+
+ <refsect1><title>Omschrijving</title>
+   <para><command>apt-cdrom</command> wordt gebruikt om een nieuwe CD toe te voegen
+aan de lijst van beschikbare bronnen voor APT. <command>apt-cdrom</command>
+draagt zorg voor het achterhalen van de structuur van de schijf, voor het
+uitvoeren van correcties voor verschillende mogelijke fouten tijdens het
+branden en voor de controle van de indexbestanden.   
+   </para>
+
+   <para>Voor het toevoegen van CD's aan het systeem van APT is het gebruik van
+<command>apt-cdrom</command> noodzakelijk. U kunt dit niet handmatig
+uitvoeren. Bovendien moet iedere CD uit een set schijven afzonderlijk
+ingevoerd worden en onderzocht op mogelijke fouten bij het branden.
+   </para>
+
+   <para>Tenzij de optie <option>-h</option>, of <option>--help</option> opgegeven
+werd, moet een van de onderstaande commando's gebruikt worden.</para>
+
+    <variablelist>
+     <varlistentry><term><option>add</option></term>
+     <listitem><para><literal>add</literal> wordt gebruikt om een nieuwe schijf aan de
+pakketbronnen toe te voegen. Het zal het CD-station ontkoppelen, vragen om
+een schijf in te voeren, die schijf controleren en de indexbestanden
+kopiëren. Indien de schijf geen passende map <filename>.disk</filename>
+bevat, zal u om een beschrijvende titel gevraagd worden.
+     </para>
+
+     <para>APT maakt per schijf gebruik van een ID om vast te stellen welke CD zich
+momenteel in het station bevindt en houdt een database van deze ID's bij in
+<filename>&statedir;/cdroms.list</filename>
+     </para>
+     </listitem>
+     </varlistentry>
+     
+     <varlistentry><term><option>ident</option></term>
+     <listitem><para>Een debug-gereedschap dat rapporteert over de identiteit van de huidige
+schijf en de naam van het opgeslagen bestand.
+     </para>
+     </listitem>
+     </varlistentry>
+    </variablelist>
+ </refsect1>
+
+ <refsect1><title>Opties</title>
+   &apt-cmdblurb;
+   
+   <variablelist>
+     <varlistentry><term><option>--no-auto-detect</option></term><term><option>--cdrom</option></term>
+     <listitem><para>Niet automatisch het CD-pad trachten te achterhalen. Meestal wordt dit
+gecombineerd met de optie <option>--cdrom</option>. Configuratie-item:
+<literal>Acquire::cdrom::AutoDetect</literal>.
+     </para>
+     </listitem>
+     </varlistentry>
+     
+
+     <varlistentry><term><option>-d</option></term><term><option>--cdrom</option></term>
+     <listitem><para>Aankoppelpunt; de locatie waar de CD aangekoppeld moet worden opgeven. Dit
+aankoppelpunt moet in <filename>/etc/fstab</filename> vermeld worden en
+correct geconfigureerd zijn. Configuratie-item:
+<literal>Acquire::cdrom::mount</literal>.
+     </para>
+     </listitem>
+     </varlistentry>
+     
+     <varlistentry><term><option>-r</option></term><term><option>--rename</option></term>
+     <listitem><para>Een schijf hernoemen; de naam van een schijf wijzigen of de aan een schijf
+gegeven naam overschrijven. Deze optie doet <command>apt-cdrom</command> om
+een nieuwe naam vragen. Configuratie-item:
+<literal>APT::CDROM::Rename</literal>.
+     </para>
+     </listitem>
+     </varlistentry>
+     
+     <varlistentry><term><option>-m</option></term><term><option>--no-mount</option></term>
+     <listitem><para>Niet aankoppelen; <command>apt-cdrom</command> verhinderen om het
+aankoppelpunt aan en af te koppelen. Configuratie-item:
+<literal>APT::CDROM::NoMount</literal>.
+     </para>
+     </listitem>
+     </varlistentry>
+     
+     <varlistentry><term><option>-f</option></term><term><option>--fast</option></term>
+     <listitem><para>Snel kopiëren; Aannemen dat de pakketbestanden geldig zijn en niet elk
+pakket controleren. Deze optie mag enkel gebruikt worden als op deze schijf
+vooraf <command>apt-cdrom</command> uitgevoerd werd en er geen fouten
+gevonden werden. Configuratie-item: <literal>APT::CDROM::Fast</literal>.
+     </para>
+     </listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>-a</option></term><term><option>--thorough</option></term>
+     <listitem><para>Grondig naar Package speuren; Deze optie kan noodzakelijk zijn bij sommige
+oude schijven die Debian 1.1/1.2 bevatten en waarbij de Package-bestanden
+zich op ongewone plaatsen bevinden. Het vraagt veel meer tijd om de CD te
+doorzoeken, maar de bestanden zullen allemaal gevonden worden.
+     </para>
+     </listitem>
+     </varlistentry>
+     
+     <varlistentry><term><option>-n</option></term>
+                   <term><option>--just-print</option></term>
+                   <term><option>--recon</option></term>
+                   <term><option>--no-act</option></term>
+     <listitem><para>Geen wijzigingen. Het bestand &sources-list; niet veranderen en geen
+indexbestanden wegschrijven. Niettemin wordt alles wel
+gecontroleerd. Configuratie-item: <literal>APT::CDROM::NoAct</literal>.
+     </para>
+     </listitem>
+     </varlistentry> 
+
+     &apt-commonoptions;
+
+   </variablelist>
+ </refsect1>
+
+ <refsect1><title>Zie ook</title>
+   <para>&apt-conf;, &apt-get;, &sources-list;
+   </para>
+ </refsect1>
+
+ <refsect1><title>Diagnostiek</title>
+   <para><command>apt-cdrom</command> geeft de terugkeerwaarde nul bij een normaal
+verlopen operatie, het decimaal getal 100 in geval van een fout.
+   </para>
+ </refsect1>
+
+ &manbugs;
+
+ <refsect1><title>&translation-title;</title>
+   <para>&translation-holder;</para>
+   <para>&translation-english;</para>
+ </refsect1>
+</refentry>
+

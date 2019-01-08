@@ -1,0 +1,184 @@
+'\" t
+.\"     Title: apt
+.\"    Author: \('Equipe de d\('eveloppement d\*(AqAPT
+.\" Generator: DocBook XSL Stylesheets v1.79.1 <http://docbook.sf.net/>
+.\"      Date: 20\ \&octobre\ \&2015
+.\"    Manual: APT
+.\"    Source: APT 1.8.0~alpha3
+.\"  Language: French
+.\"
+.TH "APT" "8" "20\ \&octobre\ \&2015" "APT 1.8.0~alpha3" "APT"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NOM"
+apt \- interface en ligne de commande
+.SH "SYNOPSIS"
+.HP \w'\fBapt\fR\ 'u
+\fBapt\fR [\fB\-h\fR] [\fB\-o=\fR\fB\fIcha\(^ine_de_configuration\fR\fR] [\fB\-c=\fR\fB\fIfichier_de_configuration\fR\fR] [\fB\-t=\fR\fB\fIpublication_cible\fR\fR] [\fB\-a=\fR\fB\fIarchitecture\fR\fR] {list | search | show | update | install\ \fIpaquet\fR\ [{=\fInum\('ero_version_paquet\fR\ |\ /\fIpublication_cible\fR}]...  | remove\ \fIpaquet\fR...  | upgrade | full\-upgrade | edit\-sources | {\-v\ |\ \-\-version} | {\-h\ |\ \-\-help}}
+.SH "DESCRIPTION"
+.PP
+\fBapt\fR
+fournit une interface en ligne de commande pour le syst\(`eme de gestion de paquets\&. Elle est con\(,cue comme une interface utilisateur et permet certaines options plus adapt\('ees \(`a une utilisation interactive par d\('efaut par rapport aux outils d\*(AqAPT plus sp\('ecialis\('es tels que
+\fBapt-get\fR(8)
+et
+\fBapt-cache\fR(8)\&.
+.PP
+Exactement comme
+\fBapt\fR
+lui\-m\(^eme, cette page de manuel vise \(`a \(^etre une interface pour l\*(Aqutilisateur et ainsi elle ne mentionne que les commandes et les options les plus courantes, en partie pour ne pas r\('ep\('eter les informations \(`a de multiples emplacements et en partie pour ne pas noyer le lecteur par une surabondance d\*(Aqoptions et de d\('etails\&.
+.PP
+\fBupdate\fR (\fBapt-get\fR(8))
+.RS 4
+La commande
+\fBupdate\fR
+permet de t\('el\('echarger les informations sur les paquets \(`a partir des sources configur\('ees\&. D\*(Aqautres commandes agissent sur ces donn\('ees, par exemple, r\('ealisent la mise \(`a jour de paquet ou recherchent et affichent des d\('etails \(`a propos de tous les paquets qui peuvent \(^etre install\('es\&.
+.RE
+.PP
+\fBupgrade\fR (\fBapt-get\fR(8))
+.RS 4
+La commande
+upgrade
+permet d\*(Aqinstaller les mises \(`a jour disponibles de tous les paquets pr\('esents sur le syst\(`eme en utilisant les sources \('enum\('er\('ees dans
+\fBsources.list\fR(5)\&. De nouveaux paquets seront install\('es si cela est n\('ecessaire pour satisfaire des d\('ependances, mais les paquets install\('es ne seront jamais supprim\('es\&. Si la mise \(`a jour d\*(Aqun paquet n\('ecessite la suppression d\*(Aqun paquet install\('e, la mise \(`a jour n\*(Aqest pas r\('ealis\('ee\&.
+.RE
+.PP
+\fBfull\-upgrade\fR (\fBapt-get\fR(8))
+.RS 4
+La commande
+full\-upgrade
+remplit la m\(^eme fonction que upgrade mais supprimera des paquets actuellement install\('es si cela est n\('ecessaire pour mettre \(`a jour le syst\(`eme dans son ensemble\&.
+.RE
+.PP
+\fBinstall\fR, \fBremove\fR, \fBpurge\fR (\fBapt-get\fR(8))
+.RS 4
+La commande r\('ealise l\*(Aqaction requise sur un ou plusieurs paquets sp\('ecifi\('es avec
+\fBregex\fR(7),
+\fBglob\fR(7)
+ou avec la correspondance exacte\&. Les actions requises peuvent \(^etre remplac\('ees pour certains paquets en ajoutant un plus (+) au nom du paquet pour l\*(Aqinstaller et ou un moins (\-) pour le supprimer\&.
+.sp
+On peut choisir d\*(Aqinstaller une version particuli\(`ere d\*(Aqun paquet en faisant suivre son nom par un signe \('egal (=) et par la version du paquet \(`a s\('electionner\&. Autrement, on peut choisir une version sp\('ecifique en faisant suivre le nom du paquet par une barre oblique (/) et le nom de code (stretch, buster, sid \&...) ou un nom de suite (stable, testing, unstable)\&. Cela s\('electionnera aussi cette version pour les d\('ependances de ce paquet si cela est n\('ecessaire pour satisfaire la requ\(^ete\&.
+.sp
+La suppression d\*(Aqun paquet entra\(^ine la suppression de toutes les donn\('ees empaquet\('ees, mais conserve habituellement les petits fichiers (modifi\('es) de configuration de l\*(Aqutilisateur, pour le cas o\(`u la suppression a \('et\('e accidentelle\&. Dans ce cas, il suffira d\*(Aq\('emettre une demande d\*(Aqinstallation pour le paquet supprim\('e accidentellement pour restaurer son fonctionnement ant\('erieur\&. D\*(Aqautre part, on peut facilement se d\('ebarrasser de ces reliquats en appelant la commande
+\fBpurge\fR
+m\(^eme sur des paquets d\('ej\(`a supprim\('es\&. Notez que cela n\*(Aqaffecte aucune donn\('ee ou configuration stock\('ees dans votre r\('epertoire personnel\&.
+.RE
+.PP
+\fBautoremove\fR (\fBapt-get\fR(8))
+.RS 4
+La commande
+autoremove, supprime les paquets install\('es automatiquement dans le but de satisfaire les d\('ependances d\*(Aqautres paquets et qui ne sont plus n\('ecessaires parce que les d\('ependances ont chang\('e ou parce que le ou les paquets ont \('et\('e supprim\('es entre\-temps\&.
+.sp
+Vous devriez v\('erifier que la liste ne contient pas des applications que vous avez fini par appr\('ecier, m\(^eme si elles ont \('et\('e install\('ees seulement comme d\('ependance d\*(Aqun autre paquet\&. Vous pouvez marquer ces paquets comme install\('es manuellement avec
+\fBapt-mark\fR(8)\&. Les paquets que vous avez install\('es explicitement avec la commande
+\fBinstall\fR
+ne seront jamais propos\('es non plus pour une suppression automatique\&.
+.RE
+.PP
+\fBsearch\fR (\fBapt-cache\fR(8))
+.RS 4
+La commande
+\fBsearch\fR
+peut \(^etre utilis\('ee pour rechercher le(s) terme(s)
+\fBregex\fR(7)
+donn\('e(s) dans la liste de paquets disponibles et affiche les paquets correspondants\&. Par exemple, cela peut \(^etre utile pour rechercher des paquets dot\('es d\*(Aqune fonctionnalit\('e particuli\(`ere\&. Si vous recherchez un paquet qui fournit un fichier particulier, essayez
+\fBapt-file\fR(1)\&.
+.RE
+.PP
+\fBshow\fR (\fBapt-cache\fR(8))
+.RS 4
+La commande affiche des informations sur le(s) paquet(s) donn\('e(s) y compris ses d\('ependances, sa taille install\('e et au t\('el\('echargement, les sources d\(cqo\(`u provient le paquet, la description du contenu des paquets et bien plus encore\&. Cela peut \(^etre utile pour consulter ces informations avant d\*(Aqautoriser
+\fBapt\fR(8)
+\(`a supprimer un paquet ou lors d\*(Aqune recherche de nouveaux paquets \(`a installer\&.
+.RE
+.PP
+\fBlist\fR (travail en cours)
+.RS 4
+La commande
+list
+est \(`a peu pr\(`es semblable \(`a la commande
+\fBdpkg\-query \-\-list\fR
+dans la mesure o\(`u elle peut afficher une liste de paquets qui satisfont \(`a certains crit\(`eres\&. Elle g\(`ere les motifs
+\fBglob\fR(7)
+pour la correspondance des noms de paquets ainsi que des options pour afficher les versions install\('ees
+\fB\-\-installed\fR, pouvant \(^etre mises \(`a jour
+\fB\-\-upgradeable\fR, ou toutes les versions disponibles
+\fB\-\-all\-versions\fR\&.
+.RE
+.PP
+\fBedit\-sources\fR (travail en cours)
+.RS 4
+La commande
+edit\-sources
+permet de modifier le fichier
+\fBsources.list\fR(5)
+avec votre \('editeur de texte pr\('ef\('er\('e et fournit des v\('erifications de s\('ecurit\('e de base\&.
+.RE
+.SH "UTILISATION DE SCRIPTS ET DIFF\('ERENCES AVEC LES AUTRES OUTILS D\*(AQAPT"
+.PP
+La ligne de commande de
+\fBapt\fR(8)
+est con\(,cue comme un outil pour l\*(Aqutilisateur et son comportement peut varier selon ses versions\&. Bien qu\*(Aqil s\*(Aqefforce de ne pas casser les compatibilit\('es ascendantes, cela ne peut pas non plus \(^etre garanti, si une modification semble b\('en\('efique pour une utilisation interactive\&.
+.PP
+Toutes les fonctionnalit\('es d\*(Aq\fBapt\fR(8)
+sont aussi propos\('ees dans les outils d\('edi\('es d\*(AqAPT tels que
+\fBapt-get\fR(8)
+ou
+\fBapt-cache\fR(8)
+\fBapt\fR(8)
+modifie seulement la valeur par d\('efaut de certaines options (voir
+\fBapt.conf\fR(5)
+et en particulier le champ d\*(Aqaction Binary)\&. Aussi vous devriez pr\('ef\('erer l\*(Aqutilisation de ces commandes (\('eventuellement avec certaines options compl\('ementaires activ\('ees) dans les scripts parce qu\*(Aqelles conservent autant que possible la compatibilit\('e ascendante\&.
+.SH "VOIR AUSSI"
+.PP
+\fBapt-get\fR(8),
+\fBapt-cache\fR(8),
+\fBsources.list\fR(5),
+\fBapt.conf\fR(5),
+\fBapt-config\fR(8), le guide d\*(AqAPT dans /usr/share/doc/apt\-doc/,
+\fBapt_preferences\fR(5), le \(Fo\ \&HOWTO\ \&\(Fc d\*(AqAPT\&.
+.SH "DIAGNOSTICS"
+.PP
+\fBapt\fR
+renvoie z\('ero apr\(`es une op\('eration normale, et le d\('ecimal 100 en cas d\*(Aqerreur\&.
+.SH "BOGUES"
+.PP
+\m[blue]\fBPage des bogues d\*(AqAPT\fR\m[]\&\s-2\u[1]\d\s+2\&. Si vous souhaitez signaler un bogue \(`a propos d\*(AqAPT, veuillez lire
+/usr/share/doc/debian/bug\-reporting\&.txt
+ou utiliser la commande
+\fBreportbug\fR(1)\&.
+.SH "TRADUCTEURS"
+.PP
+J\('er\(^ome Marant, Philippe Batailler, Christian Perrier
+<bubulle@debian\&.org>
+(2000, 2005, 2009, 2010), \('Equipe de traduction francophone de Debian
+<debian\-l10n\-french@lists\&.debian\&.org>
+.PP
+Veuillez noter que cette traduction peut contenir des parties non traduites\&. Cela est volontaire, pour \('eviter de perdre du contenu quand la traduction est l\('eg\(`erement en retard sur le contenu d\*(Aqorigine\&.
+.SH "AUTEUR"
+.PP
+\fB\('Equipe de d\('eveloppement d\*(AqAPT\fR
+.RS 4
+.RE
+.SH "NOTES"
+.IP " 1." 4
+Page des bogues d'APT
+.RS 4
+\%http://bugs.debian.org/src:apt
+.RE

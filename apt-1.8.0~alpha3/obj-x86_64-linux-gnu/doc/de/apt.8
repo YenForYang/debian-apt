@@ -1,0 +1,176 @@
+'\" t
+.\"     Title: apt
+.\"    Author: APT-Team
+.\" Generator: DocBook XSL Stylesheets v1.79.1 <http://docbook.sf.net/>
+.\"      Date: 20\ \&Oktober\ \&2015
+.\"    Manual: APT
+.\"    Source: APT 1.8.0~alpha3
+.\"  Language: German
+.\"
+.TH "APT" "8" "20\ \&Oktober\ \&2015" "APT 1.8.0~alpha3" "APT"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+apt \- Befehlszeilenschnittstelle
+.SH "\(:UBERSICHT"
+.HP \w'\fBapt\fR\ 'u
+\fBapt\fR [\fB\-h\fR] [\fB\-o=\fR\fB\fIKonfigurationszeichenkette\fR\fR] [\fB\-c=\fR\fB\fIKonfigurationsdatei\fR\fR] [\fB\-t=\fR\fB\fIZiel\-Release\fR\fR] [\fB\-a=\fR\fB\fIArchitektur\fR\fR] {list | search | show | update | install\ \fIPaket\fR\ [{=\fIPaketversionsnummer\fR\ |\ /\fIZiel\-Release\fR}]...  | remove\ \fIPaket\fR...  | upgrade | full\-upgrade | edit\-sources | {\-v\ |\ \-\-version} | {\-h\ |\ \-\-help}}
+.SH "BESCHREIBUNG"
+.PP
+\fBapt\fR
+stellt eine hoch abstrahierte Befehlszeilenschnittstelle f\(:ur das Paketverwaltungssystem zur Verf\(:ugung\&. Es ist als Endanwenderschnittstelle gedacht und aktiviert verglichen mit spezialisierteren Werkzeugen wie
+\fBapt-get\fR(8)
+und
+\fBapt-cache\fR(8)
+standardm\(:a\(ssig einige f\(:ur den interaktiven Gebrauch besser geeignete Optionen\&.
+.PP
+Ganz wie
+\fBapt\fR
+selbst ist seine Handbuchseite als Endanwenderschnittstelle gedacht und erw\(:ahnt als solche nur die am h\(:aufigsten benutzten Befehle sowie Optionen\&. Die geschieht zum Teil, um keine Informationen an mehreren Stellen zu duplizieren und zum Teil, um Leser nicht mit einem \(:Uberfluss an Optionen und Einzelheiten zu \(:uberw\(:altigen\&.
+.PP
+\fBupdate\fR (\fBapt-get\fR(8))
+.RS 4
+\fBupdate\fR
+wird verwendet, um von allen konfigurierten Quellen Paketinformationen herunterzuladen\&. Andere Befehle arbeiten mit diesen Daten, zum Beispiel, um Paket\-Upgrades durchzuf\(:uhren oder um darin zu suchen und um Einzelheiten \(:uber alle zur Installation verf\(:ugbaren Pakete anzuzeigen\&.
+.RE
+.PP
+\fBupgrade\fR (\fBapt-get\fR(8))
+.RS 4
+upgrade
+wird verwendet, um verf\(:ugbare Upgrades f\(:ur alle derzeit auf dem System installierten Pakete von den in der
+\fBsources.list\fR(5)
+konfigurierten Quellen zu installieren\&. Neue Pakete werden installiert, falls dies n\(:otig ist, um Abh\(:angigkeiten zu erf\(:ullen, existierende werden jedoch nie entfernt\&. Falls das Upgrade f\(:ur ein Paket verlangt, dass ein installiertes Paket entfernt wird, wird dieses Upgrade nicht durchgef\(:uhrt\&.
+.RE
+.PP
+\fBfull\-upgrade\fR (\fBapt-get\fR(8))
+.RS 4
+full\-upgrade
+verrichtet die Funktion von \(Fcupgrade\(Fo, wird aber auch installierte Pakete entfernen, falls dies erforderlich ist, um ein Upgrade des Systems als Ganzes durchzuf\(:uhren\&.
+.RE
+.PP
+\fBinstall\fR, \fBremove\fR, \fBpurge\fR (\fBapt-get\fR(8))
+.RS 4
+f\(:uhrt die angefragte Aktion f\(:ur eines oder mehrere Pakete durch, die \(:uber
+\fBregex\fR(7),
+\fBglob\fR(7)
+oder exakten Treffer angegeben wurden\&. Die angefragte Aktion kann f\(:ur spezielle Pakete au\(sser Kraft gesetzt werden, indem ein Plus (+) an den Paketnamen angeh\(:angt wird, um dieses Paket zu installieren oder ein Minus (\-), um es zu entfernen\&.
+.sp
+Eine bestimmte Version eines Paketes kann durch den Paketnamen gefolgt von einem Gleichheitszeichen (=) und der Version des Paketes zur Installation ausgew\(:ahlt werden\&. Alternativ kann die Version aus einer bestimmten Ver\(:offentlichung ausgew\(:ahlt werden, indem dem Paketnamen ein Vorw\(:artsschr\(:agstrich und Codename ((stretch, buster, sid \&...) oder Name der Programmsammlung (stable, testing, unstable) folgt\&. Dies wird au\(sserdem Versionen aus dieser Ver\(:offentlichung f\(:ur Abh\(:angigkeiten dieses Pakets ausw\(:ahlen, falls dies zum Erf\(:ullen der Anfrage n\(:otig ist\&.
+.sp
+Entfernen eines Pakets entfernt alle paketierten Daten, hinterl\(:asst jedoch \(:ublicherweise kleine (ver\(:anderte) Benutzerkonfigurationsdateien f\(:ur den Fall, dass das Entfernen unbeabsichtigt geschah\&. Das blo\(sse Eingeben einer Installationsanfrage f\(:ur das versehentlich entfernte Paket wird seine Funktionen wieder so herstellen, wie sie vorher waren\&. Andererseits k\(:onnen Sie diese \(:Uberbleibsel durch den Aufruf von
+\fBpurge\fR
+loswerden, sogar bei bereits entfernten Paketen\&. Beachten Sie, dass dies keine Daten oder Konfigurationsdateien betrifft, die in Ihrem Home\-Verzeichnis gespeichert sind\&.
+.RE
+.PP
+\fBautoremove\fR (\fBapt-get\fR(8))
+.RS 4
+autoremove
+wird benutzt, um Pakete zu entfernen, die automatisch installiert wurden, um Abh\(:angigkeiten f\(:ur andere Pakete zu erf\(:ullen und die nicht mehr ben\(:otigt werden, da sich die Abh\(:angigkeiten ge\(:andert haben oder die Pakete, die sie ben\(:otigten, in der Zwischenzeit entfernt wurden\&.
+.sp
+Sie sollten pr\(:ufen, ob die Liste keine Anwendungen enth\(:alt, die sie zu sch\(:atzen gelernt haben, obwohl sie nur als Abh\(:angigkeit eines anderen Pakets installiert wurden\&. Sie k\(:onnen solch ein Paket mittels
+\fBapt-mark\fR(8)
+als manuell installiert markieren\&. Pakete, die Sie explizit per
+\fBinstall\fR
+installiert haben, werden niemals zum automatischen Entfernen vorgeschlagen\&.
+.RE
+.PP
+\fBsearch\fR (\fBapt-cache\fR(8))
+.RS 4
+\fBsearch\fR
+kann zur Suche nach den angegebenen
+\fBregex\fR(7)\-Begriffen in der Liste verf\(:ugbarer Pakete und zur Anzeige der Treffer benutzt werden\&. Dies kann z\&.B\&. n\(:utzlich sein, wenn Sie nach Paketen suchen, die eine bestimmte Funktionalit\(:at bieten\&. Falls Sie nach einem Paket suchen, das eine bestimmte Datei enth\(:alt, probieren Sie es mit
+\fBapt-file\fR(1)\&.
+.RE
+.PP
+\fBshow\fR (\fBapt-cache\fR(8))
+.RS 4
+zeigt Informationen \(:uber die angegebenen Pakete einschlie\(sslich ihrer Abh\(:angigkeiten, Installations\- und Herunterladegr\(:o\(sse, Quellen, in denen das Paket verf\(:ugbar ist, der Beschreibung des Paketinhalts und vieles mehr\&. Es kann z\&.B\&. hilfreich sein, einen Blick auf diese Informationen zu werfen, bevor Sie
+\fBapt\fR(8)
+gestatten, ein Paket zu entfernen oder wenn Sie neue Pakete zur Installation suchen\&.
+.RE
+.PP
+\fBlist\fR (in Arbeit)
+.RS 4
+list
+ist
+\fBdpkg\-query \-\-list\fR
+insofern ziemlich \(:ahnlich, als dass es eine Liste von Paketen anzeigen kann, die bestimmte Kriterien erf\(:ullen\&. Es unterst\(:utzt
+\fBglob\fR(7)\-Muster zum Abgleich von Paketnamen ebenso wie Optionen zum Auflisten von installierten (\fB\-\-installed\fR) Versionen, solchen, von denen ein Upgrade durchgef\(:uhrt werden kann (\fB\-\-upgradeable\fR) oder allen verf\(:ugbaren (\fB\-\-all\-versions\fR)\&.
+.RE
+.PP
+\fBedit\-sources\fR (in Arbeit)
+.RS 4
+edit\-sources
+erm\(:oglicht die Bearbeitung Ihrer
+\fBsources.list\fR(5)\-Dateien in Ihrem bevorzugten Texteditor und stellt au\(sserdem grundlegende Plausibilit\(:atspr\(:ufungen bereit\&.
+.RE
+.SH "SKRIPTAUFRUF UND UNTERSCHIEDE ZU ANDEREN APT\-WERKZEUGEN"
+.PP
+Die
+\fBapt\fR(8)\-Befehlszeile wurde als Endanwenderwerkzeug entworfen und kann bei Versionswechseln ihr Verhalten \(:andern\&. Obwohl sie versucht, nicht die Abw\(:artskompatibilit\(:at zu besch\(:adigen, kann dies nicht garantiert werden, wenn eine \(:Anderung vorteilhaft f\(:ur den interaktiven Gebrauch zu sein scheint\&.
+.PP
+Alle Funktionalit\(:aten von
+\fBapt\fR(8)
+sind in APT\-zugeh\(:origen Werkzeugen wie
+\fBapt-cache\fR(8)
+und
+\fBapt-get\fR(8)
+ebenfalls verf\(:ugbar\&.\fBapt\fR(8)
+\(:andert nur den Vorgabewert einiger Optionen (siehe
+\fBapt.conf\fR(5)
+und insbesondere den Geltungsbereich des Programms)\&. Daher sollten Sie vorzugsweise diese Befehle (unter Umst\(:anden mit einigen zus\(:atzlichen aktivierten Optionen) in Ihren Skripten verwenden, da sie die Abw\(:artskompatibilit\(:at so weit wie m\(:oglich aufrechterhalten\&.
+.SH "SIEHE AUCH"
+.PP
+\fBapt-get\fR(8),
+\fBapt-cache\fR(8),
+\fBsources.list\fR(5),
+\fBapt.conf\fR(5),
+\fBapt-config\fR(8), die APT\-Benutzeranleitung in /usr/share/doc/apt\-doc/,
+\fBapt_preferences\fR(5), das APT\-Howto\&.
+.SH "DIAGNOSE"
+.PP
+\fBapt\fR
+gibt bei normalen Aktionen 0 zur\(:uck, dezimal 100 bei Fehlern\&.
+.SH "FEHLER"
+.PP
+\m[blue]\fBAPT\-Fehlerseite\fR\m[]\&\s-2\u[1]\d\s+2\&. Wenn Sie einen Fehler in APT berichten m\(:ochten, lesen Sie bitte
+/usr/share/doc/debian/bug\-reporting\&.txt
+oder den
+\fBreportbug\fR(1)\-Befehl\&. Verfassen Sie Fehlerberichte bitte auf Englisch\&.
+.SH "\(:UBERSETZUNG"
+.PP
+Die deutsche \(:Ubersetzung wurde 2009 von Chris Leick
+<c\&.leick@vollbio\&.de>
+in Zusammenarbeit mit dem deutschen l10n\-Team von Debian
+<debian\-l10n\-german@lists\&.debian\&.org>
+angefertigt\&.
+.PP
+Beachten Sie, dass diese \(:Ubersetzung Teile enthalten kann, die nicht \(:ubersetzt wurden\&. Dies ist so, damit kein Inhalt verloren geht, wenn die \(:Ubersetzung hinter dem Originalinhalt hinterherh\(:angt\&.
+.SH "AUTOR"
+.PP
+\fBAPT\-Team\fR
+.RS 4
+.RE
+.SH "FU\(ssNOTEN"
+.IP " 1." 4
+APT-Fehlerseite
+.RS 4
+\%http://bugs.debian.org/src:apt
+.RE

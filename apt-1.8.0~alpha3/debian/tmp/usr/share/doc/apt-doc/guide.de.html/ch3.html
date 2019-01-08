@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Kapitel 3. DSelect</title>
+    <meta name="generator" content="DocBook XSL Stylesheets V1.79.1"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="home" href="index.html" title="APT-Benutzerhandbuch"/>
+    <link rel="up" href="index.html" title="APT-Benutzerhandbuch"/>
+    <link rel="prev" href="ch2.html" title="Kapitel 2. apt-get"/>
+    <link rel="next" href="ch4.html" title="Kapitel 4. Die Schnittstelle"/>
+  </head>
+  <body>
+    <div class="navheader">
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Kapitel 3. DSelect</th>
+        </tr>
+        <tr>
+          <td align="left"><a accesskey="p" href="ch2.html">Zurück</a> </td>
+          <th width="60%" align="center"> </th>
+          <td align="right"> <a accesskey="n" href="ch4.html">Weiter</a></td>
+        </tr>
+      </table>
+      <hr/>
+    </div>
+    <div class="chapter">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h1 class="title"><a id="ch3"/>Kapitel 3. DSelect</h1>
+          </div>
+        </div>
+      </div>
+      <p>
+Die APT-<span class="command"><strong>dselect</strong></span>-Methode stellt das komplette APT-System
+mit dem <span class="command"><strong>dselect</strong></span>-Paketauswahl-GUI
+bereit. <span class="command"><strong>dselect</strong></span> wird benutzt, um Pakete zum Installieren
+oder Entfernen auszuwählen und APT installiert sie tatsächlich.
+</p>
+      <p>
+Um die APT-Methode einzuschalten, müssen Sie [Z]ugriff in
+<span class="command"><strong>dselect</strong></span> auswählen und dann die APT-Methode wählen. Sie
+werden nach einer Zusammenstellung von <span class="emphasis"><em>Quellen</em></span>
+gefragt. Dies sind Orte, von denen Archive heruntergeladen werden. Dies
+können Internetsites, lokale Debian-Spiegel oder CD-ROMs sein. Jede Quelle
+kann einen Ausschnitt des gesamten Debian-Archives bereitstellen. APT wird
+sie automatisch kombinieren, um eine komplette Zusammenstellung von Paketen
+zu formen. Falls Sie eine CD-ROM haben, ist es eine gute Idee, sie als
+erstes und dann den Spiegel anzugeben, so dass Sie Zugriff auf die neusten
+Fehlerbehebungen haben. APT wird automatisch Pakete auf der CD-ROM benutzen,
+bevor es sie aus dem Internet herunterlädt.
+</p>
+      <pre class="screen">
+   eine Liste mit Orten von Distributionsquellen einrichten
+
+ Bitte geben Sie die Basis-URL der Debian-Distribution an.
+ Die bekannten Zugriffsschemas dafür sind: http file
+
+ Zum Beispiel:
+      file:/mnt/debian,
+      ftp://ftp.debian.org/debian,
+      http://ftp.de.debian.org/debian,
+
+
+ URL [http://llug.sep.bnl.gov/debian]:
+</pre>
+      <p>
+Das Einrichten der <span class="emphasis"><em>Quellen</em></span> beginnt durch das Erfragen
+der Basis des Debian-Archives, vorgegeben ist ein HTTP-Spiegel. Als nächstes
+wird nach der zu erhaltenden Distribution gefragt.
+</p>
+      <pre class="screen">
+ Bitte geben Sie die zu erhaltende Distributionskennzeichnung oder den mit
+ einem / endenden Pfad zum Paket an. Die Distributionskennzeichnungen sind
+ normalerweise etwas wie: stable unstable testing non-US
+
+ Distribution [stable]:
+</pre>
+      <p>
+Die Distribution bezieht sich auf die Debian-Version im Archiv,
+<span class="emphasis"><em>stable</em></span> bezieht sich auf die zuletzt veröffentlichte
+Version und <span class="emphasis"><em>unstable</em></span> bezieht sich auf die
+Entwicklungsversion. <span class="emphasis"><em>non-US</em></span> ist nur auf einigen
+Spiegeln verfügbar und bezieht sich auf Pakete, die
+Verschlüsselungstechnniken oder andere Dinge enthalten, die nicht aus den
+Vereinigten Staaten exportiert werden können. Diese Pakete in die USA zu
+importieren ist jedoch legal.
+</p>
+      <pre class="screen">
+ Bitte geben Sie die Bestandteile an, die Sie erhalten möchten
+ Die Bestandteile sind normalerweise etwas wie: »main« »contrib« »non-free«
+
+ Bestandteile [main contrib non-free]:
+</pre>
+      <p>
+Die Liste der Bestandteile bezieht sich auf die Liste von
+Unter-Distributionen zum Herunterladen. Die Distribution ist auf Basis von
+Software-Lizenzen unterteilt, »Main« besteht aus Paketen, die gemäß der DFSG
+frei sind, während »Contrib« und »Non-free« Dinge enthalten, die
+verschiedene Einschränkungen in ihrer Benutzung und ihrem Vertrieb haben.
+</p>
+      <p>
+Jegliche beliebige Anzahl von Quellen kann hinzugefügt werden, das
+Einrichtungsskript wird mit Nachfragen fortfahren, bis Sie alles angegeben
+haben, was Sie möchten.
+</p>
+      <p>
+Bevor sie beginnen, <span class="command"><strong>dselect</strong></span> zu benutzen, ist es
+notwendig, die Verfügbarkeitsliste zu aktualisieren, indem sie aus dem Menü
+[E]rneuern auswählen. Dies ist eine Obermenge von <code class="literal">apt-get
+update</code>, das <span class="command"><strong>dselect</strong></span> heruntergeladene
+Informationen zur Verfügung stellt. [E]rneuern muss auch dann durchgeführt
+werden, wenn vorher <code class="literal">apt-get update</code> ausgeführt wurde.
+</p>
+      <p>
+Sie können dann fortfahren und Ihre Auswahl per [A]uswählen treffen und dann
+die Installation mit [I]nstall. vornehmen. Wenn Sie die APT-Methode
+benutzen, haben die Befehle Kon[f]ig. und [L]öschen keine Bedeutung, der
+Befehl [I]nstall. führt beides gleichermaßen aus.
+</p>
+      <p>
+Standardmäßig wird APT automatisch die Paketdateien (.deb) entfernen, sobald
+sie erfolgreich installiert sind. Um dieses Verhalten zu ändern, legen Sie
+<code class="literal">Dselect::clean "prompt";</code> in /etc/apt/apt.conf.
+</p>
+    </div>
+    <div class="navfooter">
+      <hr/>
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td align="left"><a accesskey="p" href="ch2.html">Zurück</a> </td>
+          <td align="center"> </td>
+          <td align="right"> <a accesskey="n" href="ch4.html">Weiter</a></td>
+        </tr>
+        <tr>
+          <td align="left" valign="top">Kapitel 2. apt-get </td>
+          <td align="center">
+            <a accesskey="h" href="index.html">Zum Anfang</a>
+          </td>
+          <td align="right" valign="top"> Kapitel 4. Die Schnittstelle</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,128 @@
+'\" t
+.\"     Title: apt-extracttemplates
+.\"    Author: Jason Gunthorpe
+.\" Generator: DocBook XSL Stylesheets v1.79.1 <http://docbook.sf.net/>
+.\"      Date: 27\ \&maart\ \&2014
+.\"    Manual: APT
+.\"    Source: APT 1.8.0~alpha3
+.\"  Language: Dutch
+.\"
+.TH "APT\-EXTRACTTEMPLATE" "1" "27\ \&maart\ \&2014" "APT 1.8.0~alpha3" "APT"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+apt-extracttemplates \- Hulpprogramma om configuratie\-informatie en sjablonen voor \fBdebconf\fR uit Debian\-pakketten te extraheren
+.SH "SAMENVATTING"
+.HP \w'\fBapt\-extracttemplates\fR\ 'u
+\fBapt\-extracttemplates\fR [\fB\-t=\fR\fB\fItijdelijke_map\fR\fR] \fIbestandsnaam\fR... {\-v\ |\ \-\-version} {\-h\ |\ \-\-help}
+.SH "OMSCHRIJVING"
+.PP
+\fBapt\-extracttemplates\fR
+gebruikt een of meer pakketbestanden van Debian als invoer en schrijft (naar een tijdelijke map) alle ermee verband houdende configuratiescripts en sjabloonbestanden weg\&. Voor elk verwerkt pakket dat configuratiescripts en sjablonen bevat wordt een regel met uitvoer aangemaakt volgens de indeling:
+.PP
+pakketversie sjabloonbestand configuratiescript
+.PP
+sjabloonbestand en configuratiescript worden opgeslagen in de tijdelijke map die opgegeven werd met de optie
+\fB\-t\fR
+of
+\fB\-\-tempdir\fR
+(APT::ExtractTemplates::TempDir) in bestandsnamen met de vorm
+package\&.template\&.XXXXXX
+en
+package\&.config\&.XXXXXX
+.SH "OPTIES"
+.PP
+Alle commandoregelopties kunnen via het configuratiebestand ingesteld worden\&. de omschrijving geeft de in te stellen configuratieoptie op\&. Bij booleaanse opties kunt u instellingen uit het configuratiebestand overschrijven door iets te gebruiken als
+\fB\-f\-\fR,
+\fB\-\-no\-f\fR,
+\fB\-f=no\fR
+en meerdere andere variaties\&.
+.PP
+\fB\-t\fR, \fB\-\-tempdir\fR
+.RS 4
+Tijdelijke map om er ge\(:extraheerde sjabloonbestanden en configuratiescripts voor
+\fBdebconf\fR
+in op te slaan\&. Configuratie\-item:
+APT::ExtractTemplates::TempDir
+.RE
+.PP
+\fB\-h\fR, \fB\-\-help\fR
+.RS 4
+Een korte samenvatting van het gebruik weergeven\&.
+.RE
+.PP
+\fB\-v\fR, \fB\-\-version\fR
+.RS 4
+Het versienummer van het programma weergeven\&.
+.RE
+.PP
+\fB\-c\fR, \fB\-\-config\-file\fR
+.RS 4
+Configuratiebestand; Een te gebruiken configuratiebestand opgeven\&. Het programma zal het standaard configuratiebestand inlezen en nadien dit configuratiebestand\&. Als configuratie\-instellingen opgegeven moeten worden vooraleer de standaard configuratiebestanden verwerkt worden, geef dan een bestand op met de omgevingsvariabele
+\fBAPT_CONFIG\fR\&. Raadpleeg
+\fBapt.conf\fR(5)
+voor informatie over de syntaxis\&.
+.RE
+.PP
+\fB\-o\fR, \fB\-\-option\fR
+.RS 4
+Een configuratieoptie instellen; Dit stelt een willekeurige configuratieoptie in\&. De syntaxis is
+\fB\-o Foo::Bar=bar\fR\&.
+\fB\-o\fR
+en
+\fB\-\-option\fR
+kunnen meermaals gebruikt worden om verschillende opties in te stellen\&.
+.RE
+.SH "ZIE OOK"
+.PP
+\fBapt.conf\fR(5)
+.SH "DIAGNOSTIEK"
+.PP
+\fBapt\-extracttemplates\fR
+geeft de terugkeerwaarde nul bij een normaal verlopen operatie, het decimaal getal 100 in geval van een fout\&.
+.SH "BUGS"
+.PP
+\m[blue]\fBAPT bugpagina\fR\m[]\&\s-2\u[1]\d\s+2\&. Indien u een bug in APT wilt rapporteren, raadpleeg dan
+/usr/share/doc/debian/bug\-reporting\&.txt
+of het
+\fBreportbug\fR(1)
+commando\&.
+.SH "VERTALING"
+.PP
+De Nederlandse vertaling werd in 2015 gemaakt door Frans Spiesschaert
+<Frans\&.Spiesschaert@yucom\&.be>, in samenwerking met het Debian Dutch l10n Team
+<debian\-l10n\-dutch@lists\&.debian\&.org>\&.
+.PP
+Merk op dat de vertaling van dit document nog onvertaalde delen kan bevatten\&. Dit is intentioneel om te vermijden dat inhoud verloren zou gaan door een vertaling die achterop loopt op het origineel\&.
+.SH "AUTEURS"
+.PP
+\fBJason Gunthorpe\fR
+.RS 4
+.RE
+.PP
+\fBAPT\-team\fR
+.RS 4
+.RE
+.SH "OPMERKINGEN"
+.IP " 1." 4
+APT bugpagina
+.RS 4
+\%http://bugs.debian.org/src:apt
+.RE

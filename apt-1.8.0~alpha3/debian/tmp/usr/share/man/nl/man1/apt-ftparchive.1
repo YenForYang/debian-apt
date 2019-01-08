@@ -1,0 +1,676 @@
+'\" t
+.\"     Title: apt-ftparchive
+.\"    Author: Jason Gunthorpe
+.\" Generator: DocBook XSL Stylesheets v1.79.1 <http://docbook.sf.net/>
+.\"      Date: 11\ \&november\ \&2016
+.\"    Manual: APT
+.\"    Source: APT 1.8.0~alpha3
+.\"  Language: Dutch
+.\"
+.TH "APT\-FTPARCHIVE" "1" "11\ \&november\ \&2016" "APT 1.8.0~alpha3" "APT"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+apt-ftparchive \- Hulpprogramma om indexbestanden te maken
+.SH "SAMENVATTING"
+.HP \w'\fBapt\-ftparchive\fR\ 'u
+\fBapt\-ftparchive\fR [\fB\-dsq\fR] [\fB\-\-md5\fR] [\fB\-\-delink\fR] [\fB\-\-readonly\fR] [\fB\-\-contents\fR] [\fB\-\-arch\ \fR\fB\fIarchitecture\fR\fR] [\fB\-o=\fR\fB\fIconfiguratietekenreeks\fR\fR] [\fB\-c=\fR\fB\fIconfiguratiebestand\fR\fR] {packages\ \fIpad\fR...\ [\fIoverride\-bestand\fR\ [\fIpadprefix\fR]]  | sources\ \fIpad\fR...\ [\fIoverride\-bestand\fR\ [\fIpadprefix\fR]]  | contents\ \fIpad\fR  | release\ \fIpad\fR  | generate\ \fIconfiguratiebestand\fR\ \fIsectie\fR...  | clean\ \fIconfiguratiebestand\fR  | {\-v\ |\ \-\-version} | {\-h\ |\ \-\-help}}
+.SH "OMSCHRIJVING"
+.PP
+\fBapt\-ftparchive\fR
+is een gereedschap voor de commandoregel dat de indexbestanden maakt die APT gebruikt om toegang te hebben tot een distributiebron\&. De indexbestanden moeten aangemaakt worden op de site van oorsprong en gebaseerd zijn op de inhoud van die site\&.
+.PP
+\fBapt\-ftparchive\fR
+is een uitbreiding van het programma
+\fBdpkg-scanpackages\fR(1)
+dat diens volledige functionaliteit incorporeert via het commando
+packages\&. Het bevat ook een programma,
+contents, voor het aanmaken van contents\-bestanden en degelijk ontwikkelde middelen om dit aanmaakproces voor een volledig archief door een script te laten uitvoeren\&.
+.PP
+\fBapt\-ftparchive\fR
+kan uit zichzelf gebruik maken van binaire databases om de inhoud van een \&.deb\-bestand te bufferen en het is van geen enkel extern programma afhankelijk met uitzondering van
+\fBgzip\fR(1)\&. Wanneer een volledige aanmaak gebeurt, zal het automatisch een controle uitvoeren op gewijzigde bestanden en de gewenste gecomprimeerde uitvoerbestanden bouwen\&.
+.PP
+Tenzij de optie
+\fB\-h\fR, of
+\fB\-\-help\fR
+opgegeven werd, moet een van de onderstaande commando\*(Aqs gebruikt worden\&.
+.PP
+\fBpackages\fR
+.RS 4
+Het commando packages maakt vertrekkend vanuit een mappenboom een package\-bestand aan\&. Het begint bij de opgegeven map en doorzoekt de onderliggende mappen op de aanwezigheid van \&.deb\-bestanden en schrijft voor elk ervan een pakketfiche weg naar de standaarduitvoer\&. Dit commando is bij benadering analoog aan
+\fBdpkg-scanpackages\fR(1)\&.
+.sp
+De optie
+\fB\-\-db\fR
+kan gebruikt worden om een bufferende binaire database op te geven\&.
+.RE
+.PP
+\fBsources\fR
+.RS 4
+Het commando
+sources
+maakt vertrekkend vanuit een mappenboom een indexbestand over broncodebestanden aan\&. Het begint bij de opgegeven map en doorzoekt de onderliggende mappen op de aanwezigheid van \&.dsc\-bestanden en schrijft voor elk ervan een broncodebestandsfiche weg naar de standaarduitvoer\&. Dit commando is bij benadering analoog aan
+\fBdpkg-scansources\fR(1)\&.
+.sp
+Indien een override\-bestand opgegeven werd, zal gezocht worden naar een broncode\-override\-bestand met de extensie \&.src\&. De optie \-\-source\-override kan gebruikt worden om op te geven dat een ander broncode\-override\-bestand gebruikt zal worden\&.
+.RE
+.PP
+\fBcontents\fR
+.RS 4
+Het commando
+contents
+maakt voor een mappenboom een contents\-bestand aan\&. Het begint bij de opgegeven map en doorzoekt de onderliggende mappen op de aanwezigheid van \&.deb\-bestanden en leest van elk bestand de bestandenlijst\&. Daarna sorteert het de lijst van bestanden en schrijft die gekoppeld aan een pakket weg naar de standaarduitvoer\&. Mappen worden niet naar standaarduitvoer geschreven\&. Indien hetzelfde bestand aan meerdere pakketten toebehoort, worden in de uitvoer de pakketten door een komma gescheiden\&.
+.sp
+De optie
+\fB\-\-db\fR
+kan gebruikt worden om een bufferende binaire database op te geven\&.
+.RE
+.PP
+\fBrelease\fR
+.RS 4
+Het commando
+release
+maakt voor een mappenboom een Release\-bestand aan\&. Het begint bij de opgegeven map en zoekt daar en in de onderliggende mappen standaard naar niet\-gecomprimeerde en gecomprimeerde
+Packages\-,
+Sources,
+Contents,
+Components
+en
+icons\-bestanden, alsook naar
+Release\-,
+Index\- en
+md5sum\&.txt\-bestanden\&. (APT::FTPArchive::Release::Default\-Patterns)\&. Bijkomende bestandsnaampatronen kunnen toegevoegd worden door ze op te sommen inAPT::FTPArchive::Release::Patterns\&. Het commando schrijft vervolgens naar de standaarduitvoer eenRelease\-bestand dat (standaard) voor elk bestand een MD5\-, SHA1\-, SHA256 en SHA512\-verzameling bevat\&.
+.sp
+De waarden voor de bijkomende velden met metagegevens in het Release\-bestand worden ontleend aan de overeenkomstige variabelen uit
+APT::FTPArchive::Release, bijvoorbeeld
+APT::FTPArchive::Release::Origin\&. De ondersteunde velden zijn:
+Origin,
+Label,
+Suite,
+Version,
+Codename,
+Date,
+NotAutomatic,
+ButAutomaticUpgrades,
+Acquire\-By\-Hash,
+Valid\-Until,
+Signed\-By,
+Architectures,
+Components
+en
+Description\&.
+.RE
+.PP
+\fBgenerate\fR
+.RS 4
+Het commando
+generate
+werd ontworpen voor gebruik in een cron\-script en bouwt indexen volgens het opgegeven configuratiebestand\&. De configuratietaal voorziet in een flexibel instrument om op te geven welke indexbestanden over welke mappen gemaakt moeten worden en ze voorziet ook in een eenvoudig instrument voor het onderhoud van de vereiste instellingen\&.
+.RE
+.PP
+\fBclean\fR
+.RS 4
+Het commando
+clean
+schoont de door het opgegeven configuratiebestand gebruikte gegevensbestanden op door er de niet langer gebruikte fiches uit te verwijderen\&.
+.RE
+.SH "DE CONFIGURATIE VAN HET GENERATE\-COMMANDO"
+.PP
+Het commando
+generate
+gebruikt een configuratiebestand met de beschrijving van de archieven die gegenereerd moeten worden\&. Het gebruikt het typische ISC configuratieformaat dat men aantreft in ISC\-gereedschap zoals bind 8 en dhcpd\&.
+\fBapt.conf\fR(5)
+bevat een beschrijving van de syntaxis\&. Noteer dat de configuratie van generate per sectie ontleed wordt, maar dat
+\fBapt.conf\fR(5)
+per boom ontleed wordt\&. Dit heeft enkel invloed op de manier waarop met het bereiklabel omgesprongen wordt\&.
+.PP
+De configuratie van generate bevat vier aparte secties die hierna besproken worden\&.
+.SS "De sectie Dir"
+.PP
+De sectie
+Dir
+definieert de standaardmappen waarin men de bestanden kan lokaliseren die nodig zijn tijdens het maakproces\&. Deze mappen worden voorafgegaan door bepaalde relatieve paden die in de volgende secties gedefinieerd worden om zo een volledig en absoluut pad te bekomen\&.
+.PP
+\fBArchiveDir\fR
+.RS 4
+Geeft de basismap van het FTP\-archief op\&. In een standaardconfiguratie van Debian is dat de map die de nodes
+ls\-LR
+en dist bevatten\&.
+.RE
+.PP
+\fBOverrideDir\fR
+.RS 4
+Geeft de locatie van de override\-bestanden op\&.
+.RE
+.PP
+\fBCacheDir\fR
+.RS 4
+Geeft de locatie van de cachebestanden op\&.
+.RE
+.PP
+\fBFileListDir\fR
+.RS 4
+Geeft de locatie van de bestandenlijst\-bestanden op, indien de instelling
+FileList
+hieronder gebruikt wordt\&.
+.RE
+.SS "De sectie Default"
+.PP
+De sectie
+Default
+geeft standaardwaarden en instellingen op die de werking van de generator besturen\&. Andere secties kunnen deze standaardwaarden overschrijven met een sectiegebonden instelling\&.
+.PP
+\fBPackages::Compress\fR
+.RS 4
+Stelt het standaard compressieschema in dat voor de pakketindexbestanden gebruikt wordt\&. Het is een tekenreeks die bestaat uit een door spaties gescheiden lijst van minstens een van de compressieprogramma\*(Aqs die via het configuratiebereik
+\fBAPT::Compressor\fR
+geconfigureerd zijn\&. Voor alle compressieschema\*(Aqs is de standaardinstelling \*(Aq\&. gzip\*(Aq\&.
+.RE
+.PP
+\fBPackages::Extensions\fR
+.RS 4
+Stelt in wat de lijst is van bestandsextensies die er standaard op wijzen dat het pakketbestanden betreft\&. Dit is standaard ingesteld op \*(Aq\&.deb\*(Aq\&.
+.RE
+.PP
+\fBSources::Compress\fR
+.RS 4
+Dit is gelijkaardig aan
+Packages::Compress, behalve dat het de compressie van de Sources\-bestanden regelt\&.
+.RE
+.PP
+\fBSources::Extensions\fR
+.RS 4
+Stelt in wat de lijst is van bestandsextensies die er standaard op wijzen dat het broncodebestanden betreft\&. Dit is standaard ingesteld op \*(Aq\&.dsc\*(Aq\&.
+.RE
+.PP
+\fBContents::Compress\fR
+.RS 4
+Dit is gelijkaardig aan
+Packages::Compress, behalve dat het de compressie van de Contents\-bestanden regelt\&.
+.RE
+.PP
+\fBTranslation::Compress\fR
+.RS 4
+Dit is gelijkaardig aan
+Packages::Compress, behalve dat het de compressie van het Translation\-en hoofdbestand regelt\&.
+.RE
+.PP
+\fBDeLinkLimit\fR
+.RS 4
+Geeft het aantal kilobytes op dat per doorloop ontkoppeld (en vervangen door harde koppelingen) moet worden\&. Dit wordt gebruikt in samenhang met de sectiegebonden instelling
+External\-Links\&.
+.RE
+.PP
+\fBFileMode\fR
+.RS 4
+Stelt de modus in van alle aangemaakte indexbestanden\&. Standaard is dit ingesteld op 0644\&. Alle indexbestanden worden op deze modus ingesteld ongeacht het umask\&.
+.RE
+.PP
+\fBLongDescription\fR
+.RS 4
+Stelt in of de gedetailleerde beschrijvingen moeten opgenomen worden in het
+Packages\-bestand of afgesplitst en in een
+Translation\-en
+hoofdbestand moeten geplaatst worden\&.
+.RE
+.SS "De sectie TreeDefault"
+.PP
+Stelt standaarden in die specifiek zijn voor de secties
+Tree\&. Al deze variabelen zijn substitutievariabelen waarbij de tekenreeksen $(DIST), $(SECTION) en $(ARCH) vervangen worden door hun respectieve waarden\&.
+.PP
+\fBMaxContentsChange\fR
+.RS 4
+Stelt in voor welk aantal kilobytes er iedere dag contents\-bestanden gegenereerd worden\&. Contents\-bestanden komen een na een aan de beurt, zodat ze over een periode van een aantal dagen allemaal opnieuw gebouwd worden\&.
+.RE
+.PP
+\fBContentsAge\fR
+.RS 4
+Regelt het aantal dagen dat een contents\-bestand mag gebruikt worden zonder dat het gewijzigd werd\&. Indien die limiet overschreden wordt, zal het mtime van het contents\-bestand bijgewerkt worden\&. Een dergelijke situatie kan zich voordoen als het pakketbestand op zo een manier gewijzigd wordt dat het niet resulteert in een nieuw contents\-bestand [bijvoorbeeld een wijziging aan override]\&. Uitstel is toegelaten als gehoopt mag worden dat nieuwe \&.deb\-bestanden ge\(:installeerd zullen worden wat hoe dan ook een nieuw contents\-bestand vereist\&. De standaard is 10, waarbij de eenheden in dagen uitgedrukt worden\&.
+.RE
+.PP
+\fBDirectory\fR
+.RS 4
+Stelt de basis van de \&.deb\-mappenboom in\&. Standaard is dat
+$(DIST)/$(SECTION)/binary\-$(ARCH)/
+.RE
+.PP
+\fBSrcDirectory\fR
+.RS 4
+Stelt de basis in van de mappenboom van broncodepakketten\&. Standaard is dat
+$(DIST)/$(SECTION)/source/
+.RE
+.PP
+\fBPackages\fR
+.RS 4
+Stelt in waar het Packages\-bestand geschreven wordt\&. Standaard is dat
+$(DIST)/$(SECTION)/binary\-$(ARCH)/Packages
+.RE
+.PP
+\fBSources\fR
+.RS 4
+Stelt in waar het Sources\-bestand geschreven wordt\&. Standaard is dat
+$(DIST)/$(SECTION)/source/Sources
+.RE
+.PP
+\fBTranslation\fR
+.RS 4
+Stelt in waar het hoofdbestand Translation\-en geschreven wordt met daarin de uitgebreide beschrijvingen in het geval die niet in het bestand Packages opgenomen werden\&. De standaard is
+$(DIST)/$(SECTION)/i18n/Translation\-en
+.RE
+.PP
+\fBInternalPrefix\fR
+.RS 4
+Stelt het pad\-prefix in dat regelt wanneer een symbolische koppeling als een interne en niet als een externe koppeling beschouwd moet worden\&. De standaard is
+$(DIST)/$(SECTION)/
+.RE
+.PP
+\fBContents\fR
+.RS 4
+Stelt in waar het Contents\-bestand geschreven wordt\&. De standaard is
+$(DIST)/$(SECTION)/Contents\-$(ARCH)\&. Indien deze instelling ertoe leidt dat meerdere Packages\-bestanden horen bij een enkel Contents\-bestand (wat standaard het geval is), dan zal
+\fBapt\-ftparchive\fR
+deze pakketbestanden automatisch tot een geheel integreren\&.
+.RE
+.PP
+\fBContents::Header\fR
+.RS 4
+Stelt het koptekstbestand in dat aan het begin van het aangemaakte contents\-bestand moet komen\&.
+.RE
+.PP
+\fBBinCacheDB\fR
+.RS 4
+Stelt de binaire database in om als cache te dienen voor deze sectie\&. Meerdere secties kunnen gebruik maken van dezelfde database\&.
+.RE
+.PP
+\fBFileList\fR
+.RS 4
+Stelt in dat
+\fBapt\-ftparchive\fR
+de lijst van bestanden moet halen uit het opgegeven bestand en niet moet opmaken aan de hand van het doorlopen van de mappenboom\&. De archiefmap wordt als prefix aan relatieve bestandsnamen toegevoegd\&.
+.RE
+.PP
+\fBSourceFileList\fR
+.RS 4
+Stelt in dat
+\fBapt\-ftparchive\fR
+de lijst van bestanden moet halen uit het opgegeven bestand en niet moet opmaken aan de hand van het doorlopen van de mappenboom\&. De archiefmap wordt als prefix aan relatieve bestandsnamen toegevoegd\&. Dit wordt gebruikt bij het verwerken van broncode\-indexen\&.
+.RE
+.SS "De sectie Tree"
+.PP
+De sectie
+Tree
+definieert een standaard bestandsboom voor Debian die bestaat uit een basismap met daarin dan meerdere secties en binnen elke sessie tenslotte meerdere architecturen\&. Het exacte pad dat gebruikt wordt, wordt gedefinieerd door de substitutievariabele
+Directory\&.
+.PP
+De sectie
+Tree
+werkt met een bereiklabel dat de variabele
+$(DIST)
+instelt en de basis van de boomstructuur definieert (vooraan aan het pad wordt
+ArchiveDir
+toegevoegd)\&. Doorgaans is dat een instelling zoals
+dists/stretch\&.
+.PP
+Alle in de sectie
+TreeDefault
+gedefinieerde instellingen kunnen ook in een
+Tree\-sectie gebruikt worden evenals drie nieuwe variabelen\&.
+.PP
+Als
+\fBapt\-ftparchive\fR
+een
+Tree\-sectie verwerkt, voert het een operatie uit die vergelijkbaar is met:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+for i in Sections do 
+   for j in Architectures do
+      Generate for DIST=scope SECTION=i ARCH=j
+     
+.fi
+.if n \{\
+.RE
+.\}
+
+.PP
+\fBSections\fR
+.RS 4
+Dit is een door spaties gescheiden lijst van secties die onder de distributie te vinden zijn\&. Doorgaans is dat iets zoals
+main contrib non\-free
+.RE
+.PP
+\fBArchitectures\fR
+.RS 4
+Dit is een met spaties gescheiden lijst van alle architecturen die voorkomen onder de sectie waarin gezocht wordt\&. De bijzondere architectuur \*(Aqsource\*(Aq wordt gebruikt om aan te geven dat deze boomstructuur een archief met broncode bevat\&. De architectuur \*(Aqall\*(Aq signaleert dat architectuurspecifieke bestanden zoals
+Packages, niet telkens in elk bestand informatie moeten opnemen over pakketten van het architectuurtype
+all, aangezien die te vinden is in een specifiek bestand\&.
+.RE
+.PP
+\fBLongDescription\fR
+.RS 4
+Stelt in of de gedetailleerde beschrijvingen moeten opgenomen worden in het
+Packages\-bestand of afgesplitst en in een
+Translation\-en
+hoofdbestand moeten geplaatst worden\&.
+.RE
+.PP
+\fBBinOverride\fR
+.RS 4
+Stelt het binaire override\-bestand in\&. Het override\-bestand bevat informatie over sectie, prioriteit en het adres van de onderhouder\&.
+.RE
+.PP
+\fBSrcOverride\fR
+.RS 4
+Stelt het override\-bestand van de broncode in\&. Het override\-bestand bevat informatie over de sectie\&.
+.RE
+.PP
+\fBExtraOverride\fR
+.RS 4
+Stelt het binaire extra override\-bestand in\&.
+.RE
+.PP
+\fBSrcExtraOverride\fR
+.RS 4
+Stelt het extra override\-bestand van de broncode in\&.
+.RE
+.SS "De sectie BinDirectory"
+.PP
+De sectie
+bindirectory
+definieert een binaire mappenboom zonder bijzondere structuur\&. Het bereiklabel specificeert de locatie van de binaire map en de instellingen zijn gelijkaardig aan die van de sectie
+Tree
+zonder substitutievariabelen of instellingen van het type
+SectionArchitecture\&.
+.PP
+\fBPackages\fR
+.RS 4
+Stelt in waar het Packages\-bestand aangemaakt wordt\&.
+.RE
+.PP
+\fBSources\fR
+.RS 4
+Stelt in waar het Sources\-bestand aangemaakt wordt\&. Er is minstens een bestand
+Packages
+of
+Sources
+vereist\&.
+.RE
+.PP
+\fBContents\fR
+.RS 4
+Stelt in waar het Contents\-bestand aangemaakt wordt (optioneel)\&.
+.RE
+.PP
+\fBBinOverride\fR
+.RS 4
+Stelt het binaire override\-bestand in\&.
+.RE
+.PP
+\fBSrcOverride\fR
+.RS 4
+Stelt het override\-bestand voor de broncode in\&.
+.RE
+.PP
+\fBExtraOverride\fR
+.RS 4
+Stelt het binaire extra override\-bestand in\&.
+.RE
+.PP
+\fBSrcExtraOverride\fR
+.RS 4
+Stelt het extra override\-bestand van de broncode in\&.
+.RE
+.PP
+\fBBinCacheDB\fR
+.RS 4
+Stelt de cache database in\&.
+.RE
+.PP
+\fBPathPrefix\fR
+.RS 4
+Voegt een pad toe aan al de paden van de uitvoer\&.
+.RE
+.PP
+\fBFileList\fR, \fBSourceFileList\fR
+.RS 4
+Specificeert het bestand met de bestandslijst\&.
+.RE
+.SH "HET BINAIRE OVERRIDE\-BESTAND"
+.PP
+Het binaire override\-bestand is volledig compatibel met
+\fBdpkg-scanpackages\fR(1)\&. Het bevat vier door spaties gescheiden velden\&. Het eerste veld bevat de pakketnaam, het tweede bevat de prioriteit die aan dat pakket gegeven moet worden, het derde bevat de sectie waarin dat pakket geplaatst moet worden en het laatste veld is voorbehouden voor het opgeven van een vervangende onderhouder\&.
+.PP
+De algemene vorm van het onderhouder\-veld is:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+oude [// ouden]* => nieuwe
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+, of gewoon
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+nieuwe
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+De eerste vorm laat toe om een lijst van oude e\-mailadressen, van elkaar gescheiden door een dubbele slash, op te geven\&. Indien een ervan aangetroffen wordt, dan zal nieuw als de nieuwe waarde voor het onderhouder\-veld gebruikt worden\&. De tweede vorm vervangt onvoorwaardelijk de inhoud van het onderhouder\-veld\&.
+.SH "HET OVERRIDE\-BESTAND VOOR BRONCODE"
+.PP
+Het override\-bestand voor broncode is volledig compatibel met
+\fBdpkg-scansources\fR(1)\&. Het bestaat uit twee velden die van elkaar gescheiden worden door een spatie\&. Het eerste veld bevat de naam van het broncodepakket en het tweede de sectie waartoe het moet behoren\&.
+.SH "HET EXTRA OVERRIDE\-BESTAND"
+.PP
+Het extra override\-bestand maakt het mogelijk om gelijk welk arbitrair label toe te voegen of te vervangen in de uitvoer\&. Het bestaat uit drie kolommen\&. In de eerste staat het pakket vermeld, in de tweede het label en de rest van de regel bevat de nieuwe waarde die eraan toegekend wordt\&.
+.SH "OPTIES"
+.PP
+Alle commandoregelopties kunnen via het configuratiebestand ingesteld worden\&. de omschrijving geeft de in te stellen configuratieoptie op\&. Bij booleaanse opties kunt u instellingen uit het configuratiebestand overschrijven door iets te gebruiken als
+\fB\-f\-\fR,
+\fB\-\-no\-f\fR,
+\fB\-f=no\fR
+en meerdere andere variaties\&.
+.PP
+\fB\-\-md5\fR, \fB\-\-sha1\fR, \fB\-\-sha256\fR, \fB\-\-sha512\fR
+.RS 4
+De vermelde controlesom genereren\&. Standaard staan deze opties aan\&. Indien ze uitgezet worden, dan zal het aangemaakte indexbestand zo mogelijk geen velden voor de controlesom bevatten\&. Configuratie\-items:
+APT::FTPArchive::\fIChecksum\fR
+en
+APT::FTPArchive::\fIIndex\fR::\fIChecksum\fR
+waarbij
+\fIIndex\fR
+kan bestaan uit
+Packages,
+Sources
+of
+Release
+en
+\fIChecksum\fR
+kan bestaan uit
+MD5,
+SHA1,
+SHA256
+of
+SHA512\&.
+.RE
+.PP
+\fB\-d\fR, \fB\-\-db\fR
+.RS 4
+Een bufferende binaire database gebruiken\&. Dit heeft geen invloed op het commando generate\&. Configuratie\-item:
+APT::FTPArchive::DB\&.
+.RE
+.PP
+\fB\-q\fR, \fB\-\-quiet\fR
+.RS 4
+Stille modus\&. Door het weglaten van de voortgangsindicatie produceert dit uitvoer die geschikt is om opgeslagen te worden in een logbestand\&. Meer q\*(Aqs, met een maximum van 2, resulteren in een verhoogde stille modus\&. U kunt ook
+\fB\-q=#\fR
+gebruiken om het niveau van de stille modus in te stellen en op die manier het configuratiebestand te overschrijven\&. Configuratie\-item:
+quiet\&.
+.RE
+.PP
+\fB\-\-delink\fR
+.RS 4
+Ontkoppelingen uitvoeren\&. Indien de instelling
+External\-Links
+gebruikt wordt, dan maakt deze optie het eigenlijk mogelijk om de bestanden te ontkoppelen\&. Standaard staat dit aangezet en het kan uitgezet worden met
+\fB\-\-no\-delink\fR\&. Configuratie\-item:
+APT::FTPArchive::DeLinkAct\&.
+.RE
+.PP
+\fB\-\-contents\fR
+.RS 4
+Het aanmaken van het contents\-bestand uitvoeren\&. Indien deze optie aangezet wordt en de pakketindexen gegenereerd worden met een bufferende database, dan zal ook de bestandslijst ge\(:extraheerd worden en voor later gebruik in de database opgeslagen worden\&. Als het commando generate gebruikt wordt, laat deze optie ook toe om Contents\-bestanden aan te maken\&. Standaard staat dit aangezet\&. Configuratie\-item:
+APT::FTPArchive::Contents\&.
+.RE
+.PP
+\fB\-s\fR, \fB\-\-source\-override\fR
+.RS 4
+Het override\-bestand voor broncode selecteren om met het commando
+sources
+te gebruiken\&. Configuratie\-item:
+APT::FTPArchive::SourceOverride\&.
+.RE
+.PP
+\fB\-\-readonly\fR
+.RS 4
+De bufferende databases alleen lezen maken\&. Configuration Item:
+APT::FTPArchive::ReadOnlyDB\&.
+.RE
+.PP
+\fB\-a\fR, \fB\-\-arch\fR
+.RS 4
+Voor de commando\*(Aqs
+packages
+en
+contents
+enkel pakketbestanden toelaten die overeenkomen met
+*_arch\&.deb
+of
+*_all\&.deb
+in plaats van alle pakketbestanden in het opgegeven pad\&. Configuratie\-item:
+APT::FTPArchive::Architecture\&.
+.RE
+.PP
+\fBAPT::FTPArchive::AlwaysStat\fR
+.RS 4
+\fBapt-ftparchive\fR(1)
+buffert zoveel mogelijk metadata in een bufferende database\&. Indien er pakketten opnieuw gebouwd en/of uitgebracht worden met dezelfde versie, zal dit tot problemen leiden, aangezien de dan verouderde maar in de buffer aanwezige metadata, zoals grootte en controlesommen, gebruikt zullen worden\&. Indien deze optie aangezet wordt, zal dit niet meer gebeuren, vermits gecontroleerd zal worden of het bestand gewijzigd werd\&. Noteer dat deze optie standaard ingesteld staat op "false" (uit), omdat het niet aangewezen is om meerdere versies/bouwversies van een pakket met hetzelfde versienummer te uploaden\&. In theorie zal dus niemand met deze problemen geconfronteerd worden en daarom zijn al deze extra controles nutteloos\&.
+.RE
+.PP
+\fBAPT::FTPArchive::LongDescription\fR
+.RS 4
+Deze configuratieoptie staat standaard ingesteld op "true" (aan) en zou enkel moeten ingesteld worden op
+"false"
+(uit) indien het archief dat met
+\fBapt-ftparchive\fR(1)
+gegenereerd wordt ook
+Translation\-bestanden bevat\&. Merk op dat het hoofdbestand
+Translation\-en
+enkel aangemaakt kan worden via het commando generate\&.
+.RE
+.PP
+\fB\-h\fR, \fB\-\-help\fR
+.RS 4
+Een korte samenvatting van het gebruik weergeven\&.
+.RE
+.PP
+\fB\-v\fR, \fB\-\-version\fR
+.RS 4
+Het versienummer van het programma weergeven\&.
+.RE
+.PP
+\fB\-c\fR, \fB\-\-config\-file\fR
+.RS 4
+Configuratiebestand; Een te gebruiken configuratiebestand opgeven\&. Het programma zal het standaard configuratiebestand inlezen en nadien dit configuratiebestand\&. Als configuratie\-instellingen opgegeven moeten worden vooraleer de standaard configuratiebestanden verwerkt worden, geef dan een bestand op met de omgevingsvariabele
+\fBAPT_CONFIG\fR\&. Raadpleeg
+\fBapt.conf\fR(5)
+voor informatie over de syntaxis\&.
+.RE
+.PP
+\fB\-o\fR, \fB\-\-option\fR
+.RS 4
+Een configuratieoptie instellen; Dit stelt een willekeurige configuratieoptie in\&. De syntaxis is
+\fB\-o Foo::Bar=bar\fR\&.
+\fB\-o\fR
+en
+\fB\-\-option\fR
+kunnen meermaals gebruikt worden om verschillende opties in te stellen\&.
+.RE
+.SH "VOORBEELDEN"
+.PP
+Om voor een map met binaire pakketten (\&.deb) een gecomprimeerd Packages\-bestand aan te maken:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+\fBapt\-ftparchive\fR pakketten \fImap\fR | \fBgzip\fR > Packages\&.gz
+.fi
+.if n \{\
+.RE
+.\}
+.SH "ZIE OOK"
+.PP
+\fBapt.conf\fR(5)
+.SH "DIAGNOSTIEK"
+.PP
+\fBapt\-ftparchive\fR
+geeft de terugkeerwaarde nul bij een normaal verlopen operatie, het decimaal getal 100 in geval van een fout\&.
+.SH "BUGS"
+.PP
+\m[blue]\fBAPT bugpagina\fR\m[]\&\s-2\u[1]\d\s+2\&. Indien u een bug in APT wilt rapporteren, raadpleeg dan
+/usr/share/doc/debian/bug\-reporting\&.txt
+of het
+\fBreportbug\fR(1)
+commando\&.
+.SH "VERTALING"
+.PP
+De Nederlandse vertaling werd in 2015 gemaakt door Frans Spiesschaert
+<Frans\&.Spiesschaert@yucom\&.be>, in samenwerking met het Debian Dutch l10n Team
+<debian\-l10n\-dutch@lists\&.debian\&.org>\&.
+.PP
+Merk op dat de vertaling van dit document nog onvertaalde delen kan bevatten\&. Dit is intentioneel om te vermijden dat inhoud verloren zou gaan door een vertaling die achterop loopt op het origineel\&.
+.SH "AUTEURS"
+.PP
+\fBJason Gunthorpe\fR
+.RS 4
+.RE
+.PP
+\fBAPT\-team\fR
+.RS 4
+.RE
+.SH "OPMERKINGEN"
+.IP " 1." 4
+APT bugpagina
+.RS 4
+\%http://bugs.debian.org/src:apt
+.RE

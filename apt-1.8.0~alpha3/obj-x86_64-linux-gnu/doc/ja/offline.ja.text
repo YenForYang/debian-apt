@@ -1,0 +1,224 @@
+
+                         オフラインでの APT の使用法
+
+
+-----------------------------------------------------------------------------
+                                      
+                               Jason Gunthorpe
+
+                              <jgg@debian.org>
+
+                           バージョン 1.8.0~alpha3
+
+-----------------------------------------------------------------------------
+
+製作著作 © 1999 Jason Gunthorpe
+
+ライセンスについて
+
+    "APT" and this document are free software; you can redistribute them and/
+    or modify them under the terms of the GNU General Public License as
+    published by the Free Software Foundation; either version 2 of the
+    License, or (at your option) any later version.
+
+    For more details, on Debian systems, see the file /usr/share/
+    common-licenses/GPL for the full license.
+
+概要
+
+このドキュメントはネットワークがない環境での APT の使用方法を説明しています。
+具体的には、アップグレード時の「スニーカーネット」アプローチです。
+
+-----------------------------------------------------------------------------
+
+目次
+
+1. はじめに
+
+    1.1. 概要
+
+2. 両方のマシンでの APT の使用法
+
+    2.1. 概要
+    2.2. 設定ファイル
+
+3. APT と wget の使用
+
+    3.1. 概要
+    3.2. 操作
+
+第1章はじめに
+
+目次
+
+1.1. 概要
+
+1.1. 概要
+
+    通常 APT は Debian アーカイブに、ローカルメディアから、あるいはネットワー
+    ク経由で直接アクセスできる必要があります。他によくある苦情としてはある
+    Debian マシンの接続がモデム等のために低速で、別のマシンには非常に高速な接
+    続があるけれども物理的に遠い、といったことがあります。
+
+    これに対する解法としては Zip や SuperDisk ディスクといった大容量脱着可能
+    メディアを使います。こういったディスクは Debian アーカイブ全体を格納する
+    には十分とは言えない容量ですがほとんどのユーザにとって必要なその一部を収
+    めるには十分余裕があります。その考え方は APT を使って必要なパッケージの一
+    覧を生成し、接続状態の良好な別のマシンを使ってそのディスク上に取得します
+    。APT を使える別の Debian マシンや、完全に異なる OS で wget のようなダウ
+    ンロードツールを使うことも可能です。リモートホストはパッケージをダウンロ
+    ードするマシン、対象ホストは接続がないあるいは良くないマシンだと考えてく
+    ださい。
+
+    これは APT 設定ファイルを独創的に操作することで実現できます。あるディスク
+    を APT が検索するようにするために必須となる前提条件はアーカイブファイルで
+    す。そのディスクは長いファイル名を扱えるファイルシステム、例えば ext2 や
+    fat32、vfat でフォーマットする必要があることに注意してください。
+
+第2章両方のマシンでの APT の使用法
+
+目次
+
+2.1. 概要
+2.2. 設定ファイル
+
+2.1. 概要
+
+    APT を両方のマシンで利用できるようにする最も単純な設定を考えます。基本的
+    な考え方は status ファイルのコピーをそのディスクに置いて最新のパッケージ
+    ファイルの取得やダウンロードするパッケージの決定にはリモートマシンを使い
+    ます。そのディスクのディレクトリ構造は次のようになります:
+
+      /disc/
+        archives/
+           partial/
+        lists/
+           partial/
+        status
+        sources.list
+        apt.conf
+
+2.2. 設定ファイル
+
+    設定ファイルでは APT が管理ファイルをそのディスクに保存し、そのディスク上
+    の設定ファイルを同様に利用するように指示する必要があります。sources.list
+    ではリモートマシンから利用する適切なサイトを指定し、status ファイルは対象
+    ホストの /var/lib/dpkg/status をコピーしたものを利用します。ローカルアー
+    カイブを使っている場合はその URI を利用しないといけないことに注意してくだ
+    さい。書式はファイルの URI と同一です。
+
+    apt.conf には APT がそのディスクを使うようにするのに必要な情報を記述しな
+    いといけません:
+
+     APT
+     {
+       /* This is not necessary if the two machines are the same arch, it tells
+          the remote APT what architecture the target machine is */
+       Architecture "i386";
+
+       Get::Download-Only "true";
+     };
+
+     Dir
+     {
+       /* Use the disc for state information and redirect the status file from
+          the /var/lib/dpkg default */
+       State "/disc/";
+       State::status "status";
+
+       // Binary caches will be stored locally
+       Cache::archives "/disc/archives/";
+       Cache "/tmp/";
+
+       // Location of the source list.
+       Etc "/disc/";
+     };
+
+    apt.conf の man ページや /usr/share/doc/apt/examples/apt.conf にある見本
+    の設定ファイルを調べるとさらなる詳細があります。
+
+    対象のマシンでまず行うことはディスクをマウントしてそのディスクに /var/lib
+    /dpkg/status をコピーすることです。概要にまとめられているように、ディレク
+    トリ archives/partial/ 及び lists/partial/ を作成する必要もあるでしょう。
+    それからディスクをリモートマシンに移動して sources.list を設定します。リ
+    モートマシンでは以下の手順を実行します:
+
+     # export APT_CONFIG="/disc/apt.conf"
+     # apt-get update
+     [ package ファイルを APT が取得します ]
+     # apt-get dist-upgrade
+     [ 対象マシンをアップグレードするのに必要なパッケージを、APT が取得します ]
+
+    dist-upgrade コマンドは他の任意の標準的な APT コマンド、特に
+    dselect-upgrade に置き換えることができます。dselect 等の APT フロントエン
+    ドを使うこともできます。しかし、それには選択したときにローカルコンピュー
+    タとやりとりしてしまうという問題があります。
+
+    これで、対象のマシンをアップグレードするのに必要な索引ファイルとアーカイ
+    ブが全てこのディスクに収録されたということになります。ディスクを戻して実
+    行します:
+
+      # export APT_CONFIG="/disc/apt.conf"
+      # apt-get check
+      [ キャッシュファイルのローカルコピーを生成します ]
+      # apt-get --no-d -o dir::state::status=/var/lib/dpkg/status dist-upgrade
+      [ もしくはその他の APT コマンド ]
+
+    適切に機能するためにはローカルのファイルを status ファイルに再指定する必
+    要があります。これは非常に重要です!
+
+    dselect を使っている場合、disc/status はリモートマシンで何か選択すると更
+    新されるため /var/lib/dpkg/status にコピーするのは非常に危険です。選択は
+    ローカルマシンでのみ行うことを強く勧めます - しかしこれは常に可能だとは限
+    りません。dpkg や APT を実行している間は status ファイルをコピー *しない
+    でください* !!
+
+第3章 APT と wget の使用
+
+目次
+
+3.1. 概要
+3.2. 操作
+
+3.1. 概要
+
+    wget は人気のある移植性の高いダウンロードツールで、ほぼあらゆるマシンで実
+    行できます。上記の方法とは異なり、これには利用可能なパッケージの一覧を
+    Debian マシンで用意しておく必要があります。
+
+    基本的な考え方は、リモートサイトからダウンロードしたアーカイブファイルだ
+    けを収録したディスクを作成するということです。これは apt-get に
+    --print-uris オプションを使って行い、それから wget スクリプトを準備して実
+    際にパッケージを取得します。
+
+3.2. 操作
+
+    前の技とは異なり、特別な設定ファイルを必要としません。標準的な APT コマン
+    ドを単純に使ってファイル一覧を生成します。
+
+     # apt-get dist-upgrade
+     [ 問い合わせには no を回答し、意図しない動作を起こすことのないように ]
+     # apt-get -qq --print-uris dist-upgrade > uris
+     # awk '{print "wget -O " $2 " " $1}' < uris > /disc/wget-script
+
+    dselect-upgrade を含め、ここでは dist-upgrade 以外の任意のコマンドを使え
+    ます。
+
+    /disc/wget-script ファイルには、必要なアーカイブを取得するために実行する
+    wget コマンドの一覧を収録するようになっています。ディスク上の出力を減らす
+    ため、このスクリプトは現在のディレクトリをそのディスクのマウントポイント
+    として実行するようにしてください。
+
+    リモートマシンでは以下のようにします。
+
+      # cd /disc
+      # sh -x ./wget-script
+      [ お待ちください... ]
+
+    アーカイブのダウンロードが終わってディスクが Debian マシンに返ってくると
+    インストールを続けられるようになります。
+
+      # apt-get -o dir::cache::archives="/disc/" dist-upgrade
+
+    これで、ディスクにある取得済みのアーカイブを使用するようになります。
+

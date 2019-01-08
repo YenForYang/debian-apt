@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Hoofdstuk 2. Op beide computers APT gebruiken</title>
+    <meta name="generator" content="DocBook XSL Stylesheets V1.79.1"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="home" href="index.html" title="APT offline gebruiken"/>
+    <link rel="up" href="index.html" title="APT offline gebruiken"/>
+    <link rel="prev" href="ch1.html" title="Hoofdstuk 1. Inleiding"/>
+    <link rel="next" href="ch3.html" title="Hoofdstuk 3. APT en wget gebruiken"/>
+  </head>
+  <body>
+    <div class="navheader">
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Hoofdstuk 2. Op beide computers APT gebruiken</th>
+        </tr>
+        <tr>
+          <td align="left"><a accesskey="p" href="ch1.html">Terug</a> </td>
+          <th width="60%" align="center"> </th>
+          <td align="right"> <a accesskey="n" href="ch3.html">Volgende</a></td>
+        </tr>
+      </table>
+      <hr/>
+    </div>
+    <div class="chapter">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h1 class="title"><a id="ch2"/>Hoofdstuk 2. Op beide computers APT gebruiken</h1>
+          </div>
+        </div>
+      </div>
+      <div class="toc">
+        <p>
+          <strong>Inhoudsopgave</strong>
+        </p>
+        <dl class="toc">
+          <dt>
+            <span class="section">
+              <a href="ch2.html#s2.1">2.1. Overzicht</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="section">
+              <a href="ch2.html#s2.2">2.2. Het configuratiebestand</a>
+            </span>
+          </dt>
+        </dl>
+      </div>
+      <div class="section">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h2 class="title"><a id="s2.1"/>2.1. Overzicht</h2>
+            </div>
+          </div>
+        </div>
+        <p>
+Indien APT op beide computers aanwezig is, is de configuratie het
+makkelijkst. Het basisconcept bestaat erin om een kopie van het
+statusbestand op de schijf te plaatsen en 'externe-computer' te gebruiken om
+de meest recente pakketbestanden op te halen en uit te laten maken welke
+bestanden gedownload moeten worden. De mappenstructuur op de schijf moet er
+zo uitzien:
+</p>
+        <pre class="screen">
+  /disc/
+    archives/
+       partial/
+    lists/
+       partial/
+    status
+    sources.list
+    apt.conf
+</pre>
+      </div>
+      <div class="section">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h2 class="title"><a id="s2.2"/>2.2. Het configuratiebestand</h2>
+            </div>
+          </div>
+        </div>
+        <p>
+Het configuratiebestand moet APT opdragen om zijn bestanden op de schijf op
+te slaan en om ook de configuratiebestanden op de schijf te gebruiken. In
+het bestand sources.list moeten de eigenlijke sites vermeld staan die u
+vanaf 'externe-computer' wenst te gebruiken en het statusbestand moet een
+kopie zijn van <span class="emphasis"><em>/var/lib/dpkg/status</em></span> op
+'computer-in-kwestie'. Noteer dat indien u van een lokaal archief gebruik
+maakt, u URI's van het type copy moet gebruiken, waarvan de syntaxis
+identiek is aan die van URI's van het type file.
+</p>
+        <p>
+<span class="emphasis"><em>apt.conf</em></span> moet de informatie bevatten die nodig is om
+APT de schijf te doen gebruiken:
+</p>
+        <pre class="screen">
+ APT
+ {
+   /* Dit is niet noodzakelijk als de twee computers dezelfde architectuur
+      hebben. Het vertelt APT van 'externe-computer' welke architectuur
+      'computer-in-kwestie' heeft */
+   Architecture "i386";
+
+   Get::Download-Only "true";
+ };
+
+ Dir
+ {
+   /* Gebruik maken van de schijf voor statusinformatie en het statusbestand
+      omleiden van /var/lib/dpkg wat de standaardlocatie ervan is */
+   State "/disc/";
+   State::status "status";
+
+   // Binaire caches zullen lokaal opgeslagen worden
+   Cache::archives "/disc/archives/";
+   Cache "/tmp/";
+
+   // Locatie van de lijst met pakketbronnen.
+   Etc "/disc/";
+ };
+</pre>
+        <p>
+U krijgt meer details als u de man-pagina apt.conf raadpleegt en het
+voorbeeldconfiguratiebestand in
+<span class="emphasis"><em>/usr/share/doc/apt/examples/apt.conf</em></span>.
+</p>
+        <p>
+Het eerste wat moet gebeuren is op 'computer-in-kwestie' de schijf
+aankoppelen en <span class="emphasis"><em>/var/lib/dpkg/status</em></span> er naartoe
+kopiëren. U zult ook de mappen moeten aanmaken die in het overzicht
+beschreven werden, <span class="emphasis"><em>archives/partial/</em></span> en
+<span class="emphasis"><em>lists/partial/</em></span>. Neem vervolgens de schijf mee naar
+'externe-computer' en configureer het bestand sources.list. Voer op
+'externe-computer' de volgende opdracht uit:
+</p>
+        <pre class="screen">
+ # export APT_CONFIG="/disc/apt.conf"
+ # apt-get update
+ [ APT haalt de bestanden Packages op ]
+ # apt-get dist-upgrade
+ [ APT haalt alle pakketbestanden op die nodig zijn om 'computer-in-kwestie' op te waarderen ]
+</pre>
+        <p>
+Het commando dist-upgrade kan door om het even welk ander standaard commando
+van APT vervangen worden, in het bijzonder dselect-upgrade. U kunt zelfs een
+front-end voor APT gebruiken, zoals <span class="emphasis"><em>dselect</em></span>. Dit stelt
+wel een probleem bij het opnieuw communiceren van de selecties naar
+'computer-in-kwestie'.
+</p>
+        <p>
+Nu bevat de schijf alle indexbestanden en archieven die nodig zijn om
+'computer-in-kwestie' op te waarderen. Neem de schijf terug mee en voer het
+volgende uit:
+</p>
+        <pre class="screen">
+  # export APT_CONFIG="/disc/apt.conf"
+  # apt-get check
+  [ APT maakt een lokale kopie van de cachebestanden aan ]
+  # apt-get --no-d -o dir::state::status=/var/lib/dpkg/status dist-upgrade
+  [ Of elk ander APT commando ]
+</pre>
+        <p>
+Met het oog op een goede werking is het nodig om opnieuw op te geven dat het
+statusbestand terug het lokale moet zijn. Dit is zeer belangrijk!
+</p>
+        <p>
+Indien u dselect gebruikt, kunt u de zeer riskante operatie uitvoeren om
+disc/status naar /var/lib/dpkg/status te kopiëren, waardoor alle selecties
+die u op 'externe-computer' uitvoerde, bijgewerkt worden. Ik raad mensen ten
+stelligste aan enkel selecties uit te voeren op de lokale computer - maar
+het kan zijn dat dit niet altijd mogelijk is. Kopieer het statusbestand NIET
+indien APT of dpkg ondertussen uitgevoerd werden!!
+</p>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr/>
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td align="left"><a accesskey="p" href="ch1.html">Terug</a> </td>
+          <td align="center"> </td>
+          <td align="right"> <a accesskey="n" href="ch3.html">Volgende</a></td>
+        </tr>
+        <tr>
+          <td align="left" valign="top">Hoofdstuk 1. Inleiding </td>
+          <td align="center">
+            <a accesskey="h" href="index.html">Begin</a>
+          </td>
+          <td align="right" valign="top"> Hoofdstuk 3. APT en wget gebruiken</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

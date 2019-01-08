@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+  "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % aptent SYSTEM "apt.ent"> %aptent;
+<!ENTITY % aptverbatiment SYSTEM "apt-verbatim.ent"> %aptverbatiment;
+<!ENTITY % aptvendor SYSTEM "apt-vendor.ent"> %aptvendor;
+]>
+
+<book lang="nl">
+
+<title>APT offline gebruiken</title>
+
+<bookinfo>
+
+<authorgroup>
+  <author>
+    <personname>Jason Gunthorpe</personname><email>jgg@debian.org</email>
+  </author>
+</authorgroup>
+
+<releaseinfo>Versie &apt-product-version;</releaseinfo>
+
+<abstract>
+<para>
+Dit document beschrijft hoe APT te gebruiken in een netwerkloze
+omgeving. Het behandelt in het bijzonder de zogenaamde
+'sneaker-net'-benadering voor het uitvoeren van opwaarderingen (De
+sneakernet-aanpak gebruikt fysieke media in plaats van het netwerk).
+</para>
+</abstract>
+
+<copyright><year>1999</year><holder>Jason Gunthorpe</holder></copyright>
+
+<legalnotice>
+<title>Toelichting bij de licentie</title>
+<para>
+"APT" en dit document zijn vrije software. U kunt ze verspreiden en/of ze
+aanpassen overeenkomstig de bepalingen van de GNU General Public License,
+versie 2 of (volgens uw keuze) iedere latere versie, zoals die door de Free
+Software Foundation gepubliceerd werd. 
+</para>
+<para>
+Meer details en de volledige licentie vindt u op Debian-systemen in het
+bestand /usr/share/common-licenses/GPL.
+</para>
+</legalnotice>
+
+</bookinfo>
+
+<chapter id="ch1"><title>Inleiding</title>
+
+<section id="s1.1"><title>Overzicht</title>
+<para>
+Normaal heeft APT rechtstreeks toegang tot een Debian archief nodig, ofwel
+op lokale media ofwel via een netwerk. Ook keert regelmatig de klacht terug
+dat een bepaalde Debiancomputer over een trage verbinding, zoals een modem,
+beschikt, terwijl er een andere computer met een zeer snelle verbinding
+beschikbaar is, die echter fysiek op een afstand van elkaar staan.
+</para>
+<para>
+Een oplossing hiervoor is gebruik maken van grote verwijderbare media, zoals
+een Zip-schijf of een SuperDisc-schijf. Dergelijke schijven zijn onvoldoende
+groot om een volledig Debian archief te bevatten, maar ze kunnen er met
+gemak een subset van bevatten die voor de meeste gebruikers voldoende groot
+is. Het concept is om APT te gebruiken om een lijst van pakketten samen te
+stellen die men nodig heeft en die dan op te halen met een computer met een
+goede verbinding en ze op de schijf te plaatsen. Het is zelfs mogelijk om
+een andere Debian-computer met APT te gebruiken of een computer met een
+volledig ander OS en een download-hulpmiddel zoals wget. Laten we aannemen
+dat <emphasis>'externe-computer'</emphasis> de computer is die de pakketten
+downloadt en <emphasis>'computer-in-kwestie'</emphasis> degene met een
+slechte of geen verbinding.
+</para>
+<para>
+Dit wordt gerealiseerd door op een creatieve manier het configuratiebestand
+van APT te manipuleren. De essentiële aanname is dat APT gezegd wordt om op
+een schijf te zoeken naar de archiefbestanden die het nodig heeft. Merk op
+dat de schijf geformatteerd moet zijn voor een bestandssysteem dat overweg
+kan met lange bestandsnamen, zoals ext2, fat32 of vfat.
+</para>
+</section>
+
+</chapter>
+
+<chapter id="ch2"><title>Op beide computers APT gebruiken</title>
+
+<section id="s2.1"><title>Overzicht</title>
+<para>
+Indien APT op beide computers aanwezig is, is de configuratie het
+makkelijkst. Het basisconcept bestaat erin om een kopie van het
+statusbestand op de schijf te plaatsen en 'externe-computer' te gebruiken om
+de meest recente pakketbestanden op te halen en uit te laten maken welke
+bestanden gedownload moeten worden. De mappenstructuur op de schijf moet er
+zo uitzien:
+</para>
+<screen>
+  /disc/
+    archives/
+       partial/
+    lists/
+       partial/
+    status
+    sources.list
+    apt.conf
+</screen>
+</section>
+
+<section id="s2.2"><title>Het configuratiebestand</title>
+<para>
+Het configuratiebestand moet APT opdragen om zijn bestanden op de schijf op
+te slaan en om ook de configuratiebestanden op de schijf te gebruiken. In
+het bestand sources.list moeten de eigenlijke sites vermeld staan die u
+vanaf 'externe-computer' wenst te gebruiken en het statusbestand moet een
+kopie zijn van <emphasis>/var/lib/dpkg/status</emphasis> op
+'computer-in-kwestie'. Noteer dat indien u van een lokaal archief gebruik
+maakt, u URI's van het type copy moet gebruiken, waarvan de syntaxis
+identiek is aan die van URI's van het type file.
+</para>
+<para>
+<emphasis>apt.conf</emphasis> moet de informatie bevatten die nodig is om
+APT de schijf te doen gebruiken:
+</para>
+<screen>
+ APT
+ {
+   /* Dit is niet noodzakelijk als de twee computers dezelfde architectuur
+      hebben. Het vertelt APT van 'externe-computer' welke architectuur
+      'computer-in-kwestie' heeft */
+   Architecture "i386";
+
+   Get::Download-Only "true";
+ };
+
+ Dir
+ {
+   /* Gebruik maken van de schijf voor statusinformatie en het statusbestand
+      omleiden van /var/lib/dpkg wat de standaardlocatie ervan is */
+   State "/disc/";
+   State::status "status";
+
+   // Binaire caches zullen lokaal opgeslagen worden
+   Cache::archives "/disc/archives/";
+   Cache "/tmp/";
+
+   // Locatie van de lijst met pakketbronnen.
+   Etc "/disc/";
+ };
+</screen>
+<para>
+U krijgt meer details als u de man-pagina apt.conf raadpleegt en het
+voorbeeldconfiguratiebestand in
+<emphasis>/usr/share/doc/apt/examples/apt.conf</emphasis>.
+</para>
+<para>
+Het eerste wat moet gebeuren is op 'computer-in-kwestie' de schijf
+aankoppelen en <emphasis>/var/lib/dpkg/status</emphasis> er naartoe
+kopiëren. U zult ook de mappen moeten aanmaken die in het overzicht
+beschreven werden, <emphasis>archives/partial/</emphasis> en
+<emphasis>lists/partial/</emphasis>. Neem vervolgens de schijf mee naar
+'externe-computer' en configureer het bestand sources.list. Voer op
+'externe-computer' de volgende opdracht uit:
+</para>
+<screen>
+ # export APT_CONFIG="/disc/apt.conf"
+ # apt-get update
+ [ APT haalt de bestanden Packages op ]
+ # apt-get dist-upgrade
+ [ APT haalt alle pakketbestanden op die nodig zijn om 'computer-in-kwestie' op te waarderen ]
+</screen>
+<para>
+Het commando dist-upgrade kan door om het even welk ander standaard commando
+van APT vervangen worden, in het bijzonder dselect-upgrade. U kunt zelfs een
+front-end voor APT gebruiken, zoals <emphasis>dselect</emphasis>. Dit stelt
+wel een probleem bij het opnieuw communiceren van de selecties naar
+'computer-in-kwestie'.
+</para>
+<para>
+Nu bevat de schijf alle indexbestanden en archieven die nodig zijn om
+'computer-in-kwestie' op te waarderen. Neem de schijf terug mee en voer het
+volgende uit:
+</para>
+<screen>
+  # export APT_CONFIG="/disc/apt.conf"
+  # apt-get check
+  [ APT maakt een lokale kopie van de cachebestanden aan ]
+  # apt-get --no-d -o dir::state::status=/var/lib/dpkg/status dist-upgrade
+  [ Of elk ander APT commando ]
+</screen>
+<para>
+Met het oog op een goede werking is het nodig om opnieuw op te geven dat het
+statusbestand terug het lokale moet zijn. Dit is zeer belangrijk!
+</para>
+<para>
+Indien u dselect gebruikt, kunt u de zeer riskante operatie uitvoeren om
+disc/status naar /var/lib/dpkg/status te kopiëren, waardoor alle selecties
+die u op 'externe-computer' uitvoerde, bijgewerkt worden. Ik raad mensen ten
+stelligste aan enkel selecties uit te voeren op de lokale computer - maar
+het kan zijn dat dit niet altijd mogelijk is. Kopieer het statusbestand NIET
+indien APT of dpkg ondertussen uitgevoerd werden!!
+</para>
+</section>
+
+</chapter>
+
+<chapter id="ch3"><title>APT en wget gebruiken</title>
+
+<section id="s3.1"><title>Overzicht</title>
+<para>
+<emphasis>wget</emphasis> is een populair en overdraagbaar gereedschap dat
+bijna op elke computer gebruikt kan worden. In tegenstelling tot de
+voorgaande methode vereist dit wel dat de Debian-computer reeds een lijst
+van beschikbare pakketten heeft.
+</para>
+<para>
+Het basisconcept is om een schijf te maken waarop enkel de archiefbestanden
+gedownload worden vanaf de externe site. Dit gebeurt door het gebruik van de
+optie --print-uris van apt-get, waarna een script voor wget gemaakt wordt
+waarmee het eigenlijke ophalen van de pakketten uitgevoerd wordt.
+</para>
+</section>
+
+<section id="s3.2"><title>Werking</title>
+<para>
+In tegenstelling tot de vorige techniek zijn hier geen bijzondere
+configuratiebestanden nodig. We maken hoofdzakelijk gebruik van de standaard
+commando's van APT om de bestandslijst te genereren.
+</para>
+<screen>
+ # apt-get dist-upgrade
+ [ Antwoord nee op de vraag, vergewis u ervan dat u akkoord gaat met de acties ]
+ # apt-get -qq --print-uris dist-upgrade &gt; uris
+ # awk '{print "wget -O " $2 " " $1}' &lt; uris &gt; /disc/wget-script
+</screen>
+<para>
+Ook om het even welk ander commando dan dist-upgrade kon hier gebruikt
+worden, met inbegrip van dselect-upgrade.
+</para>
+<para>
+Het bestand /disc/wget-script zal nu een lijst van wget-commando's bevatten
+die uitgevoerd moeten worden om de benodigde archieven op te halen. Dit
+script moet uitgevoerd worden terwijl de actieve map gebruikt wordt als
+aankoppelpunt voor de schijf, waardoor de uitvoer op de schijf opgeslagen
+zal worden.
+</para>
+<para>
+Op 'externe-computer' wordt dan iets in de zin van het volgende gedaan:
+</para>
+<screen>
+  # cd /disc
+  # sh -x ./wget-script
+  [ wachten.. ]
+</screen>
+<para>
+Nadat de archieven gedownload werden en de schijf terug meegenomen werd naar
+de Debian-computer, kan de installatie voortgezet worden met
+</para>
+<screen>
+  # apt-get -o dir::cache::archives="/disc/" dist-upgrade
+</screen>
+<para>
+En dit zal gebruik maken van de reeds opgehaalde archieven op de schijf.
+</para>
+</section>
+
+</chapter>
+
+</book>

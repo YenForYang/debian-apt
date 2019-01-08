@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Rozdział 1. Ogólne</title>
+    <meta name="generator" content="DocBook XSL Stylesheets V1.79.1"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="home" href="index.html" title="Podręcznik użytkownika APT"/>
+    <link rel="up" href="index.html" title="Podręcznik użytkownika APT"/>
+    <link rel="prev" href="index.html" title="Podręcznik użytkownika APT"/>
+    <link rel="next" href="ch2.html" title="Rozdział 2. apt-get"/>
+  </head>
+  <body>
+    <div class="navheader">
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Rozdział 1. Ogólne</th>
+        </tr>
+        <tr>
+          <td align="left"><a accesskey="p" href="index.html">Poprzedni</a> </td>
+          <th width="60%" align="center"> </th>
+          <td align="right"> <a accesskey="n" href="ch2.html">Następny</a></td>
+        </tr>
+      </table>
+      <hr/>
+    </div>
+    <div class="chapter">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h1 class="title"><a id="ch1"/>Rozdział 1. Ogólne</h1>
+          </div>
+        </div>
+      </div>
+      <div class="toc">
+        <p>
+          <strong>Spis treści</strong>
+        </p>
+        <dl class="toc">
+          <dt>
+            <span class="section">
+              <a href="ch1.html#s1.1">1.1. Budowa systemu pakietów</a>
+            </span>
+          </dt>
+        </dl>
+      </div>
+      <p>
+Pakiet APT składa się z dwóch części: z metody APT programu
+<span class="command"><strong>dselect</strong></span> oraz z programu <span class="command"><strong>apt-get</strong></span>
+będącego interfejsem linii poleceń. Obie części pozwalają na instalowanie i
+usuwanie pakietów oraz na pobieranie nowych pakietów z Internetu.
+</p>
+      <div class="section">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h2 class="title"><a id="s1.1"/>1.1. Budowa systemu pakietów</h2>
+            </div>
+          </div>
+        </div>
+        <p>
+System pakietów Debiana zawiera sporą ilość informacji skojarzonych z każdym
+pakietem, zapewniających integralność pakietów w systemie. Najbardziej
+widoczną cechą systemu pakietów jest system zależności.
+</p>
+        <p>
+System zależności pozwala poszczególnym programom używać wspólnych elementów
+systemu, takich jak biblioteki. Upraszcza także umieszczanie rzadko
+używanych części programów w oddzielnych pakietach, tak aby zmniejszyć
+liczbę pakietów instalowanych przez przeciętnego użytkownika. Pozwala także
+wybierać programy odpowiedzialne za dostarczanie poczty, serwery X-ów itp.
+</p>
+        <p>
+Pierwszym krokiem potrzebnym do zrozumienia systemu zależności jest
+zrozumienie koncepcji prostej zależności. Prosta zależność oznacza, że dany
+pakiet do poprawnego działania wymaga zainstalowania innego pakietu.
+</p>
+        <p>
+Na przykład mailcrypt jest rozszerzeniem edytora emacs, umożliwiającym
+szyfrowanie e-maili za pomocą programu GPG. Bez zainstalowanego pakietu GPG,
+mailcrypt jest bezużyteczny, dlatego mailcrypt zawiera prostą zależność od
+GPG. Ma także prostą zależność od pakietu emacs, ponieważ jest rozszerzeniem
+emacsa, więc i bez emacsa jest równie bezużyteczny.
+</p>
+        <p>
+Inną ważną zależnością, którą należy zrozumieć, jest konflikt. Oznacza to,
+że dany pakiet może nie działać albo może być szkodliwy dla systemu, jeżeli
+razem z nim jest zainstalowany inny pakiet. Jako przykład rozważmy program
+odpowiedzialny za dostarczanie poczty (ang. "mail transport agent") taki jak
+sendmail, exim lub qmail. Nie jest możliwe jednoczesne zainstalowanie dwóch
+takich programów, ponieważ oba musiałyby nasłuchiwać na tym samym porcie
+sieciowym, żeby odebrać e-maile. Próba zainstalowanie obu poważnie uszkodzi
+system. Dlatego też wszystkie programy obsługi dostarczania poczty są w
+konflikcie ze wszystkimi innymi programami obsługującymi dostarczanie
+poczty.
+</p>
+        <p>
+Dodatkową komplikacją jest możliwość, że dany pakiet może udawać inny
+pakiet. Proszę rozważyć jako przykład, że  exim i sendmail praktycznie rzecz
+biorąc są identyczne - oba dostarczają pocztę, oba mają wspólny
+interfejs. Dlatego też system pakietów daje im możliwość zadeklarowania, że
+oba są programami obsługującymi dostarczanie poczty.Tak więc zarówno exim,
+jak i sendmail deklarują, że dostarczają pakiet o nazwie
+mail-transport-agent, od którego mogą zależeć pakiety, wymagające do swojego
+działania programu obsługi poczty. Może to być bardzo mylące podczas próby
+ręcznego naprawiania zależności pakietów.
+</p>
+        <p>
+W dowolnym czasie pojedyncza zależność może być lub nie być spełniona przez
+obecnie zainstalowane pakiety. ATP próbuje rozwiązać zależności używając
+pewnej liczby algorytmów pomagających w wyborze pakietów do zainstalowania.
+</p>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr/>
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td align="left"><a accesskey="p" href="index.html">Poprzedni</a> </td>
+          <td align="center"> </td>
+          <td align="right"> <a accesskey="n" href="ch2.html">Następny</a></td>
+        </tr>
+        <tr>
+          <td align="left" valign="top">Podręcznik użytkownika APT </td>
+          <td align="center">
+            <a accesskey="h" href="index.html">Spis treści</a>
+          </td>
+          <td align="right" valign="top"> Rozdział 2. apt-get</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

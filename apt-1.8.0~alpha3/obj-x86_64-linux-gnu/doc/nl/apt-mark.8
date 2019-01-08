@@ -1,0 +1,196 @@
+'\" t
+.\"     Title: apt-mark
+.\"    Author: Mike O\*(AqConnor
+.\" Generator: DocBook XSL Stylesheets v1.79.1 <http://docbook.sf.net/>
+.\"      Date: 25\ \&september\ \&2015
+.\"    Manual: APT
+.\"    Source: APT 1.8.0~alpha3
+.\"  Language: Dutch
+.\"
+.TH "APT\-MARK" "8" "25\ \&september\ \&2015" "APT 1.8.0~alpha3" "APT"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+apt-mark \- toon verschillende instellingen van een pakket, stel ze in of maak ze ongedaan
+.SH "SAMENVATTING"
+.HP \w'\fBapt\-mark\fR\ 'u
+\fBapt\-mark\fR {\fB\-f=\fR\fB\fIbestandsnaam\fR\fR | {auto\ |\ manual}\ \fIpakket\fR...  | {showauto\ |\ showmanual}\ [\fIpakket\fR...] } | {\-v\ |\ \-\-version} | {\-h\ |\ \-\-help} 
+.HP \w'\fBapt\-mark\fR\ 'u
+\fBapt\-mark\fR {hold\ |\ unhold\ |\ install\ |\ remove\ |\ purge}\ \fIpakket\fR...  | {showhold\ |\ showinstall\ |\ showremove\ |\ showpurge}\ [\fIpakket\fR...]  
+.SH "OMSCHRIJVING"
+.PP
+\fBapt\-mark\fR
+kan gebruikt worden als een ge\(:integreerd frontend waarmee verschillende instellingen van een pakket ingesteld kunnen worden, zoals een pakket als automatisch/handmatig ge\(:installeerd markeren of wijzigingen aanbrengen aan
+\fBdpkg\fR\-selecties zoals handhaven, installeren, verwijderen, wissen, welke bijvoorbeeld door
+\fBapt\-get dselect\-upgrade\fR
+en
+\fBaptitude\fR
+gerespecteerd worden\&.
+.SH "AUTOMATISCH EN HANDMATIG GE\(:INSTALLEERDE PAKKETTEN"
+.PP
+Indien u vraagt dat een pakket ge\(:installeerd wordt en er worden als gevolg daarvan andere pakketten ge\(:installeerd om aan de vereisten te voldoen, dan worden die laatste pakketten gemarkeerd als automatisch ge\(:installeerd, terwijl het pakket dat u expliciet installeerde als handmatig ge\(:installeerd gemarkeerd wordt\&. Wanneer een automatisch ge\(:installeerd pakket door geen enkel handmatig ge\(:installeerd pakket meer vereist wordt, zal het als niet langer noodzakelijk beschouwd worden en bijvoorbeeld
+\fBapt\-get\fR
+of
+\fBaptitude\fR
+zullen op zijn minst voorstellen om het te verwijderen\&.
+.PP
+\fBauto\fR
+.RS 4
+auto
+wordt gebruikt om een pakket als automatisch ge\(:installeerd te markeren\&. Dit zal tot gevolg hebben dat dit pakket verwijderd wordt als er geen handmatig ge\(:installeerde pakketten meer zijn die dat pakket nodig hebben\&.
+.RE
+.PP
+\fBmanual\fR
+.RS 4
+manual
+wordt gebruikt om een pakket als handmatig ge\(:installeerd te markeren\&. Dit zal voorkomen dat het pakket automatisch wordt verwijderd als geen andere pakketten ervan afhankelijk zijn\&.
+.RE
+.PP
+\fBshowauto\fR
+.RS 4
+showauto
+wordt gebruikt om een lijst weer te geven van automatisch ge\(:installeerde pakketten, waarbij elk pakket op een nieuwe regel staat\&. Als geen pakket opgegeven wordt, zullen alle automatisch ge\(:installeerde pakketten weergegeven worden\&. Indien wel pakketten opgegeven worden, zullen enkel die pakketten weergegeven worden die automatisch ge\(:installeerd werden\&.
+.RE
+.PP
+\fBshowmanual\fR
+.RS 4
+showmanual
+kan op dezelfde manier als
+showauto
+gebruikt worden, behalve dat in dit geval een lijst van manueel ge\(:installeerde pakketten weergegeven zal worden\&.
+.RE
+.SS "Opties"
+.PP
+\fB\-f=\fR\fB\fIbestandsnaam\fR\fR, \fB\-\-file=\fR\fB\fIbestandsnaam\fR\fR
+.RS 4
+De status van een pakket lezen van/schrijven naar het bestand waarvan de naam opgegeven werd met de parameter
+\fIbestandsnaam\fR
+en geen gebruik maken van de standaardlocatie die
+extended_status
+is in de map die vermeld wordt in het configuratie\-item:
+Dir::State\&.
+.RE
+.SH "VOORKOMEN DAT EEN PAKKET GEWIJZIGD WORDT"
+.PP
+\fBhold\fR
+.RS 4
+hold
+wordt gebruikt om een pakket als te handhaven te markeren\&. Dit zal voorkomen dat het pakket automatisch ge\(:installeerd, opgewaardeerd of verwijderd wordt\&.
+.RE
+.PP
+\fBunhold\fR
+.RS 4
+unhold
+wordt gebruikt om een eerder ingestelde status tegengehouden ongedaan te maken, zodat opnieuw alle acties toegelaten zijn\&.
+.RE
+.PP
+\fBshowhold\fR
+.RS 4
+showhold
+wordt gebruikt om op dezelfde manier als voor de andere show\-opdrachten een lijst weer te geven van pakketten die tegengehouden worden\&.
+.RE
+.SH "HET INSTALLEREN, VERWIJDEREN EN WISSEN VAN PAKKETTEN INPLANNEN"
+.PP
+Sommige frontends zoals
+\fBapt\-get dselect\-upgrade\fR
+kunnen gebruikt worden om eerder geplande wijzigingen aan de installatiestatus van pakketten toe te passen\&. Deze wijzigingen kunnen ingepland worden met de commando\*(Aqs
+\fBinstall\fR,
+\fBremove\fR
+(ook gekend als
+\fBdeinstall\fR) en
+\fBpurge\fR\&. Pakketten met een specifieke selectie kunnen respectievelijk met
+\fBshowinstall\fR,
+\fBshowremove\fR
+en
+\fBshowpurge\fR
+weergegeven worden\&. Meer informatie over deze zogenaamde dpkg\-selecties vindt u in
+\fBdpkg\fR(1)\&.
+.SH "OPTIES"
+.PP
+\fB\-h\fR, \fB\-\-help\fR
+.RS 4
+Een korte samenvatting van het gebruik weergeven\&.
+.RE
+.PP
+\fB\-v\fR, \fB\-\-version\fR
+.RS 4
+Het versienummer van het programma weergeven\&.
+.RE
+.PP
+\fB\-c\fR, \fB\-\-config\-file\fR
+.RS 4
+Configuratiebestand; Een te gebruiken configuratiebestand opgeven\&. Het programma zal het standaard configuratiebestand inlezen en nadien dit configuratiebestand\&. Als configuratie\-instellingen opgegeven moeten worden vooraleer de standaard configuratiebestanden verwerkt worden, geef dan een bestand op met de omgevingsvariabele
+\fBAPT_CONFIG\fR\&. Raadpleeg
+\fBapt.conf\fR(5)
+voor informatie over de syntaxis\&.
+.RE
+.PP
+\fB\-o\fR, \fB\-\-option\fR
+.RS 4
+Een configuratieoptie instellen; Dit stelt een willekeurige configuratieoptie in\&. De syntaxis is
+\fB\-o Foo::Bar=bar\fR\&.
+\fB\-o\fR
+en
+\fB\-\-option\fR
+kunnen meermaals gebruikt worden om verschillende opties in te stellen\&.
+.RE
+.SH "BESTANDEN"
+.PP
+/var/lib/apt/extended_states
+.RS 4
+Statuslijst van automatisch ge\(:installeerde pakketten\&. Configuratie\-item:
+Dir::State::extended_states\&.
+.RE
+.SH "ZIE OOK"
+.PP
+\fBapt-get\fR(8),\fBaptitude\fR(8),\fBapt.conf\fR(5)
+.SH "DIAGNOSTIEK"
+.PP
+\fBapt\-mark\fR
+geeft de terugkeerwaarde nul bij een normaal verlopen operatie, niet\-nul in geval van een fout\&.
+.SH "BUGS"
+.PP
+\m[blue]\fBAPT bugpagina\fR\m[]\&\s-2\u[1]\d\s+2\&. Indien u een bug in APT wilt rapporteren, raadpleeg dan
+/usr/share/doc/debian/bug\-reporting\&.txt
+of het
+\fBreportbug\fR(1)
+commando\&.
+.SH "VERTALING"
+.PP
+De Nederlandse vertaling werd in 2015 gemaakt door Frans Spiesschaert
+<Frans\&.Spiesschaert@yucom\&.be>, in samenwerking met het Debian Dutch l10n Team
+<debian\-l10n\-dutch@lists\&.debian\&.org>\&.
+.PP
+Merk op dat de vertaling van dit document nog onvertaalde delen kan bevatten\&. Dit is intentioneel om te vermijden dat inhoud verloren zou gaan door een vertaling die achterop loopt op het origineel\&.
+.SH "AUTEURS"
+.PP
+\fBMike O\*(AqConnor\fR
+.RS 4
+.RE
+.PP
+\fBAPT\-team\fR
+.RS 4
+.RE
+.SH "OPMERKINGEN"
+.IP " 1." 4
+APT bugpagina
+.RS 4
+\%http://bugs.debian.org/src:apt
+.RE

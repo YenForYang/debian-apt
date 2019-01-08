@@ -1,0 +1,685 @@
+'\" t
+.\"     Title: apt-ftparchive
+.\"    Author: Jason Gunthorpe
+.\" Generator: DocBook XSL Stylesheets v1.79.1 <http://docbook.sf.net/>
+.\"      Date: 11\ \&Novembro\ \&2016
+.\"    Manual: APT
+.\"    Source: APT 1.8.0~alpha3
+.\"  Language: Portuguese
+.\"
+.TH "APT\-FTPARCHIVE" "1" "11\ \&Novembro\ \&2016" "APT 1.8.0~alpha3" "APT"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NOME"
+apt-ftparchive \- Utilit\('ario para gerar ficheiros de \('indice
+.SH "SINOPSE"
+.HP \w'\fBapt\-ftparchive\fR\ 'u
+\fBapt\-ftparchive\fR [\fB\-dsq\fR] [\fB\-\-md5\fR] [\fB\-\-delink\fR] [\fB\-\-readonly\fR] [\fB\-\-contents\fR] [\fB\-\-arch\ \fR\fB\fIarchitecture\fR\fR] [\fB\-o=\fR\fB\fIconfig_string\fR\fR] [\fB\-c=\fR\fB\fIficheiro_de_configura\(,c\(~ao\fR\fR] {packages\ \fIcaminho\fR...\ [\fIficheiro_de_sobreposi\(,c\(~ao\fR\ [\fIprefixo_de_caminho\fR]]  | sources\ \fIcaminho\fR...\ [\fIficheiro_de_sobreposi\(,c\(~ao\fR\ [\fIprefixo_de_caminho\fR]]  | contents\ \fIcaminho\fR  | release\ \fIcaminho\fR  | generate\ \fIficheiro_de_configura\(,c\(~ao\fR\ \fIsec\(,c\(~ao\fR...  | clean\ \fIficheiro_de_configura\(,c\(~ao\fR  | {\-v\ |\ \-\-version} | {\-h\ |\ \-\-help}}
+.SH "DESCRI\(,C\(~AO"
+.PP
+\fBapt\-ftparchive\fR
+\('e a ferramenta de linha de comandos que cria os ficheiros \('indice que o APT usa para aceder a uma fonte de distribui\(,c\(~ao\&. Os ficheiros \('indice devem ser gerados no site de origem baseados no conte\('udo desse site\&.
+.PP
+\fBapt\-ftparchive\fR
+\('e um super conjunto do programa
+\fBdpkg-scanpackages\fR(1), incorporando todas as suas funcionalidades atrav\('es do comando
+packages\&. Tamb\('em cont\('em um gerador de ficheiro de conte\('udos,
+contents, e um meio elaborado de colocar em script o processo de gera\(,c\(~ao para um arquivo completo\&.
+.PP
+Internamente o
+\fBapt\-ftparchive\fR
+pode fazer uso de bases de dados bin\('arias para por em cache os conte\('udos de um ficheiro \&.deb e n\(~ao precisa de nenhum programa externo \(`a excep\(,c\(~ao do
+\fBgzip\fR(1)\&. Quando faz uma gera\(,c\(~ao completa, executa automaticamente verifica\(,c\(~oes de altera\(,c\(~oes de ficheiros e constr\('oi os ficheiros comprimidos desejados\&.
+.PP
+A menos que a op\(,c\(~ao
+\fB\-h\fR, ou
+\fB\-\-help\fR
+seja fornecida, um dos comandos abaixo t\(^em que estar presentes\&.
+.PP
+\fBpackages\fR
+.RS 4
+O comando packages gera um ficheiro pacote a partir duma \('arvore de direct\('orios\&. Recebe um dado direct\('orio e procura recursivamente por ficheiros \&.deb, emitindo um registo de pacote para o stdout por cada um\&. Este comando \('e aproximadamente equivalente ao
+\fBdpkg-scanpackages\fR(1)\&.
+.sp
+A op\(,c\(~ao
+\fB\-\-db\fR
+pode ser usada para especificar uma base de dados de cache bin\('aria\&.
+.RE
+.PP
+\fBsources\fR
+.RS 4
+O comando
+sources
+gera um \('indice de fonte a partir duma \('arvore de direct\('orios\&. Recebe um dado direct\('orio e procura recursivamente por ficheiros \&.dsc, emitindo um registo de fonte para o stdout por cada um\&. Este comando \('e aproximadamente equivalente ao
+\fBdpkg-scansources\fR(1)\&.
+.sp
+Se for especificado um ficheiro de sobreposi\(,c\(~ao ent\(~ao ser\('a procurado um ficheiro de sobreposi\(,c\(~ao de fonte com uma extens\(~ao de \&.src\&. A op\(,c\(~ao \-\-source\-override pode ser usada para alterar o ficheiro de sobreposi\(,c\(~ao de fonte que ir\('a ser usado\&.
+.RE
+.PP
+\fBcontents\fR
+.RS 4
+O comandocontents
+gera um ficheiro de conte\('udos a partir duma \('arvore de direct\('orios\&. Recebe um dado direct\('orio e procura recursivamente por ficheiros \&.deb, e l\(^e a lista de ficheiros de cada ficheiro\&. Ent\(~ao organiza e escreve para o stdout a lista de ficheiros correspondente a pacotes\&. Os direct\('orios n\(~ao s\(~ao escritos no sa\('ida\&. Se m\('ultiplos pacotes possu\('irem o mesmo ficheiro ent\(~ao cada pacote \('e separado por uma v\('irgula na sa\('ida\&.
+.sp
+A op\(,c\(~ao
+\fB\-\-db\fR
+pode ser usada para especificar uma base de dados de cache bin\('aria\&.
+.RE
+.PP
+\fBrelease\fR
+.RS 4
+The
+release
+command generates a Release file from a directory tree\&. It recursively searches the given directory for uncompressed and compressed
+Packages,
+Sources,
+Contents,
+Components
+and
+icons
+files as well as
+Release,
+Index
+and
+md5sum\&.txt
+files by default (APT::FTPArchive::Release::Default\-Patterns)\&. Additional filename patterns can be added by listing them in
+APT::FTPArchive::Release::Patterns\&. It then writes to stdout a
+Release
+file containing (by default) an MD5, SHA1, SHA256 and SHA512 digest for each file\&.
+.sp
+Valores para os campos de metadados adicionais no ficheiro Release s\(~ao tomados a partir das vari\('aveis correspondentes sob
+APT::FTPArchive::Release, ex\&.
+APT::FTPArchive::Release::Origin\&. Os campos suportados s\(~ao:
+Origin,
+Label,
+Suite,
+Version,
+Codename,
+Date,
+NotAutomatic,
+ButAutomaticUpgrades,
+Acquire\-By\-Hash,
+Valid\-Until,
+Signed\-By,
+Architectures,
+Components,
+Description\&.
+.RE
+.PP
+\fBgenerate\fR
+.RS 4
+O comando
+generate
+\('e desenhado para ser executado a partir dum script cron e constr\('oi \('indices de acordo com o ficheiro de configura\(,c\(~ao fornecido\&. A linguagem de configura\(,c\(~ao disponibiliza um meio flex\('ivel de de especificar quais ficheiros \('indice s\(~ao constru\('idos a partir de quais direct\('orios, assim como disponibilizar um meio simples de manter as defini\(,c\(~oes requeridas\&.
+.RE
+.PP
+\fBclean\fR
+.RS 4
+O comando
+clean
+arruma as bases de dados usadas pelo ficheiro de configura\(,c\(~ao fornecido ao remover quaisquer registos que j\('a n\(~ao s\(~ao necess\('arios\&.
+.RE
+.SH "A CONFIGURA\(,C\(~AO DO GENERATE"
+.PP
+O comando
+generate
+usa um ficheiro de configura\(,c\(~ao para descrever os arquivos que v\(~ao ser gerados\&. Segue o formato t\('ipico de configura\(,c\(~ao ISC como visto em ferramentas ISC como o bind 8 e dhcpd\&.
+\fBapt.conf\fR(5)
+cont\('em uma descri\(,c\(~ao da sintaxe\&. Note que a configura\(,c\(~ao gerada \('e analisada de maneira seccional, mas o
+\fBapt.conf\fR(5)
+\('e analisado numa maneira de \('arvore\&. Isto apenas afecta o modo de como a etiqueta scope \('e manuseada\&.
+.PP
+A configura\(,c\(~ao do generate tem 4 sec\(,c\(~oes separadas, cada uma descrita mais abaixo\&.
+.SS "Sec\(,c\(~ao Dir"
+.PP
+A sec\(,c\(~ao
+Dir
+define os direct\('orios standard necess\('arios para localizar os ficheiros requisitados durante o processo de gera\(,c\(~ao\&. Estes direct\('orios precedem a certos caminhos relativos definidos em sec\(,c\(~oes posteriores para produzir um caminho completo e absoluto\&.
+.PP
+\fBArchiveDir\fR
+.RS 4
+Especifica a raiz do arquivo FTP, numa configura\(,c\(~ao Debian standard este \('e o direct\('orio que cont\('em o
+ls\-LR
+e n\('os da distribui\(,c\(~ao\&.
+.RE
+.PP
+\fBOverrideDir\fR
+.RS 4
+Especifica a localiza\(,c\(~ao dos ficheiros de sobrepor\&.
+.RE
+.PP
+\fBCacheDir\fR
+.RS 4
+Especifica a localiza\(,c\(~ao dos ficheiros de cache
+.RE
+.PP
+\fBFileListDir\fR
+.RS 4
+Especifica a localiza\(,c\(~ao dos ficheiros de listas de ficheiros, se a defini\(,c\(~ao
+FileList
+for usada mais abaixo\&.
+.RE
+.SS "Sec\(,c\(~ao Default"
+.PP
+A sec\(,c\(~ao
+Default
+especifica valores predefinidos, e defini\(,c\(~oes que controlam a opera\(,c\(~ao do gerador\&. Outras sec\(,c\(~oes podem sobrepor estas predefini\(,c\(~oes em uma defini\(,c\(~ao por\-sec\(,c\(~ao\&.
+.PP
+\fBPackages::Compress\fR
+.RS 4
+Sets the default compression schemes to use for the package index files\&. It is a string that contains a space separated list of at least one of the compressors configured via the
+\fBAPT::Compressor\fR
+configuration scope\&. The default for all compression schemes is \*(Aq\&. gzip\*(Aq\&.
+.RE
+.PP
+\fBPackages::Extensions\fR
+.RS 4
+Define a lista predefinida das extens\(~oes de ficheiros que s\(~ao ficheiros pacote\&. A predefini\(,c\(~ao \('e \*(Aq\&.deb\*(Aq\&.
+.RE
+.PP
+\fBSources::Compress\fR
+.RS 4
+Isto \('e semelhante a
+Packages::Compress
+excepto que controla a compress\(~ao para os ficheiros das Fontes\&.
+.RE
+.PP
+\fBSources::Extensions\fR
+.RS 4
+Define a lista predefinida das extens\(~oes de ficheiros que s\(~ao ficheiros de fontes\&. A predefini\(,c\(~ao \('e \*(Aq\&.dsc\*(Aq\&.
+.RE
+.PP
+\fBContents::Compress\fR
+.RS 4
+Isto \('e semelhante a
+Packages::Compress
+excepto que controla a compress\(~ao para os ficheiros de Conte\('udos\&.
+.RE
+.PP
+\fBTranslation::Compress\fR
+.RS 4
+Isto \('e semelhante a
+Packages::Compress
+excepto que controla a compress\(~ao para o ficheiro mestre Translation\-en\&.
+.RE
+.PP
+\fBDeLinkLimit\fR
+.RS 4
+Especifica o n\('umero de kilobytes para delink (e substitui com hard links) por execu\(,c\(~ao\&. Isto \('e usado em conjunto com a defini\(,c\(~ao
+External\-Links
+por sec\(,c\(~ao\&.
+.RE
+.PP
+\fBFileMode\fR
+.RS 4
+Especifica o modo de todos os ficheiros \('indice criados\&. A predefini\(,c\(~ao \('e 0644\&. Todos os ficheiros \('indice s\(~ao definidos para este modo independentemente do umask\&.
+.RE
+.PP
+\fBLongDescription\fR
+.RS 4
+Define se as descri\(,c\(~oes longas devem ser inclu\('idas no ficheiro
+Packages
+ou divididas em um ficheiro
+Translation\-en
+mestre\&.
+.RE
+.SS "Sec\(,c\(~ao TreeDefault"
+.PP
+Define predefini\(,c\(~oes espec\('ificas para as sec\(,c\(~oes
+Tree\&. Todas estas vari\('aveis s\(~ao vari\('aveis de substitui\(,c\(~ao e t\(^em as strings $(DIST), $(SECTION) e $(ARCH) substitu\('idas pelos seus respectivos valores\&.
+.PP
+\fBMaxContentsChange\fR
+.RS 4
+Define o n\('umero de kilobytes dos ficheiros de conte\('udo que s\(~ao gerados a cada dia\&. Os ficheiros de conte\('udo s\(~ao re\-circulados para que ao fim de alguns dias todos sejam reconstru\('idos\&.
+.RE
+.PP
+\fBContentsAge\fR
+.RS 4
+Controla o n\('umero de dias que se permite a um ficheiro de conte\('udo ser verificado sem altera\(,c\(~ao\&. Se este limite for ultrapassado o mtime do ficheiro de conte\('udo \('e actualizado\&. Este caso pode ocorrer se o ficheiro de pacote \('e alterado num modo que n\(~ao resulta num novo ficheiro de conte\('udo [por exemplo uma edi\(,c\(~ao de sobreposi\(,c\(~ao]\&. \('E permitido um soltar na esperan\(,ca que novos \&.debs sejam instalados, requerendo um novo ficheiro de qualquer modo\&. A predefini\(,c\(~ao \('e 10, as unidades s\(~ao em dias\&.
+.RE
+.PP
+\fBDirectory\fR
+.RS 4
+Define o topo da \('arvore de direct\('orios \&.deb\&. A predefini\(,c\(~ao \('e
+$(DIST)/$(SECTION)/binary\-$(ARCH)/
+.RE
+.PP
+\fBSrcDirectory\fR
+.RS 4
+Define o topo da \('arvore de direct\('orios de pacotes fonte\&. A predefini\(,c\(~ao \('e
+$(DIST)/$(SECTION)/source/
+.RE
+.PP
+\fBPackages\fR
+.RS 4
+Define o ficheiro Packages de sa\('ida\&. A predefini\(,c\(~ao \('e
+$(DIST)/$(SECTION)/binary\-$(ARCH)/Packages
+.RE
+.PP
+\fBSources\fR
+.RS 4
+Define o ficheiro Sources de sa\('ida\&. A predefini\(,c\(~ao \('e
+$(DIST)/$(SECTION)/source/Sources
+.RE
+.PP
+\fBTranslation\fR
+.RS 4
+Define se o ficheiro mestre Translation\-en de sa\('ida com as descri\(,c\(~oes longas n\(~ao deve ser inclu\('ido no ficheiro Packages\&. A predefini\(,c\(~ao \('e
+$(DIST)/$(SECTION)/i18n/Translation\-en
+.RE
+.PP
+\fBInternalPrefix\fR
+.RS 4
+Define o prefixo de caminho que causa que um symlink seja considerado um link interno em vez de um link externo\&. A predefini\(,c\(~ao \('e
+$(DIST)/$(SECTION)/
+.RE
+.PP
+\fBContents\fR
+.RS 4
+Define a sa\('ida do ficheiro Contents\&. A predefini\(,c\(~ao \('e
+$(DIST)/Contents\-$(ARCH)\&. Se esta defini\(,c\(~ao causar m\('ultiplos ficheiros Packages para mapear em um \('unico ficheiro Contents (tal como a predefini\(,c\(~ao) ent\(~ao o
+\fBapt\-ftparchive\fR
+ir\('a automaticamente integrar esses ficheiros pacotes todos juntos\&.
+.RE
+.PP
+\fBContents::Header\fR
+.RS 4
+Define o ficheiro cabe\(,calho para prefixar a sa\('ida de conte\('udos\&.
+.RE
+.PP
+\fBBinCacheDB\fR
+.RS 4
+Define a base de dados de cache bin\('aria a usar para esta sec\(,c\(~ao\&. M\('ultiplas sec\(,c\(~oes podem partilhar a mesma base de dados\&.
+.RE
+.PP
+\fBFileList\fR
+.RS 4
+Especifica que em vez de navegar na \('arvore de direct\('orios, o
+\fBapt\-ftparchive\fR
+dever\('a ler a lista de ficheiros a partir do ficheiro fornecido\&. Nomes de ficheiros relativos s\(~ao prefixados com o direct\('orio de arquivo\&.
+.RE
+.PP
+\fBSourceFileList\fR
+.RS 4
+Especifica que em vez de navegar na \('arvore de direct\('orios, o
+\fBapt\-ftparchive\fR
+dever\('a ler a lista de ficheiros a partir do ficheiro fornecido\&. Nomes de ficheiros relativos s\(~ao prefixados com o direct\('orio de arquivo\&. Isto \('e usado quando se processa \('indices de fonte\&.
+.RE
+.SS "Sec\(,c\(~ao Tree"
+.PP
+A sec\(,c\(~ao
+Tree
+define uma \('arvore de ficheiros Debian standard que consiste de um direct\('orio base, depois m\('ultiplas sec\(,c\(~oes nesse direct\('orio base e finalmente m\('ultiplas Arquitecturas em cada sec\(,c\(~ao\&. O caminho exacto usado \('e definido pela vari\('avel de substitui\(,c\(~ao
+Directory\&.
+.PP
+A sec\(,c\(~ao
+Tree
+recebe uma etiqueta scope que define a vari\('avel
+$(DIST)
+e define a raiz da \('arvore (o caminho \('e prefixado por
+ArchiveDir)\&. Tipicamente esta \('e uma defini\(,c\(~ao tal como
+dists/stretch\&.
+.PP
+Todas as defini\(,c\(~oes definidas na sec\(,c\(~ao
+TreeDefault
+podem ser usadas na sec\(,c\(~ao
+Tree
+assim como as novas tr\(^es vari\('aveis\&.
+.PP
+Quando processa uma sec\(,c\(~ao
+Tree, o
+\fBapt\-ftparchive\fR
+executa uma opera\(,c\(~ao semelhante a:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+for i in Sections do 
+   for j in Architectures do
+      Generate for DIST=scope SECTION=i ARCH=j
+     
+.fi
+.if n \{\
+.RE
+.\}
+
+.PP
+\fBSections\fR
+.RS 4
+Isto \('e uma lista de sec\(,c\(~oes separada por espa\(,cos que aparece sob a distribui\(,c\(~ao, tipicamente isto \('e algo como
+main contrib non\-free
+.RE
+.PP
+\fBArchitectures\fR
+.RS 4
+This is a space separated list of all the architectures that appear under search section\&. The special architecture \*(Aqsource\*(Aq is used to indicate that this tree has a source archive\&. The architecture \*(Aqall\*(Aq signals that architecture specific files like
+Packages
+should not include information about architecture
+all
+packages in all files as they will be available in a dedicated file\&.
+.RE
+.PP
+\fBLongDescription\fR
+.RS 4
+Define se as descri\(,c\(~oes longas devem ser inclu\('idas no ficheiro
+Packages
+ou divididas em um ficheiro
+Translation\-en
+mestre\&.
+.RE
+.PP
+\fBBinOverride\fR
+.RS 4
+Define o ficheiro de sobreposi\(,c\(~ao bin\('ario\&. O ficheiro de sobreposi\(,c\(~ao informa\(,c\(~ao de sec\(,c\(~ao, prioridade e endere\(,co do respons\('avel\&.
+.RE
+.PP
+\fBSrcOverride\fR
+.RS 4
+Define o ficheiro de sobreposi\(,c\(~ao fonte\&. O ficheiro de sobreposi\(,c\(~ao informa\(,c\(~ao de sec\(,c\(~ao\&.
+.RE
+.PP
+\fBExtraOverride\fR
+.RS 4
+Define o ficheiro de sobreposi\(,c\(~ao extra bin\('ario\&.
+.RE
+.PP
+\fBSrcExtraOverride\fR
+.RS 4
+Define o ficheiro de sobreposi\(,c\(~ao extra fonte\&.
+.RE
+.SS "Sec\(,c\(~ao BinDirectory"
+.PP
+A sec\(,c\(~ao
+bindirectory
+define uma \('arvore de direct\('orios bin\('arios sem nenhuma estrutura especial\&. A etiqueta scope especifica a localiza\(,c\(~ao do direct\('orio bin\('ario e as defini\(,c\(~oes s\(~ao semelhantes \(`as da sec\(,c\(~ao
+Tree
+sem nenhumas vari\('aveis de substitui\(,c\(~ao ou defini\(,c\(~oes
+SectionArchitecture\&.
+.PP
+\fBPackages\fR
+.RS 4
+Define a sa\('ida do ficheiro Packages\&.
+.RE
+.PP
+\fBSources\fR
+.RS 4
+Define a sa\('ida do ficheiro Sources\&. \('E necess\('ario pelo menos um de
+Packages
+ou
+Sources\&.
+.RE
+.PP
+\fBContents\fR
+.RS 4
+Define a sa\('ida do ficheiro Contents (opcional)
+.RE
+.PP
+\fBBinOverride\fR
+.RS 4
+Define o ficheiro de sobreposi\(,c\(~ao bin\('ario\&.
+.RE
+.PP
+\fBSrcOverride\fR
+.RS 4
+Define o ficheiro de sobreposi\(,c\(~ao fonte\&.
+.RE
+.PP
+\fBExtraOverride\fR
+.RS 4
+Define o ficheiro de sobreposi\(,c\(~ao extra bin\('ario\&.
+.RE
+.PP
+\fBSrcExtraOverride\fR
+.RS 4
+Define o ficheiro de sobreposi\(,c\(~ao extra fonte\&.
+.RE
+.PP
+\fBBinCacheDB\fR
+.RS 4
+Define a base de dados de cache\&.
+.RE
+.PP
+\fBPathPrefix\fR
+.RS 4
+Acrescenta um caminho a todos os caminhos de sa\('ida\&.
+.RE
+.PP
+\fBFileList\fR, \fBSourceFileList\fR
+.RS 4
+Especifica o ficheiro de lista de ficheiros\&.
+.RE
+.SH "O FICHEIRO BINARY OVERRIDE"
+.PP
+O ficheiro de sobreposi\(,c\(~ao bin\('ario \('e totalmente compat\('ivel com
+\fBdpkg-scanpackages\fR(1)\&. Cont\('em 4 campos separados por espa\(,cos\&. O primeiro campo \('e o nome do pacote, o segundo \('e a prioridade a qual for\(,car esse pacote, o terceiro \('e a sec\(,c\(~ao onde for\(,car esse pacote e o \('ultimo campo \('e o campo de permuta\(,c\(~ao do respons\('avel\&.
+.PP
+O formato geral do campo do respons\('avel \('e:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+old [// oldn]* => new
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+ou simplesmente,
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+new
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+\&. O primeiro formato permite uma lista separada por um duplo slash (//) de antigos endere\(,cos e email a serem especificados\&. Se nenhum destes for encontrado ent\(~ao \*(Aqnew\*(Aq \('e substitu\('ido para o campo do respons\('avel\&. O segundo formato substitui incondicionalmente o campo do respons\('avel\&.
+.SH "O FICHEIRO SOURCE OVERRIDE"
+.PP
+O ficheiro de sobreposi\(,c\(~ao de fonte \('e totalmente compat\('ivel com
+\fBdpkg-scansources\fR(1)\&. Cont\('em dois campos separados por espa\(,cos\&. O primeiro campo \('e o nome de pacote fonte, o segundo \('e a sec\(,c\(~ao onde o atribuir\&.
+.SH "O FICHEIRO EXTRA OVERRIDE"
+.PP
+O ficheiro de sobreposi\(,c\(~ao extra permite que qualquer etiqueta arbitr\('aria seja adicionada ou substitu\('ida na sa\('ida\&. Tem 3 colunas, a primeira \('e o pacote, a segunda \('e a etiqueta e restante da linha \('e o novo valor\&.
+.SH "OP\(,C\(~OES"
+.PP
+Todas as op\(,c\(~oes de linha de comandos podem ser definidas usando o ficheiro de configura\(,c\(~ao, as descri\(,c\(~oes indicam a op\(,c\(~ao de configura\(,c\(~ao a definir\&. Para op\(,c\(~oes booleanas voc\(^e pode sobre por o ficheiro de configura\(,c\(~ao usando algo como
+\fB\-f\-\fR,\fB\-\-no\-f\fR,
+\fB\-f=no\fR
+ou v\('arias outras variantes\&.
+.PP
+\fB\-\-md5\fR, \fB\-\-sha1\fR, \fB\-\-sha256\fR, \fB\-\-sha512\fR
+.RS 4
+Gera o sum\('ario de verifica\(,c\(~ao dado\&. Estas op\(,c\(~oes usam a predefini\(,c\(~ao de ligadas, quando s\(~ao desligadas os ficheiros de \('indice gerados n\(~ao ter\(~ao os campos de sum\('ario de verifica\(,c\(~ao onde tal for poss\('ivel Items de Configura\(,c\(~ao:
+APT::FTPArchive::\fIChecksum\fR
+e
+APT::FTPArchive::\fIIndex\fR::\fIChecksum\fR
+onde
+\fIIndex\fR
+pode ser
+Packages,
+Sources
+ou
+Release
+e o
+\fIChecksum\fR
+pode ser
+MD5,
+SHA1,
+SHA256
+ou
+SHA512\&.
+.RE
+.PP
+\fB\-d\fR, \fB\-\-db\fR
+.RS 4
+Usa uma base de dados de cache bin\('aria\&. Isto n\(~ao tem efeito no comando generate\&. Item de configura\(,c\(~ao:
+APT::FTPArchive::DB\&.
+.RE
+.PP
+\fB\-q\fR, \fB\-\-quiet\fR
+.RS 4
+Silencioso; produz sa\('ida apropriada para registar em logs, omitindo indicadores de progresso\&. Mais q\*(Aqs ir\(~ao produzir mais silencio at\('e um m\('aximo de 2\&. Voc\(^e tamb\('em pode usar
+\fB\-q=#\fR
+para definir o n\('ivel de sil\(^encio, sobrepondo o ficheiro de configura\(,c\(~ao\&. Item de Configura\(,c\(~ao:
+quiet\&.
+.RE
+.PP
+\fB\-\-delink\fR
+.RS 4
+Executa Dissocia\(,c\(~ao\&. Se \('e usada a defini\(,c\(~ao
+External\-Links
+ent\(~ao esta op\(,c\(~ao activa a dissocia\(,c\(~ao dos ficheiros\&. A sua predefini\(,c\(~ao \('e ligada e e pode ser desligada com
+\fB\-\-no\-delink\fR\&. Item de Configura\(,c\(~ao:
+APT::FTPArchive::DeLinkAct\&.
+.RE
+.PP
+\fB\-\-contents\fR
+.RS 4
+Executa a gera\(,c\(~ao de conte\('udos\&. Quando esta op\(,c\(~ao est\('a definida e os \('indices de pacotes s\(~ao gerados com um base de dados cache ent\(~ao a listagem de ficheiros tamb\('em ser\('a extra\('ida e guardada na base de dados para utiliza\(,c\(~ao posterior\&. Quando se usa o comando generate, esta op\(,c\(~ao tamb\('em permite a cria\(,c\(~ao de quaisquer ficheiros de Conte\('udos\&. A predefini\(,c\(~ao \('e ligado\&. Item de Configura\(,c\(~ao:
+APT::FTPArchive::Contents\&.
+.RE
+.PP
+\fB\-s\fR, \fB\-\-source\-override\fR
+.RS 4
+Selecciona o ficheiro de sobreposi\(,c\(~ao de fonte a usar com o comando
+sources\&. Item de Configura\(,c\(~ao:
+APT::FTPArchive::SourceOverride\&.
+.RE
+.PP
+\fB\-\-readonly\fR
+.RS 4
+Torna as bases de dados de cache apenas de leitura\&. Item de Configura\(,c\(~ao:
+APT::FTPArchive::ReadOnlyDB\&.
+.RE
+.PP
+\fB\-a\fR, \fB\-\-arch\fR
+.RS 4
+Aceita nos comandos
+packages
+e
+contents
+apenas ficheiros de pacotes que condizem com
+*_arch\&.deb
+ou
+*_all\&.deb
+em vez de todos os ficheiros de pacotes presentes no caminho fornecido\&. Item de Configura\(,c\(~ao:
+APT::FTPArchive::Architecture\&.
+.RE
+.PP
+\fBAPT::FTPArchive::AlwaysStat\fR
+.RS 4
+\fBapt-ftparchive\fR(1)
+p\(~oe em cache o m\('aximo poss\('ivel de metadados numa base de dados de cache\&. Se os pacotes forem recompilados e/ou republicados de novo com a mesma vers\(~ao, ir\('a originar problemas porque ser\(~ao usados os metadados desactualizados em cache como o tamanho e sum\('arios de verifica\(,c\(~ao\&. Com esta op\(,c\(~ao activa isto n\(~ao ir\('a mais acontecer porque ser\('a verificado se o ficheiro foi alterado\&. Note que esta op\(,c\(~ao vem regulada para "false" por predefini\(,c\(~ao pois n\(~ao \('e recomendado disponibilizar m\('ultiplas vers\(~oes/compila\(,c\(~oes de um pacote com o mesmo n\('umero de vers\(~ao, portanto em teoria ningu\('em ir\('a ter estes problemas e ent\(~ao todas as verifica\(,c\(~oes extras ser\(~ao desnecess\('arias\&.
+.RE
+.PP
+\fBAPT::FTPArchive::LongDescription\fR
+.RS 4
+Esta op\(,c\(~ao de configura\(,c\(~ao tem a predefini\(,c\(~ao de "true" e deve apenas ser definida para
+"false"
+se o Arquivo gerado com
+\fBapt-ftparchive\fR(1)
+tamb\('em disponibilizar ficheiros
+Translation\&. Note que o ficheiro mestre
+Translation\-en
+s\('o pode ser criado no comando generate\&.
+.RE
+.PP
+\fB\-h\fR, \fB\-\-help\fR
+.RS 4
+Mostra um sum\('ario curto da utiliza\(,c\(~ao\&.
+.RE
+.PP
+\fB\-v\fR, \fB\-\-version\fR
+.RS 4
+Mostra a vers\(~ao do programa\&.
+.RE
+.PP
+\fB\-c\fR, \fB\-\-config\-file\fR
+.RS 4
+Ficheiro de Configura\(,c\(~ao; Especifica o ficheiro de configura\(,c\(~ao a usar\&. O programa ir\('a ler o ficheiro de configura\(,c\(~ao predefinido e depois este ficheiro de configura\(,c\(~ao\&. Se as defini\(,c\(~oes de configura\(,c\(~ao precisarem de ser definidas antes, os ficheiros de configura\(,c\(~ao predefinidos s\(~ao analisados especificando um ficheiro com a vari\('avel de ambiente
+\fBAPT_CONFIG\fR\&. Veja
+\fBapt.conf\fR(5)
+para informa\(,c\(~ao de sintaxe\&.
+.RE
+.PP
+\fB\-o\fR, \fB\-\-option\fR
+.RS 4
+Define uma Op\(,c\(~ao de Configura\(,c\(~ao; Isto ir\('a definir uma op\(,c\(~ao de configura\(,c\(~ao arbitr\('aria\&. A sintaxe \('e
+\fB\-o Foo::Bar=bar\fR\&.
+\fB\-o\fR
+e
+\fB\-\-option\fR
+podem ser usadas v\('arias vezes para definir op\(,c\(~oes diferentes\&.
+.RE
+.SH "EXEMPLOS"
+.PP
+Para criar um ficheiro Packages comprimido para um direct\('orio que cont\('em pacotes bin\('arios (\&.deb):
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+\fBapt\-ftparchive\fR pacotes \fIdirect\('orio\fR | \fBgzip\fR > Packages\&.gz
+.fi
+.if n \{\
+.RE
+.\}
+.SH "VEJA TAMB\('EM"
+.PP
+\fBapt.conf\fR(5)
+.SH "DIAGN\('OSTICO"
+.PP
+\fBapt\-ftparchive\fR
+devolve zero na opera\(,c\(~ao normal, 100 decimal em erro\&.
+.SH "BUGS"
+.PP
+\m[blue]\fBp\('agina de bugs do APT\fR\m[]\&\s-2\u[1]\d\s+2\&. Se deseja reportar um bug no APT, por favor veja
+/usr/share/doc/debian/bug\-reporting\&.txt
+ou o comando
+\fBreportbug\fR(1)\&.
+.SH "TRADU\(,C\(^AO"
+.PP
+A tradu\(,c\(~ao Portuguesa foi feita por Am\('erico Monteiro
+<a_monteiro@netcabo\&.pt>
+de 2009 a 2012\&. A tradu\(,c\(~ao foi revista pela equipa de tradu\(,c\(~oes portuguesas da Debian
+<traduz@debianpt\&.org>\&.
+.PP
+Note que este documento traduzido pode conter partes n\(~ao traduzidas\&. Isto \('e feito propositadamente, para evitar perdas de conte\('udo quando a tradu\(,c\(~ao est\('a atrasada relativamente ao conte\('udo original\&.
+.SH "AUTORES"
+.PP
+\fBJason Gunthorpe\fR
+.RS 4
+.RE
+.PP
+\fBEquipa do APT\fR
+.RS 4
+.RE
+.SH "NOTAS"
+.IP " 1." 4
+p\('agina de bugs do APT
+.RS 4
+\%http://bugs.debian.org/src:apt
+.RE
